@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="FitNES">
+  <rect width="512" height="512" rx="96" fill="#181818" />
+  <g fill="#a855f7">
+    <rect x="84" y="220" width="40" height="72" rx="10" />
+    <rect x="124" y="196" width="40" height="120" rx="10" />
+    <rect x="164" y="240" width="184" height="32" rx="8" />
+    <rect x="348" y="196" width="40" height="120" rx="10" />
+    <rect x="388" y="220" width="40" height="72" rx="10" />
+  </g>
+</svg>

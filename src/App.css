@@ -1,0 +1,38 @@
+.app {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 100dvh;
+}
+
+.app-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-primary);
+    flex-shrink: 0;
+}
+
+.app-title {
+    margin: 0;
+    font-size: 20px;
+    color: var(--text-heading);
+}
+
+.app-main {
+    flex: 1 1 auto;
+}
+
+.placeholder {
+    text-align: center;
+    padding: var(--space-xl) var(--space-lg);
+}
+
+.placeholder-text {
+    color: var(--text-muted);
+    margin: 0;
+}
