@@ -1,0 +1,99 @@
+import { type } from 'arktype';
+import { exerciseId } from './ids.ts';
+
+/**
+ * How a measurement is counted. `total` counts once for the set; `perSide`
+ * counts once per side. The distinction is independent of the exercise's
+ * execution mode: a unilateral set may still record one total repetition count.
+ */
+const measurementCountBasis = type('"total" | "perSide"');
+type MeasurementCountBasis = typeof measurementCountBasis.infer;
+
+/** The quantity a set prescribes. Repetitions are counts; duration is a time in seconds. */
+const measurementType = type('"repetitions" | "duration"');
+type MeasurementType = typeof measurementType.infer;
+
+/** Whether an exercise is performed with both sides together or one side at a time. */
+const executionMode = type('"bilateral" | "unilateral"');
+type ExecutionMode = typeof executionMode.infer;
+
+/** What a stated external-load value means. Never converted between bases implicitly. */
+const loadBasis = type('"total" | "perHand" | "perSide"');
+type LoadBasis = typeof loadBasis.infer;
+
+/**
+ * A supported way to perform an exercise, pairing a measurement with the
+ * counting basis it uses. Enumerating valid pairs prevents contradictions such
+ * as "duration per hand".
+ */
+const measurementOption = type({
+    measurement: measurementType,
+    countBasis: measurementCountBasis,
+});
+type MeasurementOption = typeof measurementOption.infer;
+
+/**
+ * A supported load configuration. `bodyweight` and `external` may both be
+ * listed, which is how weighted pull-ups (bodyweight plus added load) are
+ * expressed without treating the two as exclusive.
+ */
+const loadOption = type({ kind: '"bodyweight"' }).or({
+    kind: '"external"',
+    bases: loadBasis
+        .array()
+        .atLeastLength(1)
+        .narrow((bases, ctx) => new Set(bases).size === bases.length || ctx.mustBe('unique')),
+});
+type LoadOption = typeof loadOption.infer;
+
+const measurementOptions = measurementOption
+    .array()
+    .atLeastLength(1)
+    .narrow((options, ctx) => {
+        const seen = new Set(options.map((option) => `${option.measurement}/${option.countBasis}`));
+        return seen.size === options.length || ctx.mustBe('unique by measurement and count basis');
+    });
+
+const executionModes = executionMode
+    .array()
+    .atLeastLength(1)
+    .narrow((modes, ctx) => new Set(modes).size === modes.length || ctx.mustBe('unique'));
+
+const loadOptions = loadOption.array().narrow((options, ctx) => {
+    const seen = new Set(options.map((option) => option.kind));
+    return seen.size === options.length || ctx.mustBe('unique by load kind');
+});
+
+/**
+ * A reusable catalog entry describing what kinds of performance an exercise
+ * allows. Every exercise is defined once; workout prescriptions then choose a
+ * configuration from `measurements`, `executionModes`, and `loads`.
+ */
+const exerciseDefinition = type({
+    id: exerciseId,
+    name: 'string > 0',
+    'description?': 'string',
+    measurements: measurementOptions,
+    executionModes,
+    loads: loadOptions,
+});
+type ExerciseDefinition = typeof exerciseDefinition.infer;
+
+export {
+    exerciseDefinition,
+    executionMode,
+    loadBasis,
+    loadOption,
+    measurementCountBasis,
+    measurementOption,
+    measurementType,
+};
+export type {
+    ExecutionMode,
+    ExerciseDefinition,
+    LoadBasis,
+    LoadOption,
+    MeasurementCountBasis,
+    MeasurementOption,
+    MeasurementType,
+};
