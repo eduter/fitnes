@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",
+    "arktype": "^2.2.8",
     "dexie": "^4.4.6",
     "solid-js": "^1.9.17",
     "workbox-precaching": "^7.4.1"
