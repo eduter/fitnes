@@ -596,3 +596,16 @@ below preserve the original findings and rationale.
 - Still open: FITNES-003, FITNES-004, and FITNES-006 through FITNES-010.
 - Next task: require every planned set to occur exactly once in the execution
   sequence (FITNES-006).
+
+### Checkpoint after FITNES-006
+
+- Fixed: FITNES-006 in `c0c25ab` (`fix(domain): require every set in
+  sequence`).
+- Template validation now enforces both sides of the occurrence rule: every
+  sequence reference resolves, and every planned set appears exactly once.
+- Missing occurrences are reported at the orphaned planned-set ID; dangling
+  sequence references and all resulting orphaned sets are reported together.
+- Verification: `npm run check` passed (7 test files, 83 tests).
+- Still open: FITNES-003, FITNES-004, and FITNES-007 through FITNES-010.
+- Next task: reuse finite-positive validation for bodyweight session snapshots
+  (FITNES-003).
