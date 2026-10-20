@@ -567,3 +567,18 @@ below preserve the original findings and rationale.
 - Next task: add failing session tests for result/prescription semantic
   alignment (FITNES-002), then compare discriminants and bases in
   `checkResults`.
+
+### Checkpoint after FITNES-002
+
+- Fixed: FITNES-002 in `71277c0` (`fix(domain): align results with
+  prescriptions`).
+- Actual repetition, duration, and weight values may differ from prescribed
+  targets, but measurement type, count basis, load kind, and external-load
+  basis must match the sequence occurrence's prescription.
+- Exercise-capability failures remain the primary error when an actual result
+  violates both the exercise and prescription, avoiding duplicate field
+  diagnostics.
+- Verification: `npm run check` passed (6 test files, 74 tests).
+- Still open: FITNES-003 through FITNES-010.
+- Next task: reject undeclared fields across persisted ArkType schemas and add
+  discriminated-union exclusivity tests (FITNES-005).
