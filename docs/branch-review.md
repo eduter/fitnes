@@ -620,3 +620,17 @@ below preserve the original findings and rationale.
 - Still open: FITNES-004 and FITNES-007 through FITNES-010.
 - Next task: enforce result completion timestamps within session bounds
   (FITNES-004).
+
+### Checkpoint after FITNES-004
+
+- Fixed: FITNES-004 in `723550e` (`fix(domain): bound result completion
+  times`).
+- Every result must complete at or after the session start and, for an ended
+  session, at or before the session completion time. Boundary equality is
+  explicitly tested.
+- Verification: `npm run check` passed (7 test files, 87 tests).
+- Essential confirmed defects remaining: FITNES-008 source/snapshot
+  consistency. FITNES-007, FITNES-009, and FITNES-010 require design/API
+  decisions or lower-priority policy work.
+- Next task: enforce the unambiguous parts of session source/snapshot
+  consistency (FITNES-008) without guessing the bodyweight backfill policy.
