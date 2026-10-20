@@ -15,12 +15,12 @@ function pathsOf(input: unknown): string[] {
     return result.errors.map((issue) => issue.path);
 }
 
-function rowResult(sequenceEntryId: string, reps: number, kg: number): unknown {
+function rowResult(sequenceEntryId: string, reps: number, kg: number, completedAt = 2_000): unknown {
     return {
         sequenceEntryId,
         measurement: { measurement: 'repetitions', countBasis: 'total', reps },
         load: { kind: 'external', basis: 'total', weight: { value: kg, unit: 'kg' } },
-        completedAt: 2_000,
+        completedAt,
     };
 }
 
@@ -291,6 +291,35 @@ describe('validateWorkoutSession', () => {
         const bad = session({ completedAt: 500 });
 
         expect(pathsOf(bad)).toEqual(['completedAt']);
+    });
+
+    it('rejects a result completed before the session starts', () => {
+        const bad = session({
+            results: [rowResult('entry-1', 8, 40, 500)] as WorkoutSession['results'],
+        });
+
+        expect(pathsOf(bad)).toEqual(['results[0].completedAt']);
+    });
+
+    it('rejects a result completed after the session ends', () => {
+        const bad = session({
+            completedAt: 1_500,
+            results: [rowResult('entry-1', 8, 40, 2_000)] as WorkoutSession['results'],
+        });
+
+        expect(pathsOf(bad)).toEqual(['results[0].completedAt']);
+    });
+
+    it('accepts result timestamps on the session boundaries', () => {
+        const onBoundaries = session({
+            completedAt: 2_000,
+            results: [
+                rowResult('entry-1', 8, 40, 1_000),
+                rowResult('entry-2', 6, 45, 2_000),
+            ] as WorkoutSession['results'],
+        });
+
+        expect(validateWorkoutSession(onBoundaries).ok).toBe(true);
     });
 
     it('rejects an invalid plan snapshot', () => {

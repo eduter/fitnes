@@ -56,6 +56,8 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
     const seenOccurrences = new Set<string>();
 
     for (const [index, result] of session.results.entries()) {
+        checkResultTiming(issues, session, result, index);
+
         const entry = entriesById.get(result.sequenceEntryId);
 
         if (!entry) {
@@ -97,6 +99,22 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
                 issues.add(['results', index, problem.field], problem.message);
             }
         }
+    }
+}
+
+function checkResultTiming(issues: IssueCollector, session: WorkoutSession, result: ActualResult, index: number): void {
+    if (result.completedAt < session.startedAt) {
+        issues.add(
+            ['results', index, 'completedAt'],
+            `result completedAt (${result.completedAt}) is before session startedAt (${session.startedAt})`
+        );
+    }
+
+    if (session.completedAt !== undefined && result.completedAt > session.completedAt) {
+        issues.add(
+            ['results', index, 'completedAt'],
+            `result completedAt (${result.completedAt}) is after session completedAt (${session.completedAt})`
+        );
     }
 }
 
