@@ -1,7 +1,8 @@
 import { type } from 'arktype';
-import { loadProblems, measurementProblems } from './capability.ts';
+import { loadProblems, measurementProblems, type PrescriptionProblem } from './capability.ts';
 import type { ExerciseDefinition } from './exercise.ts';
-import { workoutSession, type WorkoutSession } from './session.ts';
+import type { SetPrescription } from './prescription.ts';
+import { workoutSession, type ActualResult, type WorkoutSession } from './session.ts';
 import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
 import { collectTemplateIssues } from './validateWorkoutTemplate.ts';
 
@@ -72,17 +73,67 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
         seenOccurrences.add(result.sequenceEntryId);
 
         const set = setsById.get(entry.plannedSetId);
-        const exercise = set ? exercisesById.get(set.exerciseId) : undefined;
+        if (!set) {
+            continue;
+        }
+
+        const exercise = exercisesById.get(set.exerciseId);
         if (!exercise) {
             continue;
         }
 
         // A result has no execution mode; the snapshot's prescription already fixes it.
-        const problems = [...measurementProblems(exercise, result.measurement), ...loadProblems(exercise, result.load)];
-        for (const problem of problems) {
+        const capabilityProblems = [
+            ...measurementProblems(exercise, result.measurement),
+            ...loadProblems(exercise, result.load),
+        ];
+        for (const problem of capabilityProblems) {
             issues.add(['results', index, problem.field], problem.message);
         }
+
+        const invalidFields = new Set(capabilityProblems.map((problem) => problem.field));
+        for (const problem of resultPrescriptionProblems(set.prescription, result)) {
+            if (!invalidFields.has(problem.field)) {
+                issues.add(['results', index, problem.field], problem.message);
+            }
+        }
     }
+}
+
+function resultPrescriptionProblems(prescription: SetPrescription, result: ActualResult): PrescriptionProblem[] {
+    const problems: PrescriptionProblem[] = [];
+    const prescribedMeasurement = prescription.measurement;
+
+    if (
+        result.measurement.measurement !== prescribedMeasurement.measurement ||
+        result.measurement.countBasis !== prescribedMeasurement.countBasis
+    ) {
+        problems.push({
+            field: 'measurement',
+            message: `actual measurement '${result.measurement.measurement}/${result.measurement.countBasis}' does not match prescribed '${prescribedMeasurement.measurement}/${prescribedMeasurement.countBasis}'`,
+        });
+    }
+
+    if (result.load.kind !== prescription.load.kind) {
+        problems.push({
+            field: 'load',
+            message: `actual load kind '${result.load.kind}' does not match prescribed '${prescription.load.kind}'`,
+        });
+        return problems;
+    }
+
+    if (
+        (result.load.kind === 'external' || result.load.kind === 'bodyweightExternal') &&
+        (prescription.load.kind === 'external' || prescription.load.kind === 'bodyweightExternal') &&
+        result.load.basis !== prescription.load.basis
+    ) {
+        problems.push({
+            field: 'load',
+            message: `actual load basis '${result.load.basis}' does not match prescribed '${prescription.load.basis}'`,
+        });
+    }
+
+    return problems;
 }
 
 export { validateWorkoutSession };

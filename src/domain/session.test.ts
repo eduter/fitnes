@@ -143,6 +143,14 @@ describe('validateWorkoutSession', () => {
         expect(validateWorkoutSession(withResults).ok).toBe(true);
     });
 
+    it('accepts actual values that differ from prescribed targets', () => {
+        const withResults = session({
+            results: [rowResult('entry-1', 7, 42), rowResult('entry-2', 5, 47)] as WorkoutSession['results'],
+        });
+
+        expect(validateWorkoutSession(withResults).ok).toBe(true);
+    });
+
     it('accepts a partially completed session with fewer results', () => {
         const partial = session({ results: [rowResult('entry-1', 8, 40)] as WorkoutSession['results'] });
 
@@ -180,6 +188,78 @@ describe('validateWorkoutSession', () => {
         });
 
         expect(pathsOf(bad)).toEqual(['results[0].measurement']);
+    });
+
+    it('rejects a result whose measurement type differs from its prescription', () => {
+        const bad = session();
+        bad.snapshot.exercises[0].measurements.push({ measurement: 'duration', countBasis: 'total' });
+        bad.results = [
+            {
+                sequenceEntryId: 'entry-1',
+                measurement: { measurement: 'duration', countBasis: 'total', seconds: 30 },
+                load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                completedAt: 2_000,
+            },
+        ];
+
+        expect(pathsOf(bad)).toEqual(['results[0].measurement']);
+    });
+
+    it('rejects a result whose count basis differs from its prescription', () => {
+        const bad = session();
+        bad.snapshot.exercises[0].measurements.push({ measurement: 'repetitions', countBasis: 'perSide' });
+        bad.results = [
+            {
+                sequenceEntryId: 'entry-1',
+                measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 8 },
+                load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                completedAt: 2_000,
+            },
+        ];
+
+        expect(pathsOf(bad)).toEqual(['results[0].measurement']);
+    });
+
+    it('rejects a result whose load basis differs from its prescription', () => {
+        const bad = session({
+            results: [
+                {
+                    sequenceEntryId: 'entry-1',
+                    measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
+                    load: { kind: 'external', basis: 'perHand', weight: { value: 20, unit: 'kg' } },
+                    completedAt: 2_000,
+                },
+            ],
+        });
+
+        expect(pathsOf(bad)).toEqual(['results[0].load']);
+    });
+
+    it('rejects a result whose load kind differs from its prescription', () => {
+        const template = rowTemplate();
+        useOnlyExercise(template, pullUp);
+        for (const set of template.sets) {
+            setPrescription(template, set.id, {
+                measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
+                executionMode: 'bilateral',
+                load: { kind: 'bodyweight' },
+            });
+        }
+        const bad = createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 });
+        bad.results = [
+            {
+                sequenceEntryId: 'entry-1',
+                measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
+                load: {
+                    kind: 'bodyweightExternal',
+                    basis: 'total',
+                    weight: { value: 10, unit: 'kg' },
+                },
+                completedAt: 2_000,
+            },
+        ];
+
+        expect(pathsOf(bad)).toEqual(['results[0].load']);
     });
 
     it('rejects a result whose load the exercise does not allow', () => {
