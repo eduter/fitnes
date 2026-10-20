@@ -522,13 +522,13 @@ unrelated validation tightening into that mechanical change.
 
 ### Must be fixed before relying on the model for UI/persistence
 
-- [ ] FITNES-001 explicit valid load modes.
-- [ ] FITNES-002 result/prescription semantic alignment.
-- [ ] FITNES-003 finite bodyweight snapshots.
-- [ ] FITNES-004 result timestamp bounds.
-- [ ] FITNES-005 undeclared-key rejection.
-- [ ] FITNES-006 exact planned-set sequence coverage.
-- [ ] FITNES-008 source/snapshot consistency.
+- [x] FITNES-001 explicit valid load modes.
+- [x] FITNES-002 result/prescription semantic alignment.
+- [x] FITNES-003 finite bodyweight snapshots.
+- [x] FITNES-004 result timestamp bounds.
+- [x] FITNES-005 undeclared-key rejection.
+- [x] FITNES-006 exact planned-set sequence coverage.
+- [x] FITNES-008 template and bodyweight-source structural consistency.
 
 ### Remaining decisions
 
@@ -545,9 +545,10 @@ git log --oneline --decorate -12
 npm run check
 ```
 
-Then start with a failing test for FITNES-001. Keep one logical fix per commit,
-update the implementation-status section below after each increment, and push
-each green checkpoint.
+Review the implementation-status checkpoints below, then resolve FITNES-007
+before exposing template construction to the UI. Keep one logical fix per
+commit, update this report after each increment, and push each green
+checkpoint.
 
 ## Implementation status
 
@@ -634,3 +635,19 @@ below preserve the original findings and rationale.
   decisions or lower-priority policy work.
 - Next task: enforce the unambiguous parts of session source/snapshot
   consistency (FITNES-008) without guessing the bodyweight backfill policy.
+
+### Checkpoint after FITNES-008 (partial)
+
+- Partially fixed: FITNES-008 in `f483f82` (`fix(domain): enforce session
+  source consistency`).
+- A session's `templateId`, when present, must match `snapshot.id`.
+- Bodyweight trace metadata is now an optional nested `source` containing both
+  `measurementId` and `measuredAt`; partial source metadata is invalid.
+- Deliberately unresolved: whether a bodyweight measurement attached after the
+  session may be backfilled. Until that policy is decided, validation does not
+  reject `bodyweight.source.measuredAt > startedAt`.
+- Verification: `npm run check` passed (7 test files, 89 tests).
+- Open design/policy work: FITNES-007, the remaining FITNES-008 timestamp
+  policy, FITNES-009, and FITNES-010.
+- Next recommended implementation task: decide catalog/template ownership
+  (FITNES-007) before exposing template construction to the UI.
