@@ -609,3 +609,14 @@ below preserve the original findings and rationale.
 - Still open: FITNES-003, FITNES-004, and FITNES-007 through FITNES-010.
 - Next task: reuse finite-positive validation for bodyweight session snapshots
   (FITNES-003).
+
+### Checkpoint after FITNES-003
+
+- Fixed: FITNES-003 in `fe4a478` (`fix(domain): reject non-finite bodyweight
+  snapshots`).
+- Session bodyweight snapshots now reuse the same `positiveFinite` schema as
+  bodyweight-history measurements.
+- Verification: `npm run check` passed (7 test files, 84 tests).
+- Still open: FITNES-004 and FITNES-007 through FITNES-010.
+- Next task: enforce result completion timestamps within session bounds
+  (FITNES-004).
