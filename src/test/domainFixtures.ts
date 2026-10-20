@@ -1,54 +1,7 @@
+import { airSquat, bentOverRow, halfCrimpHold, plank, pullUp, wristCurl } from '../domain/examples.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import type { LoadConfiguration, SetPrescription } from '../domain/prescription.ts';
 import type { PlannedSet, SequenceEntry, WorkoutTemplate } from '../domain/workoutTemplate.ts';
-
-const bentOverRow: ExerciseDefinition = {
-    id: 'ex-bent-over-row',
-    name: 'Bent-over row',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perHand'] }],
-};
-
-const pullUp: ExerciseDefinition = {
-    id: 'ex-pull-up',
-    name: 'Pull-up',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
-};
-
-const plank: ExerciseDefinition = {
-    id: 'ex-plank',
-    name: 'Plank',
-    measurements: [{ measurement: 'duration', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }],
-};
-
-const halfCrimpHold: ExerciseDefinition = {
-    id: 'ex-half-crimp-hold',
-    name: 'Half-crimp hold',
-    measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
-    executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
-};
-
-const wristCurl: ExerciseDefinition = {
-    id: 'ex-wrist-curl',
-    name: 'Wrist curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
-};
-
-const airSquat: ExerciseDefinition = {
-    id: 'ex-air-squat',
-    name: 'Air squat',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'none' }],
-};
 
 const examples: ExerciseDefinition[] = [bentOverRow, pullUp, plank, halfCrimpHold, wristCurl];
 
