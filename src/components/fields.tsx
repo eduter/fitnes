@@ -1,5 +1,4 @@
-import type { JSX } from 'solid-js';
-import { For } from 'solid-js';
+import { For, createEffect, createSignal, type JSX } from 'solid-js';
 import { fromDatetimeLocalValue, toDatetimeLocalValue } from '../utils/datetime.ts';
 
 interface TextFieldProps {
@@ -57,8 +56,23 @@ interface NumberFieldProps {
     onChange: (value: number) => void;
 }
 
-/** Labeled numeric input. Invalid keystrokes keep the previous number. */
+/** Labeled numeric input. Digits stay local until blur so multi-digit values are not truncated. */
 function NumberField(props: NumberFieldProps): JSX.Element {
+    const [text, setText] = createSignal(String(props.value));
+
+    createEffect(() => {
+        setText(String(props.value));
+    });
+
+    function commit(raw: string): void {
+        const next = Number(raw);
+        if (!Number.isFinite(next)) {
+            setText(String(props.value));
+            return;
+        }
+        props.onChange(next);
+    }
+
     return (
         <label class="form-field">
             <span class="form-label">{props.label}</span>
@@ -67,15 +81,11 @@ function NumberField(props: NumberFieldProps): JSX.Element {
                 type="number"
                 min={props.min}
                 step={props.step ?? 'any'}
-                value={props.value}
+                value={text()}
                 disabled={props.disabled}
-                onInput={(event) => {
-                    const next = event.currentTarget.valueAsNumber;
-                    if (Number.isNaN(next)) {
-                        return;
-                    }
-                    props.onChange(next);
-                }}
+                onInput={(event) => setText(event.currentTarget.value)}
+                onChange={(event) => commit(event.currentTarget.value)}
+                onBlur={(event) => commit(event.currentTarget.value)}
             />
         </label>
     );
