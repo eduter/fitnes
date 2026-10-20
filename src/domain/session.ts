@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import type { BodyweightMeasurement } from './bodyweight.ts';
 import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
-import { epochMillis, type Weight, weightUnit } from './units.ts';
+import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
 import { bodyweightMeasurementId, sequenceEntryId, workoutSessionId, workoutTemplateId } from './ids.ts';
 import { type LoadConfiguration, loadConfiguration, measurementValue } from './prescription.ts';
 
@@ -11,7 +11,7 @@ import { type LoadConfiguration, loadConfiguration, measurementValue } from './p
  * past session. `measurementId` and `measuredAt` are kept for traceability.
  */
 const bodyweightSnapshot = type({
-    value: 'number > 0',
+    value: positiveFinite,
     unit: weightUnit,
     'measurementId?': bodyweightMeasurementId,
     'measuredAt?': epochMillis,

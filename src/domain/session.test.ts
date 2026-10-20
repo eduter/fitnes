@@ -306,6 +306,14 @@ describe('validateWorkoutSession', () => {
         expect(pathsOf(bad)).toContain('bodyweight.value');
     });
 
+    it('rejects a non-finite bodyweight snapshot value', () => {
+        for (const value of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+            const bad = session({ bodyweight: { value, unit: 'kg' } });
+
+            expect(pathsOf(bad)).toContain('bodyweight.value');
+        }
+    });
+
     it('rejects unknown fields anywhere in the document', () => {
         const atTopLevel = { ...session(), source: 'import' };
         const nested = session({
