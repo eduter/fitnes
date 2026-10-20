@@ -88,8 +88,8 @@ function checkPrescriptionCapabilities(
 
 /**
  * Report sequence entries whose planned set is missing and planned sets that
- * appear more than once. A set may occur at most once in a sequence; repeated
- * work is modelled as distinct planned sets.
+ * do not appear exactly once. Repeated work is modelled as distinct planned
+ * sets so each execution occurrence remains independently addressable.
  */
 function checkSequenceReferences(
     issues: IssueCollector,
@@ -116,6 +116,12 @@ function checkSequenceReferences(
             continue;
         }
         occurrences.set(entry.plannedSetId, index);
+    }
+
+    for (const [index, set] of template.sets.entries()) {
+        if (!occurrences.has(set.id)) {
+            issues.add([...prefix, 'sets', index, 'id'], `planned set '${set.id}' does not occur in the sequence`);
+        }
     }
 }
 

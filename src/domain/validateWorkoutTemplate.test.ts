@@ -174,6 +174,20 @@ describe('validateWorkoutTemplate', () => {
         expect(pathsOf(template)).toEqual(['sequence[2].plannedSetId']);
     });
 
+    it('rejects a planned set omitted from the execution sequence', () => {
+        const template = rowTemplate();
+        setSequence(template, [{ id: 'entry-1', plannedSetId: 'set-1' }]);
+
+        expect(pathsOf(template)).toEqual(['sets[1].id']);
+    });
+
+    it('rejects an empty sequence when the template has planned sets', () => {
+        const template = rowTemplate();
+        setSequence(template, []);
+
+        expect(pathsOf(template)).toEqual(['sets[0].id', 'sets[1].id']);
+    });
+
     it('rejects duplicate exercise, set, and sequence-entry ids', () => {
         const template = rowTemplate();
         addExercise(template, structuredClone(template.exercises[0]));
@@ -198,7 +212,7 @@ describe('validateWorkoutTemplate', () => {
         const template = rowTemplate();
         setSequence(template, [{ id: 'entry-1', plannedSetId: 'set-missing' }]);
 
-        expect(pathsOf(template)).toEqual(['sequence[0].plannedSetId']);
+        expect(pathsOf(template)).toContain('sequence[0].plannedSetId');
     });
 
     it('rejects an unsupported weight unit', () => {
