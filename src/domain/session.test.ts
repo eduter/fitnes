@@ -306,6 +306,16 @@ describe('validateWorkoutSession', () => {
         expect(pathsOf(bad)).toContain('bodyweight.value');
     });
 
+    it('rejects unknown fields anywhere in the document', () => {
+        const atTopLevel = { ...session(), source: 'import' };
+        const nested = session({
+            results: [{ ...rowResult('entry-1', 8, 40), perceivedEffort: 8 }] as WorkoutSession['results'],
+        });
+
+        expect(validateWorkoutSession(atTopLevel).ok).toBe(false);
+        expect(validateWorkoutSession(nested).ok).toBe(false);
+    });
+
     it('survives a JSON round-trip and re-validates', () => {
         const original = session({ results: [rowResult('entry-1', 8, 40)] as WorkoutSession['results'] });
         const serialized = JSON.parse(JSON.stringify(original));

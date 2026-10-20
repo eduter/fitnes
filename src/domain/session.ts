@@ -15,7 +15,7 @@ const bodyweightSnapshot = type({
     unit: weightUnit,
     'measurementId?': bodyweightMeasurementId,
     'measuredAt?': epochMillis,
-});
+}).onUndeclaredKey('reject');
 type BodyweightSnapshot = typeof bodyweightSnapshot.infer;
 
 /** The recorded performance for one sequence occurrence, using the same measurement and load semantics as a prescription. */
@@ -24,7 +24,7 @@ const actualResult = type({
     measurement: measurementValue,
     load: loadConfiguration,
     completedAt: epochMillis,
-});
+}).onDeepUndeclaredKey('reject');
 type ActualResult = typeof actualResult.infer;
 
 /**
@@ -41,7 +41,7 @@ const workoutSession = type({
     snapshot: workoutTemplate,
     'bodyweight?': bodyweightSnapshot,
     results: actualResult.array(),
-});
+}).onDeepUndeclaredKey('reject');
 type WorkoutSession = typeof workoutSession.infer;
 
 /** Inputs needed to start a session from a template. */

@@ -26,6 +26,10 @@ describe('bodyweightMeasurement', () => {
     it('rejects a missing timestamp or id', () => {
         expect(bodyweightMeasurement({ value: 80, unit: 'kg' })).toBeInstanceOf(type.errors);
     });
+
+    it('rejects unknown fields', () => {
+        expect(bodyweightMeasurement({ ...measurements[0], source: 'manual' })).toBeInstanceOf(type.errors);
+    });
 });
 
 describe('latestBodyweightAtOrBefore', () => {

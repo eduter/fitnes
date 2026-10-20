@@ -11,11 +11,13 @@ const measurementValue = type({
     measurement: '"repetitions"',
     countBasis: measurementCountBasis,
     reps: positiveCount,
-}).or({
-    measurement: '"duration"',
-    countBasis: measurementCountBasis,
-    seconds: positiveFinite,
-});
+})
+    .or({
+        measurement: '"duration"',
+        countBasis: measurementCountBasis,
+        seconds: positiveFinite,
+    })
+    .onDeepUndeclaredKey('reject');
 type MeasurementValue = typeof measurementValue.infer;
 
 /**
@@ -27,7 +29,8 @@ type MeasurementValue = typeof measurementValue.infer;
 const loadConfiguration = type({ kind: '"none"' })
     .or({ kind: '"bodyweight"' })
     .or({ kind: '"external"', basis: loadBasis, weight })
-    .or({ kind: '"bodyweightExternal"', basis: loadBasis, weight });
+    .or({ kind: '"bodyweightExternal"', basis: loadBasis, weight })
+    .onDeepUndeclaredKey('reject');
 type LoadConfiguration = typeof loadConfiguration.infer;
 
 /**
@@ -39,7 +42,7 @@ const setPrescription = type({
     measurement: measurementValue,
     executionMode,
     load: loadConfiguration,
-});
+}).onDeepUndeclaredKey('reject');
 type SetPrescription = typeof setPrescription.infer;
 
 export { loadConfiguration, measurementValue, setPrescription };

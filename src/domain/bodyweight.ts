@@ -8,7 +8,7 @@ const bodyweightMeasurement = type({
     measuredAt: epochMillis,
     value: positiveFinite,
     unit: weightUnit,
-});
+}).onUndeclaredKey('reject');
 type BodyweightMeasurement = typeof bodyweightMeasurement.infer;
 
 /**

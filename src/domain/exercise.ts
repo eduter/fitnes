@@ -34,7 +34,7 @@ const loadBases = loadBasis
 const measurementOption = type({
     measurement: measurementType,
     countBasis: measurementCountBasis,
-});
+}).onUndeclaredKey('reject');
 type MeasurementOption = typeof measurementOption.infer;
 
 /**
@@ -45,7 +45,8 @@ type MeasurementOption = typeof measurementOption.infer;
 const loadOption = type({ kind: '"none"' })
     .or({ kind: '"bodyweight"' })
     .or({ kind: '"external"', bases: loadBases })
-    .or({ kind: '"bodyweightExternal"', bases: loadBases });
+    .or({ kind: '"bodyweightExternal"', bases: loadBases })
+    .onDeepUndeclaredKey('reject');
 type LoadOption = typeof loadOption.infer;
 
 const measurementOptions = measurementOption
@@ -81,7 +82,7 @@ const exerciseDefinition = type({
     measurements: measurementOptions,
     executionModes,
     loads: loadOptions,
-});
+}).onDeepUndeclaredKey('reject');
 type ExerciseDefinition = typeof exerciseDefinition.infer;
 
 export {

@@ -258,6 +258,20 @@ describe('validateWorkoutTemplate', () => {
         expect(validateWorkoutTemplate(withoutSequence).ok).toBe(false);
     });
 
+    it('rejects unknown fields anywhere in the document', () => {
+        const atTopLevel = { ...rowTemplate(), owner: 'user-1' };
+        const nested = rowTemplate();
+        const load = nested.sets[0].prescription.load;
+        if (load.kind !== 'external') {
+            throw new Error('row fixture must use external load');
+        }
+        const withUnknown = { ...load, equipment: 'barbell' };
+        setLoad(nested, 'set-1', withUnknown);
+
+        expect(validateWorkoutTemplate(atTopLevel).ok).toBe(false);
+        expect(validateWorkoutTemplate(nested).ok).toBe(false);
+    });
+
     it('rejects a non-object input', () => {
         expect(validateWorkoutTemplate(null).ok).toBe(false);
         expect(validateWorkoutTemplate('nope').ok).toBe(false);

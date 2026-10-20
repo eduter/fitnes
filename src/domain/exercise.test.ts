@@ -67,6 +67,16 @@ describe('exerciseDefinition', () => {
         expect(exerciseDefinition(withDescription)).not.toBeInstanceOf(type.errors);
     });
 
+    it('rejects unknown top-level and nested fields', () => {
+        expect(exerciseDefinition({ ...plank, aliases: ['front plank'] })).toBeInstanceOf(type.errors);
+        expect(
+            exerciseDefinition({
+                ...bentOverRow,
+                loads: [{ kind: 'external', bases: ['total'], equipment: 'barbell' }],
+            })
+        ).toBeInstanceOf(type.errors);
+    });
+
     it('rejects an empty id or name', () => {
         expect(exerciseDefinition({ ...plank, id: '' })).toBeInstanceOf(type.errors);
         expect(exerciseDefinition({ ...plank, name: '' })).toBeInstanceOf(type.errors);

@@ -17,7 +17,7 @@ const weightUnit = type('"kg" | "lb"');
 type WeightUnit = typeof weightUnit.infer;
 
 /** A mass with an explicit unit. A bare number is never a valid weight. */
-const weight = type({ value: nonNegativeFinite, unit: weightUnit });
+const weight = type({ value: nonNegativeFinite, unit: weightUnit }).onUndeclaredKey('reject');
 type Weight = typeof weight.infer;
 
 export { epochMillis, nonNegativeFinite, positiveCount, positiveFinite, weight, weightUnit };

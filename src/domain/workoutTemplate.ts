@@ -12,7 +12,7 @@ const plannedSet = type({
     id: plannedSetId,
     exerciseId,
     prescription: setPrescription,
-});
+}).onDeepUndeclaredKey('reject');
 type PlannedSet = typeof plannedSet.infer;
 
 /**
@@ -26,7 +26,7 @@ type PlannedSet = typeof plannedSet.infer;
 const sequenceEntry = type({
     id: sequenceEntryId,
     plannedSetId,
-});
+}).onUndeclaredKey('reject');
 type SequenceEntry = typeof sequenceEntry.infer;
 
 /**
@@ -42,7 +42,7 @@ const workoutTemplate = type({
     exercises: exerciseDefinition.array(),
     sets: plannedSet.array(),
     sequence: sequenceEntry.array(),
-});
+}).onDeepUndeclaredKey('reject');
 type WorkoutTemplate = typeof workoutTemplate.infer;
 
 export { plannedSet, sequenceEntry, workoutTemplate };
