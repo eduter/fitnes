@@ -21,6 +21,7 @@ function validateWorkoutSession(input: unknown): ValidationResult<WorkoutSession
 
     const issues = new IssueCollector();
     collectTemplateIssues(parsed.snapshot, issues, ['snapshot']);
+    checkSessionSource(issues, parsed);
     checkSessionTiming(issues, parsed);
     checkResults(issues, parsed);
 
@@ -29,6 +30,16 @@ function validateWorkoutSession(input: unknown): ValidationResult<WorkoutSession
     }
 
     return { ok: true, value: parsed };
+}
+
+/** Report trace metadata that contradicts the session's preserved snapshot. */
+function checkSessionSource(issues: IssueCollector, session: WorkoutSession): void {
+    if (session.templateId !== undefined && session.templateId !== session.snapshot.id) {
+        issues.add(
+            ['templateId'],
+            `source template id '${session.templateId}' does not match snapshot id '${session.snapshot.id}'`
+        );
+    }
 }
 
 /** Report a completion timestamp that precedes the session start. */

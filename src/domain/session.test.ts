@@ -61,8 +61,10 @@ describe('createSessionFromTemplate', () => {
         expect(session.bodyweight).toEqual({
             value: 80,
             unit: 'kg',
-            measurementId: 'bw-1',
-            measuredAt: 1_000,
+            source: {
+                measurementId: 'bw-1',
+                measuredAt: 1_000,
+            },
         });
 
         // Mutating the source measurement must not change the session.
@@ -329,10 +331,28 @@ describe('validateWorkoutSession', () => {
         expect(pathsOf(bad)).toEqual(['snapshot.sets[0].exerciseId']);
     });
 
+    it('rejects a source template id that differs from the snapshot', () => {
+        const bad = session({ templateId: 'tmpl-other' });
+
+        expect(pathsOf(bad)).toEqual(['templateId']);
+    });
+
     it('rejects a non-positive bodyweight snapshot value', () => {
         const bad = session({ bodyweight: { value: 0, unit: 'kg' } });
 
         expect(pathsOf(bad)).toContain('bodyweight.value');
+    });
+
+    it('requires bodyweight source id and timestamp together', () => {
+        const withIdOnly = session({
+            bodyweight: { value: 80, unit: 'kg', source: { measurementId: 'bw-1' } },
+        });
+        const withTimestampOnly = session({
+            bodyweight: { value: 80, unit: 'kg', source: { measuredAt: 1_000 } },
+        });
+
+        expect(validateWorkoutSession(withIdOnly).ok).toBe(false);
+        expect(validateWorkoutSession(withTimestampOnly).ok).toBe(false);
     });
 
     it('rejects a non-finite bodyweight snapshot value', () => {
@@ -382,7 +402,8 @@ describe('validateWorkoutSession', () => {
         template.sequence = [{ id: 'entry-1', plannedSetId: 'set-1' }];
 
         const created = createSessionFromTemplate({ id: 'sess-2', template, startedAt: 1_000, bodyweight });
+        const result = validateWorkoutSession(created);
 
-        expect(validateWorkoutSession(created).ok).toBe(true);
+        expect(result.ok, result.ok ? undefined : JSON.stringify(result.errors)).toBe(true);
     });
 });

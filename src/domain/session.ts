@@ -13,9 +13,11 @@ import { type LoadConfiguration, loadConfiguration, measurementValue } from './p
 const bodyweightSnapshot = type({
     value: positiveFinite,
     unit: weightUnit,
-    'measurementId?': bodyweightMeasurementId,
-    'measuredAt?': epochMillis,
-}).onUndeclaredKey('reject');
+    'source?': type({
+        measurementId: bodyweightMeasurementId,
+        measuredAt: epochMillis,
+    }).onUndeclaredKey('reject'),
+}).onDeepUndeclaredKey('reject');
 type BodyweightSnapshot = typeof bodyweightSnapshot.infer;
 
 /** The recorded performance for one sequence occurrence, using the same measurement and load semantics as a prescription. */
@@ -73,8 +75,10 @@ function createSessionFromTemplate(input: StartSessionInput): WorkoutSession {
         session.bodyweight = {
             value: bodyweight.value,
             unit: bodyweight.unit,
-            measurementId: bodyweight.id,
-            measuredAt: bodyweight.measuredAt,
+            source: {
+                measurementId: bodyweight.id,
+                measuredAt: bodyweight.measuredAt,
+            },
         };
     }
 
