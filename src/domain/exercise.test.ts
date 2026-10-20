@@ -15,7 +15,7 @@ const pullUp = {
     name: 'Pull-up',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'external', bases: ['total'] }],
+    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
 };
 
 const plank = {
@@ -49,13 +49,13 @@ describe('exerciseDefinition', () => {
         }
     });
 
-    it('accepts an exercise that uses no load', () => {
+    it('accepts an exercise that explicitly uses no load', () => {
         const bodyweightSquat = {
             id: 'ex-air-squat',
             name: 'Air squat',
             measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
             executionModes: ['bilateral'],
-            loads: [],
+            loads: [{ kind: 'none' }],
         };
 
         expect(exerciseDefinition(bodyweightSquat)).not.toBeInstanceOf(type.errors);
@@ -96,6 +96,12 @@ describe('exerciseDefinition', () => {
         expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
     });
 
+    it('rejects bodyweight plus external load without any basis', () => {
+        const invalid = { ...pullUp, loads: [{ kind: 'bodyweightExternal', bases: [] }] };
+
+        expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
+    });
+
     it('rejects duplicate measurement options and execution modes', () => {
         const duplicateMeasurement = {
             ...plank,
@@ -112,6 +118,12 @@ describe('exerciseDefinition', () => {
 
     it('rejects a measurement with no capabilities', () => {
         const invalid = { ...plank, measurements: [] };
+
+        expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
+    });
+
+    it('rejects an exercise with no load capabilities', () => {
+        const invalid = { ...plank, loads: [] };
 
         expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
     });

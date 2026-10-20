@@ -21,6 +21,11 @@ type ExecutionMode = typeof executionMode.infer;
 const loadBasis = type('"total" | "perHand" | "perSide"');
 type LoadBasis = typeof loadBasis.infer;
 
+const loadBases = loadBasis
+    .array()
+    .atLeastLength(1)
+    .narrow((bases, ctx) => new Set(bases).size === bases.length || ctx.mustBe('unique'));
+
 /**
  * A supported way to perform an exercise, pairing a measurement with the
  * counting basis it uses. Enumerating valid pairs prevents contradictions such
@@ -33,17 +38,14 @@ const measurementOption = type({
 type MeasurementOption = typeof measurementOption.infer;
 
 /**
- * A supported load configuration. `bodyweight` and `external` may both be
- * listed, which is how weighted pull-ups (bodyweight plus added load) are
- * expressed without treating the two as exclusive.
+ * A complete supported load configuration. Combined bodyweight and external
+ * load is explicit so configuring a weighted bodyweight exercise does not also
+ * permit an external-only prescription.
  */
-const loadOption = type({ kind: '"bodyweight"' }).or({
-    kind: '"external"',
-    bases: loadBasis
-        .array()
-        .atLeastLength(1)
-        .narrow((bases, ctx) => new Set(bases).size === bases.length || ctx.mustBe('unique')),
-});
+const loadOption = type({ kind: '"none"' })
+    .or({ kind: '"bodyweight"' })
+    .or({ kind: '"external"', bases: loadBases })
+    .or({ kind: '"bodyweightExternal"', bases: loadBases });
 type LoadOption = typeof loadOption.infer;
 
 const measurementOptions = measurementOption
@@ -59,10 +61,13 @@ const executionModes = executionMode
     .atLeastLength(1)
     .narrow((modes, ctx) => new Set(modes).size === modes.length || ctx.mustBe('unique'));
 
-const loadOptions = loadOption.array().narrow((options, ctx) => {
-    const seen = new Set(options.map((option) => option.kind));
-    return seen.size === options.length || ctx.mustBe('unique by load kind');
-});
+const loadOptions = loadOption
+    .array()
+    .atLeastLength(1)
+    .narrow((options, ctx) => {
+        const seen = new Set(options.map((option) => option.kind));
+        return seen.size === options.length || ctx.mustBe('unique by load kind');
+    });
 
 /**
  * A reusable catalog entry describing what kinds of performance an exercise

@@ -15,7 +15,7 @@ const pullUp: ExerciseDefinition = {
     name: 'Pull-up',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'external', bases: ['total'] }],
+    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
 };
 
 const plank: ExerciseDefinition = {
@@ -47,7 +47,7 @@ const airSquat: ExerciseDefinition = {
     name: 'Air squat',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral'],
-    loads: [],
+    loads: [{ kind: 'none' }],
 };
 
 const examples: ExerciseDefinition[] = [bentOverRow, pullUp, plank, halfCrimpHold, wristCurl];

@@ -30,11 +30,12 @@ function describeMeasurements(exercise: ExerciseDefinition): string {
 }
 
 function describeLoads(exercise: ExerciseDefinition): string {
-    if (exercise.loads.length === 0) {
-        return 'no load';
-    }
     return exercise.loads
-        .map((option) => (option.kind === 'external' ? `external (${option.bases.join(', ')})` : option.kind))
+        .map((option) =>
+            option.kind === 'external' || option.kind === 'bodyweightExternal'
+                ? `${option.kind} (${option.bases.join(', ')})`
+                : option.kind
+        )
         .join(', ');
 }
 
@@ -78,33 +79,6 @@ function executionModeProblems(exercise: ExerciseDefinition, prescription: SetPr
     ];
 }
 
-function externalBasisProblems(exercise: ExerciseDefinition, load: LoadConfiguration): PrescriptionProblem[] {
-    if (load.kind !== 'external' && load.kind !== 'bodyweightExternal') {
-        return [];
-    }
-
-    const external = findLoadOption(exercise, 'external');
-    if (external?.kind !== 'external') {
-        return [
-            {
-                field: 'load',
-                message: `exercise '${exercise.name}' does not allow external load; allowed: ${describeLoads(exercise)}`,
-            },
-        ];
-    }
-
-    if (external.bases.includes(load.basis)) {
-        return [];
-    }
-
-    return [
-        {
-            field: 'load',
-            message: `exercise '${exercise.name}' does not allow external load basis '${load.basis}'; allowed: ${external.bases.join(', ')}`,
-        },
-    ];
-}
-
 /**
  * Report every way `prescription` conflicts with `exercise`. Checks the
  * measurement and its counting basis, the execution mode, and the load
@@ -124,30 +98,32 @@ function prescriptionProblems(exercise: ExerciseDefinition, prescription: SetPre
  * supports.
  */
 function loadProblems(exercise: ExerciseDefinition, load: LoadConfiguration): PrescriptionProblem[] {
-    const problems: PrescriptionProblem[] = [];
-
-    if (load.kind === 'none') {
-        if (exercise.loads.length > 0) {
-            problems.push({
+    const option = findLoadOption(exercise, load.kind);
+    if (!option) {
+        return [
+            {
                 field: 'load',
-                message: `exercise '${exercise.name}' requires load; allowed: ${describeLoads(exercise)}`,
-            });
-        }
-        return problems;
+                message: `exercise '${exercise.name}' does not allow '${load.kind}' load; allowed: ${describeLoads(exercise)}`,
+            },
+        ];
     }
 
-    if (load.kind === 'bodyweight' || load.kind === 'bodyweightExternal') {
-        if (!findLoadOption(exercise, 'bodyweight')) {
-            problems.push({
-                field: 'load',
-                message: `exercise '${exercise.name}' does not allow bodyweight load; allowed: ${describeLoads(exercise)}`,
-            });
-        }
+    if (load.kind === 'none' || load.kind === 'bodyweight') {
+        return [];
     }
 
-    problems.push(...externalBasisProblems(exercise, load));
+    if ((option.kind === 'external' || option.kind === 'bodyweightExternal') && option.bases.includes(load.basis)) {
+        return [];
+    }
 
-    return problems;
+    const allowedBases =
+        option.kind === 'external' || option.kind === 'bodyweightExternal' ? option.bases.join(', ') : 'none';
+    return [
+        {
+            field: 'load',
+            message: `exercise '${exercise.name}' does not allow '${load.kind}' load basis '${load.basis}'; allowed: ${allowedBases}`,
+        },
+    ];
 }
 
 export { executionModeProblems, loadProblems, measurementProblems, prescriptionProblems };

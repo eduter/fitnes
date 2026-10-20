@@ -96,13 +96,32 @@ describe('validateWorkoutTemplate', () => {
     it('accepts a weighted pull-up as bodyweight plus external load', () => {
         const template = rowTemplate();
         useOnlyExercise(template, pullUp);
-        setPrescription(template, 'set-1', {
+        const prescription = {
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
             executionMode: 'bilateral',
             load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 10, unit: 'kg' } },
-        });
+        };
+        setPrescription(template, 'set-1', prescription);
+        setPrescription(template, 'set-2', prescription);
 
         expect(validateWorkoutTemplate(template).ok).toBe(true);
+    });
+
+    it('rejects external-only load when an exercise requires bodyweight plus external load', () => {
+        const template = rowTemplate();
+        useOnlyExercise(template, pullUp);
+        setPrescription(template, 'set-1', {
+            measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
+            executionMode: 'bilateral',
+            load: { kind: 'external', basis: 'total', weight: { value: 10, unit: 'kg' } },
+        });
+        setPrescription(template, 'set-2', {
+            measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
+            executionMode: 'bilateral',
+            load: { kind: 'bodyweight' },
+        });
+
+        expect(pathsOf(template)).toContain('sets[0].prescription.load');
     });
 
     it('accepts sets of the same exercise with different targets', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { plank, pullUp, rowTemplate, useOnlyExercise } from '../test/domainFixtures.ts';
+import { plank, pullUp, rowTemplate, setPrescription, useOnlyExercise } from '../test/domainFixtures.ts';
 import type { BodyweightMeasurement } from './bodyweight.ts';
 import { createSessionFromTemplate, totalLoad, type WorkoutSession } from './session.ts';
 import { validateWorkoutSession } from './validateWorkoutSession.ts';
@@ -185,6 +185,13 @@ describe('validateWorkoutSession', () => {
     it('rejects a result whose load the exercise does not allow', () => {
         const template = rowTemplate();
         useOnlyExercise(template, pullUp);
+        for (const set of template.sets) {
+            setPrescription(template, set.id, {
+                measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
+                executionMode: 'bilateral',
+                load: { kind: 'bodyweight' },
+            });
+        }
         const bad = {
             ...createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 }),
             results: [
