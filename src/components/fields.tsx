@@ -59,9 +59,15 @@ interface NumberFieldProps {
 /** Labeled numeric input. Digits stay local until blur so multi-digit values are not truncated. */
 function NumberField(props: NumberFieldProps): JSX.Element {
     const [text, setText] = createSignal(String(props.value));
+    let committed = props.value;
 
     createEffect(() => {
-        setText(String(props.value));
+        const incoming = props.value;
+        if (incoming === committed) {
+            return;
+        }
+        committed = incoming;
+        setText(String(incoming));
     });
 
     function commit(raw: string): void {
@@ -70,6 +76,7 @@ function NumberField(props: NumberFieldProps): JSX.Element {
             setText(String(props.value));
             return;
         }
+        committed = next;
         props.onChange(next);
     }
 

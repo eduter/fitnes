@@ -1,5 +1,5 @@
 import { A, useNavigate, useParams } from '@solidjs/router';
-import { For, Show, createEffect, createMemo, createSignal, type JSX } from 'solid-js';
+import { For, Show, createMemo, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
@@ -28,36 +28,7 @@ function SessionPage(): JSX.Element {
 
     const [drafts, setDrafts] = createSignal<Record<string, ActualResult>>({});
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
-
-    createEffect(() => {
-        const current = session();
-        if (!current) {
-            return;
-        }
-
-        setDrafts((previous) => {
-            const next: Record<string, ActualResult> = { ...previous };
-
-            for (const entry of current.snapshot.sequence) {
-                const existing = current.results.find((result) => result.sequenceEntryId === entry.id);
-                if (existing) {
-                    next[entry.id] = existing;
-                    continue;
-                }
-
-                if (next[entry.id]) {
-                    continue;
-                }
-
-                const occurrence = findOccurrence(current.snapshot, entry.id);
-                if (occurrence) {
-                    next[entry.id] = draftResultFromPrescription(entry.id, occurrence.set.prescription, Date.now());
-                }
-            }
-
-            return next;
-        });
-    });
+    const defaults = createMemo(() => defaultDrafts(session()));
 
     const readOnly = createMemo(() => session()?.completedAt !== undefined);
 
@@ -69,7 +40,7 @@ function SessionPage(): JSX.Element {
 
     async function log(entryId: SequenceEntryId): Promise<void> {
         const current = session();
-        const draft = drafts()[entryId];
+        const draft = drafts()[entryId] ?? defaults()[entryId];
         if (!current || !draft) {
             return;
         }
@@ -214,11 +185,15 @@ function SessionPage(): JSX.Element {
                             <For each={current().snapshot.sequence}>
                                 {(entry) => {
                                     const occurrence = findOccurrence(current().snapshot, entry.id);
+                                    if (!occurrence) {
+                                        return <li class="card">Unknown sequence entry {entry.id}</li>;
+                                    }
+
                                     const result = current().results.find(
                                         (candidate) => candidate.sequenceEntryId === entry.id
                                     );
-                                    const draft = drafts()[entry.id];
-                                    if (!occurrence || !draft) {
+                                    const draft = drafts()[entry.id] ?? result ?? defaults()[entry.id];
+                                    if (!draft) {
                                         return <li class="card">Unknown sequence entry {entry.id}</li>;
                                     }
 
@@ -246,6 +221,22 @@ function SessionPage(): JSX.Element {
             </Show>
         </section>
     );
+}
+
+function defaultDrafts(current: WorkoutSession | undefined): Record<string, ActualResult> {
+    if (!current) {
+        return {};
+    }
+
+    const next: Record<string, ActualResult> = {};
+    for (const entry of current.snapshot.sequence) {
+        const occurrence = findOccurrence(current.snapshot, entry.id);
+        if (!occurrence) {
+            continue;
+        }
+        next[entry.id] = draftResultFromPrescription(entry.id, occurrence.set.prescription, current.startedAt);
+    }
+    return next;
 }
 
 export { SessionPage };

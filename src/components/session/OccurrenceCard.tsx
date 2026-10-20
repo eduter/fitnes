@@ -18,10 +18,24 @@ interface OccurrenceCardProps {
 
 /** One sequence occurrence: prescription, optional actual, and logging controls. */
 function OccurrenceCard(props: OccurrenceCardProps): JSX.Element {
+    const load = () => props.result?.load ?? props.occurrence.set.prescription.load;
     const combined = (): string | undefined => {
-        const load = props.result?.load ?? props.occurrence.set.prescription.load;
-        const total = totalLoad(load, sessionBodyweightWeight(props.session));
+        const total = totalLoad(load(), sessionBodyweightWeight(props.session));
         return total ? formatWeight(total) : undefined;
+    };
+    const surprisingMissingTotal = (): boolean => {
+        const currentLoad = load();
+        if (combined()) {
+            return false;
+        }
+        if (currentLoad.kind === 'bodyweight') {
+            return sessionBodyweightWeight(props.session) === undefined;
+        }
+        if (currentLoad.kind !== 'bodyweightExternal' || currentLoad.basis !== 'total') {
+            return false;
+        }
+        const bodyweight = sessionBodyweightWeight(props.session);
+        return !bodyweight || bodyweight.unit !== currentLoad.weight.unit;
     };
 
     return (
@@ -31,18 +45,18 @@ function OccurrenceCard(props: OccurrenceCardProps): JSX.Element {
                 prescribed {formatMeasurement(props.occurrence.set.prescription.measurement)} ·{' '}
                 {formatLoad(props.occurrence.set.prescription.load)} · {props.occurrence.set.prescription.executionMode}
             </p>
+            <Show when={combined()}>{(total) => <p>combined totalLoad {total()}</p>}</Show>
             <Show when={props.result}>
                 {(result) => (
                     <p>
                         actual {formatMeasurement(result().measurement)} · {formatLoad(result().load)}
-                        <Show when={combined()}>{(total) => <> · total {total()}</>}</Show>
                     </p>
                 )}
             </Show>
-            <Show when={!combined()}>
+            <Show when={surprisingMissingTotal()}>
                 <p class="muted">
-                    Combined totalLoad is undefined (no load, per-hand/per-side basis, missing bodyweight, or mixed
-                    units).
+                    Combined totalLoad is undefined because bodyweight is missing from the session or its unit does not
+                    match the external load.
                 </p>
             </Show>
             <Show when={!props.readOnly}>
