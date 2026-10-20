@@ -582,3 +582,17 @@ below preserve the original findings and rationale.
 - Still open: FITNES-003 through FITNES-010.
 - Next task: reject undeclared fields across persisted ArkType schemas and add
   discriminated-union exclusivity tests (FITNES-005).
+
+### Checkpoint after FITNES-005
+
+- Fixed: FITNES-005 in `60bb3a1` (`fix(domain): reject undeclared data
+  fields`).
+- Persisted schemas now use ArkType's undeclared-key rejection recursively.
+  Repetition/duration and load union variants reject fields belonging to other
+  variants, and unknown fields are rejected at document and nested levels.
+- Added direct prescription-schema coverage in addition to template/session
+  integration coverage.
+- Verification: `npm run check` passed (7 test files, 81 tests).
+- Still open: FITNES-003, FITNES-004, and FITNES-006 through FITNES-010.
+- Next task: require every planned set to occur exactly once in the execution
+  sequence (FITNES-006).
