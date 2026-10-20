@@ -4,6 +4,15 @@ import { render } from 'solid-js/web';
 import './styles/global.css';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App.tsx';
+import { BodyweightPage } from './pages/BodyweightPage.tsx';
+import { ExerciseEditPage } from './pages/ExerciseEditPage.tsx';
+import { ExerciseListPage } from './pages/ExerciseListPage.tsx';
+import { HomePage } from './pages/HomePage.tsx';
+import { SessionListPage } from './pages/SessionListPage.tsx';
+import { SessionPage } from './pages/SessionPage.tsx';
+import { StartSessionPage } from './pages/StartSessionPage.tsx';
+import { TemplateEditPage } from './pages/TemplateEditPage.tsx';
+import { TemplateListPage } from './pages/TemplateListPage.tsx';
 
 const root = document.getElementById('root');
 if (!root) {
@@ -13,19 +22,20 @@ if (!root) {
 render(
     () => (
         <Router root={App}>
-            <Route path="/" component={Home} />
+            <Route path="/" component={HomePage} />
+            <Route path="/exercises" component={ExerciseListPage} />
+            <Route path="/exercises/new" component={ExerciseEditPage} />
+            <Route path="/exercises/:id" component={ExerciseEditPage} />
+            <Route path="/templates" component={TemplateListPage} />
+            <Route path="/templates/new" component={TemplateEditPage} />
+            <Route path="/templates/:id" component={TemplateEditPage} />
+            <Route path="/sessions" component={SessionListPage} />
+            <Route path="/sessions/start/:templateId" component={StartSessionPage} />
+            <Route path="/sessions/:id" component={SessionPage} />
+            <Route path="/bodyweight" component={BodyweightPage} />
         </Router>
     ),
     root
 );
 
 registerSW({ immediate: true });
-
-function Home() {
-    return (
-        <div class="placeholder">
-            <h1>FitNES</h1>
-            <p class="placeholder-text">Scaffolding is in place. Time to build the workout tracker.</p>
-        </div>
-    );
-}
