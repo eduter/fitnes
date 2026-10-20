@@ -52,7 +52,7 @@ lockfile without changing it. The second `npm run check` passed:
 - Biome lint: passed, 30 files checked
 - TypeScript project typecheck: passed
 - Biome format check: passed, 29 files checked
-- Vitest: passed, 7 files and 66 tests
+- Vitest: passed, 6 files and 66 tests
 
 There were no pre-existing test, typecheck, lint, or format failures after the
 environment was initialized.
@@ -551,6 +551,19 @@ each green checkpoint.
 
 ## Implementation status
 
-No implementation changes had been made when the original audit was written.
-All findings above were open. This section is reserved for append-only status
-updates so the original findings and rationale remain intact.
+The original audit was committed before implementation changes. Status updates
+below preserve the original findings and rationale.
+
+### Checkpoint after FITNES-001
+
+- Fixed: FITNES-001 in `62c75c8` (`fix(domain): make load capabilities explicit`).
+- Exercise definitions now enumerate complete load modes. `none` is explicit,
+  and `bodyweightExternal` has its own allowed external-load bases.
+- The pull-up fixture allows `bodyweight` and `bodyweightExternal`, so an
+  external-only pull-up is rejected.
+- Empty load-capability lists are rejected.
+- Verification: `npm run check` passed (6 test files, 69 tests).
+- Still open: FITNES-002 through FITNES-010.
+- Next task: add failing session tests for result/prescription semantic
+  alignment (FITNES-002), then compare discriminants and bases in
+  `checkResults`.
