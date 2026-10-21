@@ -19,17 +19,24 @@ function ExerciseEditPage(): JSX.Element {
     const [draft, setDraft] = createSignal<ExerciseDefinition>(blankExercise());
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const [created, setCreated] = createSignal(false);
-    const [hydrated, setHydrated] = createSignal(false);
+    const [hydratedFor, setHydratedFor] = createSignal<string | undefined>(undefined);
+
+    // Ids are non-empty, so '' can mark the create route without colliding with
+    // a real one. Keying on the route (not a one-shot flag) re-hydrates when
+    // navigating between two exercises, which the router serves with this same
+    // component instance.
+    const routeKey = () => params.id ?? '';
 
     createEffect(() => {
-        if (hydrated()) {
+        const key = routeKey();
+        if (hydratedFor() === key) {
             return;
         }
 
         if (isNew()) {
             setDraft(blankExercise());
             setCreated(false);
-            setHydrated(true);
+            setHydratedFor(key);
             return;
         }
 
@@ -37,9 +44,9 @@ function ExerciseEditPage(): JSX.Element {
         if (found) {
             setDraft(structuredClone(found));
             setCreated(true);
-            setHydrated(true);
+            setHydratedFor(key);
         } else if (app.loadState() === 'ready') {
-            setHydrated(true);
+            setHydratedFor(key);
         }
     });
 
@@ -82,7 +89,8 @@ function ExerciseEditPage(): JSX.Element {
         navigate('/exercises');
     }
 
-    const missing = () => hydrated() && !isNew() && !app.exercises().some((exercise) => exercise.id === params.id);
+    const missing = () =>
+        hydratedFor() !== undefined && !isNew() && !app.exercises().some((exercise) => exercise.id === params.id);
 
     return (
         <section class="page">
