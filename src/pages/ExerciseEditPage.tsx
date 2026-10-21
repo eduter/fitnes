@@ -4,6 +4,7 @@ import { useAppData } from '../app/AppData.tsx';
 import { ExerciseForm } from '../components/exercise/ExerciseForm.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
+import { duplicateExercise } from '../domain/duplicateExercise.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { generateExerciseId } from '../domain/generateIds.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
@@ -64,6 +65,15 @@ function ExerciseEditPage(): JSX.Element {
         navigate(`/exercises/${result.value.id}`, { replace: true });
     }
 
+    async function duplicate(): Promise<void> {
+        const result = await app.saveExercise(duplicateExercise(draft()));
+        if (!result.ok) {
+            setErrors(result.errors);
+            return;
+        }
+        navigate(`/exercises/${result.value.id}`);
+    }
+
     async function remove(): Promise<void> {
         if (!confirm('Delete this exercise from the catalog? Templates keep their snapshots.')) {
             return;
@@ -80,9 +90,14 @@ function ExerciseEditPage(): JSX.Element {
                 title={created() ? draft().name || 'Exercise' : 'New exercise'}
                 actions={
                     <Show when={created()}>
-                        <button class="btn btn--secondary" type="button" onClick={() => void remove()}>
-                            Delete
-                        </button>
+                        <div class="button-row">
+                            <button class="btn btn--secondary" type="button" onClick={() => void duplicate()}>
+                                Duplicate
+                            </button>
+                            <button class="btn btn--secondary" type="button" onClick={() => void remove()}>
+                                Delete
+                            </button>
+                        </div>
                     </Show>
                 }
             />

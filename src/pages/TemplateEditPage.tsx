@@ -4,6 +4,7 @@ import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
 import { TemplateForm } from '../components/template/TemplateForm.tsx';
+import { duplicateWorkoutTemplate } from '../domain/duplicateWorkoutTemplate.ts';
 import { generateWorkoutTemplateId } from '../domain/generateIds.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
@@ -64,6 +65,15 @@ function TemplateEditPage(): JSX.Element {
         navigate(`/templates/${result.value.id}`, { replace: true });
     }
 
+    async function duplicate(): Promise<void> {
+        const result = await app.saveTemplate(duplicateWorkoutTemplate(draft()));
+        if (!result.ok) {
+            setErrors(result.errors);
+            return;
+        }
+        navigate(`/templates/${result.value.id}`);
+    }
+
     async function remove(): Promise<void> {
         if (!confirm('Delete this template? Sessions keep their snapshots.')) {
             return;
@@ -84,6 +94,9 @@ function TemplateEditPage(): JSX.Element {
                             <A class="btn btn--primary" href={`/sessions/start/${draft().id}`}>
                                 Start
                             </A>
+                            <button class="btn btn--secondary" type="button" onClick={() => void duplicate()}>
+                                Duplicate
+                            </button>
                             <button class="btn btn--secondary" type="button" onClick={() => void remove()}>
                                 Delete
                             </button>
