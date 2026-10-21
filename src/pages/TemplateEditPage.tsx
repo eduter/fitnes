@@ -20,6 +20,8 @@ function TemplateEditPage(): JSX.Element {
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const [created, setCreated] = createSignal(false);
     const [hydratedFor, setHydratedFor] = createSignal<string | undefined>(undefined);
+    const [duplicating, setDuplicating] = createSignal(false);
+    const [pendingEdit, setPendingEdit] = createSignal<WorkoutTemplate | undefined>(undefined);
 
     // Ids are non-empty, so '' can mark the create route without colliding with
     // a real one. Keying on the route (not a one-shot flag) re-hydrates when
@@ -57,6 +59,13 @@ function TemplateEditPage(): JSX.Element {
             return;
         }
 
+        // Hold the edit while a duplicate is in flight; `duplicate` folds it into
+        // the copy once the copy exists, so it cannot reach the source document.
+        if (duplicating()) {
+            setPendingEdit(next);
+            return;
+        }
+
         const result = await app.saveTemplate(next);
         setErrors(result.ok ? [] : result.errors);
     }
@@ -73,12 +82,26 @@ function TemplateEditPage(): JSX.Element {
     }
 
     async function duplicate(): Promise<void> {
-        const result = await app.saveTemplate(duplicateWorkoutTemplate(draft()));
+        const copy = duplicateWorkoutTemplate(draft());
+
+        setDuplicating(true);
+        setPendingEdit(undefined);
+        const result = await app.saveTemplate(copy);
+        const edit = pendingEdit();
+        setPendingEdit(undefined);
+        setDuplicating(false);
+
         if (!result.ok) {
             setErrors(result.errors);
             return;
         }
-        navigate(`/templates/${result.value.id}`);
+        setErrors([]);
+
+        if (edit) {
+            await app.saveTemplate({ ...edit, id: copy.id });
+        }
+
+        navigate(`/templates/${copy.id}`);
     }
 
     async function remove(): Promise<void> {

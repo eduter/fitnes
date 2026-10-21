@@ -6,7 +6,7 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { App } from '../App.tsx';
 import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
-import { putTemplate } from '../db/repository.ts';
+import { listExercises, listTemplates, putTemplate } from '../db/repository.ts';
 import { createWorkoutTemplate } from '../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../domain/defaultPrescription.ts';
 import { exampleExercises, pullUp } from '../domain/examples.ts';
@@ -108,6 +108,27 @@ describe('ExerciseEditPage', () => {
 
         await waitFor(() => expect(name.value).toBe('Wrist curl (copy)'));
     });
+
+    it('applies an edit made immediately after Duplicate to the copy, not the source', async () => {
+        const { getByLabelText, getByRole } = renderAppAt('/exercises/ex-wrist-curl', () => (
+            <>
+                <Route path="/exercises" component={ExerciseListPage} />
+                <Route path="/exercises/:id" component={ExerciseEditPage} />
+            </>
+        ));
+
+        const name = getByLabelText('Name') as HTMLInputElement;
+        await waitFor(() => expect(name.value).toBe('Wrist curl'));
+
+        fireEvent.click(getByRole('button', { name: 'Duplicate' }));
+        fireEvent.input(name, { target: { value: 'Raced edit' } });
+
+        await waitFor(async () => {
+            const exercises = await listExercises(db);
+            expect(exercises.find((exercise) => exercise.id === 'ex-wrist-curl')?.name).toBe('Wrist curl');
+            expect(exercises.some((exercise) => exercise.name === 'Raced edit')).toBe(true);
+        });
+    });
 });
 
 describe('TemplateEditPage', () => {
@@ -144,5 +165,30 @@ describe('TemplateEditPage', () => {
         fireEvent.click(within(actions as HTMLElement).getByRole('button', { name: 'Duplicate' }));
 
         await waitFor(() => expect(name.value).toBe('Test day (copy)'));
+    });
+
+    it('applies an edit made immediately after Duplicate to the copy, not the source', async () => {
+        const { getByLabelText } = renderAppAt(`/templates/${TEMPLATE_ID}`, () => (
+            <>
+                <Route path="/templates" component={TemplateListPage} />
+                <Route path="/templates/:id" component={TemplateEditPage} />
+            </>
+        ));
+
+        const name = getByLabelText('Name') as HTMLInputElement;
+        await waitFor(() => expect(name.value).toBe('Test day'));
+
+        const actions = document.querySelector('.page-actions');
+        if (!actions) {
+            throw new Error('page actions missing');
+        }
+        fireEvent.click(within(actions as HTMLElement).getByRole('button', { name: 'Duplicate' }));
+        fireEvent.input(name, { target: { value: 'Raced template' } });
+
+        await waitFor(async () => {
+            const templates = await listTemplates(db);
+            expect(templates.find((template) => template.id === TEMPLATE_ID)?.name).toBe('Test day');
+            expect(templates.some((template) => template.name === 'Raced template')).toBe(true);
+        });
     });
 });
