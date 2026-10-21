@@ -40,6 +40,21 @@ to carry a change all the way to review, not to stop at a local commit:
 
 Never push or merge directly to `main`; all changes reach it through a PR.
 
+### Verifying a preview
+
+The app registers a service worker (`registerSW` in `src/index.tsx`) with
+`autoUpdate`. In a browser that has already loaded the preview origin, the
+old worker keeps serving the previously cached bundle, so the page can show
+stale UI even though the deployed asset hash changed. A stale-looking preview
+is therefore not evidence of a bug — clear site data for the preview origin
+and re-test before concluding anything.
+
+To exercise a real browser without that confound, run headless Chromium
+against the preview URL with a fresh `--user-data-dir` and drive it over the
+DevTools protocol (`Runtime.evaluate` to click and read the DOM). A fresh
+profile starts with no service worker, which is the only way to observe the
+bundle that was actually deployed.
+
 ## Code style
 
 Formatting and the mechanical lint rules are Biome's job.
