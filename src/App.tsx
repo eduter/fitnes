@@ -24,6 +24,7 @@ function App(props: AppProps): JSX.Element {
                         <A href="/exercises">Exercises</A>
                         <A href="/bodyweight">Weight</A>
                         <A href="/sessions">History</A>
+                        <A href="/data">Data</A>
                     </nav>
                 </header>
                 <StatusBanner />

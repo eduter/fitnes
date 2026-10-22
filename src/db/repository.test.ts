@@ -1,6 +1,7 @@
 import Dexie from 'dexie';
 import { afterEach, describe, expect, it } from 'vitest';
 import { exampleExercises, pullUp } from '../domain/examples.ts';
+import { EXPORT_SCHEMA_VERSION } from '../domain/dataExport.ts';
 import { createWorkoutTemplate } from '../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../domain/defaultPrescription.ts';
 import { generatePlannedSetId, generateSequenceEntryId, generateWorkoutTemplateId } from '../domain/generateIds.ts';
@@ -11,7 +12,9 @@ import {
     deleteExercise,
     deleteSession,
     deleteTemplate,
+    exportDatabase,
     getExercise,
+    importDatabase,
     listBodyweightMeasurements,
     listExercises,
     listSessions,
@@ -119,5 +122,73 @@ describe('FitnesDB repository', () => {
         expect(await listTemplates(testDb)).toEqual([]);
         expect(await listSessions(testDb)).toEqual([]);
         expect(await listBodyweightMeasurements(testDb)).toEqual([]);
+    });
+
+    it('exports every stored collection in one document', async () => {
+        testDb = await openDb();
+        await seedExampleExercises(testDb);
+        await putBodyweightMeasurement(testDb, { id: 'bw-1', measuredAt: 1_000, value: 80, unit: 'kg' });
+
+        const exported = await exportDatabase(testDb);
+
+        expect(exported.schemaVersion).toBe(EXPORT_SCHEMA_VERSION);
+        expect(exported.exercises).toHaveLength(exampleExercises.length);
+        expect(exported.bodyweightMeasurements).toHaveLength(1);
+        expect(exported.templates).toEqual([]);
+        expect(exported.sessions).toEqual([]);
+    });
+
+    it('exports a row this build cannot parse, rather than losing it', async () => {
+        testDb = await openDb();
+        // A row from an older build: a per-side prescription with no sides.
+        await testDb.templates.put({
+            id: 'tmpl-legacy',
+            name: 'Legacy',
+            schemaVersion: 1,
+            exercises: [],
+            sets: [],
+            sequence: [],
+        } as never);
+
+        const exported = await exportDatabase(testDb);
+
+        expect(exported.templates).toHaveLength(1);
+        expect(exported.templates[0].id).toBe('tmpl-legacy');
+    });
+
+    it('replaces every collection on import, deleting records the document omits', async () => {
+        testDb = await openDb();
+        await seedExampleExercises(testDb);
+        await putBodyweightMeasurement(testDb, { id: 'bw-1', measuredAt: 1_000, value: 80, unit: 'kg' });
+
+        await importDatabase(testDb, {
+            schemaVersion: EXPORT_SCHEMA_VERSION,
+            exercises: [pullUp],
+            templates: [],
+            sessions: [],
+            bodyweightMeasurements: [],
+        });
+
+        expect(await listExercises(testDb)).toEqual([pullUp]);
+        expect(await listBodyweightMeasurements(testDb)).toEqual([]);
+    });
+
+    it('round-trips a full database through export and import', async () => {
+        testDb = await openDb();
+        await seedExampleExercises(testDb);
+        await putBodyweightMeasurement(testDb, { id: 'bw-1', measuredAt: 1_000, value: 80, unit: 'kg' });
+        const before = await exportDatabase(testDb);
+
+        await importDatabase(testDb, { ...before, exercises: [] });
+        expect(await listExercises(testDb)).toEqual([]);
+
+        await importDatabase(testDb, before);
+        const after = await exportDatabase(testDb);
+
+        // `exportedAt` is the export's own timestamp, so only the records can match.
+        expect(after.exercises).toEqual(before.exercises);
+        expect(after.bodyweightMeasurements).toEqual(before.bodyweightMeasurements);
+        expect(after.templates).toEqual(before.templates);
+        expect(after.sessions).toEqual(before.sessions);
     });
 });

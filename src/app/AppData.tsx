@@ -6,6 +6,8 @@ import {
     deleteExercise,
     deleteSession,
     deleteTemplate,
+    exportDatabase,
+    importDatabase,
     latestStoredBodyweight,
     listBodyweightMeasurements,
     listExercises,
@@ -18,6 +20,7 @@ import {
     seedExampleExercises,
 } from '../db/repository.ts';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
+import { parseDataExport, serializeDataExport, type DataExport } from '../domain/dataExport.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { generateWorkoutSessionId } from '../domain/generateIds.ts';
 import { createSessionFromTemplate, type WorkoutSession } from '../domain/session.ts';
@@ -46,6 +49,8 @@ interface AppData {
         bodyweight?: BodyweightMeasurement
     ) => Promise<ValidationResult<WorkoutSession>>;
     latestBodyweight: (at: number) => Promise<BodyweightMeasurement | undefined>;
+    exportData: () => Promise<string>;
+    importData: (input: unknown) => Promise<ValidationResult<DataExport>>;
 }
 
 interface AppDataProviderProps {
@@ -170,6 +175,27 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         return withDbRead(() => latestStoredBodyweight(db, at));
     }
 
+    /** Read the whole database as JSON text. Reads raw rows, so it works even when loading fails. */
+    async function exportData(): Promise<string> {
+        return serializeDataExport(await withDbRead(() => exportDatabase(db)));
+    }
+
+    /**
+     * Replace the whole database from an export document. The document is
+     * validated before anything is written, so a malformed file leaves the
+     * current data untouched.
+     */
+    async function importData(input: unknown): Promise<ValidationResult<DataExport>> {
+        const parsed = parseDataExport(input);
+        if (!parsed.ok) {
+            return parsed;
+        }
+
+        await withDbWrite(() => importDatabase(db, parsed.value));
+        await reloadAll();
+        return parsed;
+    }
+
     const value: AppData = {
         loadState,
         loadError,
@@ -187,6 +213,8 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         removeBodyweight,
         startSession,
         latestBodyweight,
+        exportData,
+        importData,
     };
 
     return <AppDataContext.Provider value={value}>{props.children}</AppDataContext.Provider>;

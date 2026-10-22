@@ -1,4 +1,5 @@
 import { latestBodyweightAtOrBefore, type BodyweightMeasurement } from '../domain/bodyweight.ts';
+import { EXPORT_SCHEMA_VERSION, type DataExport } from '../domain/dataExport.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { exampleExercises } from '../domain/examples.ts';
 import type { WorkoutSession } from '../domain/session.ts';
@@ -137,6 +138,52 @@ async function deleteBodyweightMeasurement(db: FitnesDB, id: string): Promise<vo
     await db.bodyweightMeasurements.delete(id);
 }
 
+/**
+ * Read every stored row into one document. Rows are read from the tables
+ * directly rather than through the validating readers, so a row this build
+ * cannot parse is still exported instead of blocking the export. An export
+ * should never be the thing that loses data.
+ */
+async function exportDatabase(db: FitnesDB): Promise<DataExport> {
+    const [exercises, templates, sessions, bodyweightMeasurements] = await Promise.all([
+        db.exercises.toArray(),
+        db.templates.toArray(),
+        db.sessions.toArray(),
+        db.bodyweightMeasurements.toArray(),
+    ]);
+
+    return {
+        schemaVersion: EXPORT_SCHEMA_VERSION,
+        exportedAt: Date.now(),
+        exercises,
+        templates,
+        sessions,
+        bodyweightMeasurements,
+    };
+}
+
+/**
+ * Replace every stored collection with the contents of `value`, in a single
+ * transaction so a failure part-way leaves the previous data intact. This is a
+ * whole-database replace, not a merge: a record absent from `value` is deleted.
+ */
+async function importDatabase(db: FitnesDB, value: DataExport): Promise<void> {
+    await db.transaction('rw', db.exercises, db.templates, db.sessions, db.bodyweightMeasurements, async () => {
+        await Promise.all([
+            db.exercises.clear(),
+            db.templates.clear(),
+            db.sessions.clear(),
+            db.bodyweightMeasurements.clear(),
+        ]);
+        await Promise.all([
+            db.exercises.bulkPut(value.exercises),
+            db.templates.bulkPut(value.templates),
+            db.sessions.bulkPut(value.sessions),
+            db.bodyweightMeasurements.bulkPut(value.bodyweightMeasurements),
+        ]);
+    });
+}
+
 function readExercise(row: ExerciseDefinition): ExerciseDefinition {
     return unwrap(validateExercise(row), 'exercise', row.id);
 }
@@ -167,9 +214,11 @@ export {
     deleteExercise,
     deleteSession,
     deleteTemplate,
+    exportDatabase,
     getExercise,
     getSession,
     getTemplate,
+    importDatabase,
     latestStoredBodyweight,
     listBodyweightMeasurements,
     listExercises,

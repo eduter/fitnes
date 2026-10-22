@@ -5,6 +5,7 @@ import './styles/global.css';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App.tsx';
 import { BodyweightPage } from './pages/BodyweightPage.tsx';
+import { DataPage } from './pages/DataPage.tsx';
 import { ExerciseEditPage } from './pages/ExerciseEditPage.tsx';
 import { ExerciseListPage } from './pages/ExerciseListPage.tsx';
 import { HomePage } from './pages/HomePage.tsx';
@@ -33,6 +34,7 @@ render(
             <Route path="/sessions/start/:templateId" component={StartSessionPage} />
             <Route path="/sessions/:id" component={SessionPage} />
             <Route path="/bodyweight" component={BodyweightPage} />
+            <Route path="/data" component={DataPage} />
         </Router>
     ),
     root

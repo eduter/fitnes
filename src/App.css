@@ -182,6 +182,15 @@
     font-size: 12px;
 }
 
+.data-document {
+    font-family: monospace;
+    font-size: 13px;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    resize: vertical;
+}
+
 fieldset.form-field {
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
