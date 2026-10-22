@@ -96,8 +96,7 @@
     color: var(--text-heading);
 }
 
-.list,
-.sequence-list {
+.list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -412,4 +411,87 @@ legend.form-label {
     height: 100%;
     background: var(--accent);
     transition: width var(--transition-fast);
+}
+
+/* --- Planned set rows ------------------------------------------------------
+   A template's sets are a scannable list of one-line rows; the full
+   prescription editor opens in place for the row being changed. */
+
+.planned-set {
+    border-bottom: 1px solid var(--border);
+}
+
+.planned-set:last-child {
+    border-bottom: none;
+}
+
+.planned-set__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.planned-set__summary {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.planned-set__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.planned-set__name {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.planned-set__detail {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.planned-set__caret {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.planned-set__body {
+    padding: var(--space-sm) 0 var(--space-md);
+}
+
+/* Icon buttons for per-set actions: they must not compete with the summary. */
+.btn--icon {
+    width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.btn--icon:disabled {
+    opacity: 0.35;
+}
+
+.set-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
 }

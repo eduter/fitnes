@@ -1,8 +1,7 @@
-import { For, Show, type JSX } from 'solid-js';
+import { For, Show, createSignal, type JSX } from 'solid-js';
 import { createWorkoutTemplate, refreshTemplateExercises } from '../../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../../domain/defaultPrescription.ts';
 import type { ExerciseDefinition } from '../../domain/exercise.ts';
-import { formatLoad, formatMeasurement } from '../../domain/format.ts';
 import { generatePlannedSetId, generateSequenceEntryId } from '../../domain/generateIds.ts';
 import type { SetPrescription } from '../../domain/prescription.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
@@ -10,6 +9,7 @@ import type { PlannedSet, WorkoutTemplate } from '../../domain/workoutTemplate.t
 import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
 import { TextAreaField, TextField } from '../fields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
+import { prescriptionSummary } from './prescriptionSummary.ts';
 
 interface TemplateFormProps {
     value: WorkoutTemplate;
@@ -20,6 +20,12 @@ interface TemplateFormProps {
 
 /** Edit a template's metadata, planned sets, and execution sequence. */
 function TemplateForm(props: TemplateFormProps): JSX.Element {
+    const [expanded, setExpanded] = createSignal<number | null>(null);
+
+    function toggle(index: number): void {
+        setExpanded((current) => (current === index ? null : index));
+    }
+
     function rebuild(overrides: Partial<WorkoutTemplate>, existingSnapshots = props.value.exercises): void {
         const result = createWorkoutTemplate({
             id: overrides.id ?? props.value.id,
@@ -144,7 +150,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 </button>
             </div>
             <AddSetControl catalog={props.catalog} onAdd={addSet} />
-            <ol class="sequence-list">
+            <ol class="set-list">
                 <For each={props.value.sequence} fallback={<p class="muted">No sets yet.</p>}>
                     {(entry, index) => {
                         const set = props.value.sets.find((candidate) => candidate.id === entry.plannedSetId);
@@ -153,7 +159,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                             props.catalog.find((candidate) => candidate.id === set?.exerciseId);
 
                         return (
-                            <li class="card">
+                            <li>
                                 <Show
                                     when={set && exercise}
                                     fallback={<p class="muted">Unknown planned set {entry.plannedSetId}</p>}
@@ -166,6 +172,8 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                             (candidate) => candidate.id === exercise?.id
                                         )}
                                         set={set as PlannedSet}
+                                        expanded={expanded() === index()}
+                                        onToggle={() => toggle(index())}
                                         onPrescription={(prescription) =>
                                             setAt(
                                                 props.value.sets.findIndex((candidate) => candidate.id === set?.id),
@@ -236,61 +244,90 @@ interface OccurrenceEditorProps {
     exercise: ExerciseDefinition;
     catalogExercise: ExerciseDefinition | undefined;
     set: PlannedSet;
+    expanded: boolean;
+    onToggle: () => void;
     onPrescription: (prescription: SetPrescription) => void;
     onMove: (delta: number) => void;
     onDuplicate: () => void;
     onRemove: () => void;
 }
 
+/**
+ * One planned set as a single collapsed row, expanding in place to the full
+ * prescription editor. Collapsed-by-default is what keeps a whole plan
+ * scannable: only the set being changed pays the height cost.
+ */
 function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
     const drifted = (): boolean =>
         props.catalogExercise !== undefined && JSON.stringify(props.catalogExercise) !== JSON.stringify(props.exercise);
 
     return (
-        <div class="stack">
-            <div class="row-split">
-                <div>
-                    <h2 class="card-title">
-                        {props.index + 1}. {props.exercise.name}
-                    </h2>
-                    <p class="card-meta">
-                        {formatMeasurement(props.set.prescription.measurement)} ·{' '}
-                        {formatLoad(props.set.prescription.load)} · {props.set.prescription.executionMode}
-                    </p>
-                    <Show when={drifted()}>
-                        <p class="warning-text">Catalog definition differs from this snapshot.</p>
-                    </Show>
-                </div>
+        <div class="planned-set" classList={{ 'planned-set--expanded': props.expanded }}>
+            <div class="planned-set__row">
+                <button
+                    class="planned-set__summary"
+                    type="button"
+                    aria-expanded={props.expanded}
+                    onClick={props.onToggle}
+                >
+                    <span class="set-badge">{props.index + 1}</span>
+                    <span class="planned-set__text">
+                        <span class="planned-set__name">{props.exercise.name}</span>
+                        <span class="planned-set__detail">{prescriptionSummary(props.set.prescription)}</span>
+                    </span>
+                    <span class="planned-set__caret" aria-hidden="true">
+                        {props.expanded ? '▾' : '▸'}
+                    </span>
+                </button>
                 <div class="button-row">
                     <button
-                        class="btn btn--secondary"
+                        class="btn btn--icon"
                         type="button"
+                        aria-label={`Move set ${props.index + 1} up`}
                         disabled={props.index === 0}
                         onClick={() => props.onMove(-1)}
                     >
-                        Up
+                        ↑
                     </button>
                     <button
-                        class="btn btn--secondary"
+                        class="btn btn--icon"
                         type="button"
+                        aria-label={`Move set ${props.index + 1} down`}
                         disabled={props.index === props.lastIndex}
                         onClick={() => props.onMove(1)}
                     >
-                        Down
+                        ↓
                     </button>
-                    <button class="btn btn--secondary" type="button" onClick={props.onDuplicate}>
-                        Duplicate
+                    <button
+                        class="btn btn--icon"
+                        type="button"
+                        aria-label={`Duplicate set ${props.index + 1}`}
+                        onClick={props.onDuplicate}
+                    >
+                        ⧉
                     </button>
-                    <button class="btn btn--secondary" type="button" onClick={props.onRemove}>
-                        Remove
+                    <button
+                        class="btn btn--icon"
+                        type="button"
+                        aria-label={`Remove set ${props.index + 1}`}
+                        onClick={props.onRemove}
+                    >
+                        ✕
                     </button>
                 </div>
             </div>
-            <PrescriptionFields
-                exercise={props.exercise}
-                value={props.set.prescription}
-                onChange={props.onPrescription}
-            />
+            <Show when={drifted()}>
+                <p class="warning-text">Catalog definition differs from this snapshot.</p>
+            </Show>
+            <Show when={props.expanded}>
+                <div class="planned-set__body">
+                    <PrescriptionFields
+                        exercise={props.exercise}
+                        value={props.set.prescription}
+                        onChange={props.onPrescription}
+                    />
+                </div>
+            </Show>
         </div>
     );
 }
