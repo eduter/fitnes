@@ -462,6 +462,15 @@ legend.form-label {
     border-bottom: 1px solid var(--border);
 }
 
+.reading-row {
+    padding: var(--space-xs) var(--space-md);
+}
+
+.reading-row__value {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
 .planned-set:last-child {
     border-bottom: none;
 }

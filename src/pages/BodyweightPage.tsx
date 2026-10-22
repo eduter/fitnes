@@ -18,6 +18,7 @@ function BodyweightPage(): JSX.Element {
     const [unit, setUnit] = createSignal<WeightUnit>('kg');
     const [measuredAt, setMeasuredAt] = createSignal(Date.now());
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
+    const [expanded, setExpanded] = createSignal<string | null>(null);
 
     async function add(): Promise<void> {
         const result = await app.saveBodyweight({
@@ -70,42 +71,16 @@ function BodyweightPage(): JSX.Element {
             <ul class="list">
                 <For each={app.bodyweightMeasurements()} fallback={<li class="muted">No readings yet.</li>}>
                     {(measurement) => (
-                        <li class="card stack">
-                            <div class="row-split">
-                                <strong>
-                                    {formatWeight(measurement)} · {formatDateTime(measurement.measuredAt)}
-                                </strong>
-                                <button
-                                    class="btn btn--secondary"
-                                    type="button"
-                                    onClick={() => void remove(measurement.id)}
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                            <div class="inline-fields">
-                                <NumberField
-                                    label="Value"
-                                    min={0}
-                                    value={measurement.value}
-                                    onChange={(next) => void edit({ ...measurement, value: next })}
-                                />
-                                <SelectField
-                                    label="Unit"
-                                    value={measurement.unit}
-                                    options={[
-                                        { value: 'kg', label: 'kg' },
-                                        { value: 'lb', label: 'lb' },
-                                    ]}
-                                    onChange={(next) => void edit({ ...measurement, unit: next as WeightUnit })}
-                                />
-                                <DateTimeField
-                                    label="Measured at"
-                                    value={measurement.measuredAt}
-                                    onChange={(next) => void edit({ ...measurement, measuredAt: next })}
-                                />
-                            </div>
-                            <RawDocument value={measurement} />
+                        <li>
+                            <ReadingRow
+                                measurement={measurement}
+                                expanded={expanded() === measurement.id}
+                                onToggle={() =>
+                                    setExpanded((current) => (current === measurement.id ? null : measurement.id))
+                                }
+                                onEdit={(next) => void edit(next)}
+                                onRemove={() => void remove(measurement.id)}
+                            />
                         </li>
                     )}
                 </For>
@@ -116,6 +91,72 @@ function BodyweightPage(): JSX.Element {
                 </p>
             </Show>
         </section>
+    );
+}
+
+interface ReadingRowProps {
+    measurement: BodyweightMeasurement;
+    expanded: boolean;
+    onToggle: () => void;
+    onEdit: (measurement: BodyweightMeasurement) => void;
+    onRemove: () => void;
+}
+
+/**
+ * One reading as a single line — the mass and when it was taken — expanding in
+ * place to the editor. History is read far more often than it is edited, so the
+ * list pays only for what is read.
+ */
+function ReadingRow(props: ReadingRowProps): JSX.Element {
+    return (
+        <div class="card reading-row" classList={{ 'reading-row--expanded': props.expanded }}>
+            <div class="planned-set__row">
+                <button
+                    class="planned-set__summary"
+                    type="button"
+                    aria-expanded={props.expanded}
+                    onClick={props.onToggle}
+                >
+                    <span class="planned-set__text">
+                        <span class="reading-row__value">{formatWeight(props.measurement)}</span>
+                        <span class="planned-set__detail">{formatDateTime(props.measurement.measuredAt)}</span>
+                    </span>
+                    <span class="planned-set__caret" aria-hidden="true">
+                        {props.expanded ? '▾' : '▸'}
+                    </span>
+                </button>
+                <button class="btn btn--icon" type="button" aria-label="Delete reading" onClick={props.onRemove}>
+                    ✕
+                </button>
+            </div>
+            <Show when={props.expanded}>
+                <div class="planned-set__body">
+                    <div class="inline-fields">
+                        <NumberField
+                            label="Value"
+                            min={0}
+                            value={props.measurement.value}
+                            onChange={(next) => props.onEdit({ ...props.measurement, value: next })}
+                        />
+                        <SelectField
+                            label="Unit"
+                            value={props.measurement.unit}
+                            options={[
+                                { value: 'kg', label: 'kg' },
+                                { value: 'lb', label: 'lb' },
+                            ]}
+                            onChange={(next) => props.onEdit({ ...props.measurement, unit: next as WeightUnit })}
+                        />
+                        <DateTimeField
+                            label="Measured at"
+                            value={props.measurement.measuredAt}
+                            onChange={(next) => props.onEdit({ ...props.measurement, measuredAt: next })}
+                        />
+                    </div>
+                    <RawDocument value={props.measurement} />
+                </div>
+            </Show>
+        </div>
     );
 }
 
