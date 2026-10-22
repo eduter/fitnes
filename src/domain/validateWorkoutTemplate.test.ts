@@ -9,6 +9,7 @@ import {
     setPrescription,
     setSequence,
     useOnlyExercise,
+    wristCurl,
 } from '../test/domainFixtures.ts';
 import { validateWorkoutTemplate } from './validateWorkoutTemplate.ts';
 
@@ -86,9 +87,10 @@ describe('validateWorkoutTemplate', () => {
         expect(pathsOf(template)).toContain('sets[0].prescription.load');
     });
 
-    it('rejects an unsupported load basis', () => {
+    it('rejects a load basis the exercise does not allow', () => {
         const template = rowTemplate();
-        setLoad(template, 'set-1', { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } });
+        useOnlyExercise(template, wristCurl);
+        setLoad(template, 'set-1', { kind: 'external', basis: 'total', weight: { value: 20, unit: 'kg' } });
 
         expect(pathsOf(template)).toContain('sets[0].prescription.load');
     });

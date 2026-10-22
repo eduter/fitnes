@@ -17,8 +17,8 @@ describe('formatLoad', () => {
         expect(formatLoad({ kind: 'none' })).toBe('no load');
         expect(formatLoad({ kind: 'bodyweight' })).toBe('bodyweight');
         expect(formatLoad({ kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } })).toBe('40 kg total');
-        expect(formatLoad({ kind: 'external', basis: 'perHand', weight: { value: 20, unit: 'kg' } })).toBe(
-            '20 kg / hand'
+        expect(formatLoad({ kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } })).toBe(
+            '20 kg / side'
         );
         expect(formatLoad({ kind: 'external', basis: 'perSide', weight: { value: 15, unit: 'lb' } })).toBe(
             '15 lb / side'

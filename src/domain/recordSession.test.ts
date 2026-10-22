@@ -81,7 +81,7 @@ describe('recordResult', () => {
     it('rejects a result that changes the prescription meaning', () => {
         const session = createSessionFromTemplate({ id: 'sess-1', template: rowTemplate(), startedAt: 1_000 });
         const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
-        drafted.load = { kind: 'external', basis: 'perHand', weight: { value: 20, unit: 'kg' } };
+        drafted.load = { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } };
 
         const recorded = recordResult(session, drafted);
 

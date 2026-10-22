@@ -16,7 +16,7 @@ const MEASUREMENT_TYPES: MeasurementType[] = ['repetitions', 'duration'];
 const COUNT_BASES: MeasurementCountBasis[] = ['total', 'perSide'];
 const EXECUTION_MODES: ExecutionMode[] = ['bilateral', 'unilateral'];
 const LOAD_KINDS: LoadOption['kind'][] = ['none', 'bodyweight', 'external', 'bodyweightExternal'];
-const LOAD_BASES: LoadBasis[] = ['total', 'perHand', 'perSide'];
+const LOAD_BASES: LoadBasis[] = ['total', 'perSide'];
 
 interface ExerciseFormProps {
     value: ExerciseDefinition;

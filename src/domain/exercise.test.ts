@@ -7,7 +7,7 @@ const bentOverRow = {
     name: 'Bent-over row',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perHand'] }],
+    loads: [{ kind: 'external', bases: ['total', 'perSide'] }],
 };
 
 const pullUp = {
@@ -31,7 +31,7 @@ const halfCrimpHold = {
     name: 'Half-crimp hold',
     measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
     executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
+    loads: [{ kind: 'external', bases: ['perSide'] }],
 };
 
 const wristCurl = {
@@ -39,7 +39,7 @@ const wristCurl = {
     name: 'Wrist curl',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
+    loads: [{ kind: 'external', bases: ['perSide'] }],
 };
 
 describe('exerciseDefinition', () => {

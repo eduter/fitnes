@@ -105,11 +105,11 @@ describe('totalLoad', () => {
 
     it('returns undefined for per-hand or per-side load', () => {
         expect(
-            totalLoad({ kind: 'external', basis: 'perHand', weight: { value: 20, unit: 'kg' } }, undefined)
+            totalLoad({ kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } }, undefined)
         ).toBeUndefined();
         expect(
             totalLoad(
-                { kind: 'bodyweightExternal', basis: 'perHand', weight: { value: 20, unit: 'kg' } },
+                { kind: 'bodyweightExternal', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
                 { value: 80, unit: 'kg' }
             )
         ).toBeUndefined();
@@ -228,7 +228,7 @@ describe('validateWorkoutSession', () => {
                 {
                     sequenceEntryId: 'entry-1',
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
-                    load: { kind: 'external', basis: 'perHand', weight: { value: 20, unit: 'kg' } },
+                    load: { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
                     completedAt: 2_000,
                 },
             ],
@@ -280,7 +280,7 @@ describe('validateWorkoutSession', () => {
                 {
                     sequenceEntryId: 'entry-1',
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
-                    load: { kind: 'external', basis: 'perHand', weight: { value: 10, unit: 'kg' } },
+                    load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
                     completedAt: 2_000,
                 },
             ],

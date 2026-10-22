@@ -26,13 +26,11 @@ function formatWeight(weight: Weight): string {
     return `${weight.value} ${weight.unit}`;
 }
 
-function basisLabel(basis: 'total' | 'perHand' | 'perSide'): string {
+function basisLabel(basis: 'total' | 'perSide'): string {
     if (basis === 'total') {
         return 'total';
     }
-    if (basis === 'perHand') {
-        return '/ hand';
-    }
+
     return '/ side';
 }
 

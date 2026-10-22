@@ -6,7 +6,7 @@ const bentOverRow: ExerciseDefinition = {
     name: 'Bent-over row',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perHand'] }],
+    loads: [{ kind: 'external', bases: ['total', 'perSide'] }],
 };
 
 const pullUp: ExerciseDefinition = {
@@ -30,7 +30,7 @@ const halfCrimpHold: ExerciseDefinition = {
     name: 'Half-crimp hold',
     measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
     executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
+    loads: [{ kind: 'external', bases: ['perSide'] }],
 };
 
 const wristCurl: ExerciseDefinition = {
@@ -38,7 +38,7 @@ const wristCurl: ExerciseDefinition = {
     name: 'Wrist curl',
     measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
     executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perHand'] }],
+    loads: [{ kind: 'external', bases: ['perSide'] }],
 };
 
 const airSquat: ExerciseDefinition = {

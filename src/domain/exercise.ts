@@ -18,7 +18,7 @@ const executionMode = type('"bilateral" | "unilateral"');
 type ExecutionMode = typeof executionMode.infer;
 
 /** What a stated external-load value means. Never converted between bases implicitly. */
-const loadBasis = type('"total" | "perHand" | "perSide"');
+const loadBasis = type('"total" | "perSide"');
 type LoadBasis = typeof loadBasis.infer;
 
 const loadBases = loadBasis

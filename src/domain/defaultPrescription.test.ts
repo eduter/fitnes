@@ -23,7 +23,7 @@ describe('defaultPrescription', () => {
         expect(defaultPrescription(halfCrimpHold)).toEqual({
             measurement: { measurement: 'duration', countBasis: 'perSide', seconds: 30 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perHand', weight: { value: 0, unit: 'kg' } },
+            load: { kind: 'external', basis: 'perSide', weight: { value: 0, unit: 'kg' } },
         });
         expect(defaultPrescription(airSquat)).toEqual({
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
