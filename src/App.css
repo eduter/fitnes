@@ -200,3 +200,183 @@ fieldset.form-field {
 legend.form-label {
     padding: 0 var(--space-xs);
 }
+
+/* --- Compact set logging ---------------------------------------------------
+   One row per set instead of one card per set. The table owns the horizontal
+   rhythm so weight and rep columns line up across every exercise, which is what
+   lets a whole workout fit in a screen or two. */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.exercise-block {
+    padding: var(--space-sm) var(--space-md) var(--space-xs);
+}
+
+.exercise-block__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.exercise-block__name {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-heading);
+}
+
+.exercise-block__progress {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.exercise-block__target {
+    margin: 0 0 var(--space-xs);
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.set-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.set-table th,
+.set-table td {
+    padding: 0;
+    text-align: left;
+    font-weight: 400;
+}
+
+.set-table thead th {
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Set number and the done toggle are fixed; the numeric cells share the rest. */
+.set-table__set {
+    width: 2.25rem;
+}
+
+.set-table__check {
+    width: 2.5rem;
+    text-align: right;
+}
+
+.set-row {
+    border-bottom: 1px solid var(--border);
+}
+
+.set-row:last-child {
+    border-bottom: none;
+}
+
+.set-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.set-cell {
+    display: inline-block;
+    padding: 0 var(--space-xs);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.set-cell--muted {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.set-cell--number {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 15px;
+    text-align: center;
+}
+
+.set-cell--number:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.set-cell--number:disabled {
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.set-pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.set-pair__divider {
+    color: var(--text-muted);
+}
+
+.set-check,
+.set-check-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    font-size: 16px;
+}
+
+.set-check-button {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.set-check-button--on {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+    color: var(--accent-hover);
+}
+
+/* A logged set stays legible but recedes, so the remaining work stands out. */
+.set-row--done .set-cell,
+.set-row--done .set-badge {
+    color: var(--text-muted);
+}
+
+.set-row--done .set-cell--number {
+    opacity: 0.6;
+}
+
+.session-meta {
+    font-size: 13px;
+}

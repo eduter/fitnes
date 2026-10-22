@@ -50,5 +50,34 @@ function sessionBodyweightWeight(session: WorkoutSession): Weight | undefined {
     return { value: session.bodyweight.value, unit: session.bodyweight.unit };
 }
 
-export { findOccurrence, loadUsesBodyweight, sessionBodyweightWeight, templateUsesBodyweight };
+/**
+ * Group consecutive sequence entries that use the same exercise, so one screen
+ * section can show one exercise's sets as a block. Grouping is adjacency-only:
+ * a plan that interleaves two exercises stays interleaved, because reordering
+ * it for display would misrepresent the order the user is meant to follow.
+ */
+function groupSequenceEntries(template: WorkoutTemplate): SequenceOccurrence[][] {
+    const blocks: SequenceOccurrence[][] = [];
+
+    for (const entry of template.sequence) {
+        const occurrence = findOccurrence(template, entry.id);
+        if (!occurrence) {
+            continue;
+        }
+
+        const current = blocks[blocks.length - 1];
+        const previous = current?.[current.length - 1];
+
+        if (previous && previous.exercise.id === occurrence.exercise.id) {
+            current.push(occurrence);
+            continue;
+        }
+
+        blocks.push([occurrence]);
+    }
+
+    return blocks;
+}
+
+export { findOccurrence, groupSequenceEntries, loadUsesBodyweight, sessionBodyweightWeight, templateUsesBodyweight };
 export type { SequenceOccurrence };

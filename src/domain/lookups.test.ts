@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { plank, pullUp, rowTemplate } from '../test/domainFixtures.ts';
+import { airSquat, plank, pullUp, rowTemplate } from '../test/domainFixtures.ts';
 import { createSessionFromTemplate } from './session.ts';
-import { findOccurrence, sessionBodyweightWeight, templateUsesBodyweight } from './lookups.ts';
+import { findOccurrence, groupSequenceEntries, sessionBodyweightWeight, templateUsesBodyweight } from './lookups.ts';
 
 describe('findOccurrence', () => {
     it('resolves the sequence entry, planned set, and exercise', () => {
@@ -58,5 +58,53 @@ describe('sessionBodyweightWeight', () => {
         expect(
             sessionBodyweightWeight(createSessionFromTemplate({ id: 'sess-2', template: rowTemplate(), startedAt: 1 }))
         ).toBeUndefined();
+    });
+});
+
+describe('groupSequenceEntries', () => {
+    it('collects consecutive sets of one exercise into a single block', () => {
+        const blocks = groupSequenceEntries(rowTemplate());
+
+        expect(blocks).toHaveLength(1);
+        expect(blocks[0]?.map((occurrence) => occurrence.entry.id)).toEqual(['entry-1', 'entry-2']);
+    });
+
+    it('starts a new block when the exercise changes', () => {
+        const template = rowTemplate();
+        template.exercises = [structuredClone(pullUp), structuredClone(airSquat)];
+        template.sets[0].exerciseId = pullUp.id;
+        template.sets[1].exerciseId = airSquat.id;
+
+        const blocks = groupSequenceEntries(template);
+
+        expect(blocks.map((block) => block.map((occurrence) => occurrence.exercise.name))).toEqual([
+            ['Pull-up'],
+            ['Air squat'],
+        ]);
+    });
+
+    it('keeps an interleaved plan interleaved rather than regrouping it', () => {
+        const template = rowTemplate();
+        template.exercises = [structuredClone(pullUp), structuredClone(airSquat)];
+        template.sets[0].exerciseId = pullUp.id;
+        template.sets[1].exerciseId = airSquat.id;
+        template.sequence.push({ id: 'entry-3', plannedSetId: 'set-3' });
+        template.sets.push({
+            id: 'set-3',
+            exerciseId: pullUp.id,
+            prescription: structuredClone(template.sets[0]!.prescription),
+        });
+
+        const blocks = groupSequenceEntries(template);
+
+        expect(blocks.map((block) => block[0]?.exercise.name)).toEqual(['Pull-up', 'Air squat', 'Pull-up']);
+    });
+
+    it('returns nothing for an empty plan', () => {
+        const template = rowTemplate();
+        template.sets = [];
+        template.sequence = [];
+
+        expect(groupSequenceEntries(template)).toEqual([]);
     });
 });

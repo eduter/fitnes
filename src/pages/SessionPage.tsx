@@ -3,11 +3,11 @@ import { For, Show, createMemo, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
-import { OccurrenceCard } from '../components/session/OccurrenceCard.tsx';
+import { ExerciseBlock } from '../components/session/ExerciseBlock.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { formatWeight } from '../domain/format.ts';
 import type { SequenceEntryId } from '../domain/ids.ts';
-import { findOccurrence } from '../domain/lookups.ts';
+import { findOccurrence, groupSequenceEntries } from '../domain/lookups.ts';
 import {
     clearResult,
     completeSession,
@@ -29,6 +29,30 @@ function SessionPage(): JSX.Element {
     const [drafts, setDrafts] = createSignal<Record<string, ActualResult>>({});
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const defaults = createMemo(() => defaultDrafts(session()));
+    const blocks = createMemo(() => {
+        const current = session();
+        return current ? groupSequenceEntries(current.snapshot) : [];
+    });
+    const loggedCount = createMemo(() => session()?.results.length ?? 0);
+    const plannedCount = createMemo(() => session()?.snapshot.sequence.length ?? 0);
+    const effectiveDrafts = createMemo<Record<string, ActualResult>>(() => {
+        const current = session();
+        if (!current) {
+            return {};
+        }
+
+        const next: Record<string, ActualResult> = {};
+        for (const entry of current.snapshot.sequence) {
+            const draft =
+                drafts()[entry.id] ??
+                current.results.find((result) => result.sequenceEntryId === entry.id) ??
+                defaults()[entry.id];
+            if (draft) {
+                next[entry.id] = draft;
+            }
+        }
+        return next;
+    });
 
     const readOnly = createMemo(() => session()?.completedAt !== undefined);
 
@@ -158,63 +182,42 @@ function SessionPage(): JSX.Element {
                                 </div>
                             }
                         />
-                        <p class="muted">
-                            started {formatDateTime(current().startedAt)}
+                        <p class="muted session-meta">
+                            {formatDateTime(current().startedAt)}
                             <Show when={current().completedAt}>
-                                {(completedAt) => <> · completed {formatDateTime(completedAt())}</>}
+                                {(completedAt) => <> → {formatDateTime(completedAt())}</>}
                             </Show>
                             <Show when={current().bodyweight}>
-                                {(bodyweight) => (
-                                    <>
-                                        {' '}
-                                        · bodyweight {formatWeight(bodyweight())}
-                                        {bodyweight().source
-                                            ? ` from ${formatDateTime(bodyweight().source?.measuredAt ?? 0)}`
-                                            : ' (no history source)'}
-                                    </>
-                                )}
+                                {(bodyweight) => <> · BW {formatWeight(bodyweight())}</>}
                             </Show>
-                            <Show when={!current().bodyweight}> · no bodyweight snapshot</Show>
-                        </p>
-                        <p class="muted">
-                            {current().results.length}/{current().snapshot.sequence.length} logged. Execution mode lives
-                            on the prescription, not the result. A per-side set logs each side separately.
                         </p>
                         <ValidationErrors errors={errors()} />
-                        <ol class="sequence-list">
-                            <For each={current().snapshot.sequence}>
-                                {(entry) => {
-                                    const occurrence = findOccurrence(current().snapshot, entry.id);
-                                    if (!occurrence) {
-                                        return <li class="card">Unknown sequence entry {entry.id}</li>;
-                                    }
-
-                                    const result = current().results.find(
-                                        (candidate) => candidate.sequenceEntryId === entry.id
-                                    );
-                                    const draft = drafts()[entry.id] ?? result ?? defaults()[entry.id];
-                                    if (!draft) {
-                                        return <li class="card">Unknown sequence entry {entry.id}</li>;
-                                    }
-
-                                    return (
-                                        <li>
-                                            <OccurrenceCard
-                                                session={current()}
-                                                occurrence={occurrence}
-                                                result={result}
-                                                draft={draft}
-                                                readOnly={readOnly()}
-                                                onDraftChange={(next) => setDrafts({ ...drafts(), [entry.id]: next })}
-                                                onLog={() => void log(entry.id)}
-                                                onEdit={(next) => void edit(next)}
-                                                onClear={() => void clear(entry.id)}
-                                            />
-                                        </li>
-                                    );
-                                }}
+                        <p class="muted session-meta">
+                            {loggedCount()}/{plannedCount()} sets logged
+                        </p>
+                        <div class="stack">
+                            <For each={blocks()}>
+                                {(occurrences) => (
+                                    <ExerciseBlock
+                                        occurrences={occurrences}
+                                        session={current()}
+                                        drafts={effectiveDrafts()}
+                                        readOnly={readOnly()}
+                                        onDraftChange={(entryId, draft) => {
+                                            setDrafts({ ...drafts(), [entryId]: draft });
+                                            const existing = current().results.find(
+                                                (candidate) => candidate.sequenceEntryId === entryId
+                                            );
+                                            if (existing) {
+                                                void edit(draft);
+                                            }
+                                        }}
+                                        onLog={(entryId) => void log(entryId)}
+                                        onClear={(entryId) => void clear(entryId)}
+                                    />
+                                )}
                             </For>
-                        </ol>
+                        </div>
                         <RawDocument value={current()} />
                     </>
                 )}

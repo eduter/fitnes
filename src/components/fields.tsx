@@ -98,6 +98,66 @@ function NumberField(props: NumberFieldProps): JSX.Element {
     );
 }
 
+interface CompactNumberFieldProps {
+    label: string;
+    value: number;
+    min?: number;
+    step?: number | string;
+    disabled?: boolean;
+    integer?: boolean;
+    onChange: (value: number) => void;
+}
+
+/**
+ * A borderless numeric input sized for one cell of a dense set row. It carries
+ * no visible label, so `label` becomes the accessible name; tests and screen
+ * readers address it that way. Digits stay local until change or blur, exactly
+ * like {@link NumberField}, because committing per keystroke would truncate a
+ * multi-digit entry.
+ */
+function CompactNumberField(props: CompactNumberFieldProps): JSX.Element {
+    const [text, setText] = createSignal(String(props.value));
+    let committed = props.value;
+
+    createEffect(() => {
+        const incoming = props.value;
+        if (incoming === committed) {
+            return;
+        }
+        committed = incoming;
+        setText(String(incoming));
+    });
+
+    function commit(raw: string): void {
+        const next = Number(raw);
+        // An empty cell must not read as `Number('') === 0`; treat it as
+        // abandoned input and put the last committed value back.
+        if (raw.trim() === '' || !Number.isFinite(next)) {
+            setText(String(props.value));
+            return;
+        }
+        committed = next;
+        props.onChange(next);
+    }
+
+    return (
+        <input
+            class="set-cell set-cell--number"
+            type="text"
+            // `inputmode` rather than `type="number"`: Chrome on Android shows a
+            // numeric keypad without the spinner arrows that eat row width.
+            inputmode={props.integer ? 'numeric' : 'decimal'}
+            aria-label={props.label}
+            value={text()}
+            disabled={props.disabled}
+            onInput={(event) => setText(event.currentTarget.value)}
+            onChange={(event) => commit(event.currentTarget.value)}
+            onBlur={(event) => commit(event.currentTarget.value)}
+            onFocus={(event) => event.currentTarget.select()}
+        />
+    );
+}
+
 interface SelectOption {
     value: string;
     label: string;
@@ -190,5 +250,5 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
     );
 }
 
-export { CheckboxGroup, DateTimeField, NumberField, SelectField, TextAreaField, TextField };
+export { CheckboxGroup, CompactNumberField, DateTimeField, NumberField, SelectField, TextAreaField, TextField };
 export type { CheckboxItem, SelectOption };
