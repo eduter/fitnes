@@ -45,6 +45,10 @@
     --transition-fast: 150ms ease;
     --transition-normal: 250ms ease;
 
+    /* Height of the sticky app header. Anything else that sticks below it
+       offsets by this rather than a magic zero. */
+    --header-height: 41px;
+
     color-scheme: dark;
 }
 
