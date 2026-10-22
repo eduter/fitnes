@@ -384,3 +384,32 @@ legend.form-label {
 .session-meta {
     font-size: 13px;
 }
+
+/* Keeps how-far-through-am-I on screen while the set list scrolls under it. */
+.session-progress {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) 0;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.session-progress__track {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    overflow: hidden;
+}
+
+.session-progress__bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width var(--transition-fast);
+}

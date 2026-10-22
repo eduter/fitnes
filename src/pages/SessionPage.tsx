@@ -197,9 +197,17 @@ function SessionPage(): JSX.Element {
                             </Show>
                         </p>
                         <ValidationErrors errors={errors()} />
-                        <p class="muted session-meta">
-                            {loggedCount()}/{plannedCount()} sets logged
-                        </p>
+                        <div class="session-progress" role="status">
+                            <span>
+                                {loggedCount()}/{plannedCount()} sets logged
+                            </span>
+                            <div class="session-progress__track">
+                                <div
+                                    class="session-progress__bar"
+                                    style={{ width: `${progressPercent(loggedCount(), plannedCount())}%` }}
+                                />
+                            </div>
+                        </div>
                         <div class="stack">
                             <For each={blocks()}>
                                 {(occurrences) => (
@@ -230,6 +238,15 @@ function SessionPage(): JSX.Element {
             </Show>
         </section>
     );
+}
+
+/** Progress as a whole-number percentage; an empty plan reports nothing logged. */
+function progressPercent(logged: number, planned: number): number {
+    if (planned === 0) {
+        return 0;
+    }
+
+    return Math.round((logged / planned) * 100);
 }
 
 function defaultDrafts(current: WorkoutSession | undefined): Record<string, ActualResult> {
