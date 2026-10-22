@@ -4,6 +4,7 @@ import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
 import { ExerciseBlock } from '../components/session/ExerciseBlock.tsx';
+import { previousPerformance } from '../components/session/previousPerformance.ts';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { formatWeight } from '../domain/format.ts';
 import type { SequenceEntryId } from '../domain/ids.ts';
@@ -29,6 +30,10 @@ function SessionPage(): JSX.Element {
     const [drafts, setDrafts] = createSignal<Record<string, ActualResult>>({});
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const defaults = createMemo(() => defaultDrafts(session()));
+    const previous = createMemo(() => {
+        const current = session();
+        return current ? previousPerformance(current, app.sessions()) : {};
+    });
     const blocks = createMemo(() => {
         const current = session();
         return current ? groupSequenceEntries(current.snapshot) : [];
@@ -201,6 +206,7 @@ function SessionPage(): JSX.Element {
                                     <ExerciseBlock
                                         occurrences={occurrences}
                                         session={current()}
+                                        previous={previous()}
                                         drafts={effectiveDrafts()}
                                         readOnly={readOnly()}
                                         onDraftChange={(entryId, draft) => {

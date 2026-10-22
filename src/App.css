@@ -279,6 +279,10 @@ legend.form-label {
     text-align: right;
 }
 
+.set-table__prev {
+    width: 5.5rem;
+}
+
 .set-row {
     border-bottom: 1px solid var(--border);
 }

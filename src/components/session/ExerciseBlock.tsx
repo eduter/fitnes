@@ -6,6 +6,7 @@ import type { ActualResult, WorkoutSession } from '../../domain/session.ts';
 import { CompactNumberField } from '../fields.tsx';
 import {
     externalWeightValue,
+    formatSetReference,
     resultCells,
     sideCountValues,
     summarizeTargets,
@@ -19,6 +20,8 @@ interface ExerciseBlockProps {
     /** Consecutive occurrences of one exercise, in execution order. */
     occurrences: SequenceOccurrence[];
     session: WorkoutSession;
+    /** Last time's result per sequence-entry id, for the reference column. */
+    previous: Record<string, ActualResult>;
     /** The draft or recorded result per sequence-entry id. */
     drafts: Record<string, ActualResult>;
     readOnly: boolean;
@@ -56,6 +59,9 @@ function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
                         <th class="set-table__set" scope="col">
                             Set
                         </th>
+                        <th class="set-table__prev" scope="col">
+                            Prev
+                        </th>
                         <th class="set-table__weight" scope="col">
                             Weight
                         </th>
@@ -73,6 +79,7 @@ function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
                             <SetRow
                                 occurrence={occurrence}
                                 index={index()}
+                                previous={props.previous[occurrence.entry.id]}
                                 draft={props.drafts[occurrence.entry.id]}
                                 recorded={props.session.results.some(
                                     (result) => result.sequenceEntryId === occurrence.entry.id
@@ -93,6 +100,7 @@ function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
 interface SetRowProps {
     occurrence: SequenceOccurrence;
     index: number;
+    previous: ActualResult | undefined;
     draft: ActualResult | undefined;
     recorded: boolean;
     readOnly: boolean;
@@ -111,6 +119,11 @@ function SetRow(props: SetRowProps): JSX.Element {
             <th class="set-table__set" scope="row">
                 <span class="set-badge">{props.index + 1}</span>
             </th>
+            <td class="set-table__prev">
+                <Show when={props.previous} fallback={<span class="set-cell set-cell--muted">—</span>}>
+                    {(previous) => <span class="set-cell set-cell--muted">{formatSetReference(previous())}</span>}
+                </Show>
+            </td>
             <td class="set-table__weight">
                 <Show when={cells()}>
                     {(shape) => (
