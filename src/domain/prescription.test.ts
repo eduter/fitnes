@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 import { describe, expect, it } from 'vitest';
-import { loadConfiguration, measurementValue, setPrescription } from './prescription.ts';
+import { actualMeasurement, loadConfiguration, measurementValue, setPrescription } from './prescription.ts';
 
 describe('prescription schemas', () => {
     it('rejects fields from the other measurement variant', () => {
@@ -49,5 +49,55 @@ describe('prescription schemas', () => {
         };
 
         expect(setPrescription(prescription)).toBeInstanceOf(type.errors);
+    });
+});
+
+describe('actualMeasurement', () => {
+    it('records an unequal number of repetitions for each side', () => {
+        const performed = { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9 } };
+
+        expect(actualMeasurement(performed)).toEqual(performed);
+    });
+
+    it('records an unequal duration for each side', () => {
+        const performed = { measurement: 'duration', countBasis: 'perSide', sides: { left: 30, right: 24.5 } };
+
+        expect(actualMeasurement(performed)).toEqual(performed);
+    });
+
+    it('records a single value when the set is counted as a total', () => {
+        const performed = { measurement: 'repetitions', countBasis: 'total', reps: 8 };
+
+        expect(actualMeasurement(performed)).toEqual(performed);
+    });
+
+    it('rejects a per-side total, which has no sides to tell apart', () => {
+        expect(
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'total', sides: { left: 8, right: 8 } })
+        ).toBeInstanceOf(type.errors);
+    });
+
+    it('rejects a single value for a per-side measurement, which loses the asymmetry', () => {
+        expect(actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', reps: 10 })).toBeInstanceOf(
+            type.errors
+        );
+    });
+
+    it('rejects a side that was not performed', () => {
+        expect(
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 0 } })
+        ).toBeInstanceOf(type.errors);
+    });
+
+    it('rejects a missing side', () => {
+        expect(
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10 } })
+        ).toBeInstanceOf(type.errors);
+    });
+
+    it('rejects a side value of the wrong measurement kind', () => {
+        expect(
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9.5 } })
+        ).toBeInstanceOf(type.errors);
     });
 });

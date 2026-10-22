@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { loadProblems, measurementProblems, type PrescriptionProblem } from './capability.ts';
 import type { ExerciseDefinition } from './exercise.ts';
-import type { SetPrescription } from './prescription.ts';
+import type { ActualMeasurement, SetPrescription } from './prescription.ts';
 import { workoutSession, type ActualResult, type WorkoutSession } from './session.ts';
 import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
 import { collectTemplateIssues } from './validateWorkoutTemplate.ts';
@@ -139,7 +139,7 @@ function resultPrescriptionProblems(prescription: SetPrescription, result: Actua
     ) {
         problems.push({
             field: 'measurement',
-            message: `actual measurement '${result.measurement.measurement}/${result.measurement.countBasis}' does not match prescribed '${prescribedMeasurement.measurement}/${prescribedMeasurement.countBasis}'`,
+            message: `actual measurement '${describeMeasurement(result.measurement)}' does not match prescribed '${describeMeasurement(prescribedMeasurement)}'`,
         });
     }
 
@@ -163,6 +163,16 @@ function resultPrescriptionProblems(prescription: SetPrescription, result: Actua
     }
 
     return problems;
+}
+
+/** Render either a planned or performed measurement for an error message, including per-side values. */
+function describeMeasurement(measurement: ActualMeasurement | SetPrescription['measurement']): string {
+    if (measurement.countBasis === 'perSide' && 'sides' in measurement) {
+        const { left, right } = measurement.sides;
+        return `${measurement.measurement}/perSide (left ${left}, right ${right})`;
+    }
+
+    return `${measurement.measurement}/${measurement.countBasis}`;
 }
 
 export { validateWorkoutSession };

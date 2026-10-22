@@ -178,7 +178,7 @@ function SessionPage(): JSX.Element {
                         </p>
                         <p class="muted">
                             {current().results.length}/{current().snapshot.sequence.length} logged. Execution mode lives
-                            on the prescription, not the result. Asymmetric left/right actuals are not in the model.
+                            on the prescription, not the result. A per-side set logs each side separately.
                         </p>
                         <ValidationErrors errors={errors()} />
                         <ol class="sequence-list">

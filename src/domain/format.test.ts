@@ -10,6 +10,21 @@ describe('formatMeasurement', () => {
             '12.5s / side'
         );
     });
+
+    it('shows both sides when a performed per-side value is unequal', () => {
+        expect(
+            formatMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9 } })
+        ).toBe('10 reps left, 9 reps right');
+        expect(
+            formatMeasurement({ measurement: 'duration', countBasis: 'perSide', sides: { left: 30, right: 24.5 } })
+        ).toBe('30s left, 24.5s right');
+    });
+
+    it('collapses a performed per-side value to one number when the sides match', () => {
+        expect(
+            formatMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 10 } })
+        ).toBe('10 reps / side');
+    });
 });
 
 describe('formatLoad', () => {

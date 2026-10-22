@@ -49,7 +49,23 @@ const airSquat: ExerciseDefinition = {
     loads: [{ kind: 'none' }],
 };
 
-/** Representative catalog entries covering every current capability combination. */
-const exampleExercises: ExerciseDefinition[] = [bentOverRow, pullUp, plank, halfCrimpHold, wristCurl, airSquat];
+const dumbbellCurl: ExerciseDefinition = {
+    id: exerciseId.assert('ex-dumbbell-curl'),
+    name: 'Dumbbell curl',
+    measurements: [{ measurement: 'repetitions', countBasis: 'perSide' }],
+    executionModes: ['unilateral'],
+    loads: [{ kind: 'external', bases: ['perSide'] }],
+};
 
-export { airSquat, bentOverRow, exampleExercises, halfCrimpHold, plank, pullUp, wristCurl };
+/** Representative catalog entries covering every current capability combination. */
+const exampleExercises: ExerciseDefinition[] = [
+    bentOverRow,
+    pullUp,
+    plank,
+    halfCrimpHold,
+    wristCurl,
+    airSquat,
+    dumbbellCurl,
+];
+
+export { airSquat, bentOverRow, dumbbellCurl, exampleExercises, halfCrimpHold, plank, pullUp, wristCurl };

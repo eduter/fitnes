@@ -1,4 +1,4 @@
-import { airSquat, bentOverRow, halfCrimpHold, plank, pullUp, wristCurl } from '../domain/examples.ts';
+import { airSquat, bentOverRow, dumbbellCurl, halfCrimpHold, plank, pullUp, wristCurl } from '../domain/examples.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import type { LoadConfiguration, SetPrescription } from '../domain/prescription.ts';
 import type { PlannedSet, SequenceEntry, WorkoutTemplate } from '../domain/workoutTemplate.ts';
@@ -88,6 +88,7 @@ export {
     addSet,
     airSquat,
     bentOverRow,
+    dumbbellCurl,
     examples,
     halfCrimpHold,
     plank,

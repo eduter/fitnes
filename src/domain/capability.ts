@@ -13,8 +13,8 @@ interface PrescriptionProblem {
 
 function findMeasurementOption(
     exercise: ExerciseDefinition,
-    measurement: SetPrescription['measurement']['measurement'],
-    countBasis: SetPrescription['measurement']['countBasis']
+    measurement: MeasurementValue['measurement'],
+    countBasis: MeasurementValue['countBasis']
 ): MeasurementOption | undefined {
     return exercise.measurements.find(
         (option) => option.measurement === measurement && option.countBasis === countBasis
@@ -39,7 +39,10 @@ function describeLoads(exercise: ExerciseDefinition): string {
         .join(', ');
 }
 
-function measurementProblems(exercise: ExerciseDefinition, value: MeasurementValue): PrescriptionProblem[] {
+function measurementProblems(
+    exercise: ExerciseDefinition,
+    value: { measurement: MeasurementValue['measurement']; countBasis: MeasurementValue['countBasis'] }
+): PrescriptionProblem[] {
     const { measurement, countBasis } = value;
 
     if (findMeasurementOption(exercise, measurement, countBasis)) {

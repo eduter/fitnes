@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { plank, rowTemplate, setPrescription, useOnlyExercise } from '../test/domainFixtures.ts';
-import { createSessionFromTemplate } from './session.ts';
+import { dumbbellCurl, plank, rowTemplate, setPrescription, useOnlyExercise } from '../test/domainFixtures.ts';
+import { createSessionFromTemplate, type WorkoutSession } from './session.ts';
 import {
     clearResult,
     completeSession,
@@ -25,6 +25,74 @@ describe('draftResultFromPrescription', () => {
 
         prescription.measurement = { measurement: 'repetitions', countBasis: 'total', reps: 99 };
         expect(result.measurement).toEqual({ measurement: 'repetitions', countBasis: 'total', reps: 8 });
+    });
+
+    it('splits a per-side target into a side per side, so a logged set starts symmetric', () => {
+        const template = rowTemplate();
+        useOnlyExercise(template, dumbbellCurl);
+        const prescription = {
+            measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 10 },
+            executionMode: 'unilateral',
+            load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
+        } as const;
+
+        const result = draftResultFromPrescription('entry-1', prescription, 2_000);
+
+        expect(result.measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: 10, right: 10 },
+        });
+    });
+
+    it('splits a per-side duration target into a side per side', () => {
+        const prescription = {
+            measurement: { measurement: 'duration', countBasis: 'perSide', seconds: 30 },
+            executionMode: 'unilateral',
+            load: { kind: 'bodyweight' },
+        } as const;
+
+        const result = draftResultFromPrescription('entry-1', prescription, 2_000);
+
+        expect(result.measurement).toEqual({
+            measurement: 'duration',
+            countBasis: 'perSide',
+            sides: { left: 30, right: 30 },
+        });
+    });
+});
+
+describe('per-side actuals', () => {
+    /** A one-set dumbbell curl session, whose per-side target becomes a per-side actual. */
+    function curlSession(): WorkoutSession {
+        const template = rowTemplate();
+        useOnlyExercise(template, dumbbellCurl);
+        setPrescription(template, 'set-1', {
+            measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 10 },
+            executionMode: 'unilateral',
+            load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
+        });
+        template.sets = [template.sets[0]];
+        template.sequence = [{ id: 'entry-1', plannedSetId: 'set-1' }];
+        return createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 });
+    }
+
+    it('records an unequal number of repetitions for each side', () => {
+        const session = curlSession();
+        const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
+        drafted.measurement = { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9 } };
+
+        const recorded = recordResult(session, drafted);
+
+        expect(recorded.ok).toBe(true);
+        if (!recorded.ok) {
+            return;
+        }
+        expect(recorded.value.results[0].measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: 10, right: 9 },
+        });
     });
 });
 

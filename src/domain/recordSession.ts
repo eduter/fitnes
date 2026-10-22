@@ -1,5 +1,5 @@
 import type { ActualResult, WorkoutSession } from './session.ts';
-import type { SetPrescription } from './prescription.ts';
+import type { ActualMeasurement, SetPrescription } from './prescription.ts';
 import type { SequenceEntryId } from './ids.ts';
 import type { ValidationResult } from './validation.ts';
 import { validateWorkoutSession } from './validateWorkoutSession.ts';
@@ -7,7 +7,9 @@ import { validateWorkoutSession } from './validateWorkoutSession.ts';
 /**
  * Copy a planned set's prescription into an actual result. Numeric values start
  * as prescribed so logging "as planned" is a no-edit save; callers may then
- * change counts or weights without changing measurement or load meaning.
+ * change counts or weights without changing measurement or load meaning. A
+ * per-side target becomes a per-side actual with both sides at that target,
+ * which the caller can then adjust independently.
  */
 function draftResultFromPrescription(
     sequenceEntryId: SequenceEntryId,
@@ -16,9 +18,30 @@ function draftResultFromPrescription(
 ): ActualResult {
     return {
         sequenceEntryId,
-        measurement: structuredClone(prescription.measurement),
+        measurement: draftMeasurement(prescription.measurement),
         load: structuredClone(prescription.load),
         completedAt,
+    };
+}
+
+/** Widen a prescribed target into the performed shape, splitting a per-side target across both sides. */
+function draftMeasurement(prescribed: SetPrescription['measurement']): ActualMeasurement {
+    if (prescribed.countBasis === 'total') {
+        return structuredClone(prescribed);
+    }
+
+    if (prescribed.measurement === 'repetitions') {
+        return {
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: prescribed.reps, right: prescribed.reps },
+        };
+    }
+
+    return {
+        measurement: 'duration',
+        countBasis: 'perSide',
+        sides: { left: prescribed.seconds, right: prescribed.seconds },
     };
 }
 

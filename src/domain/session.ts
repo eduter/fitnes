@@ -3,7 +3,7 @@ import type { BodyweightMeasurement } from './bodyweight.ts';
 import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
 import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
 import { bodyweightMeasurementId, sequenceEntryId, workoutSessionId, workoutTemplateId } from './ids.ts';
-import { type LoadConfiguration, loadConfiguration, measurementValue } from './prescription.ts';
+import { actualMeasurement, type LoadConfiguration, loadConfiguration } from './prescription.ts';
 
 /**
  * A bodyweight snapshot taken when a session begins. The value and unit are
@@ -23,7 +23,7 @@ type BodyweightSnapshot = typeof bodyweightSnapshot.infer;
 /** The recorded performance for one sequence occurrence, using the same measurement and load semantics as a prescription. */
 const actualResult = type({
     sequenceEntryId,
-    measurement: measurementValue,
+    measurement: actualMeasurement,
     load: loadConfiguration,
     completedAt: epochMillis,
 }).onDeepUndeclaredKey('reject');

@@ -213,7 +213,7 @@ describe('validateWorkoutSession', () => {
         bad.results = [
             {
                 sequenceEntryId: 'entry-1',
-                measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 8 },
+                measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 8, right: 8 } },
                 load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
                 completedAt: 2_000,
             },
