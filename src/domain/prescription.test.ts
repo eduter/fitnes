@@ -83,9 +83,40 @@ describe('actualMeasurement', () => {
         );
     });
 
-    it('rejects a side that was not performed', () => {
+    it('rejects a side value of the wrong measurement kind', () => {
         expect(
-            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 0 } })
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9.5 } })
+        ).toBeInstanceOf(type.errors);
+    });
+
+    it('accepts zero for a total actual, so a skipped set can be recorded', () => {
+        expect(actualMeasurement({ measurement: 'repetitions', countBasis: 'total', reps: 0 })).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'total',
+            reps: 0,
+        });
+        expect(actualMeasurement({ measurement: 'duration', countBasis: 'total', seconds: 0 })).toEqual({
+            measurement: 'duration',
+            countBasis: 'total',
+            seconds: 0,
+        });
+    });
+
+    it('accepts zero on one side, so an injured side can be recorded as skipped', () => {
+        const skippedLeft = { measurement: 'duration', countBasis: 'perSide', sides: { left: 0, right: 30 } };
+
+        expect(actualMeasurement(skippedLeft)).toEqual(skippedLeft);
+    });
+
+    it('accepts zero on both sides, so a wholly skipped unilateral set can be recorded', () => {
+        const skipped = { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 0, right: 0 } };
+
+        expect(actualMeasurement(skipped)).toEqual(skipped);
+    });
+
+    it('rejects a negative side, which is not a performance', () => {
+        expect(
+            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: -1, right: 8 } })
         ).toBeInstanceOf(type.errors);
     });
 
@@ -94,10 +125,15 @@ describe('actualMeasurement', () => {
             actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10 } })
         ).toBeInstanceOf(type.errors);
     });
+});
 
-    it('rejects a side value of the wrong measurement kind', () => {
-        expect(
-            actualMeasurement({ measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9.5 } })
-        ).toBeInstanceOf(type.errors);
+describe('plan measurements stay positive', () => {
+    it('rejects a zero target, because a plan must state something to attempt', () => {
+        expect(measurementValue({ measurement: 'repetitions', countBasis: 'total', reps: 0 })).toBeInstanceOf(
+            type.errors
+        );
+        expect(measurementValue({ measurement: 'duration', countBasis: 'perSide', seconds: 0 })).toBeInstanceOf(
+            type.errors
+        );
     });
 });

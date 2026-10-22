@@ -77,7 +77,7 @@ function ResultFields(props: ResultFieldsProps): JSX.Element {
                         <div class="inline-fields">
                             <NumberField
                                 label="Reps left"
-                                min={1}
+                                min={0}
                                 step={1}
                                 value={sides().left}
                                 onChange={(left) =>
@@ -90,7 +90,7 @@ function ResultFields(props: ResultFieldsProps): JSX.Element {
                             />
                             <NumberField
                                 label="Reps right"
-                                min={1}
+                                min={0}
                                 step={1}
                                 value={sides().right}
                                 onChange={(right) =>
@@ -139,7 +139,7 @@ function TotalRepsField(props: TotalFieldProps): JSX.Element {
     return (
         <NumberField
             label="Reps"
-            min={1}
+            min={0}
             step={1}
             value={totalReps(props.measurement()) ?? 8}
             onChange={(reps) => props.onChange({ measurement: 'repetitions', countBasis: 'total', reps })}

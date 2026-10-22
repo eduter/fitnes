@@ -53,4 +53,21 @@ describe('ResultFields', () => {
         expect((getByLabelText('Reps') as HTMLInputElement).value).toBe('8');
         expect(queryByLabelText('Reps left')).toBeNull();
     });
+
+    it('accepts zero for a side, so an injured side can be logged as skipped', () => {
+        const [value, setValue] = createSignal(curlResult());
+        const { getByLabelText } = render(() => (
+            <ResultFields exercise={dumbbellCurl} value={value()} onChange={setValue} />
+        ));
+
+        const left = getByLabelText('Reps left') as HTMLInputElement;
+        fireEvent.input(left, { target: { value: '0' } });
+        fireEvent.blur(left);
+
+        expect(value().measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: 0, right: 10 },
+        });
+    });
 });

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { dumbbellCurl, plank, rowTemplate, setPrescription, useOnlyExercise } from '../test/domainFixtures.ts';
+import {
+    dumbbellCurl,
+    halfCrimpHold,
+    plank,
+    rowTemplate,
+    setPrescription,
+    useOnlyExercise,
+} from '../test/domainFixtures.ts';
 import { createSessionFromTemplate, type WorkoutSession } from './session.ts';
 import {
     clearResult,
@@ -93,6 +100,81 @@ describe('per-side actuals', () => {
             countBasis: 'perSide',
             sides: { left: 10, right: 9 },
         });
+    });
+
+    it('records a set skipped on both sides as zero, against a positive plan', () => {
+        const session = curlSession();
+        const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
+        drafted.measurement = { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 0, right: 0 } };
+
+        const recorded = recordResult(session, drafted);
+
+        expect(recorded.ok).toBe(true);
+        if (!recorded.ok) {
+            return;
+        }
+        expect(recorded.value.results[0].measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: 0, right: 0 },
+        });
+    });
+
+    it('records a set skipped on one side, keeping the side that was performed', () => {
+        const session = curlSession();
+        const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
+        drafted.measurement = { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 0, right: 10 } };
+
+        const recorded = recordResult(session, drafted);
+
+        expect(recorded.ok).toBe(true);
+        if (!recorded.ok) {
+            return;
+        }
+        expect(recorded.value.results[0].measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'perSide',
+            sides: { left: 0, right: 10 },
+        });
+    });
+});
+
+describe('skipped sets', () => {
+    it('records a skipped bilateral set as zero against a positive plan', () => {
+        const session = createSessionFromTemplate({ id: 'sess-1', template: rowTemplate(), startedAt: 1_000 });
+        const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
+        drafted.measurement = { measurement: 'repetitions', countBasis: 'total', reps: 0 };
+
+        const recorded = recordResult(session, drafted);
+
+        expect(recorded.ok).toBe(true);
+        if (!recorded.ok) {
+            return;
+        }
+        expect(recorded.value.results[0].measurement).toEqual({
+            measurement: 'repetitions',
+            countBasis: 'total',
+            reps: 0,
+        });
+    });
+
+    it('records a skipped hold as zero seconds', () => {
+        const template = rowTemplate();
+        useOnlyExercise(template, halfCrimpHold);
+        template.sets = [template.sets[0]];
+        template.sequence = [{ id: 'entry-1', plannedSetId: 'set-1' }];
+        setPrescription(template, 'set-1', {
+            measurement: { measurement: 'duration', countBasis: 'perSide', seconds: 30 },
+            executionMode: 'unilateral',
+            load: { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
+        });
+        const session = createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 });
+        const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
+        drafted.measurement = { measurement: 'duration', countBasis: 'perSide', sides: { left: 0, right: 0 } };
+
+        const recorded = recordResult(session, drafted);
+
+        expect(recorded.ok).toBe(true);
     });
 });
 

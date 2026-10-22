@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 import { executionMode, loadBasis } from './exercise.ts';
-import { positiveCount, positiveFinite, weight } from './units.ts';
+import { nonNegativeCount, nonNegativeFinite, positiveCount, positiveFinite, weight } from './units.ts';
 
 /**
  * The quantity prescribed, with its counting basis. Repetitions are positive
@@ -20,8 +20,8 @@ const measurementValue = type({
     .onDeepUndeclaredKey('reject');
 type MeasurementValue = typeof measurementValue.infer;
 
-const sideCounts = type({ left: positiveCount, right: positiveCount }).onUndeclaredKey('reject');
-const sideDurations = type({ left: positiveFinite, right: positiveFinite }).onUndeclaredKey('reject');
+const sideCounts = type({ left: nonNegativeCount, right: nonNegativeCount }).onUndeclaredKey('reject');
+const sideDurations = type({ left: nonNegativeFinite, right: nonNegativeFinite }).onUndeclaredKey('reject');
 
 /**
  * The quantity actually performed. A `total` measurement keeps a single value,
@@ -30,13 +30,17 @@ const sideDurations = type({ left: positiveFinite, right: positiveFinite }).onUn
  * plan — which states a target, not a performance — cannot carry that. Keeping
  * `sides` off the total variants means the asymmetry only appears where it is
  * meaningful, and a per-side actual can never silently lose one side.
+ *
+ * Values may be zero: a set can be attempted and skipped — an injury noticed at
+ * the last moment — and that is a real performance to record. Plans stay
+ * strictly positive, because a target of zero states nothing to attempt.
  */
 const actualMeasurement = type({
     measurement: '"repetitions"',
     countBasis: '"total"',
-    reps: positiveCount,
+    reps: nonNegativeCount,
 })
-    .or({ measurement: '"duration"', countBasis: '"total"', seconds: positiveFinite })
+    .or({ measurement: '"duration"', countBasis: '"total"', seconds: nonNegativeFinite })
     .or({ measurement: '"repetitions"', countBasis: '"perSide"', sides: sideCounts })
     .or({ measurement: '"duration"', countBasis: '"perSide"', sides: sideDurations })
     .onDeepUndeclaredKey('reject');

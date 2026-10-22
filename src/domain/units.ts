@@ -6,8 +6,11 @@ const nonNegativeFinite = type('number >= 0').narrow((n, ctx) => Number.isFinite
 /** A finite, strictly positive number; rejects zero, `NaN`, and infinities. */
 const positiveFinite = type('number > 0').narrow((n, ctx) => Number.isFinite(n) || ctx.mustBe('a finite number'));
 
-/** A strictly positive integer, used for repetition counts. */
+/** A strictly positive integer, used for planned repetition targets. */
 const positiveCount = type('number.integer > 0');
+
+/** A non-negative integer, used for performed repetitions where zero means "did none". */
+const nonNegativeCount = type('number.integer >= 0');
 
 /** Epoch milliseconds. Integer and non-negative so timestamps sort and compare reliably. */
 const epochMillis = type('number.integer >= 0');
@@ -20,5 +23,5 @@ type WeightUnit = typeof weightUnit.infer;
 const weight = type({ value: nonNegativeFinite, unit: weightUnit }).onUndeclaredKey('reject');
 type Weight = typeof weight.infer;
 
-export { epochMillis, nonNegativeFinite, positiveCount, positiveFinite, weight, weightUnit };
+export { epochMillis, nonNegativeCount, nonNegativeFinite, positiveCount, positiveFinite, weight, weightUnit };
 export type { Weight, WeightUnit };
