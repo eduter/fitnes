@@ -2,6 +2,7 @@ import { A } from '@solidjs/router';
 import { For, Show, type JSX } from 'solid-js';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
 import { primaryNavItems, secondaryNavItems } from './app/navigation.ts';
+import { PixelIcon } from './components/pixel/index.ts';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
 import './App.css';
 
@@ -14,8 +15,8 @@ function App(props: AppProps): JSX.Element {
         <AppDataProvider>
             <div class="app">
                 <header class="app-header">
-                    <A href="/" class="app-title" end>
-                        FitNES
+                    <A href="/" class="app-title" end aria-label="FitNES home">
+                        <img class="app-title__logo" src="/fitnes-logo.png" alt="" />
                     </A>
                     <nav class="app-header__links">
                         <For each={secondaryNavItems}>{(item) => <A href={item.href}>{item.label}</A>}</For>
@@ -27,9 +28,7 @@ function App(props: AppProps): JSX.Element {
                     <For each={primaryNavItems}>
                         {(item) => (
                             <A href={item.href} end={item.href === '/'}>
-                                <span class="app-tabs__icon" aria-hidden="true">
-                                    {item.icon}
-                                </span>
+                                <PixelIcon name={item.icon} size="sm" />
                                 <span class="app-tabs__label">{item.label}</span>
                             </A>
                         )}

@@ -18,8 +18,8 @@ const pwa = VitePWA({
         name: 'FitNES',
         short_name: 'FitNES',
         description: 'Personal offline-first workout tracker',
-        theme_color: '#181818',
-        background_color: '#181818',
+        theme_color: '#010007',
+        background_color: '#010007',
         display: 'standalone',
         scope: '/',
         start_url: '/',
@@ -49,7 +49,7 @@ const pwa = VitePWA({
         ],
     },
     workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,ttf,woff2}'],
     },
 });
 

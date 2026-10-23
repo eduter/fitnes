@@ -1,0 +1,112 @@
+.pixel-panel {
+    position: relative;
+    padding: calc(var(--pixel-unit) * 3);
+    border: var(--pixel-border-width) solid var(--color-border);
+    border-radius: var(--pixel-corner);
+    background-color: var(--color-surface-raised);
+    background-image:
+        radial-gradient(circle at 4px 4px, var(--nes-black) 0 1px, var(--nes-blue-bright) 1px 2px, transparent 2px),
+        radial-gradient(
+            circle at calc(100% - 4px) 4px,
+            var(--nes-black) 0 1px,
+            var(--nes-blue-bright) 1px 2px,
+            transparent 2px
+        ),
+        radial-gradient(
+            circle at 4px calc(100% - 4px),
+            var(--nes-black) 0 1px,
+            var(--nes-blue-bright) 1px 2px,
+            transparent 2px
+        ),
+        radial-gradient(
+            circle at calc(100% - 4px) calc(100% - 4px),
+            var(--nes-black) 0 1px,
+            var(--nes-blue-bright) 1px 2px,
+            transparent 2px
+        );
+    box-shadow: var(--pixel-shadow);
+}
+
+.pixel-panel--inset {
+    background-color: var(--color-surface);
+    box-shadow:
+        inset 0 0 0 2px var(--nes-black),
+        inset 0 0 0 4px var(--nes-blue-deep);
+}
+
+.pixel-panel--highlight {
+    border-color: var(--nes-yellow);
+    background-color: var(--nes-yellow);
+    background-image: none;
+    box-shadow: var(--pixel-shadow-active);
+    color: var(--color-action-text);
+}
+
+.pixel-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: calc(var(--pixel-unit) * 2);
+    margin: calc(var(--pixel-unit) * -1) calc(var(--pixel-unit) * -1) calc(var(--pixel-unit) * 2);
+    padding: 0 var(--pixel-unit) var(--pixel-unit);
+    border-bottom: var(--pixel-border-width) solid var(--color-border);
+}
+
+.pixel-panel__title {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.pixel-panel--highlight .pixel-panel__title {
+    color: var(--color-action-text);
+}
+
+.pixel-icon {
+    display: block;
+    width: var(--pixel-icon-size, 28px);
+    height: var(--pixel-icon-size, 28px);
+    object-fit: contain;
+    image-rendering: pixelated;
+}
+
+.pixel-icon--sm {
+    --pixel-icon-size: 20px;
+}
+
+.pixel-icon--lg {
+    --pixel-icon-size: 36px;
+}
+
+.pixel-hero {
+    position: relative;
+    min-height: 138px;
+    overflow: hidden;
+    border: var(--pixel-border-width) solid var(--color-border);
+    border-radius: var(--pixel-corner);
+    background: var(--nes-navy-900) url("/artwork/gym-hero.png") center / cover no-repeat;
+    box-shadow: var(--pixel-shadow);
+    image-rendering: pixelated;
+}
+
+.pixel-hero::after {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 45%, rgb(0 5 38 / 78%));
+    content: "";
+}
+
+.pixel-hero__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: 134px;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: calc(var(--pixel-unit) * 3);
+    text-align: right;
+    text-shadow: 2px 2px 0 var(--nes-black);
+}

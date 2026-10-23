@@ -1,40 +1,43 @@
+@import "./tokens.css";
+@import "./pixel.css";
+
 :root {
-    --bg-primary: #181818;
-    --bg-secondary: #1f1f1f;
-    --bg-surface: #252526;
-    --bg-surface-hover: #2d2d2d;
-    --bg-surface-active: #333333;
-    --bg-input: #1f1f1f;
+    --bg-primary: var(--color-canvas);
+    --bg-secondary: var(--color-surface);
+    --bg-surface: var(--color-surface-raised);
+    --bg-surface-hover: var(--color-surface-active);
+    --bg-surface-active: var(--nes-blue-deep);
+    --bg-input: var(--nes-navy-950);
 
-    --text-primary: #cccccc;
-    --text-secondary: #a0a0a0;
-    --text-muted: #6e6e6e;
-    --text-heading: #e8e8e8;
+    --text-primary: var(--color-text);
+    --text-secondary: var(--color-text-muted);
+    --text-muted: #88bce8;
+    --text-heading: var(--nes-white);
 
-    --accent: #7630b9;
-    --accent-hover: #9333ea;
-    --accent-subtle: rgba(168, 85, 247, 0.15);
+    --accent: var(--nes-blue-electric);
+    --accent-hover: var(--nes-yellow);
+    --accent-subtle: rgb(0 133 251 / 22%);
 
-    --success: #34d399;
-    --success-subtle: rgba(52, 211, 153, 0.15);
-    --warning: #fbbf24;
-    --warning-subtle: rgba(251, 191, 36, 0.15);
-    --danger: #f87171;
-    --danger-subtle: rgba(248, 113, 113, 0.15);
+    --success: var(--nes-yellow);
+    --success-subtle: rgb(253 224 86 / 18%);
+    --warning: var(--nes-peach);
+    --warning-subtle: rgb(253 195 134 / 18%);
+    --danger: var(--nes-red);
+    --danger-subtle: rgb(233 89 88 / 18%);
 
-    --border: #3c3c3c;
-    --border-light: #4a4a4a;
+    --border: var(--color-border);
+    --border-light: #62baff;
 
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --radius-sm: 2px;
+    --radius-md: var(--pixel-corner);
+    --radius-lg: 10px;
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --shadow-sm: 2px 2px 0 var(--nes-black);
+    --shadow-md: 3px 3px 0 var(--nes-black);
+    --shadow-lg: 4px 4px 0 var(--nes-black);
 
-    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    --font-sans: var(--font-body);
+    --font-mono: var(--font-body);
 
     --space-xs: 4px;
     --space-sm: 8px;
@@ -66,12 +69,11 @@ body {
 body {
     margin: 0;
     font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 20px;
+    line-height: 1.2;
     color: var(--text-primary);
     background: var(--bg-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    image-rendering: pixelated;
 }
 
 #root {
@@ -102,21 +104,28 @@ select {
 }
 
 .btn {
+    min-height: 40px;
+    padding: var(--space-xs) var(--space-md);
+    border: 2px solid var(--border);
     border-radius: var(--radius-md);
-    font-size: 14px;
-    transition: background var(--transition-fast);
+    box-shadow: var(--pixel-shadow);
+    font-size: 18px;
+    line-height: 1;
+    text-decoration: none;
+    transition:
+        color var(--transition-fast),
+        background var(--transition-fast);
 }
 
 .btn--primary {
-    padding: var(--space-sm) var(--space-md);
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
+    border-color: var(--nes-yellow);
+    background: var(--nes-yellow);
+    color: var(--nes-black);
+    font-weight: 400;
 }
 
 .btn--primary:hover:not(:disabled) {
-    background: var(--accent-hover);
+    background: var(--nes-white);
 }
 
 .btn--primary:disabled {
@@ -142,25 +151,31 @@ select {
 }
 
 .form-label {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 400;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
 .form-input {
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    border: 2px solid var(--border);
     background: var(--bg-input);
     color: var(--text-primary);
     outline: none;
-    transition: border-color var(--transition-fast);
+    box-shadow: inset 2px 2px 0 var(--nes-black);
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
 }
 
 .form-input:focus {
-    border-color: var(--accent);
+    border-color: var(--nes-yellow);
+    box-shadow:
+        inset 2px 2px 0 var(--nes-black),
+        0 0 0 2px var(--nes-blue-deep);
 }
 
 .form-input::placeholder {

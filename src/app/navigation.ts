@@ -1,9 +1,11 @@
+import type { PixelIconName } from '../components/pixel/index.ts';
+
 /** A destination in the app shell's navigation. */
 interface NavItem {
     href: string;
     label: string;
-    /** Single glyph shown in the bottom bar, where there is no room for a word. */
-    icon: string;
+    /** Pixel-art symbol shown in the bottom bar, where there is no room for a word. */
+    icon: PixelIconName;
 }
 
 /**
@@ -13,15 +15,15 @@ interface NavItem {
  * navigation away with it.
  */
 const primaryNavItems: NavItem[] = [
-    { href: '/', label: 'Home', icon: '⌂' },
-    { href: '/templates', label: 'Templates', icon: '☰' },
-    { href: '/exercises', label: 'Exercises', icon: '◈' },
-    { href: '/bodyweight', label: 'Weight', icon: '⚖' },
-    { href: '/sessions', label: 'History', icon: '◷' },
+    { href: '/', label: 'Home', icon: 'home' },
+    { href: '/templates', label: 'Templates', icon: 'clipboard' },
+    { href: '/exercises', label: 'Exercises', icon: 'dumbbell' },
+    { href: '/bodyweight', label: 'Weight', icon: 'progress' },
+    { href: '/sessions', label: 'History', icon: 'calendar' },
 ];
 
 /** Destinations that matter too rarely to earn a permanent slot. */
-const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', icon: '⇅' }];
+const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', icon: 'diamond' }];
 
 export { primaryNavItems, secondaryNavItems };
 export type { NavItem };

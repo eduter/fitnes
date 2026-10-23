@@ -1,0 +1,47 @@
+@font-face {
+    font-family: "VT323";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/vt323-regular.ttf") format("truetype");
+}
+
+:root {
+    /* Palette sampled from the reference artwork */
+    --nes-blue-bright: #0085fb;
+    --nes-blue-electric: #005ff5;
+    --nes-blue-mid: #0060d3;
+    --nes-blue-deep: #0045c3;
+    --nes-yellow: #fde056;
+    --nes-red: #e95958;
+    --nes-peach: #fdc386;
+    --nes-white: #f9fbfd;
+    --nes-black: #010007;
+
+    /* Dark blues used between the sampled palette colors */
+    --nes-navy-950: #000526;
+    --nes-navy-900: #00113a;
+    --nes-navy-800: #001945;
+    --nes-navy-700: #050b53;
+
+    --color-canvas: var(--nes-black);
+    --color-surface: var(--nes-navy-950);
+    --color-surface-raised: var(--nes-navy-900);
+    --color-surface-active: var(--nes-navy-800);
+    --color-text: var(--nes-white);
+    --color-text-muted: #cce6fc;
+    --color-border: var(--nes-blue-bright);
+    --color-border-shadow: var(--nes-blue-deep);
+    --color-action: var(--nes-yellow);
+    --color-action-text: var(--nes-black);
+    --color-danger: var(--nes-red);
+
+    --font-display: "VT323", monospace;
+    --font-body: "VT323", monospace;
+
+    --pixel-unit: 4px;
+    --pixel-border-width: 2px;
+    --pixel-corner: 7px;
+    --pixel-shadow: 0 0 0 1px var(--nes-blue-deep), inset 0 0 0 2px var(--nes-navy-700);
+    --pixel-shadow-active: 0 0 0 1px #b98f00, inset 0 0 0 2px #fff49a;
+}
