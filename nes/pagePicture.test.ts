@@ -12,10 +12,10 @@ const PAGES = ['/', '/templates', '/exercises', '/bodyweight', '/sessions', '/da
 
 /**
  * Open the real app at 256 CSS pixels, where one logical pixel is one screenshot
- * pixel, and score each shell page with the background rules.
+ * pixel, and score each shell page as a background with a sprite layer on top.
  */
 describe('rendered pages', () => {
-    it('stay inside the NES background limits', async () => {
+    it('stay inside the NES picture limits', async () => {
         const palette = masterPalette();
         const failures: string[] = [];
 

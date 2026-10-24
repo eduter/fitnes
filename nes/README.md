@@ -230,18 +230,42 @@ Approximations and omissions, stated so they are not mistaken for hardware:
 
 ## Rendered pages
 
-`assessPicture` (`nes/pictureCheck.ts`) scores a finished RGB picture with
-the background limits: width 256, height a multiple of 16, FCEUX colors,
-four colors in each 8×8 tile, one subpalette per 16×16 region, and four
-subpalettes. That is 13 background colors on screen, because every
-subpalette shares one universal color and then adds three of its own.
-Every pixel is background. A fifth color that only a sprite could add is
-a failure, so the app cannot sneak past the still-picture rules.
+`assessPicture` (`nes/pictureCheck.ts`) scores a finished RGB picture as a
+still frame an unmodified NES could draw: a background layer, with sprites
+layered on top where the background cannot hold the color.
+
+The column is 256 pixels wide and the height is a multiple of 16, because a
+page scrolls past 240. Every pixel is an FCEUX master-palette color. The
+background is still four subpalettes sharing one universal color, one
+subpalette for each 16×16 region, three colors of its own plus that shared
+color. That is 13 background colors. Tiles stay 8×8 and four colors. A
+per-tile attribute, the MMC5 kind, is still rejected.
+
+Sprites are the other layer. Games stack them on the background to show a
+color the attribute region does not have: a cursor, an icon, a figure. The
+checker keeps a pixel on the background when that pixel's color fits the
+region's subpalette. Colors that already cover a wide run, more than 64
+pixels on one line, stay on the background too, because eight sprites cannot
+cover them. The leftovers are sprite pixels, and they have to fit the stock
+sprite hardware:
+
+- four sprite subpalettes of three colors each, so 12 sprite colors
+- one subpalette per sprite, in either 8×8 or 8×16 for the whole frame
+- eight sprites on a scanline, at most 64 sprite pixels on that line
+- 64 sprites in any 240-line window, because OAM is one screen and a
+  scrolling page can reuse those slots further down
+
+A fifth color in one tile is legal when a sprite covers it. The same color
+stretched across the screen is not. There is still no mid-frame palette
+swap, so one background palette set and one sprite palette set cover the
+whole picture.
 
 The 256-tile pattern table is a CHR bank, not a rule about how a color
 may be used. The scrolling app does not keep one bank for a whole page,
 so the page check turns that cap off. The JSON screen tool still enforces
-it.
+it. A tile hidden by a sprite is charged as if the sprite pixels were the
+universal color, which is the background those pixels would show if the
+sprite moved.
 
 `nes/pagePicture.test.ts` opens the shell routes in Chrome at 256 CSS
 pixels, where one logical pixel is one screenshot pixel, and runs that

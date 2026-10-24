@@ -9,7 +9,7 @@ import { decodePng, type RgbImage } from '../../nes/png.ts';
 const assets = dirname(fileURLToPath(new URL('../assets/logo.png', import.meta.url)));
 
 describe('quantized art', () => {
-    it('fits the poster and the bar in four subpalettes', () => {
+    it('draws the poster and the bar within the console limits', () => {
         const picture = solid(256, 256);
         paint(picture, 0, 0, 16, 16, [0x00, 0x00, 0xa8]);
         setPixel(picture, 1, 1, [0xfc, 0xfc, 0xfc]);
