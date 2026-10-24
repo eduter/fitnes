@@ -12,20 +12,15 @@
     <meta name="theme-color" content="#000000" />
     <title>FitNES</title>
     <script>
-      // Same formula as nesScale() in src/app/nesScale.ts, so the first paint is already scaled.
+      // Same formula as nesScale() in src/app/nesScale.ts, so the first paint already fills the width.
       (() => {
         var logical = 256;
         var width = document.documentElement.clientWidth || logical;
-        var dpr = window.devicePixelRatio || 1;
-        var device = width * dpr;
-        var integer = Math.floor(device / logical);
-        var px = device < logical ? width / logical : integer / dpr;
-        var screen = device < logical ? width : logical * px;
-        var left = device < logical ? 0 : Math.floor((device - logical * integer) / 2) / dpr;
+        var px = width / logical;
         var style = document.documentElement.style;
         style.setProperty('--px', `${px}px`);
-        style.setProperty('--screen', `${screen}px`);
-        style.setProperty('--screen-left', `${left}px`);
+        style.setProperty('--screen', `${width}px`);
+        style.setProperty('--screen-left', '0px');
       })();
     </script>
   </head>

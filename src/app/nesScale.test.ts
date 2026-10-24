@@ -6,30 +6,24 @@ describe('nesScale', () => {
         expect(LOGICAL_WIDTH).toBe(256);
     });
 
-    it('fills a viewport that is an integer multiple of the logical width', () => {
-        expect(nesScale(256, 1)).toEqual({ px: 1, screen: 256, left: 0 });
-        expect(nesScale(1280, 1)).toEqual({ px: 5, screen: 1280, left: 0 });
+    it('fills every viewport width with the 256-pixel column', () => {
+        expect(nesScale(256)).toEqual({ px: 1, screen: 256, left: 0 });
+        expect(nesScale(390)).toEqual({ px: 390 / 256, screen: 390, left: 0 });
+        expect(nesScale(1300)).toEqual({ px: 1300 / 256, screen: 1300, left: 0 });
     });
 
-    it('picks the largest integer device-pixel scale and centers the remainder', () => {
-        // 390 CSS px at 2x is 780 device px: 3×256 = 768, 12 device px of letterbox
-        expect(nesScale(390, 2)).toEqual({ px: 1.5, screen: 384, left: 3 });
-        expect(nesScale(1300, 1)).toEqual({ px: 5, screen: 1280, left: 10 });
+    it('fills a viewport narrower than one screen', () => {
+        expect(nesScale(200)).toEqual({ px: 200 / 256, screen: 200, left: 0 });
     });
 
-    it('shrinks to fit a viewport narrower than one screen', () => {
-        expect(nesScale(200, 1)).toEqual({ px: 200 / 256, screen: 200, left: 0 });
-    });
-
-    it('ignores a missing device pixel ratio', () => {
-        expect(nesScale(256, 0)).toEqual({ px: 1, screen: 256, left: 0 });
+    it('falls back to one screen when the width is missing', () => {
+        expect(nesScale(0)).toEqual({ px: 1, screen: 256, left: 0 });
+        expect(nesScale(-4)).toEqual({ px: 1, screen: 256, left: 0 });
     });
 
     it('does not take a height: a taller page uses the same scale', () => {
-        const phone = nesScale(390, 2);
-        const samePhone = nesScale(390, 2);
+        const phone = nesScale(390);
 
-        expect(phone).toEqual(samePhone);
         expect(Object.keys(phone).sort()).toEqual(['left', 'px', 'screen']);
     });
 });
