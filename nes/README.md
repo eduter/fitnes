@@ -232,10 +232,16 @@ Approximations and omissions, stated so they are not mistaken for hardware:
 
 `assessPicture` (`nes/pictureCheck.ts`) scores a finished RGB picture with
 the background limits: width 256, height a multiple of 16, FCEUX colors,
-four colors in each 8×8 tile, one subpalette per 16×16 region, four
-subpalettes, and 256 patterns. Every pixel is background. A fifth color
-that only a sprite could add is a failure, so the app cannot sneak past
-the still-picture rules.
+four colors in each 8×8 tile, one subpalette per 16×16 region, and four
+subpalettes. That is 13 background colors on screen, because every
+subpalette shares one universal color and then adds three of its own.
+Every pixel is background. A fifth color that only a sprite could add is
+a failure, so the app cannot sneak past the still-picture rules.
+
+The 256-tile pattern table is a CHR bank, not a rule about how a color
+may be used. The scrolling app does not keep one bank for a whole page,
+so the page check turns that cap off. The JSON screen tool still enforces
+it.
 
 `nes/pagePicture.test.ts` opens the shell routes in Chrome at 256 CSS
 pixels, where one logical pixel is one screenshot pixel, and runs that

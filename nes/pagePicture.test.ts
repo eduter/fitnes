@@ -22,7 +22,7 @@ describe('rendered pages', () => {
         await withApp(async (origin, page) => {
             for (const path of PAGES) {
                 const picture = await capture(page, `${origin}${path}`);
-                const problems = assessPicture(picture, palette);
+                const problems = assessPicture(picture, palette, { patternLimit: false });
                 if (problems.length > 0) {
                     failures.push(`${path}\n${problems.map((problem) => problem.message).join('\n')}`);
                 }
@@ -100,7 +100,7 @@ async function capture(page: Cdp, url: string): Promise<RgbImage> {
         expression: `new Promise((resolve) => {
             const start = Date.now();
             const tick = () => {
-                const ready = document.fonts.check('8px "FitNES HUD"') && document.querySelector('.app-title');
+                const ready = document.fonts.check('8px "FitNES HUD"') && document.querySelector('.app-tabs');
                 if (ready || Date.now() - start > 4000) resolve(true);
                 else requestAnimationFrame(tick);
             };

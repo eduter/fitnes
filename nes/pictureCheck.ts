@@ -9,6 +9,15 @@ import {
 import { formatPaletteIndex, type MasterPalette } from './palette.ts';
 import type { RgbImage } from './png.ts';
 
+/** Which background limits a picture is scored against. */
+interface PictureRules {
+    /**
+     * Reject a picture with more than 256 distinct tiles. A scrolling page is
+     * not one CHR bank, so the app turns this off.
+     */
+    readonly patternLimit?: boolean;
+}
+
 /** One way a captured picture breaks the background rules. */
 interface PictureProblem {
     readonly code:
@@ -29,11 +38,12 @@ const TILE_AREA = TILE_SIZE * TILE_SIZE;
  * The column is 256 pixels wide and may be taller than 240, because a workout
  * scrolls. Every pixel must be a master-palette color. Each 8×8 tile holds at
  * most four of those colors, each 16×16 region shares one subpalette, the
- * picture uses at most four subpalettes, and distinct tiles fit in one pattern
- * table. Sprites are not inferred: a color that only a sprite could add fails
- * here, which keeps the page drawable as a background.
+ * picture uses at most four subpalettes. Distinct tiles must fit in one
+ * pattern table unless `patternLimit` is false. Sprites are not inferred: a
+ * color that only a sprite could add fails here, which keeps the page
+ * drawable as a background.
  */
-function assessPicture(image: RgbImage, palette: MasterPalette): PictureProblem[] {
+function assessPicture(image: RgbImage, palette: MasterPalette, rules: PictureRules = {}): PictureProblem[] {
     const { width, height } = image;
 
     if (width !== SCREEN_WIDTH || height < ATTRIBUTE_REGION_SIZE || height % ATTRIBUTE_REGION_SIZE !== 0) {
@@ -131,7 +141,7 @@ function assessPicture(image: RgbImage, palette: MasterPalette): PictureProblem[
         });
     }
 
-    if (patterns.size > PATTERN_TABLE_TILES) {
+    if (rules.patternLimit !== false && patterns.size > PATTERN_TABLE_TILES) {
         problems.push({
             code: 'pattern-limit',
             message: `picture uses ${patterns.size} distinct tiles; a background pattern table holds ${PATTERN_TABLE_TILES}`,

@@ -11,7 +11,9 @@
     align-items: center;
     justify-content: space-between;
     gap: var(--space-md);
+    height: calc(var(--px) * 24);
     margin: calc(var(--px) * 8) calc(var(--px) * 8) 0;
+    padding: calc(var(--px) * 8);
 }
 
 .app-title {
@@ -35,55 +37,79 @@
     left: var(--screen-left);
     bottom: 0;
     width: var(--screen);
-    padding: 0 calc(var(--px) * 8) calc(var(--px) * 8 + env(safe-area-inset-bottom, 0px));
+    height: var(--tab-block);
+    padding: 0 0 env(safe-area-inset-bottom, 0px);
     background: var(--nes-black);
 }
 
+/* Five 32-pixel pictures on the 16-pixel grid. The row above them is the active mark. */
 .app-tabs {
-    display: flex;
-    align-items: center;
-    width: auto;
+    display: grid;
+    grid-template-columns: repeat(16, calc(var(--px) * 16));
+    grid-template-rows: calc(var(--px) * 16) calc(var(--px) * 32);
+    width: var(--screen);
     margin: 0;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 .app-tabs a {
+    grid-row: 1 / span 2;
     display: flex;
-    flex: 1;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-width: 0;
-    min-height: calc(var(--px) * 16);
+    min-height: 0;
+    padding: 0;
     color: var(--nes-white);
-    text-align: center;
 }
 
-.pixel-icon {
+.tab-mark {
+    display: flex;
+    align-items: flex-end;
+    width: calc(var(--px) * 32);
+    height: calc(var(--px) * 16);
+    background: var(--nes-black);
+}
+
+.tab-mark__bar {
+    width: 100%;
+    height: calc(var(--px) * 8);
+    background: transparent;
+}
+
+.app-tabs a[aria-current="page"] .tab-mark__bar {
+    background: var(--nes-gold);
+}
+
+.pixel-art {
     display: block;
-    flex: none;
+    image-rendering: pixelated;
 }
 
-.icon-sizes {
+.home-logo {
+    width: calc(var(--px) * 224);
+    height: calc(var(--px) * 96);
+    margin: calc(var(--px) * 16) auto;
+}
+
+.home-hero {
+    width: calc(var(--px) * 256);
+    height: calc(var(--px) * 128);
+}
+
+.page.home {
+    gap: 0;
+    padding: 0;
+}
+
+.home-actions {
     display: flex;
     flex-direction: column;
     gap: calc(var(--px) * 8);
-}
-
-.icon-sizes__row {
-    display: flex;
-    align-items: center;
-    gap: calc(var(--px) * 8);
-    min-height: calc(var(--px) * 24);
-}
-
-.icon-sizes__label {
-    flex: none;
-    width: calc(var(--px) * 16);
-    color: var(--nes-gold);
-}
-
-.app-tabs a.active,
-.app-tabs a[aria-current="page"] {
-    color: var(--nes-gold);
+    padding: calc(var(--px) * 16);
 }
 
 .app-main {

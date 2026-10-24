@@ -97,6 +97,26 @@ describe('assessPicture', () => {
 
         expect(problems.map((problem) => problem.code)).toEqual(['pattern-limit']);
     });
+
+    it('allows unlimited tiles when the pattern table is not the limit being checked', () => {
+        const picture = solid(256, 80, 15);
+        const white = rgb(32);
+
+        for (let tile = 0; tile < 32 * 10; tile++) {
+            const originX = (tile % 32) * 8;
+            const originY = Math.floor(tile / 32) * 8;
+            for (let bit = 0; bit < 8; bit++) {
+                if ((tile & (1 << bit)) !== 0) {
+                    setPixel(picture, originX + bit, originY, white);
+                }
+            }
+            if (tile >= 256) {
+                setPixel(picture, originX, originY + 1, white);
+            }
+        }
+
+        expect(assessPicture(picture, palette, { patternLimit: false })).toEqual([]);
+    });
 });
 
 function solid(width: number, height: number, index: number): RgbImage {

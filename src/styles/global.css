@@ -61,7 +61,7 @@
     --transition-normal: 0s;
 
     --header-height: calc(var(--px) * 32);
-    --tab-block: calc(var(--px) * 64 + env(safe-area-inset-bottom, 0px));
+    --tab-block: calc(var(--px) * 48 + env(safe-area-inset-bottom, 0px));
 
     --frame: calc(var(--px) * 4);
 
@@ -160,7 +160,6 @@ a {
 .card-link,
 .page-header,
 .app-header,
-.app-tabs,
 .banner,
 .error-text,
 fieldset.form-field,
@@ -181,7 +180,6 @@ fieldset.form-field,
 .card-link,
 .page-header,
 .app-header,
-.app-tabs,
 fieldset.form-field,
 .stack > label.form-field,
 .planned-set {
