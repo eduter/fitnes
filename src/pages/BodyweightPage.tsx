@@ -1,4 +1,4 @@
-import { For, Show, createSignal, type JSX } from 'solid-js';
+import { createSignal, For, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DateTimeField, NumberField, SelectField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
@@ -122,11 +122,11 @@ function ReadingRow(props: ReadingRowProps): JSX.Element {
                         <span class="planned-set__detail">{formatDateTime(props.measurement.measuredAt)}</span>
                     </span>
                     <span class="planned-set__caret" aria-hidden="true">
-                        {props.expanded ? '▾' : '▸'}
+                        {props.expanded ? 'V' : '>'}
                     </span>
                 </button>
                 <button class="btn btn--icon" type="button" aria-label="Delete reading" onClick={props.onRemove}>
-                    ✕
+                    X
                 </button>
             </div>
             <Show when={props.expanded}>

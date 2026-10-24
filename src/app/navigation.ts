@@ -2,8 +2,11 @@
 interface NavItem {
     href: string;
     label: string;
-    /** Single glyph shown in the bottom bar, where there is no room for a word. */
-    icon: string;
+    /**
+     * Bottom-bar text. Four letters, because five of them have to fit a row
+     * that is 32 tiles wide.
+     */
+    short: string;
 }
 
 /**
@@ -13,15 +16,15 @@ interface NavItem {
  * navigation away with it.
  */
 const primaryNavItems: NavItem[] = [
-    { href: '/', label: 'Home', icon: '⌂' },
-    { href: '/templates', label: 'Templates', icon: '☰' },
-    { href: '/exercises', label: 'Exercises', icon: '◈' },
-    { href: '/bodyweight', label: 'Weight', icon: '⚖' },
-    { href: '/sessions', label: 'History', icon: '◷' },
+    { href: '/', label: 'Home', short: 'Home' },
+    { href: '/templates', label: 'Templates', short: 'Plan' },
+    { href: '/exercises', label: 'Exercises', short: 'Move' },
+    { href: '/bodyweight', label: 'Weight', short: 'Body' },
+    { href: '/sessions', label: 'History', short: 'Hist' },
 ];
 
 /** Destinations that matter too rarely to earn a permanent slot. */
-const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', icon: '⇅' }];
+const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', short: 'Data' }];
 
-export { primaryNavItems, secondaryNavItems };
 export type { NavItem };
+export { primaryNavItems, secondaryNavItems };

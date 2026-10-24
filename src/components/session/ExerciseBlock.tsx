@@ -1,4 +1,4 @@
-import { For, Show, type JSX } from 'solid-js';
+import { For, type JSX, Show } from 'solid-js';
 import { formatMeasurement } from '../../domain/format.ts';
 import type { SequenceEntryId } from '../../domain/ids.ts';
 import type { SequenceOccurrence } from '../../domain/lookups.ts';
@@ -192,7 +192,7 @@ function SetRow(props: SetRowProps): JSX.Element {
                     when={!props.readOnly}
                     fallback={
                         <span class="set-check" aria-hidden="true">
-                            {props.recorded ? '✓' : ''}
+                            {props.recorded ? 'OK' : ''}
                         </span>
                     }
                 >
@@ -204,7 +204,7 @@ function SetRow(props: SetRowProps): JSX.Element {
                         aria-label={`${props.recorded ? 'Clear' : 'Log'} ${prefix()}`}
                         onClick={() => (props.recorded ? props.onClear() : props.onLog())}
                     >
-                        ✓
+                        OK
                     </button>
                 </Show>
             </td>

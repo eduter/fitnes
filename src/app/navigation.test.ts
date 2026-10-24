@@ -18,6 +18,13 @@ describe('navigation', () => {
         }
     });
 
+    it('keeps bottom-bar words to four letters so five fit a 32-tile row', () => {
+        expect(primaryNavItems.map((item) => item.short)).toEqual(['Home', 'Plan', 'Move', 'Body', 'Hist']);
+        for (const item of primaryNavItems) {
+            expect(item.short.length).toBeLessThanOrEqual(4);
+        }
+    });
+
     it('keeps the rare destinations out of the bottom bar', () => {
         expect(secondaryNavItems.map((item) => item.label)).toEqual(['Data']);
     });

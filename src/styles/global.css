@@ -1,53 +1,70 @@
 :root {
-    --bg-primary: #181818;
-    --bg-secondary: #1f1f1f;
-    --bg-surface: #252526;
-    --bg-surface-hover: #2d2d2d;
-    --bg-surface-active: #333333;
-    --bg-input: #1f1f1f;
+    /* FCEUX master palette. Indexes are the logical NES colors, not measured 2C02 output. */
+    --nes-black: #000000; /* $0F */
+    --nes-blue: #0000a8; /* $02 */
+    --nes-white: #fcfcfc; /* $30 */
+    --nes-gray: #747474; /* $00 */
+    --nes-silver: #bcbcbc; /* $10 */
+    --nes-gold: #f0bc3c; /* $28 */
+    --nes-red: #fc7460; /* $26 */
+    --nes-green: #4cdc48; /* $2A */
 
-    --text-primary: #cccccc;
-    --text-secondary: #a0a0a0;
-    --text-muted: #6e6e6e;
-    --text-heading: #e8e8e8;
+    --bg-primary: var(--nes-black);
+    --bg-secondary: var(--nes-black);
+    --bg-surface: var(--nes-blue);
+    --bg-surface-hover: var(--nes-blue);
+    --bg-surface-active: var(--nes-blue);
+    --bg-input: var(--nes-black);
 
-    --accent: #7630b9;
-    --accent-hover: #9333ea;
-    --accent-subtle: rgba(168, 85, 247, 0.15);
+    --text-primary: var(--nes-white);
+    --text-secondary: var(--nes-silver);
+    --text-muted: var(--nes-silver);
+    --text-heading: var(--nes-white);
 
-    --success: #34d399;
-    --success-subtle: rgba(52, 211, 153, 0.15);
-    --warning: #fbbf24;
-    --warning-subtle: rgba(251, 191, 36, 0.15);
-    --danger: #f87171;
-    --danger-subtle: rgba(248, 113, 113, 0.15);
+    --accent: var(--nes-gold);
+    --accent-hover: var(--nes-gold);
+    --accent-subtle: var(--nes-blue);
 
-    --border: #3c3c3c;
-    --border-light: #4a4a4a;
+    --success: var(--nes-green);
+    --success-subtle: var(--nes-black);
+    --warning: var(--nes-gold);
+    --warning-subtle: var(--nes-black);
+    --danger: var(--nes-red);
+    --danger-subtle: var(--nes-black);
 
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
+    --border: var(--nes-white);
+    --border-light: var(--nes-silver);
 
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
 
-    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
+    --font-pixel: "FitNES HUD", ui-monospace, monospace;
+    --font-sans: var(--font-pixel);
+    --font-mono: ui-monospace, monospace;
 
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
+    /* Fallback until nesScale measures the device. One logical pixel across a 256-wide column. */
+    --px: calc(100vw / 256);
+    --screen: 100vw;
+    --screen-left: 0px;
 
-    --transition-fast: 150ms ease;
-    --transition-normal: 250ms ease;
+    --space-xs: calc(var(--px) * 2);
+    --space-sm: calc(var(--px) * 4);
+    --space-md: calc(var(--px) * 8);
+    --space-lg: calc(var(--px) * 8);
+    --space-xl: calc(var(--px) * 16);
 
-    /* Height of the sticky app header. Anything else that sticks below it
-       offsets by this rather than a magic zero. */
-    --header-height: 41px;
+    --transition-fast: 0s;
+    --transition-normal: 0s;
+
+    --header-height: calc(var(--px) * 32);
+    --tab-block: calc(var(--px) * 64 + env(safe-area-inset-bottom, 0px));
+
+    --chamfer: calc(var(--px) * 4);
+    --frame: calc(var(--px) * 6);
 
     color-scheme: dark;
 }
@@ -61,108 +78,231 @@
 html,
 body {
     min-height: 100dvh;
+    background: var(--nes-black);
+}
+
+html {
+    overflow-x: clip;
 }
 
 body {
     margin: 0;
-    font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--text-primary);
-    background: var(--bg-primary);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-pixel);
+    font-size: calc(var(--px) * 8);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0;
+    font-kerning: none;
+    font-synthesis: none;
+    font-variant-ligatures: none;
+    text-transform: uppercase;
+    color: var(--nes-white);
+    background: var(--nes-black);
+    -webkit-font-smoothing: none;
 }
 
 #root {
-    max-width: 600px;
-    margin: 0 auto;
+    width: var(--screen);
+    margin-left: var(--screen-left);
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    background: var(--nes-black);
 }
 
-/* Prevent page scroll while a modal dialog is open. */
 html.dialog-scroll-lock,
 body.dialog-scroll-lock {
     overflow: hidden;
     overscroll-behavior: none;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
-}
-
+button,
 input,
 textarea,
 select {
     font-family: inherit;
     font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    text-transform: none;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+h1,
+h2,
+h3,
+p,
+b,
+strong {
+    margin: 0;
+    font-size: inherit;
+    font-weight: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+::selection {
+    background: var(--nes-gold);
+    color: var(--nes-black);
+}
+
+/* A menu window: white outer edge, gray band, black inner line, chamfered corners. */
+.pane,
+.card,
+.card-link,
+.page-header,
+.app-header,
+.app-tabs,
+.banner,
+.error-text,
+fieldset.form-field,
+.stack > label.form-field,
+.planned-set,
+.btn {
+    --chamfer: calc(var(--px) * 4);
+    position: relative;
+    border: 0;
+    border-radius: 0;
+    background: var(--nes-blue);
+    color: var(--nes-white);
+    box-shadow:
+        inset 0 0 0 calc(var(--px) * 1) var(--nes-black),
+        inset 0 0 0 calc(var(--px) * 2) var(--nes-gray),
+        inset 0 0 0 calc(var(--px) * 4) var(--nes-silver),
+        inset 0 0 0 var(--frame) var(--nes-white);
+    clip-path: polygon(
+        var(--chamfer) 0,
+        calc(100% - var(--chamfer)) 0,
+        100% var(--chamfer),
+        100% calc(100% - var(--chamfer)),
+        calc(100% - var(--chamfer)) 100%,
+        var(--chamfer) 100%,
+        0 calc(100% - var(--chamfer)),
+        0 var(--chamfer)
+    );
+}
+
+.card,
+.card-link,
+.page-header,
+.app-header,
+.app-tabs,
+fieldset.form-field,
+.stack > label.form-field,
+.planned-set {
+    padding: calc(var(--frame) + var(--px) * 8) calc(var(--frame) + var(--px) * 6);
+}
+
+.banner,
+.error-text {
+    padding: calc(var(--frame) + var(--px) * 4) calc(var(--frame) + var(--px) * 6);
+    background: var(--nes-black);
+    color: var(--nes-red);
 }
 
 .btn {
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    transition: background var(--transition-fast);
+    --chamfer: calc(var(--px) * 3);
+    --frame: calc(var(--px) * 4);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--px) * 24);
+    padding: calc(var(--px) * 8) calc(var(--px) * 8);
+    background: var(--nes-black);
+    color: var(--nes-white);
+    box-shadow:
+        inset 0 0 0 calc(var(--px) * 1) var(--nes-black),
+        inset 0 0 0 calc(var(--px) * 2) var(--nes-gray),
+        inset 0 0 0 calc(var(--px) * 3) var(--nes-silver),
+        inset 0 0 0 var(--frame) var(--nes-white);
 }
 
 .btn--primary {
-    padding: var(--space-sm) var(--space-md);
-    border: none;
-    background: var(--accent);
-    color: #fff;
-    font-weight: 600;
-}
-
-.btn--primary:hover:not(:disabled) {
-    background: var(--accent-hover);
-}
-
-.btn--primary:disabled {
-    opacity: 0.5;
-    cursor: default;
+    color: var(--nes-gold);
 }
 
 .btn--secondary {
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
+    color: var(--nes-white);
 }
 
-.btn--secondary:hover {
-    background: var(--bg-surface-hover);
+.btn:disabled {
+    color: var(--nes-gray);
+    cursor: default;
+}
+
+.btn--icon {
+    width: calc(var(--px) * 24);
+    min-height: calc(var(--px) * 24);
+    padding: calc(var(--px) * 6);
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: calc(var(--px) * 1) solid var(--nes-gold);
+    outline-offset: calc(var(--px) * 2);
 }
 
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: calc(var(--px) * 4);
+    min-width: 0;
 }
 
 .form-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-secondary);
+    color: var(--nes-silver);
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: 0;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
 }
 
 .form-input {
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    background: var(--bg-input);
-    color: var(--text-primary);
+    width: 100%;
+    min-height: calc(var(--px) * 24);
+    padding: calc(var(--px) * 4);
+    border: calc(var(--px) * 1) solid var(--nes-white);
+    border-radius: 0;
+    background: var(--nes-black);
+    color: var(--nes-white);
     outline: none;
-    transition: border-color var(--transition-fast);
 }
 
 .form-input:focus {
-    border-color: var(--accent);
+    border-color: var(--nes-gold);
+    color: var(--nes-gold);
 }
 
 .form-input::placeholder {
-    color: var(--text-muted);
+    color: var(--nes-gray);
+}
+
+.form-input:disabled {
+    color: var(--nes-gray);
+}
+
+input[type="checkbox"] {
+    width: calc(var(--px) * 8);
+    height: calc(var(--px) * 8);
+    margin: 0;
+    accent-color: var(--nes-gold);
+}
+
+fieldset.form-field {
+    min-width: 0;
+}
+
+legend.form-label {
+    padding: 0 calc(var(--px) * 4);
 }

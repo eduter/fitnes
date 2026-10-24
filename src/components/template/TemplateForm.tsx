@@ -1,4 +1,4 @@
-import { For, Show, createSignal, type JSX } from 'solid-js';
+import { createSignal, For, type JSX, Show } from 'solid-js';
 import { createWorkoutTemplate, refreshTemplateExercises } from '../../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../../domain/defaultPrescription.ts';
 import type { ExerciseDefinition } from '../../domain/exercise.ts';
@@ -6,8 +6,8 @@ import { generatePlannedSetId, generateSequenceEntryId } from '../../domain/gene
 import type { SetPrescription } from '../../domain/prescription.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
 import type { PlannedSet, WorkoutTemplate } from '../../domain/workoutTemplate.ts';
-import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
 import { TextAreaField, TextField } from '../fields.tsx';
+import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
 import { prescriptionSummary } from './prescriptionSummary.ts';
 
@@ -276,7 +276,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         <span class="planned-set__detail">{prescriptionSummary(props.set.prescription)}</span>
                     </span>
                     <span class="planned-set__caret" aria-hidden="true">
-                        {props.expanded ? '▾' : '▸'}
+                        {props.expanded ? 'V' : '>'}
                     </span>
                 </button>
                 <div class="button-row">
@@ -287,7 +287,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         disabled={props.index === 0}
                         onClick={() => props.onMove(-1)}
                     >
-                        ↑
+                        ^
                     </button>
                     <button
                         class="btn btn--icon"
@@ -296,7 +296,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         disabled={props.index === props.lastIndex}
                         onClick={() => props.onMove(1)}
                     >
-                        ↓
+                        V
                     </button>
                     <button
                         class="btn btn--icon"
@@ -304,7 +304,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         aria-label={`Duplicate set ${props.index + 1}`}
                         onClick={props.onDuplicate}
                     >
-                        ⧉
+                        +
                     </button>
                     <button
                         class="btn btn--icon"
@@ -312,7 +312,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         aria-label={`Remove set ${props.index + 1}`}
                         onClick={props.onRemove}
                     >
-                        ✕
+                        X
                     </button>
                 </div>
             </div>

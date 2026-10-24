@@ -16,6 +16,10 @@ limits. `npm run nes:validate` and `npm run nes:render` are documented in
 `nes/README.md`. The FitNES reference screen is
 `nes/examples/workout-dashboard.json`.
 
+The app uses the same width and no height limit. Its column is 256 logical
+pixels, scaled to the device in whole device pixels, and the page scrolls
+for as long as the workout is.
+
 ## Build
 
 ```bash

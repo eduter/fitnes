@@ -1,5 +1,5 @@
 import { A } from '@solidjs/router';
-import { For, Show, type JSX } from 'solid-js';
+import { For, type JSX, Show } from 'solid-js';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
 import { primaryNavItems, secondaryNavItems } from './app/navigation.ts';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
@@ -23,18 +23,17 @@ function App(props: AppProps): JSX.Element {
                 </header>
                 <StatusBanner />
                 <main class="app-main">{props.children}</main>
-                <nav class="app-tabs" aria-label="Main">
-                    <For each={primaryNavItems}>
-                        {(item) => (
-                            <A href={item.href} end={item.href === '/'}>
-                                <span class="app-tabs__icon" aria-hidden="true">
-                                    {item.icon}
-                                </span>
-                                <span class="app-tabs__label">{item.label}</span>
-                            </A>
-                        )}
-                    </For>
-                </nav>
+                <div class="app-tabs-slot">
+                    <nav class="app-tabs" aria-label="Main">
+                        <For each={primaryNavItems}>
+                            {(item) => (
+                                <A href={item.href} end={item.href === '/'} aria-label={item.label}>
+                                    <span class="app-tabs__label">{item.short}</span>
+                                </A>
+                            )}
+                        </For>
+                    </nav>
+                </div>
             </div>
         </AppDataProvider>
     );
