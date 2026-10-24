@@ -6,6 +6,7 @@ import { type Diagnostic, DiagnosticSink } from './diagnostics.ts';
 import { PATTERN_TABLE_TILES } from './hardware.ts';
 import { layoutLayers } from './layout.ts';
 import { parseScreen, type ScreenPalettes } from './screen.ts';
+import { compileSprites, type CompiledSprite } from './sprites.ts';
 import { type Pattern, patternKey } from './tiles.ts';
 
 /**
@@ -19,6 +20,7 @@ interface CompiledScreen {
     readonly nametable: readonly (readonly number[])[];
     readonly attributes: AttributeGrid;
     readonly attributeTable: Uint8Array;
+    readonly sprites: readonly CompiledSprite[];
     readonly scale: number;
 }
 
@@ -70,6 +72,7 @@ function compileScreen(
     const attributes = resolveAttributes(cells, source.attributes, file, sink);
     const tileNames = cells.map((line) => line.map((cell) => cell?.tile ?? BLANK_TILE));
     const { patternTable, nametable } = buildPatternTable(tileNames, library, file, sink);
+    const sprites = compileSprites(source.sprites, { size: source.spriteSize, library, file }, sink);
 
     const screen: CompiledScreen = {
         name: source.name,
@@ -78,6 +81,7 @@ function compileScreen(
         nametable,
         attributes,
         attributeTable: encodeAttributeTable(attributes),
+        sprites,
         scale: source.scale,
     };
     return { screen, diagnostics: sink.items, valid: !sink.hasErrors() };

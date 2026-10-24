@@ -23,7 +23,7 @@ interface ScreenSource {
     readonly attributes: AttributeGrid | undefined;
     readonly layers: readonly unknown[];
     readonly sprites: readonly unknown[];
-    readonly spriteSize: '8x8';
+    readonly spriteSize: '8x8' | '8x16';
     readonly scale: number;
 }
 
@@ -70,13 +70,9 @@ function parseScreen(value: unknown, file: string, sink: DiagnosticSink): Screen
     const attributes = value.attributes === undefined ? undefined : parseAttributeGrid(value.attributes, file, sink);
     const layers = optionalArray(value.layers, 'layers', file, sink);
     const sprites = optionalArray(value.sprites, 'sprites', file, sink);
-    if (value.spriteSize !== undefined && value.spriteSize !== '8x8') {
-        sink.error(
-            'schema',
-            file,
-            'spriteSize',
-            `sprite size '${String(value.spriteSize)}' is not supported; use "8x8"`
-        );
+    const spriteSize = value.spriteSize ?? '8x8';
+    if (spriteSize !== '8x8' && spriteSize !== '8x16') {
+        sink.error('schema', file, 'spriteSize', `sprite size ${JSON.stringify(spriteSize)} must be "8x8" or "8x16"`);
     }
     if (sprites.length > 0 && palettes?.sprite === undefined) {
         sink.error('palette-shape', file, 'palettes.sprite', 'screen has sprites but no "sprite" palettes');
@@ -87,7 +83,16 @@ function parseScreen(value: unknown, file: string, sink: DiagnosticSink): Screen
     if (typeof name !== 'string' || assets === undefined || palettes === undefined) {
         return undefined;
     }
-    return { name, assets, palettes, attributes, layers, sprites, spriteSize: '8x8', scale };
+    return {
+        name,
+        assets,
+        palettes,
+        attributes,
+        layers,
+        sprites,
+        spriteSize: spriteSize === '8x16' ? '8x16' : '8x8',
+        scale,
+    };
 }
 
 function checkDimension(
