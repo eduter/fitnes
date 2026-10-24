@@ -1,0 +1,67 @@
+{
+    "name": "workout-dashboard",
+    "width": 256,
+    "height": 240,
+    "assets": ["../assets/fitnes.json"],
+    "palettes": {
+        "universal": "$0F",
+        "background": [
+            ["$0C", "$00", "$30"],
+            ["$02", "$21", "$30"],
+            ["$08", "$28", "$30"],
+            ["$01", "$11", "$30"]
+        ],
+        "sprite": [
+            ["$28", "$27", "$30"],
+            ["$00", "$10", "$30"],
+            ["$02", "$12", "$30"],
+            ["$06", "$16", "$30"]
+        ]
+    },
+    "preview": { "scale": 3 },
+    "layers": [
+        { "op": "fill", "id": "ground", "x": 0, "y": 0, "w": 32, "h": 30, "tile": "fill", "palette": 0 },
+        { "op": "hline", "id": "top-edge", "x": 0, "y": 0, "w": 32, "tile": "box.t", "palette": 0 },
+        { "op": "metatile", "id": "barbell", "x": 1, "y": 1, "name": "barbell", "palette": 0 },
+        { "op": "text", "id": "wordmark", "x": 4, "y": 1, "text": "FITNES", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "workout", "x": 22, "y": 1, "text": "PUSH", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+
+        { "op": "text", "id": "exercise", "x": 1, "y": 2, "text": "BENCH PRESS", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "progress-label", "x": 1, "y": 3, "text": "SET 3 OF 5", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+
+        { "op": "panel", "id": "timer-well", "x": 0, "y": 4, "w": 32, "h": 8, "frame": "box", "fill": "fill", "palette": 1 },
+        { "op": "text", "id": "timer", "x": 8, "y": 5, "text": "01:30", "font": "hud", "palette": 1, "ink": 3, "paper": 1, "scale": 3 },
+        { "op": "text", "id": "timer-label", "x": 14, "y": 9, "text": "REST", "font": "hud", "palette": 1, "ink": 2, "paper": 1 },
+
+        { "op": "text", "id": "col-set", "x": 1, "y": 12, "text": "SET", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+        { "op": "text", "id": "col-kg", "x": 6, "y": 12, "text": "KG", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+        { "op": "text", "id": "col-reps", "x": 16, "y": 12, "text": "REPS", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+        { "op": "hline", "id": "column-rule", "x": 1, "y": 13, "w": 30, "tile": "rule", "palette": 0 },
+
+        { "op": "text", "id": "set-1-n", "x": 1, "y": 14, "text": "1", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-1-kg", "x": 6, "y": 14, "text": "60 KG", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-1-reps", "x": 16, "y": 14, "text": "8  OK", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-2-n", "x": 1, "y": 16, "text": "2", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-2-kg", "x": 6, "y": 16, "text": "70 KG", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-2-reps", "x": 16, "y": 16, "text": "8  OK", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "fill", "id": "current-band", "x": 0, "y": 18, "w": 32, "h": 2, "tile": "fill", "palette": 2 },
+        { "op": "text", "id": "set-3-n", "x": 1, "y": 18, "text": "3", "font": "hud", "palette": 2, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-3-kg", "x": 6, "y": 18, "text": "80 KG", "font": "hud", "palette": 2, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-3-reps", "x": 16, "y": 18, "text": "8  NOW", "font": "hud", "palette": 2, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-4-n", "x": 1, "y": 20, "text": "4", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-4-kg", "x": 6, "y": 20, "text": "80 KG", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-4-reps", "x": 16, "y": 20, "text": "8", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-5-n", "x": 1, "y": 22, "text": "5", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-5-kg", "x": 6, "y": 22, "text": "80 KG", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "set-5-reps", "x": 16, "y": 22, "text": "5", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+
+        { "op": "fill", "id": "meter-band", "x": 0, "y": 24, "w": 32, "h": 2, "tile": "fill", "palette": 2 },
+        { "op": "meter", "id": "sets-done", "x": 1, "y": 24, "w": 5, "value": 3, "max": 5, "full": "pip-on", "empty": "pip-off", "palette": 2 },
+        { "op": "text", "id": "meter-count", "x": 8, "y": 24, "text": "3/5", "font": "hud", "palette": 2, "ink": 3, "paper": 1 },
+
+        { "op": "text", "id": "motto", "x": 1, "y": 28, "text": "NO EXCUSES", "font": "hud", "palette": 0, "ink": 3, "paper": 1 },
+        { "op": "text", "id": "status", "x": 24, "y": 28, "text": "STEADY", "font": "hud", "palette": 0, "ink": 2, "paper": 1 },
+        { "op": "hline", "id": "bottom-edge", "x": 0, "y": 29, "w": 32, "tile": "box.b", "palette": 0 }
+    ],
+    "sprites": [{ "id": "live", "tile": "mark", "x": 240, "y": 8, "palette": 0 }]
+}
