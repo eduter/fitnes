@@ -1,0 +1,741 @@
+@font-face {
+    font-family: "VT323";
+    src: url("assets/fonts/vt323-regular.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+:root {
+    --black: #000000;
+    --blue: #0000a8;
+    --blue-deep: #24188c;
+    --blue-bright: #0070ec;
+    --slate: #183c5c;
+    --white: #fcfcfc;
+    --gray: #747474;
+    --silver: #bcbcbc;
+    --gold: #f0bc3c;
+    --green: #4cdc48;
+    --brown: #402c00;
+    --step: 320ms;
+    color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    min-height: 100%;
+    background: var(--black);
+}
+
+body {
+    font-family: "VT323", ui-monospace, monospace;
+    font-weight: 400;
+    color: var(--white);
+    font-synthesis: none;
+    font-kerning: none;
+    -webkit-font-smoothing: none;
+}
+
+button {
+    font-family: inherit;
+    font-weight: 400;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    color: inherit;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+p,
+h1 {
+    margin: 0;
+    font-weight: 400;
+}
+
+.phone {
+    width: min(100%, 430px);
+    min-height: 100dvh;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--black);
+}
+
+.live {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.top {
+    padding: 12px 12px 0;
+}
+
+.brand {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.brand__name {
+    color: var(--gold);
+    font-size: 30px;
+    line-height: 1;
+}
+
+.brand__day {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.concept-line {
+    margin: 2px 0 8px;
+    color: var(--silver);
+    font-size: 18px;
+    line-height: 1.1;
+}
+
+.switch {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+}
+
+.switch button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 4px 2px 6px;
+    background: var(--black);
+    color: var(--silver);
+    box-shadow: inset 0 -4px 0 var(--slate);
+}
+
+.switch button[aria-pressed="true"] {
+    color: var(--gold);
+    box-shadow: inset 0 -4px 0 var(--gold);
+}
+
+.switch__key {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.switch__name {
+    font-size: 16px;
+    line-height: 1;
+}
+
+#view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.label {
+    color: var(--silver);
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.meter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meter__track {
+    flex: 1;
+    height: 10px;
+    border: 2px solid var(--white);
+    background: var(--black);
+}
+
+.meter__bar {
+    height: 100%;
+    background: repeating-linear-gradient(90deg, var(--gold) 0 8px, var(--black) 8px 10px);
+    transition: width var(--step) steps(4, end);
+}
+
+.meter__count {
+    min-width: 78px;
+    font-size: 22px;
+    line-height: 1;
+    text-align: right;
+}
+
+.meter__count b {
+    font-weight: 400;
+}
+
+.done-line {
+    min-height: 22px;
+    color: var(--silver);
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.done-line__ack {
+    display: none;
+    color: var(--gold);
+}
+
+.depart {
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    color: var(--silver);
+    font-size: 20px;
+    line-height: 28px;
+}
+
+.now {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 16px 12px 12px;
+    background: var(--brown);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        inset 0 0 0 4px var(--white);
+}
+
+.kicker {
+    color: var(--gold);
+    font-size: 22px;
+    line-height: 1;
+}
+
+.exercise {
+    margin-top: 4px;
+    font-size: clamp(30px, 8vw, 38px);
+    line-height: 1.05;
+}
+
+.load {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.load b {
+    font-size: clamp(56px, 16vw, 72px);
+    font-weight: 400;
+    line-height: 0.85;
+}
+
+.load small {
+    color: var(--silver);
+    font-size: 24px;
+}
+
+.load__times {
+    color: var(--gold);
+    font-size: 36px;
+    line-height: 1;
+}
+
+.action {
+    width: 100%;
+    min-height: 52px;
+    margin-top: 16px;
+    padding: 8px 12px;
+    background: var(--black);
+    color: var(--gold);
+    font-size: 28px;
+    line-height: 1;
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        inset 0 0 0 4px var(--gold);
+}
+
+.action:active {
+    transform: translateY(2px);
+    background: var(--gold);
+    color: var(--black);
+}
+
+.next-line {
+    color: var(--silver);
+    font-size: 20px;
+    line-height: 1.1;
+}
+
+.hero {
+    display: block;
+    height: auto;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Concept A — gym floor between two station plates. */
+
+.gym {
+    display: grid;
+    grid-template-rows: 72px 72px 44px;
+    margin: 0 -12px;
+    overflow: hidden;
+    background-color: var(--black);
+    background-image:
+        linear-gradient(to right, var(--slate) 2px, transparent 2px),
+        linear-gradient(to bottom, var(--slate) 2px, transparent 2px);
+    background-size: 16px 16px;
+    box-shadow: inset 0 2px 0 var(--slate), inset 0 -2px 0 var(--slate);
+}
+
+.gym__row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+}
+
+.gym__spot {
+    position: relative;
+    grid-column: 2;
+    width: 72px;
+    height: 100%;
+}
+
+.gym__tag {
+    grid-column: 3;
+    align-self: end;
+    margin: 0 0 8px;
+    color: var(--silver);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.gym__row--here .gym__tag {
+    color: var(--gold);
+}
+
+.marker {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    width: 28px;
+    height: 8px;
+    margin-left: -14px;
+    background: var(--slate);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        0 0 0 2px var(--gray);
+}
+
+.marker--now {
+    background: var(--gold);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        0 0 0 2px var(--white);
+}
+
+.marker--done {
+    background: var(--blue-bright);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        0 0 0 2px var(--slate);
+}
+
+.hero--a {
+    --travel: 72px;
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    width: 48px;
+    margin-left: -24px;
+}
+
+/* Concept B — a one-column overworld trail beside the set. */
+
+.b-body {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+    min-height: 0;
+}
+
+.path {
+    position: relative;
+    display: grid;
+    grid-template-rows: repeat(4, 64px);
+    width: 64px;
+    height: 256px;
+    flex: none;
+    overflow: hidden;
+    background: var(--black);
+    box-shadow: inset 2px 0 0 var(--slate), inset -2px 0 0 var(--slate);
+}
+
+.stone {
+    position: relative;
+    align-self: end;
+    justify-self: center;
+    width: 26px;
+    height: 8px;
+    background: var(--slate);
+    box-shadow: inset 0 0 0 2px var(--black);
+}
+
+.stone--done {
+    background: var(--blue-bright);
+}
+
+.stone--now {
+    width: 32px;
+    height: 10px;
+    background: var(--gold);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        0 0 0 2px var(--white);
+}
+
+.stone--ahead {
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        0 0 0 2px var(--gray);
+}
+
+.stone--empty {
+    width: 8px;
+    height: 2px;
+    background: var(--gray);
+    box-shadow: none;
+}
+
+.stone--done::before,
+.stone--now::before,
+.stone--ahead::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    width: 2px;
+    height: 56px;
+    margin-left: -1px;
+    background: var(--slate);
+}
+
+.stone:first-child::before {
+    display: none;
+}
+
+.hero--b {
+    --travel: 64px;
+    position: absolute;
+    top: 68px;
+    left: 50%;
+    width: 40px;
+    margin-left: -20px;
+    z-index: 1;
+}
+
+.b-copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.b-copy .now {
+    min-height: 0;
+}
+
+/* Concept C — text, with a corridor slot only for the walk. */
+
+.well {
+    position: relative;
+    height: 86px;
+    margin: 0 -12px;
+    overflow: hidden;
+    background: var(--black);
+    box-shadow:
+        inset 8px 0 0 var(--slate),
+        inset -8px 0 0 var(--slate);
+}
+
+.well__floor {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 32px;
+    background-image: repeating-linear-gradient(to bottom, transparent 0 14px, var(--slate) 14px 16px);
+}
+
+.hero--c {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    width: 44px;
+    margin-left: -22px;
+}
+
+/* Concept D — industrial shaft, lamps as checkpoints. */
+
+.screen-d {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+.screen-d .meter {
+    padding: 0 12px;
+}
+
+.shaft {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px 14px 12px;
+    background-color: var(--black);
+    background-image: repeating-linear-gradient(to bottom, transparent 0 20px, var(--slate) 20px 22px);
+    box-shadow:
+        inset 6px 0 0 var(--blue-bright),
+        inset -6px 0 0 var(--blue-bright);
+}
+
+.gates {
+    display: grid;
+    grid-template-rows: 72px 72px 40px;
+    overflow: hidden;
+    background: var(--black);
+}
+
+.gate {
+    position: relative;
+}
+
+.lamp {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    height: 4px;
+    background: var(--slate);
+}
+
+.lamp::after {
+    content: "";
+    position: absolute;
+    top: -8px;
+    left: 18px;
+    width: 10px;
+    height: 10px;
+    background: var(--blue-deep);
+    box-shadow: 0 0 0 2px var(--blue-bright);
+}
+
+.gate--done .lamp::after {
+    background: var(--green);
+    box-shadow: 0 0 0 2px var(--black);
+}
+
+.gate--now .lamp {
+    background: var(--gold);
+}
+
+.gate--now .lamp::after {
+    background: var(--gold);
+    box-shadow: 0 0 0 2px var(--white);
+}
+
+.gate__label {
+    position: absolute;
+    right: 12px;
+    bottom: 16px;
+    color: var(--silver);
+    font-size: 18px;
+    line-height: 1;
+}
+
+.gate--now .gate__label {
+    color: var(--gold);
+}
+
+.hero--d {
+    --travel: 72px;
+    position: absolute;
+    bottom: 14px;
+    left: 50%;
+    width: 46px;
+    margin-left: -8px;
+}
+
+.bay {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: var(--blue);
+    box-shadow:
+        inset 0 0 0 2px var(--black),
+        inset 0 0 0 4px var(--white);
+}
+
+.screen-d .now {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+.is-stepping .hero--a,
+.is-stepping .hero--b,
+.is-stepping .hero--d {
+    animation: stride var(--step) steps(4, end) both;
+}
+
+.is-stepping .hero--c {
+    animation: bob-south var(--step) steps(4, end) both;
+}
+
+.is-stepping .well__floor {
+    animation: floor-south var(--step) steps(4, end) both;
+}
+
+.is-stepping .now {
+    animation: rise var(--step) steps(4, end) both;
+}
+
+.is-stepping .depart {
+    animation: compress var(--step) steps(4, end) both;
+}
+
+.is-stepping .done-line__rest {
+    display: none;
+}
+
+.is-stepping .done-line__ack {
+    display: inline;
+}
+
+@keyframes stride {
+    0% {
+        transform: translate(0, calc(var(--travel) * -1));
+    }
+
+    25% {
+        transform: translate(-2px, calc(var(--travel) * -0.75));
+    }
+
+    50% {
+        transform: translate(2px, calc(var(--travel) * -0.5));
+    }
+
+    75% {
+        transform: translate(-2px, calc(var(--travel) * -0.25));
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes bob-south {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-2px, 6px);
+    }
+
+    50% {
+        transform: translate(2px, 10px);
+    }
+
+    75% {
+        transform: translate(-2px, 4px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes floor-south {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 0 -32px;
+    }
+}
+
+@keyframes rise {
+    from {
+        transform: translateY(16px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes compress {
+    from {
+        height: 28px;
+    }
+
+    to {
+        height: 0;
+    }
+}
+
+@media (max-width: 340px) {
+    .switch__name {
+        display: none;
+    }
+
+    .path {
+        width: 52px;
+    }
+
+    .hero--b {
+        width: 34px;
+        margin-left: -17px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .meter__bar,
+    .hero,
+    .now,
+    .depart,
+    .well,
+    .well__floor {
+        animation: none !important;
+        transition: none !important;
+    }
+}
