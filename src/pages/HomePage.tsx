@@ -1,6 +1,7 @@
 import { A } from '@solidjs/router';
-import { For, Show, type JSX } from 'solid-js';
+import { For, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
+import { IconSizes } from '../components/IconSizes.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { formatWeight } from '../domain/format.ts';
 import { formatDateTime } from '../utils/datetime.ts';
@@ -19,6 +20,7 @@ function HomePage(): JSX.Element {
     return (
         <section class="page">
             <PageHeader title="Train" />
+            <IconSizes />
             <Show when={app.loadState() === 'loading'}>
                 <p class="muted">Opening local database…</p>
             </Show>

@@ -57,6 +57,30 @@
     text-align: center;
 }
 
+.pixel-icon {
+    display: block;
+    flex: none;
+}
+
+.icon-sizes {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--px) * 8);
+}
+
+.icon-sizes__row {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--px) * 6);
+    min-height: calc(var(--px) * 24);
+}
+
+.icon-sizes__label {
+    flex: none;
+    width: calc(var(--px) * 16);
+    color: var(--nes-gold);
+}
+
 .app-tabs a.active,
 .app-tabs a[aria-current="page"] {
     color: var(--nes-gold);

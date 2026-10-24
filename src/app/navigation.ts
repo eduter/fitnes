@@ -1,12 +1,11 @@
+import type { IconName } from './icons.ts';
+
 /** A destination in the app shell's navigation. */
 interface NavItem {
     href: string;
     label: string;
-    /**
-     * Bottom-bar text. Four letters, because five of them have to fit a row
-     * that is 32 tiles wide.
-     */
-    short: string;
+    /** Bottom-bar symbol. Five of them share the 32-tile row. */
+    icon?: IconName;
 }
 
 /**
@@ -16,15 +15,15 @@ interface NavItem {
  * navigation away with it.
  */
 const primaryNavItems: NavItem[] = [
-    { href: '/', label: 'Home', short: 'Home' },
-    { href: '/templates', label: 'Templates', short: 'Plan' },
-    { href: '/exercises', label: 'Exercises', short: 'Move' },
-    { href: '/bodyweight', label: 'Weight', short: 'Body' },
-    { href: '/sessions', label: 'History', short: 'Hist' },
+    { href: '/', label: 'Home', icon: 'home' },
+    { href: '/templates', label: 'Templates', icon: 'plan' },
+    { href: '/exercises', label: 'Exercises', icon: 'move' },
+    { href: '/bodyweight', label: 'Weight', icon: 'body' },
+    { href: '/sessions', label: 'History', icon: 'history' },
 ];
 
 /** Destinations that matter too rarely to earn a permanent slot. */
-const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', short: 'Data' }];
+const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data' }];
 
 export type { NavItem };
 export { primaryNavItems, secondaryNavItems };
