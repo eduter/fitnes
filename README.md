@@ -18,7 +18,8 @@ limits. `npm run nes:validate` and `npm run nes:render` are documented in
 
 The app uses the same width and no height limit. Its column is 256 logical
 pixels, scaled to fill the device width, and the page scrolls for as long
-as the workout is.
+as the workout is. `npm run check` screenshots the shell routes at that
+width and rejects a page that leaves the background limits.
 
 ## Build
 

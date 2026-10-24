@@ -1,7 +1,7 @@
 import type { JSX } from 'solid-js';
 
 interface PixelIconProps {
-    /** Rows of `.` (empty), `1` (ink), and `2` (gold). Every row is the same length. */
+    /** Rows of `.` (empty), `1` (black), `2` (fill), and `3` (gold). Every row is the same length. */
     rows: readonly string[];
     /** Logical pixels each source pixel covers. Defaults to 1. */
     pixel?: number;
@@ -15,7 +15,8 @@ interface LitPixel {
 
 /**
  * Draw a bitmap with one rectangle per lit pixel.
- * Ink follows the surrounding text color, so the active tab turns the icon gold.
+ * The fill follows the surrounding text color, so the active tab turns the body gold
+ * while the black outline stays put.
  */
 function PixelIcon(props: PixelIconProps): JSX.Element {
     const pixel = () => props.pixel ?? 1;
@@ -51,7 +52,7 @@ function litPixels(rows: readonly string[], pixel: number): LitPixel[] {
             cells.push({
                 x: x * pixel,
                 y: y * pixel,
-                fill: ink === '2' ? 'var(--nes-gold)' : 'currentColor',
+                fill: ink === '1' ? 'var(--nes-black)' : ink === '3' ? 'var(--nes-gold)' : 'currentColor',
             });
         }
     });

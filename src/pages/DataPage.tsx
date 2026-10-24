@@ -1,4 +1,4 @@
-import { createSignal, Show, type JSX } from 'solid-js';
+import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
@@ -77,7 +77,6 @@ function DataPage(): JSX.Element {
                     <span class="form-label">Document</span>
                     <textarea
                         class="form-input data-document"
-                        rows={14}
                         spellcheck={false}
                         placeholder="Paste an export document here"
                         value={draft()}

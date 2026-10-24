@@ -227,3 +227,18 @@ Approximations and omissions, stated so they are not mistaken for hardware:
 - There is no sprite-0 hit, no sprite-to-sprite collision, and no scanline split of the palette.
 - Identical tile bytes share a pattern slot. Two names with the same pixels do not cost two slots.
 - No CRT shader, no subpixel placement, and no system-font rendering in the PNG.
+
+## Rendered pages
+
+`assessPicture` (`nes/pictureCheck.ts`) scores a finished RGB picture with
+the background limits: width 256, height a multiple of 16, FCEUX colors,
+four colors in each 8×8 tile, one subpalette per 16×16 region, four
+subpalettes, and 256 patterns. Every pixel is background. A fifth color
+that only a sprite could add is a failure, so the app cannot sneak past
+the still-picture rules.
+
+`nes/pagePicture.test.ts` opens the shell routes in Chrome at 256 CSS
+pixels, where one logical pixel is one screenshot pixel, and runs that
+check. Height may run past 240 because the page scrolls. `npm run check`
+includes it. The workflow installs Chrome and passes its path as
+`CHROME_PATH`.

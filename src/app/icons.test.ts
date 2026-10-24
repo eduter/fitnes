@@ -18,5 +18,5 @@ function square(rows: readonly string[], size: number): boolean {
         return false;
     }
 
-    return rows.every((row) => row.length === size && /^[.12]+$/.test(row));
+    return rows.every((row) => row.length === size && /^[.123]+$/.test(row));
 }

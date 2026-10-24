@@ -17,8 +17,8 @@
     --bg-input: var(--nes-black);
 
     --text-primary: var(--nes-white);
-    --text-secondary: var(--nes-silver);
-    --text-muted: var(--nes-silver);
+    --text-secondary: var(--nes-white);
+    --text-muted: var(--nes-white);
     --text-heading: var(--nes-white);
 
     --accent: var(--nes-gold);
@@ -63,8 +63,7 @@
     --header-height: calc(var(--px) * 32);
     --tab-block: calc(var(--px) * 64 + env(safe-area-inset-bottom, 0px));
 
-    --chamfer: calc(var(--px) * 4);
-    --frame: calc(var(--px) * 6);
+    --frame: calc(var(--px) * 4);
 
     color-scheme: dark;
 }
@@ -154,7 +153,8 @@ a {
     color: var(--nes-black);
 }
 
-/* A menu window: white outer edge, gray band, black inner line, chamfered corners. */
+/* A menu window: white outer edge, black inner line, square corners.
+   A diagonal cut blends two colors, which a tile cannot do. */
 .pane,
 .card,
 .card-link,
@@ -167,27 +167,14 @@ fieldset.form-field,
 .stack > label.form-field,
 .planned-set,
 .btn {
-    --chamfer: calc(var(--px) * 4);
     position: relative;
     border: 0;
     border-radius: 0;
     background: var(--nes-blue);
     color: var(--nes-white);
     box-shadow:
-        inset 0 0 0 calc(var(--px) * 1) var(--nes-black),
-        inset 0 0 0 calc(var(--px) * 2) var(--nes-gray),
-        inset 0 0 0 calc(var(--px) * 4) var(--nes-silver),
+        inset 0 0 0 calc(var(--px) * 2) var(--nes-black),
         inset 0 0 0 var(--frame) var(--nes-white);
-    clip-path: polygon(
-        var(--chamfer) 0,
-        calc(100% - var(--chamfer)) 0,
-        100% var(--chamfer),
-        100% calc(100% - var(--chamfer)),
-        calc(100% - var(--chamfer)) 100%,
-        var(--chamfer) 100%,
-        0 calc(100% - var(--chamfer)),
-        0 var(--chamfer)
-    );
 }
 
 .card,
@@ -198,18 +185,17 @@ fieldset.form-field,
 fieldset.form-field,
 .stack > label.form-field,
 .planned-set {
-    padding: calc(var(--frame) + var(--px) * 8) calc(var(--frame) + var(--px) * 6);
+    padding: calc(var(--px) * 8);
 }
 
 .banner,
 .error-text {
-    padding: calc(var(--frame) + var(--px) * 4) calc(var(--frame) + var(--px) * 6);
+    padding: calc(var(--px) * 8);
     background: var(--nes-black);
     color: var(--nes-red);
 }
 
 .btn {
-    --chamfer: calc(var(--px) * 3);
     --frame: calc(var(--px) * 4);
     display: inline-flex;
     align-items: center;
@@ -219,9 +205,7 @@ fieldset.form-field,
     background: var(--nes-black);
     color: var(--nes-white);
     box-shadow:
-        inset 0 0 0 calc(var(--px) * 1) var(--nes-black),
-        inset 0 0 0 calc(var(--px) * 2) var(--nes-gray),
-        inset 0 0 0 calc(var(--px) * 3) var(--nes-silver),
+        inset 0 0 0 calc(var(--px) * 2) var(--nes-black),
         inset 0 0 0 var(--frame) var(--nes-white);
 }
 
@@ -234,14 +218,14 @@ fieldset.form-field,
 }
 
 .btn:disabled {
-    color: var(--nes-gray);
+    color: var(--nes-blue);
     cursor: default;
 }
 
 .btn--icon {
     width: calc(var(--px) * 24);
     min-height: calc(var(--px) * 24);
-    padding: calc(var(--px) * 6);
+    padding: calc(var(--px) * 8);
 }
 
 a:focus-visible,
@@ -261,7 +245,7 @@ textarea:focus-visible {
 }
 
 .form-label {
-    color: var(--nes-silver);
+    color: var(--nes-white);
     font-size: inherit;
     font-weight: inherit;
     letter-spacing: 0;
@@ -285,11 +269,22 @@ textarea:focus-visible {
 }
 
 .form-input::placeholder {
-    color: var(--nes-gray);
+    color: var(--nes-white);
 }
 
 .form-input:disabled {
-    color: var(--nes-gray);
+    color: var(--nes-blue);
+}
+
+/* The native picker glyphs are not tiles. The field stays a black box. */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: none;
+}
+
+select {
+    appearance: none;
 }
 
 input[type="checkbox"] {
