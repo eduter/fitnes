@@ -1,5 +1,23 @@
 # Working notes for agents on this repo
 
+## Product context: read before working
+
+- Read [the vision](docs/vision.md) and [product decisions](docs/product-decisions.md)
+  before planning or changing product behavior or visuals.
+- Read [repository status](docs/repo-status.md) before reusing experimental
+  branches, and [the backlog](docs/backlog.md) when choosing the next task.
+- The compact preview is a temporary model-testing UI, not the visual target.
+- NES visual constraints are required by default: 256 logical pixels across,
+  vertical scrolling allowed, with palette, tile, and appropriate sprite rules.
+  Only the owner can approve an exception for UX. Demonstrate a conflict and
+  propose alternatives before relaxing a rule or weakening its validator.
+- Agent-authored research, screenshots, and prototypes are candidates, not
+  approved product decisions. Do not promote their recommendations silently.
+- Preserve the consolidated model's semantics. Raise concrete gaps separately
+  instead of redesigning the model to fit a mockup.
+- Update the relevant product docs when an owner-approved decision changes.
+  Keep durable decisions, current status, and unresolved questions distinct.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not
@@ -167,5 +185,8 @@ composite; **Save** = commit a draft or batch. Do not use **Update**.
 
 ## Docs
 
-- `./docs/vision.md`: vision and roadmap
-- `./docs/backlog.md`: open tasks
+- `./docs/vision.md`: product goals and NES visual contract
+- `./docs/product-decisions.md`: confirmed policies, current model behavior, open questions
+- `./docs/repo-status.md`: baseline, preview, and experimental branch map
+- `./docs/backlog.md`: proposed integration order and open tasks
+- `./docs/branch-review.md`: domain audit; consult the latest checkpoint first
