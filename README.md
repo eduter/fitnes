@@ -15,3 +15,13 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## Verify UI changes
+
+```bash
+npm run nes:check -- --url http://localhost:5173/ --ready '#root h1'
+npm run nes:check -- screenshots/changed-state.png
+```
+
+See the [NES visual check](tools/nes/README.md) for reports, exit codes,
+Chrome setup, and the constraints (with unlimited distinct tiles).

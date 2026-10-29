@@ -16,4 +16,10 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - uses: browser-actions/setup-chrome@v2
+        id: chrome
+        with:
+          chrome-version: stable
       - run: npm run check
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}

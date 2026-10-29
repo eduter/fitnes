@@ -6,6 +6,17 @@ Read [the vision](docs/vision.md) before changing product behavior or visuals.
 Use [the backlog](docs/backlog.md) when choosing the next task.
 Update the owning document when an owner-approved decision changes.
 
+## NES visual verification
+
+After changing UI, run `npm run nes:check -- <actual-rendered.png>` or
+`npm run nes:check -- --url http://localhost:5173/ --ready '<selector>'`.
+See [the checker contract](tools/nes/README.md) for state coverage, device
+scaling, and output artifacts. Include reports for changed states in the PR.
+Only `pass` / exit 0 establishes compliance. `inconclusive` blocks approval too;
+never quantize a screenshot or relax a rule to turn it into a pass.
+Distinct tile patterns are unrestricted. `npm run check` tests the checker,
+but does not automatically check every application state.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not

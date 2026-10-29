@@ -19,7 +19,9 @@ levels, rewards, combat, or a persistent map.
 The interface should feel like an NES game menu built for training. Follow
 actual NES palette, tile, background attribute, and sprite constraints.
 Use a 256-pixel logical content width; pages may extend vertically and scroll.
-Preserve crisp pixel art when scaling for a device.
+Preserve crisp pixel art when scaling for a device. Distinct tile patterns
+are unrestricted; the visual checker does not enforce CHR/pattern-bank capacity.
+This owner-approved scope applies to both background and sprite art.
 
 **Only the owner may approve a visual exception for UX.** Demonstrate the
 readability or interaction problem, explain the constraint, and propose

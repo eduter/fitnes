@@ -16,7 +16,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run test",
-    "fix": "npm run lint:fix && npm run format"
+    "fix": "npm run lint:fix && npm run format",
+    "nes:check": "node tools/nes/cli.ts"
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",
