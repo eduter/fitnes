@@ -1,5 +1,11 @@
 # Working notes for agents on this repo
 
+## Product context
+
+Read [the vision](docs/vision.md) before changing product behavior or visuals.
+Use [the backlog](docs/backlog.md) when choosing the next task.
+Update the owning document when an owner-approved decision changes.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not
@@ -164,8 +170,3 @@ or committing a batch that can hurt.
 
 Copy: **Add** = append an item; **Create** = first persist of a
 composite; **Save** = commit a draft or batch. Do not use **Update**.
-
-## Docs
-
-- `./docs/vision.md`: vision and roadmap
-- `./docs/backlog.md`: open tasks

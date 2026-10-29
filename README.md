@@ -1,6 +1,6 @@
 # FitNES
 
-Personal, offline-first PWA workout tracker built with Solid.js and TypeScript.
+[Product vision](docs/vision.md) · [Backlog](docs/backlog.md) · [Agent guidance](AGENTS.md)
 
 ## Development
 
