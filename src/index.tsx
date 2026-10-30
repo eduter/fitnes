@@ -4,6 +4,9 @@ import { render } from 'solid-js/web';
 import './styles/global.css';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App.tsx';
+import { applyNesScale, syncNesHeight } from './app/nesScale.ts';
+import { SettingsPage } from './pages/SettingsPage.tsx';
+import { WorkoutPickerPage } from './pages/WorkoutPickerPage.tsx';
 import { BodyweightPage } from './pages/BodyweightPage.tsx';
 import { DataPage } from './pages/DataPage.tsx';
 import { ExerciseEditPage } from './pages/ExerciseEditPage.tsx';
@@ -20,6 +23,10 @@ if (!root) {
     throw new Error('Root element #root not found');
 }
 
+applyNesScale();
+window.addEventListener('resize', applyNesScale);
+new ResizeObserver(syncNesHeight).observe(root);
+
 render(
     () => (
         <Router root={App}>
@@ -35,6 +42,8 @@ render(
             <Route path="/sessions/:id" component={SessionPage} />
             <Route path="/bodyweight" component={BodyweightPage} />
             <Route path="/data" component={DataPage} />
+            <Route path="/settings" component={SettingsPage} />
+            <Route path="/workouts/start" component={WorkoutPickerPage} />
         </Router>
     ),
     root

@@ -10,8 +10,11 @@ describe('datetime local round-trip', () => {
         expect(fromDatetimeLocalValue(local)).toBe(stamp);
     });
 
-    it('formats a timestamp with the runtime locale', () => {
+    it('keeps display timestamps compact without seconds or a year', () => {
         const stamp = new Date(2026, 0, 2, 3, 4).getTime();
-        expect(formatDateTime(stamp)).toBe(new Date(stamp).toLocaleString());
+        const label = formatDateTime(stamp);
+        expect(label).toContain('03:04');
+        expect(label).not.toContain('2026');
+        expect(label).not.toContain('03:04:00');
     });
 });

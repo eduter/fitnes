@@ -11,8 +11,16 @@ actual performance, actions, and session progress must be readable on a phone.
 The existing model is a good starting point. Preserve its measurement and load
 meanings when designing the interface; raise concrete gaps separately.
 
-Explore a character moving as the workout advances. This does not imply XP,
-levels, rewards, combat, or a persistent map.
+The first usable UI uses restrained black, white, and gold game menus with mixed-case text.
+The home screen pairs the FitNES logo and gym character with Start a workout
+and Log bodyweight actions. Start opens the saved-workout picker. Keep the
+bottom tabs; keep import/export inside Settings.
+
+During a workout, focus on the current set, its target, actuals, and last result.
+Keep the full set list accessible for review, editing, and clearing results.
+Do not show a character on the workout screen in this version. Character
+movement remains a possible later experiment; it does not imply XP, levels,
+rewards, combat, or a persistent map.
 
 ## NES visual contract
 

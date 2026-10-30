@@ -13,7 +13,13 @@ function fromDatetimeLocalValue(value: string): number {
 
 /** Format epoch millis for display with the runtime locale. */
 function formatDateTime(ms: number): string {
-    return new Date(ms).toLocaleString();
+    return new Intl.DateTimeFormat(undefined, {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).format(new Date(ms));
 }
 
 export { formatDateTime, fromDatetimeLocalValue, toDatetimeLocalValue };

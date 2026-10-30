@@ -1,5 +1,5 @@
 import { For, Show, type JSX } from 'solid-js';
-import { formatMeasurement } from '../../domain/format.ts';
+import { formatLoad, formatMeasurement } from '../../domain/format.ts';
 import type { SequenceEntryId } from '../../domain/ids.ts';
 import type { SequenceOccurrence } from '../../domain/lookups.ts';
 import type { ActualResult, WorkoutSession } from '../../domain/session.ts';
@@ -38,7 +38,10 @@ interface ExerciseBlockProps {
  */
 function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
     const targets = () =>
-        props.occurrences.map((occurrence) => formatMeasurement(occurrence.set.prescription.measurement));
+        props.occurrences.map(
+            (occurrence) =>
+                `${formatMeasurement(occurrence.set.prescription.measurement)} · ${formatLoad(occurrence.set.prescription.load)}`
+        );
     const logged = () =>
         props.occurrences.filter((occurrence) =>
             props.session.results.some((result) => result.sequenceEntryId === occurrence.entry.id)
@@ -63,10 +66,15 @@ function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
                             Prev
                         </th>
                         <th class="set-table__weight" scope="col">
-                            Weight
+                            {props.occurrences[0]?.set.prescription.load.kind === 'external' ||
+                            props.occurrences[0]?.set.prescription.load.kind === 'bodyweightExternal'
+                                ? props.occurrences[0]?.set.prescription.load.weight.unit
+                                : 'Load'}
                         </th>
                         <th class="set-table__count" scope="col">
-                            Reps
+                            {props.occurrences[0]?.set.prescription.measurement.measurement === 'duration'
+                                ? 'Sec'
+                                : 'Reps'}
                         </th>
                         <th class="set-table__check" scope="col">
                             <span class="visually-hidden">Done</span>
@@ -201,10 +209,10 @@ function SetRow(props: SetRowProps): JSX.Element {
                         classList={{ 'set-check-button--on': props.recorded }}
                         type="button"
                         aria-pressed={props.recorded}
-                        aria-label={`${props.recorded ? 'Clear' : 'Log'} ${prefix()}`}
+                        aria-label={`${props.recorded ? 'Undo' : 'Log'} ${prefix()}`}
                         onClick={() => (props.recorded ? props.onClear() : props.onLog())}
                     >
-                        ✓
+                        {props.recorded ? 'Undo' : 'Log'}
                     </button>
                 </Show>
             </td>

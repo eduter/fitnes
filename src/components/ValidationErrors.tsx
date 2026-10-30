@@ -9,7 +9,7 @@ interface ValidationErrorsProps {
 function ValidationErrors(props: ValidationErrorsProps): JSX.Element {
     return (
         <Show when={props.errors.length > 0}>
-            <ul class="error-list">
+            <ul class="validation-errors" role="alert">
                 <For each={props.errors}>
                     {(issue) => (
                         <li>

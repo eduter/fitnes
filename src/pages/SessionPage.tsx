@@ -2,7 +2,8 @@ import { A, useNavigate, useParams } from '@solidjs/router';
 import { For, Show, createMemo, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { RawDocument } from '../components/RawDocument.tsx';
+import { CurrentSetPanel } from '../components/session/CurrentSetPanel.tsx';
+import { currentSet } from '../components/session/currentSet.ts';
 import { ExerciseBlock } from '../components/session/ExerciseBlock.tsx';
 import { previousPerformance } from '../components/session/previousPerformance.ts';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
@@ -27,6 +28,11 @@ function SessionPage(): JSX.Element {
     const app = useAppData();
     const session = (): WorkoutSession | undefined => app.sessions().find((candidate) => candidate.id === params.id);
 
+    const [busy, setBusy] = createSignal(false);
+    const active = createMemo(() => {
+        const value = session();
+        return value ? currentSet(value) : undefined;
+    });
     const [drafts, setDrafts] = createSignal<Record<string, ActualResult>>({});
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const defaults = createMemo(() => defaultDrafts(session()));
@@ -68,8 +74,11 @@ function SessionPage(): JSX.Element {
     }
 
     async function log(entryId: SequenceEntryId): Promise<void> {
+        if (busy()) {
+            return;
+        }
         const current = session();
-        const draft = drafts()[entryId] ?? defaults()[entryId];
+        const draft = drafts()[entryId] ?? effectiveDrafts()[entryId];
         if (!current || !draft) {
             return;
         }
@@ -79,7 +88,12 @@ function SessionPage(): JSX.Element {
             setErrors(recorded.errors);
             return;
         }
-        await persist(recorded.value);
+        setBusy(true);
+        try {
+            await persist(recorded.value);
+        } finally {
+            setBusy(false);
+        }
     }
 
     async function edit(draft: ActualResult): Promise<void> {
@@ -116,6 +130,12 @@ function SessionPage(): JSX.Element {
             return;
         }
 
+        if (
+            current.results.length < current.snapshot.sequence.length &&
+            !confirm(`Finish with ${current.snapshot.sequence.length - current.results.length} unlogged sets?`)
+        ) {
+            return;
+        }
         const timestamps = current.results.map((result) => result.completedAt);
         const completedAt = Math.max(Date.now(), ...timestamps, current.startedAt);
         const completed = completeSession(current, completedAt);
@@ -178,7 +198,7 @@ function SessionPage(): JSX.Element {
                                         }
                                     >
                                         <button class="btn btn--primary" type="button" onClick={() => void complete()}>
-                                            Complete
+                                            Finish
                                         </button>
                                     </Show>
                                     <button class="btn btn--secondary" type="button" onClick={() => void remove()}>
@@ -208,31 +228,61 @@ function SessionPage(): JSX.Element {
                                 />
                             </div>
                         </div>
-                        <div class="stack">
-                            <For each={blocks()}>
-                                {(occurrences) => (
-                                    <ExerciseBlock
-                                        occurrences={occurrences}
-                                        session={current()}
-                                        previous={previous()}
-                                        drafts={effectiveDrafts()}
-                                        readOnly={readOnly()}
-                                        onDraftChange={(entryId, draft) => {
-                                            setDrafts({ ...drafts(), [entryId]: draft });
-                                            const existing = current().results.find(
-                                                (candidate) => candidate.sequenceEntryId === entryId
-                                            );
-                                            if (existing) {
-                                                void edit(draft);
-                                            }
-                                        }}
-                                        onLog={(entryId) => void log(entryId)}
-                                        onClear={(entryId) => void clear(entryId)}
-                                    />
+                        <Show when={!readOnly()}>
+                            <Show
+                                when={active()}
+                                fallback={
+                                    <div class="stack">
+                                        <h2 class="section-title">All sets logged</h2>
+                                        <p>Finish the workout when you are ready.</p>
+                                    </div>
+                                }
+                            >
+                                {(focused) => (
+                                    <Show when={effectiveDrafts()[focused().occurrence.entry.id]}>
+                                        {(draft) => (
+                                            <CurrentSetPanel
+                                                current={focused()}
+                                                draft={draft()}
+                                                previous={previous()[focused().occurrence.entry.id]}
+                                                busy={busy()}
+                                                onChange={(next) =>
+                                                    setDrafts({ ...drafts(), [focused().occurrence.entry.id]: next })
+                                                }
+                                                onLog={() => void log(focused().occurrence.entry.id)}
+                                            />
+                                        )}
+                                    </Show>
                                 )}
-                            </For>
-                        </div>
-                        <RawDocument value={current()} />
+                            </Show>
+                        </Show>
+                        <details open={readOnly()} class="session-overview">
+                            <summary>{readOnly() ? 'Recorded sets' : 'All sets / edit results'}</summary>
+                            <div class="stack">
+                                <For each={blocks()}>
+                                    {(occurrences) => (
+                                        <ExerciseBlock
+                                            occurrences={occurrences}
+                                            session={current()}
+                                            previous={previous()}
+                                            drafts={effectiveDrafts()}
+                                            readOnly={readOnly()}
+                                            onDraftChange={(entryId, draft) => {
+                                                setDrafts({ ...drafts(), [entryId]: draft });
+                                                const existing = current().results.find(
+                                                    (candidate) => candidate.sequenceEntryId === entryId
+                                                );
+                                                if (existing) {
+                                                    void edit(draft);
+                                                }
+                                            }}
+                                            onLog={(entryId) => void log(entryId)}
+                                            onClear={(entryId) => void clear(entryId)}
+                                        />
+                                    )}
+                                </For>
+                            </div>
+                        </details>
                     </>
                 )}
             </Show>

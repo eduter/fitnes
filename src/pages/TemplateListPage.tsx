@@ -10,7 +10,7 @@ function TemplateListPage(): JSX.Element {
     return (
         <section class="page">
             <PageHeader
-                title="Templates"
+                title="Workouts"
                 actions={
                     <A class="btn btn--primary" href="/templates/new">
                         Create
@@ -18,7 +18,7 @@ function TemplateListPage(): JSX.Element {
                 }
             />
             <ul class="list">
-                <For each={app.templates()} fallback={<li class="muted">No templates yet.</li>}>
+                <For each={app.templates()} fallback={<li class="muted">No workouts yet. Create your first plan.</li>}>
                     {(template) => (
                         <li class="card">
                             <div class="row-split">

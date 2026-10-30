@@ -2,7 +2,6 @@ import { For, Show, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DateTimeField, NumberField, SelectField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { RawDocument } from '../components/RawDocument.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
 import { formatWeight } from '../domain/format.ts';
@@ -87,7 +86,7 @@ function BodyweightPage(): JSX.Element {
             </ul>
             <Show when={app.bodyweightMeasurements().length === 0}>
                 <p class="muted">
-                    Sessions can start without a snapshot; weighted bodyweight totals will then be undefined.
+                    Log your weight to attach it to bodyweight workouts. Existing sessions keep their recorded weight.
                 </p>
             </Show>
         </section>
@@ -153,7 +152,6 @@ function ReadingRow(props: ReadingRowProps): JSX.Element {
                             onChange={(next) => props.onEdit({ ...props.measurement, measuredAt: next })}
                         />
                     </div>
-                    <RawDocument value={props.measurement} />
                 </div>
             </Show>
         </div>

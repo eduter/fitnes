@@ -2,7 +2,6 @@ import { A, useNavigate, useParams } from '@solidjs/router';
 import { Show, createEffect, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { RawDocument } from '../components/RawDocument.tsx';
 import { TemplateForm } from '../components/template/TemplateForm.tsx';
 import { duplicateWorkoutTemplate } from '../domain/duplicateWorkoutTemplate.ts';
 import { generateWorkoutTemplateId } from '../domain/generateIds.ts';
@@ -154,7 +153,6 @@ function TemplateEditPage(): JSX.Element {
                         Create
                     </button>
                 </Show>
-                <RawDocument value={draft()} />
             </Show>
         </section>
     );

@@ -3,7 +3,6 @@ import { Show, createEffect, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { ExerciseForm } from '../components/exercise/ExerciseForm.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { RawDocument } from '../components/RawDocument.tsx';
 import { duplicateExercise } from '../domain/duplicateExercise.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { generateExerciseId } from '../domain/generateIds.ts';
@@ -146,7 +145,6 @@ function ExerciseEditPage(): JSX.Element {
                         Create
                     </button>
                 </Show>
-                <RawDocument value={draft()} />
             </Show>
         </section>
     );

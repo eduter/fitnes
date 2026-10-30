@@ -1,80 +1,37 @@
 import { A } from '@solidjs/router';
 import { For, Show, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
+import hero from '../assets/hero.png';
+import logo from '../assets/logo.png';
 import { formatWeight } from '../domain/format.ts';
-import { formatDateTime } from '../utils/datetime.ts';
 
-/** Dashboard: in-progress work, templates to start, and recent history. */
+/** Home keeps the gym artwork and the two everyday entry points. */
 function HomePage(): JSX.Element {
     const app = useAppData();
     const inProgress = () => app.sessions().filter((session) => session.completedAt === undefined);
-    const recent = () =>
-        app
-            .sessions()
-            .filter((session) => session.completedAt !== undefined)
-            .slice(0, 5);
-    const latestBodyweight = () => app.bodyweightMeasurements()[0];
+    const latest = () => app.bodyweightMeasurements()[0];
 
     return (
-        <section class="page">
-            <PageHeader title="Train" />
-            <Show when={app.loadState() === 'loading'}>
-                <p class="muted">Opening local database…</p>
-            </Show>
-            <Show when={app.loadError()}>{(message) => <p class="error-text">{message()}</p>}</Show>
-            <Show when={latestBodyweight()}>
-                {(measurement) => (
-                    <p class="muted">
-                        Latest bodyweight {formatWeight(measurement())} at {formatDateTime(measurement().measuredAt)}
-                    </p>
-                )}
-            </Show>
+        <section class="page home-page" aria-label="Home">
+            <h1 class="visually-hidden">FitNES</h1>
+            <img class="home-logo" src={logo} alt="FitNES" />
+            <img class="home-art" src={hero} alt="Lifter training in the FitNES gym" width="256" height="128" />
+            <div class="home-actions">
+                <A class="btn btn--primary" href="/workouts/start">
+                    Start a workout
+                </A>
+                <A class="btn btn--secondary" href="/bodyweight">
+                    Log bodyweight
+                </A>
+                <Show when={latest()}>{(reading) => <p class="muted">Latest: {formatWeight(reading())}</p>}</Show>
+            </div>
             <Show when={inProgress().length > 0}>
-                <h2 class="section-title">In progress</h2>
-                <ul class="list">
+                <div class="home-resume">
+                    <h2 class="section-title">In progress</h2>
                     <For each={inProgress()}>
-                        {(session) => (
-                            <li>
-                                <A class="card-link" href={`/sessions/${session.id}`}>
-                                    Continue {session.snapshot.name} · started {formatDateTime(session.startedAt)}
-                                </A>
-                            </li>
-                        )}
+                        {(session) => <A href={`/sessions/${session.id}`}>Continue {session.snapshot.name} &gt;</A>}
                     </For>
-                </ul>
-            </Show>
-            <h2 class="section-title">Templates</h2>
-            <ul class="list">
-                <For each={app.templates()} fallback={<li class="muted">No templates yet.</li>}>
-                    {(template) => (
-                        <li class="card">
-                            <div class="row-split">
-                                <div>
-                                    <A href={`/templates/${template.id}`}>{template.name}</A>
-                                    <p class="muted">{template.sequence.length} sets</p>
-                                </div>
-                                <A class="btn btn--primary" href={`/sessions/start/${template.id}`}>
-                                    Start
-                                </A>
-                            </div>
-                        </li>
-                    )}
-                </For>
-            </ul>
-            <Show when={recent().length > 0}>
-                <h2 class="section-title">Recent sessions</h2>
-                <ul class="list">
-                    <For each={recent()}>
-                        {(session) => (
-                            <li>
-                                <A class="card-link" href={`/sessions/${session.id}`}>
-                                    {session.snapshot.name} · {formatDateTime(session.startedAt)}
-                                </A>
-                            </li>
-                        )}
-                    </For>
-                </ul>
+                </div>
             </Show>
         </section>
     );

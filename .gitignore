@@ -4,3 +4,5 @@ dev-dist
 .idea
 *.local
 *.log
+
+/work/

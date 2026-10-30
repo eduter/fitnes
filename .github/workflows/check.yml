@@ -23,3 +23,11 @@ jobs:
       - run: npm run check
         env:
           CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+      - run: npm run ui:check
+        env:
+          CHROME_PATH: ${{ steps.chrome.outputs.chrome-path }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: focused-ui-screenshots
+          path: work/ui/

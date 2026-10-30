@@ -304,7 +304,7 @@ function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
                         aria-label={`Duplicate set ${props.index + 1}`}
                         onClick={props.onDuplicate}
                     >
-                        ⧉
+                        +
                     </button>
                     <button
                         class="btn btn--icon"

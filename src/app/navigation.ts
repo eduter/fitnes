@@ -13,15 +13,15 @@ interface NavItem {
  * navigation away with it.
  */
 const primaryNavItems: NavItem[] = [
-    { href: '/', label: 'Home', icon: '⌂' },
-    { href: '/templates', label: 'Templates', icon: '☰' },
-    { href: '/exercises', label: 'Exercises', icon: '◈' },
-    { href: '/bodyweight', label: 'Weight', icon: '⚖' },
-    { href: '/sessions', label: 'History', icon: '◷' },
+    { href: '/', label: 'Home', icon: 'home' },
+    { href: '/templates', label: 'Plans', icon: 'plan' },
+    { href: '/exercises', label: 'Moves', icon: 'move' },
+    { href: '/bodyweight', label: 'Weight', icon: 'body' },
+    { href: '/sessions', label: 'Log', icon: 'history' },
 ];
 
 /** Destinations that matter too rarely to earn a permanent slot. */
-const secondaryNavItems: NavItem[] = [{ href: '/data', label: 'Data', icon: '⇅' }];
+const secondaryNavItems: NavItem[] = [{ href: '/settings', label: 'Settings', icon: '*' }];
 
 export { primaryNavItems, secondaryNavItems };
 export type { NavItem };
