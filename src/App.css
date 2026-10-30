@@ -5,13 +5,17 @@
     min-height: 100dvh;
 }
 
+/* The header holds only identity and the rare destinations; the frequent ones
+   live in the bottom bar, where a thumb is. */
 .app-header {
     position: sticky;
     top: 0;
     z-index: 20;
     display: flex;
     align-items: center;
-    padding: var(--space-md) var(--space-lg);
+    justify-content: space-between;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-lg);
     border-bottom: 1px solid var(--border);
     background: var(--bg-primary);
     flex-shrink: 0;
@@ -19,20 +23,525 @@
 
 .app-title {
     margin: 0;
-    font-size: 20px;
+    font-size: 16px;
+    font-weight: 700;
     color: var(--text-heading);
+    text-decoration: none;
+}
+
+.app-header__links {
+    display: flex;
+    gap: var(--space-md);
+}
+
+.app-header__links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.app-header__links a.active,
+.app-header__links a[aria-current="page"] {
+    color: var(--text-heading);
+    font-weight: 600;
+}
+
+/* Pinned to the bottom and to the viewport, so it never scrolls away. */
+.app-tabs {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 20;
+    display: flex;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    border-top: 1px solid var(--border);
+    background: var(--bg-primary);
+}
+
+.app-tabs a {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: var(--space-xs) 0 var(--space-sm);
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 11px;
+}
+
+.app-tabs a.active,
+.app-tabs a[aria-current="page"] {
+    color: var(--accent-hover);
+    font-weight: 600;
+}
+
+.app-tabs__icon {
+    font-size: 18px;
+    line-height: 1;
 }
 
 .app-main {
     flex: 1 1 auto;
+    /* Room for the fixed bottom bar, so the last row is not hidden behind it. */
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0));
 }
 
-.placeholder {
-    text-align: center;
-    padding: var(--space-xl) var(--space-lg);
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    padding: var(--space-lg);
 }
 
-.placeholder-text {
-    color: var(--text-muted);
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-md);
+}
+
+.page-title {
     margin: 0;
+    font-size: 22px;
+    color: var(--text-heading);
+}
+
+.page-actions,
+.button-row,
+.inline-fields,
+.row-split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    align-items: flex-end;
+}
+
+.row-split {
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.section-title {
+    margin: var(--space-sm) 0 0;
+    font-size: 16px;
+    color: var(--text-heading);
+}
+
+.list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.card,
+.card-link {
+    display: block;
+    padding: var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+}
+
+.card-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 16px;
+    color: var(--text-heading);
+}
+
+.card-meta,
+.muted {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.error-list {
+    margin: 0;
+    padding-left: 1.2em;
+    color: var(--danger);
+}
+
+.error-path {
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.error-text,
+.banner {
+    margin: 0;
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--danger-subtle);
+    color: var(--danger);
+}
+
+.warning-text {
+    margin: 0;
+    color: var(--warning);
+}
+
+.check-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-md);
+}
+
+.check-item {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+}
+
+.raw-document {
+    color: var(--text-secondary);
+}
+
+.raw-document pre {
+    overflow: auto;
+    padding: var(--space-sm);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    font-size: 12px;
+}
+
+.data-document {
+    font-family: monospace;
+    font-size: 13px;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+    resize: vertical;
+}
+
+fieldset.form-field {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm) var(--space-md);
+}
+
+legend.form-label {
+    padding: 0 var(--space-xs);
+}
+
+/* --- Compact set logging ---------------------------------------------------
+   One row per set instead of one card per set. The table owns the horizontal
+   rhythm so weight and rep columns line up across every exercise, which is what
+   lets a whole workout fit in a screen or two. */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.exercise-block {
+    padding: var(--space-sm) var(--space-md) var(--space-xs);
+}
+
+.exercise-block__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+}
+
+.exercise-block__name {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text-heading);
+}
+
+.exercise-block__progress {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.exercise-block__target {
+    margin: 0 0 var(--space-xs);
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.set-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.set-table th,
+.set-table td {
+    padding: 0;
+    text-align: left;
+    font-weight: 400;
+}
+
+.set-table thead th {
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Set number and the done toggle are fixed; the numeric cells share the rest. */
+.set-table__set {
+    width: 2.25rem;
+}
+
+.set-table__check {
+    width: 2.5rem;
+    text-align: right;
+}
+
+.set-table__prev {
+    width: 5.5rem;
+}
+
+.set-row {
+    border-bottom: 1px solid var(--border);
+}
+
+.set-row:last-child {
+    border-bottom: none;
+}
+
+.set-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.set-cell {
+    display: inline-block;
+    padding: 0 var(--space-xs);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-variant-numeric: tabular-nums;
+}
+
+.set-cell--muted {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.set-cell--number {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 15px;
+    text-align: center;
+}
+
+.set-cell--number:focus {
+    border-color: var(--accent);
+    outline: none;
+}
+
+.set-cell--number:disabled {
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.set-pair {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.set-pair__divider {
+    color: var(--text-muted);
+}
+
+.set-check,
+.set-check-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    font-size: 16px;
+}
+
+.set-check-button {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+}
+
+.set-check-button--on {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+    color: var(--accent-hover);
+}
+
+/* A logged set stays legible but recedes, so the remaining work stands out. */
+.set-row--done .set-cell,
+.set-row--done .set-badge {
+    color: var(--text-muted);
+}
+
+.set-row--done .set-cell--number {
+    opacity: 0.6;
+}
+
+.session-meta {
+    font-size: 13px;
+}
+
+/* Keeps how-far-through-am-I on screen while the set list scrolls under it.
+   Offsets by the header height so it parks below the header, not under it. */
+.session-progress {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) 0;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.session-progress__track {
+    flex: 1;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    overflow: hidden;
+}
+
+.session-progress__bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width var(--transition-fast);
+}
+
+/* --- Planned set rows ------------------------------------------------------
+   A template's sets are a scannable list of one-line rows; the full
+   prescription editor opens in place for the row being changed. */
+
+.planned-set {
+    border-bottom: 1px solid var(--border);
+}
+
+.reading-row {
+    padding: var(--space-xs) var(--space-md);
+}
+
+.reading-row__value {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.planned-set:last-child {
+    border-bottom: none;
+}
+
+.planned-set__row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.planned-set__summary {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 44px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.planned-set__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.planned-set__name {
+    overflow: hidden;
+    color: var(--text-primary);
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.planned-set__detail {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.planned-set__caret {
+    color: var(--text-muted);
+    font-size: 11px;
+}
+
+.planned-set__body {
+    padding: var(--space-sm) 0 var(--space-md);
+}
+
+/* Icon buttons for per-set actions: they must not compete with the summary. */
+.btn--icon {
+    width: 32px;
+    min-height: 32px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+}
+
+.btn--icon:disabled {
+    opacity: 0.35;
+}
+
+.set-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--border);
 }
