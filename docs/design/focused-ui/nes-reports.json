@@ -1,0 +1,184 @@
+[
+  {
+    "file": "home-empty.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "home.png",
+    "status": "pass",
+    "width": 256,
+    "height": 576,
+    "problems": []
+  },
+  {
+    "file": "picker.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "workouts.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "workout-edit.png",
+    "status": "pass",
+    "width": 256,
+    "height": 916,
+    "problems": []
+  },
+  {
+    "file": "workout-new.png",
+    "status": "pass",
+    "width": 256,
+    "height": 648,
+    "problems": []
+  },
+  {
+    "file": "exercises.png",
+    "status": "pass",
+    "width": 256,
+    "height": 567,
+    "problems": []
+  },
+  {
+    "file": "exercise-edit.png",
+    "status": "pass",
+    "width": 256,
+    "height": 944,
+    "problems": []
+  },
+  {
+    "file": "exercise-new.png",
+    "status": "pass",
+    "width": 256,
+    "height": 872,
+    "problems": []
+  },
+  {
+    "file": "weight.png",
+    "status": "pass",
+    "width": 256,
+    "height": 547,
+    "problems": []
+  },
+  {
+    "file": "history.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "start.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "session.png",
+    "status": "pass",
+    "width": 256,
+    "height": 644,
+    "problems": []
+  },
+  {
+    "file": "completed.png",
+    "status": "pass",
+    "width": 256,
+    "height": 754,
+    "problems": []
+  },
+  {
+    "file": "settings.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "data.png",
+    "status": "pass",
+    "width": 256,
+    "height": 776,
+    "problems": []
+  },
+  {
+    "file": "session-duration.png",
+    "status": "pass",
+    "width": 256,
+    "height": 644,
+    "problems": []
+  },
+  {
+    "file": "session-per-side.png",
+    "status": "pass",
+    "width": 256,
+    "height": 732,
+    "problems": []
+  },
+  {
+    "file": "session-all-logged.png",
+    "status": "pass",
+    "width": 256,
+    "height": 480,
+    "problems": []
+  },
+  {
+    "file": "session-overview.png",
+    "status": "pass",
+    "width": 256,
+    "height": 1114,
+    "problems": []
+  },
+  {
+    "file": "workout-expanded.png",
+    "status": "pass",
+    "width": 256,
+    "height": 1460,
+    "problems": []
+  },
+  {
+    "file": "weight-added.png",
+    "status": "pass",
+    "width": 256,
+    "height": 636,
+    "problems": []
+  },
+  {
+    "file": "data-export.png",
+    "status": "pass",
+    "width": 256,
+    "height": 776,
+    "problems": []
+  },
+  {
+    "file": "data-invalid.png",
+    "status": "pass",
+    "width": 256,
+    "height": 858,
+    "problems": []
+  },
+  {
+    "file": "data-imported.png",
+    "status": "pass",
+    "width": 256,
+    "height": 840,
+    "problems": []
+  },
+  {
+    "file": "workout-phone.png (content rectangle x=73,width=1024,scale=4)",
+    "status": "pass",
+    "width": 256,
+    "height": 633,
+    "problems": []
+  }
+]
