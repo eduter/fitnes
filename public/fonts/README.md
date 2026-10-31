@@ -15,3 +15,10 @@ grid. They add no antialiasing colors in normal Chromium rendering. Swedish
 å, ä and ö are retained. These are licensed homebrew letterforms, not fonts
 traced from a commercial game. The application does not suppress Chromium's
 normal antialiasing or quantize its screenshots.
+
+Each glyph also has a COLR v0 foreground-color layer (palette index 0xffff)
+using the same outlines. This makes Chrome use shape rasterization instead of
+LCD text rasterization, which can introduce RGB fringes even at native sizes.
+The layer inherits the normal text color; it adds no color of its own. Both
+regular Chromium and Google Chrome with RGB subpixel font configuration are
+covered by the captured UI checks. Browser antialiasing remains enabled.
