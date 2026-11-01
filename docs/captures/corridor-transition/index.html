@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DW3 corridor capture — 592s–622s</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141821; --line:#252b38; --ink:#e8ecf3;
+    --dim:#98a2b6; --accent:#f2c14e; --accent2:#4ea1f2;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  a{color:var(--accent2)}
+  header{padding:28px 20px 18px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#161b25,#0b0d12)}
+  .wrap{max-width:1100px;margin:0 auto}
+  h1{margin:0 0 6px;font-size:22px;letter-spacing:.2px}
+  .sub{color:var(--dim);font-size:13.5px}
+  .sub code{background:#1d2230;padding:1px 6px;border-radius:5px;color:var(--accent)}
+  main{max-width:1100px;margin:0 auto;padding:22px 20px 60px}
+  section{margin:0 0 34px}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--dim);margin:0 0 12px;font-weight:600}
+  h3{font-size:13px;color:var(--dim);margin:0 0 8px;font-weight:600;letter-spacing:.04em}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:14px;overflow:hidden}
+  video{width:100%;display:block;border-radius:8px;background:#000;image-rendering:pixelated}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .row>*{flex:1 1 320px}
+  .dl{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .dl a{display:inline-block;padding:8px 13px;border:1px solid var(--line);
+    border-radius:8px;text-decoration:none;color:var(--ink);font-size:13.5px;
+    background:#1a1f2b}
+  .dl a:hover{border-color:var(--accent);color:var(--accent)}
+  img.sheet{width:100%;display:block;border-radius:8px;background:#000;
+    image-rendering:pixelated}
+  .menu-list{list-style:none;padding:0;margin:0}
+  .menu-list li{padding:11px 13px;border:1px solid var(--line);border-radius:9px;
+    margin-bottom:9px;background:#171c27}
+  .menu-list b{color:var(--accent);font-variant-numeric:tabular-nums;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+  .menu-list span{display:block;color:var(--dim);font-size:13.5px;margin-top:3px}
+  .menu-list .nm{color:var(--ink);font-weight:600;font-size:14px}
+  .scrub{margin-top:14px}
+  .scrub input[type=range]{width:100%}
+  .meta{display:flex;justify-content:space-between;color:var(--dim);
+    font-size:12.5px;font-family:ui-monospace,Menlo,monospace;margin-bottom:6px}
+  .filmstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));
+    gap:6px;max-height:340px;overflow:auto;padding:2px}
+  .filmstrip figure{margin:0;position:relative;cursor:pointer}
+  .filmstrip img{width:100%;display:block;border-radius:5px;border:2px solid transparent;
+    image-rendering:pixelated}
+  .filmstrip figure:hover img{border-color:var(--accent2)}
+  .filmstrip figcaption{position:absolute;left:3px;bottom:3px;font-size:10px;
+    background:#000a;padding:1px 4px;border-radius:4px;
+    font-family:ui-monospace,Menlo,monospace}
+  .strip{display:flex;gap:4px;overflow-x:auto;padding:2px}
+  .strip figure{margin:0;flex:0 0 auto;text-align:center;cursor:pointer}
+  .strip img{height:150px;display:block;border-radius:4px;background:#000;
+    image-rendering:pixelated;border:1px solid var(--line)}
+  .strip figure:hover img{border-color:var(--accent2)}
+  .strip figcaption{font-size:10px;color:var(--dim);margin-top:3px;
+    font-family:ui-monospace,Menlo,monospace}
+  .note{color:var(--dim);font-size:13px;margin-top:10px}
+  footer{color:var(--dim);font-size:12.5px;text-align:center;padding:26px 20px;
+    border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Dragon Warrior III (NES) — corridor transition, 592s&ndash;622s</h1>
+  <div class="sub">Video <code>pLvXBDb-XPQ</code> &middot; 30 s segment &middot;
+    <a href="https://youtu.be/pLvXBDb-XPQ?t=592">source</a> &middot;
+    captured from a blocked-IP sandbox via proxy egress &middot;
+    reference for the FitNES between-sets interstitial</div>
+</div></header>
+
+<main>
+  <section>
+    <h2>Segment (video + audio)</h2>
+    <div class="panel">
+      <video id="v" controls preload="metadata" poster="screens/frame_001.png"
+             src="seg.full.mp4"></video>
+      <div class="scrub">
+        <div class="meta"><span id="pos">0.0s in segment / 592.0s absolute</span>
+          <span id="dur"></span></div>
+        <input id="seek" type="range" min="0" max="30" step="0.1" value="0">
+      </div>
+      <div class="dl">
+        <a href="seg.full.mp4" download>seg.full.mp4 (muxed)</a>
+        <a href="seg.video.mp4" download>seg.video.mp4 (h264 854&times;480)</a>
+        <a href="seg.audio.m4a" download>seg.audio.m4a (aac)</a>
+        <a href="manifest.json" download>manifest.json</a>
+      </div>
+      <div class="note">Click any thumbnail below to seek the player to that moment.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What happens in this window</h2>
+    <div class="row">
+      <div class="panel"><ul class="menu-list" id="menus"></ul></div>
+      <div class="panel">
+        <img class="sheet" src="contact_1.png" alt="contact sheet 1">
+        <div class="note">Contact sheets: every 0.5 s, 20 frames each (below).</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Contact sheets</h2>
+    <div class="panel"><img class="sheet" src="contact_2.png" alt="contact sheet 2"></div>
+    <div style="height:12px"></div>
+    <div class="panel"><img class="sheet" src="contact_3.png" alt="contact sheet 3"></div>
+  </section>
+
+  <section>
+    <h2>Transition into the corridor &mdash; fade to black</h2>
+    <div class="panel">
+      <div class="strip" id="strip-out"></div>
+      <div class="note">Every frame at 30 fps from 599.70s. The screen steps down
+        twice, then holds black.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Transition out of the corridor &mdash; fade up from black</h2>
+    <div class="panel">
+      <div class="strip" id="strip-in"></div>
+      <div class="note">Every frame at 30 fps from 601.50s. Two steps up out of
+        black, then the new room is drawn in.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Every screen (60 @ 2 fps)</h2>
+    <div class="panel"><div class="filmstrip" id="strip"></div></div>
+  </section>
+</main>
+
+<footer>Captured by an AI agent (OpenHands) on the user's behalf.</footer>
+
+<script>
+const ABS_START = 592, DUR = 30;
+const v = document.getElementById('v');
+const seek = document.getElementById('seek');
+const pos = document.getElementById('pos');
+const durEl = document.getElementById('dur');
+
+function fmt(s){return s.toFixed(1)+'s';}
+function update(){
+  pos.textContent = fmt(v.currentTime) + ' in segment / ' +
+    (ABS_START + v.currentTime).toFixed(1) + 's absolute';
+}
+v.addEventListener('loadedmetadata', ()=>{ durEl.textContent = 'length ' + fmt(v.duration); });
+v.addEventListener('timeupdate', update);
+v.addEventListener('seeked', update);
+seek.addEventListener('input', e=>{ v.currentTime = parseFloat(e.target.value); });
+v.addEventListener('timeupdate', ()=>{ seek.value = v.currentTime; });
+update();
+
+function seekTo(rel){
+  v.currentTime = Math.max(0, Math.min(DUR, rel));
+  v.play();
+  v.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function buildStrip(id, prefix, count, startAbs){
+  const host = document.getElementById(id);
+  for (let n = 1; n <= count; n++){
+    const rel = startAbs - ABS_START + (n - 1) / 30;
+    const fig = document.createElement('figure');
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.src = 'transition/' + prefix + '_' + String(n).padStart(3,'0') + '.png';
+    img.alt = prefix + ' frame ' + n;
+    const cap = document.createElement('figcaption');
+    cap.textContent = (startAbs + (n - 1) / 30).toFixed(2) + 's';
+    fig.appendChild(img); fig.appendChild(cap);
+    fig.title = 'seek to ' + (startAbs + (n-1)/30).toFixed(2) + 's absolute';
+    fig.addEventListener('click', ()=>seekTo(rel));
+    host.appendChild(fig);
+  }
+}
+
+fetch('manifest.json').then(r=>r.json()).then(m=>{
+  const ul = document.getElementById('menus');
+  m.transitions.forEach(s=>{
+    const li = document.createElement('li');
+    li.innerHTML = '<b>'+s.range+'</b><span class="nm">'+s.name+
+      '</span><span>'+s.detail+'</span>';
+    ul.appendChild(li);
+  });
+  const strip = document.getElementById('strip');
+  m.frames.forEach(f=>{
+    const rel = f.t - ABS_START;
+    const fig = document.createElement('figure');
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.src = 'screens/frame_' + String(f.n).padStart(3,'0') + '.png';
+    img.alt = 'frame at ' + f.t + 's';
+    const cap = document.createElement('figcaption');
+    cap.textContent = f.t.toFixed(1) + 's';
+    fig.appendChild(img); fig.appendChild(cap);
+    fig.addEventListener('click', ()=>seekTo(rel));
+    strip.appendChild(fig);
+  });
+  buildStrip('strip-out', 'out', m.strips.out.count, m.strips.out.start);
+  buildStrip('strip-in', 'in', m.strips.in.count, m.strips.in.start);
+});
+</script>
+</body>
+</html>
