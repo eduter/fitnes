@@ -31,4 +31,36 @@ describe('SteelPanel', () => {
         expect(screen.getByTestId('panel').classList.contains('active')).toBe(true);
         expect(screen.getByTestId('panel').textContent).toBe('Second');
     });
+
+    it('keeps classList flags when class changes and removes disabled classes', () => {
+        const [name, setName] = createSignal('first extra');
+        const [selected, setSelected] = createSignal(true);
+        render(() => (
+            <SteelPanel
+                data-testid="flags"
+                class={name()}
+                classList={{ selected: selected(), extra: false, 'badge pair': selected() }}
+            />
+        ));
+        const panel = screen.getByTestId('flags');
+        expect(panel.classList.contains('selected')).toBe(true);
+        expect(panel.classList.contains('extra')).toBe(false);
+        expect(panel.classList.contains('badge')).toBe(true);
+        expect(panel.classList.contains('pair')).toBe(true);
+
+        setName('second extra');
+        expect(panel.classList.contains('steel-panel')).toBe(true);
+        expect(panel.classList.contains('first')).toBe(false);
+        expect(panel.classList.contains('second')).toBe(true);
+        expect(panel.classList.contains('selected')).toBe(true);
+        expect(panel.classList.contains('extra')).toBe(false);
+
+        setSelected(false);
+        expect(panel.classList.contains('selected')).toBe(false);
+        expect(panel.classList.contains('badge')).toBe(false);
+        expect(panel.classList.contains('pair')).toBe(false);
+        expect(panel.classList.contains('second')).toBe(true);
+        setSelected(true);
+        expect(panel.classList.contains('selected')).toBe(true);
+    });
 });

@@ -12,7 +12,8 @@ import { SteelPanel } from './components/SteelPanel/SteelPanel.tsx';
 ```
 
 Set width/height through normal CSS or `style`, or let height grow with children.
-Ordinary div attributes, classes and refs pass through. Importing the component
+Ordinary div attributes and refs pass through; reactive `class` and `classList`
+inputs are merged while preserving the required frame class. Importing the component
 also imports its CSS; it does not depend on the app's stylesheet.
 
 CSS nine-slices the editable **18×18 SVG**: 8px corners stay fixed while the
