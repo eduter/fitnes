@@ -1,0 +1,45 @@
+{
+    "logicalSize": [
+        256,
+        240
+    ],
+    "backgroundPatterns": 242,
+    "backgroundBankLimit": 256,
+    "spritePatterns": 6,
+    "sprites": 6,
+    "maximumSpritesPerScanline": 2,
+    "backgroundPalettes": [
+        [
+            15,
+            0,
+            16,
+            32
+        ],
+        [
+            15,
+            23,
+            40,
+            56
+        ]
+    ],
+    "spritePalettes": [
+        [
+            15,
+            15,
+            55,
+            23
+        ],
+        [
+            15,
+            15,
+            55,
+            32
+        ],
+        [
+            15,
+            15,
+            12,
+            16
+        ]
+    ]
+}
