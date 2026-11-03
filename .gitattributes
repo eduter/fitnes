@@ -1,1 +1,5 @@
 * text=auto eol=lf
+art/tab-panel-studies/*-pixels.json linguist-generated=true
+art/tab-panel-studies/layout.json linguist-generated=true
+art/tab-panel-studies/verification.json linguist-generated=true
+art/tab-panel-studies/checks/*.json linguist-generated=true

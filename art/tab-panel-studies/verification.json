@@ -1,0 +1,62 @@
+[
+    {
+        "id": "A",
+        "size": [
+            256,
+            48
+        ],
+        "margin": 2,
+        "frame": 4,
+        "backgroundPatterns": 71,
+        "sprites": 0,
+        "exact3xPixels": true
+    },
+    {
+        "id": "B",
+        "size": [
+            256,
+            48
+        ],
+        "margin": 2,
+        "frame": 4,
+        "backgroundPatterns": 89,
+        "sprites": 0,
+        "exact3xPixels": true
+    },
+    {
+        "id": "C",
+        "size": [
+            256,
+            48
+        ],
+        "margin": 2,
+        "frame": 4,
+        "backgroundPatterns": 98,
+        "sprites": 0,
+        "exact3xPixels": true
+    },
+    {
+        "id": "D",
+        "size": [
+            256,
+            48
+        ],
+        "margin": 2,
+        "frame": 4,
+        "backgroundPatterns": 102,
+        "sprites": 0,
+        "exact3xPixels": true
+    },
+    {
+        "id": "E",
+        "size": [
+            256,
+            48
+        ],
+        "margin": 2,
+        "frame": 4,
+        "backgroundPatterns": 91,
+        "sprites": 0,
+        "exact3xPixels": true
+    }
+]

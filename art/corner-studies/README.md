@@ -25,8 +25,8 @@ extends the straight bars and mirrors the corner onto the other end.
 G and H have editable 16×16 pixel sources alongside the previous studies.
 
 Only top-level panels are intended to receive elaborate borders, per the
-owner's direction now recorded in `docs/vision.md`. No bar thickness or corner
-variant has been selected yet. The preview page shows native and 3× versions,
+owner's direction now recorded in `docs/vision.md`. The owner selected H with 4-pixel bars for the next bottom-panel study; see
+`../tab-panel-studies/README.md`. The preview page shows native and 3× versions,
 with optional individual corner details.
 
 ## Original corner comparison

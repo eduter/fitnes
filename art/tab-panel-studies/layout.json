@@ -1,0 +1,232 @@
+[
+    {
+        "id": "A",
+        "count": 4,
+        "size": 24,
+        "captions": false,
+        "dimensions": [
+            256,
+            48
+        ],
+        "outerMargin": 2,
+        "frameWidth": 4,
+        "innerWidth": 244,
+        "separatorWidth": 1,
+        "cells": [
+            {
+                "name": "home",
+                "width": 60,
+                "iconSize": 24,
+                "sideSpace": 36
+            },
+            {
+                "name": "train",
+                "width": 60,
+                "iconSize": 24,
+                "sideSpace": 36
+            },
+            {
+                "name": "stats",
+                "width": 60,
+                "iconSize": 24,
+                "sideSpace": 36
+            },
+            {
+                "name": "setup",
+                "width": 61,
+                "iconSize": 24,
+                "sideSpace": 37
+            }
+        ]
+    },
+    {
+        "id": "B",
+        "count": 5,
+        "size": 24,
+        "captions": false,
+        "dimensions": [
+            256,
+            48
+        ],
+        "outerMargin": 2,
+        "frameWidth": 4,
+        "innerWidth": 244,
+        "separatorWidth": 1,
+        "cells": [
+            {
+                "name": "home",
+                "width": 48,
+                "iconSize": 24,
+                "sideSpace": 24
+            },
+            {
+                "name": "train",
+                "width": 48,
+                "iconSize": 24,
+                "sideSpace": 24
+            },
+            {
+                "name": "log",
+                "width": 48,
+                "iconSize": 24,
+                "sideSpace": 24
+            },
+            {
+                "name": "stats",
+                "width": 48,
+                "iconSize": 24,
+                "sideSpace": 24
+            },
+            {
+                "name": "setup",
+                "width": 48,
+                "iconSize": 24,
+                "sideSpace": 24
+            }
+        ]
+    },
+    {
+        "id": "C",
+        "count": 5,
+        "size": 32,
+        "captions": false,
+        "dimensions": [
+            256,
+            48
+        ],
+        "outerMargin": 2,
+        "frameWidth": 4,
+        "innerWidth": 244,
+        "separatorWidth": 1,
+        "cells": [
+            {
+                "name": "home",
+                "width": 48,
+                "iconSize": 32,
+                "sideSpace": 16
+            },
+            {
+                "name": "train",
+                "width": 48,
+                "iconSize": 32,
+                "sideSpace": 16
+            },
+            {
+                "name": "log",
+                "width": 48,
+                "iconSize": 32,
+                "sideSpace": 16
+            },
+            {
+                "name": "stats",
+                "width": 48,
+                "iconSize": 32,
+                "sideSpace": 16
+            },
+            {
+                "name": "setup",
+                "width": 48,
+                "iconSize": 32,
+                "sideSpace": 16
+            }
+        ]
+    },
+    {
+        "id": "D",
+        "count": 6,
+        "size": 24,
+        "captions": false,
+        "dimensions": [
+            256,
+            48
+        ],
+        "outerMargin": 2,
+        "frameWidth": 4,
+        "innerWidth": 244,
+        "separatorWidth": 1,
+        "cells": [
+            {
+                "name": "home",
+                "width": 39,
+                "iconSize": 24,
+                "sideSpace": 15
+            },
+            {
+                "name": "train",
+                "width": 40,
+                "iconSize": 24,
+                "sideSpace": 16
+            },
+            {
+                "name": "log",
+                "width": 40,
+                "iconSize": 24,
+                "sideSpace": 16
+            },
+            {
+                "name": "clock",
+                "width": 40,
+                "iconSize": 24,
+                "sideSpace": 16
+            },
+            {
+                "name": "stats",
+                "width": 40,
+                "iconSize": 24,
+                "sideSpace": 16
+            },
+            {
+                "name": "setup",
+                "width": 40,
+                "iconSize": 24,
+                "sideSpace": 16
+            }
+        ]
+    },
+    {
+        "id": "E",
+        "count": 5,
+        "size": 16,
+        "captions": true,
+        "dimensions": [
+            256,
+            48
+        ],
+        "outerMargin": 2,
+        "frameWidth": 4,
+        "innerWidth": 244,
+        "separatorWidth": 1,
+        "cells": [
+            {
+                "name": "home",
+                "width": 48,
+                "iconSize": 16,
+                "sideSpace": 32
+            },
+            {
+                "name": "train",
+                "width": 48,
+                "iconSize": 16,
+                "sideSpace": 32
+            },
+            {
+                "name": "log",
+                "width": 48,
+                "iconSize": 16,
+                "sideSpace": 32
+            },
+            {
+                "name": "stats",
+                "width": 48,
+                "iconSize": 16,
+                "sideSpace": 32
+            },
+            {
+                "name": "setup",
+                "width": 48,
+                "iconSize": 16,
+                "sideSpace": 32
+            }
+        ]
+    }
+]

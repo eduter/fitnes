@@ -6,7 +6,14 @@
         "useIgnoreFile": true
     },
     "files": {
-        "includes": ["src/**", "vite.config.ts", "index.html", "tools/art-sample/**", "art/corner-studies/index.html"]
+        "includes": [
+            "src/**",
+            "vite.config.ts",
+            "index.html",
+            "tools/art-sample/**",
+            "art/corner-studies/index.html",
+            "art/tab-panel-studies/index.html"
+        ]
     },
     "formatter": {
         "enabled": true,

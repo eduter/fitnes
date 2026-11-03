@@ -36,7 +36,11 @@ charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,
 rivets, industrial gym scenery, and warm logo/character accents. Adapt texture
 and shading to NES constraints while retaining depth, silhouettes, and contrast.
-Reserve elaborate metal framing for top-level panels.
+Reserve elaborate metal framing for top-level panels. Use the H corner treatment
+(single outermost pixel cut off) with 4-pixel-wide metal bars for this frame.
+The bottom navigation study uses a 252-pixel-wide panel within the 256-pixel
+column, leaving a 2-pixel black margin around the panel. Tab count and icon
+size remain under review.
 
 ![FitNES style comparison, with the selected charcoal/steel design on the right](style-reference.png)
 
