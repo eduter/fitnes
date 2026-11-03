@@ -11,8 +11,7 @@ actual performance, actions, and session progress must be readable on a phone.
 The existing model is a good starting point. Preserve its measurement and load
 meanings when designing the interface; raise concrete gaps separately.
 
-Explore a character moving as the workout advances. This does not imply XP,
-levels, rewards, combat, or a persistent map.
+Use top-down character movement between sets to communicate workout progress.
 
 ## NES visual contract
 
@@ -32,43 +31,23 @@ owner adopts them.
 
 ## Design direction
 
-NES compliance alone is not sufficient: the art should have the deliberate
-detail and finish of a well-made NES game. The owner's preferred mood reference
-is the **rightmost image** in
-[this shared FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b).
-Use it for atmosphere and visual richness, adapting its modern level of detail
-to the console's constraints. The owner supplied the three-color comparison
-sheet in the project discussion on 2026-11-03; the selected version is the
-rightmost charcoal/steel design. No matching standalone image was found in the
-inspected branches. The existing blue six-screen concept sheet is a different
-reference.
-The [repository inventory](repo-status.md) locates the concept art and existing
-asset candidates.
+Aim for the detail and finish of a well-made NES game. Use the **rightmost
+charcoal/steel design** in
+[this FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b)
+as the art reference; the comparison sheet is also attached in the project
+discussion. Carry forward its dark panels, steel frames, shaped corners,
+rivets, industrial gym scenery, and warm logo/character accents. Adapt texture
+and shading to NES constraints while retaining depth, silhouettes, and contrast.
 
-Carry forward the selected design's dark charcoal panels, steel-gray framing,
-shaped corners, corner plates/rivets, and light/dark edges that suggest depth.
-Use detailed industrial gym scenery and warm orange/yellow logo and character
-accents as focal points. Translate those features into a small set of deliberate
-tiles and NES palette choices; simplify texture and shading while retaining
-the frame construction, silhouettes, and contrast. This is an art-direction
-reference. Its dense dashboard layout, XP, streaks, and other pictured features
-do not become product requirements.
+Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
+for navigation: show a few choices, then expose further options through
+subsequent menus, keeping workout interaction quick.
 
-The owner selected these references on 2026-11-03:
+Use the [corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/)
+for top-down character movement through the environment between sets. Develop
+the graphics for FitNES; timing and interaction remain to be designed.
 
-- [Menu capture](https://capture-487s.dw3-capture-preview.pages.dev/): show a few
-  choices, then expose further options through subsequent menus. Preserve quick
-  workout interaction. The reference's simple border does not establish the
-  desired appearance; frames and graphics need further art direction.
-- [Corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/):
-  use the **top-down view**, with a character moving through the environment,
-  for transitioning between sets. Develop the graphics for FitNES. The owner
-  rejected the separate first-person corridor animation for this flow. The
-  older four transition concepts are historical alternatives. Exact timing,
-  interaction, and final artwork remain to be designed.
-
-These directions do not grant visual exceptions or approve an entire existing
-UI branch.
+The [inventory](repo-status.md) locates useful existing code, artwork, and research.
 
 ## Preview in use
 

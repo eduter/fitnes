@@ -16,7 +16,7 @@ recorded in [the vision](vision.md#design-direction).
   scrolling pages, device scaling, and letterboxing.
 - [ ] Choose typography, case, menu hierarchy, and layout.
 - [ ] Design the between-set flow from the selected corridor reference;
-  use its top-down view. The first-person implementation direction was rejected.
+  use its top-down view.
 - [ ] Implement the workout UI in small changes, checking native-resolution
   output and the actual phone experience.
 - [ ] Plan deployment and data transfer before replacing the preview.
