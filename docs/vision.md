@@ -30,6 +30,29 @@ Visual fidelity does not require an NES emulator, CPU timing, audio hardware,
 or controller-only input. Research and prototypes are candidates until the
 owner adopts them.
 
+## Design direction
+
+NES compliance alone is not sufficient: the art should have the deliberate
+detail and finish of a well-made NES game. Use the modern concept art for
+atmosphere and visual richness, adapting it to the console's constraints.
+The [repository inventory](repo-status.md) locates the concept art and existing
+asset candidates.
+
+The owner selected these references on 2026-11-03:
+
+- [Menu capture](https://capture-487s.dw3-capture-preview.pages.dev/): show a few
+  choices, then expose further options through subsequent menus. Preserve quick
+  workout interaction. The reference's simple border does not establish the
+  desired appearance; frames and graphics need further art direction.
+- [Corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/):
+  preferred direction for transitioning between sets, with graphics developed
+  for FitNES. This selects the captured example, not the separate corridor
+  implementation experiment or the older four transition concepts. Exact
+  timing, interaction, and final artwork remain to be designed.
+
+These directions do not grant visual exceptions or approve an entire existing
+UI branch.
+
 ## Preview in use
 
 The owner uses [the compact preview](https://feat-compact-workout-ui.fitnes-preview.pages.dev/)
