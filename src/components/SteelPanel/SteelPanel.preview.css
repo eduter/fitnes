@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    background: #000;
+    color: #bcbcbc;
+    font: 14px monospace;
+}
+.steel-panel-preview {
+    width: 256px;
+    margin-inline: auto;
+}
+.steel-panel-preview h1 {
+    font-size: 18px;
+}
+.steel-panel-preview p {
+    line-height: 1.5;
+}
+.steel-panel-preview section {
+    margin-block-end: 16px;
+}

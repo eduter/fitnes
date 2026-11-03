@@ -1,0 +1,113 @@
+{
+    "approvedBorderPixelsCompared": 3568,
+    "approvedBorderMatches": true,
+    "measuredCases": [
+        {
+            "x": 0,
+            "y": 0,
+            "width": 256,
+            "height": 48
+        },
+        {
+            "x": 0,
+            "y": 64,
+            "width": 127,
+            "height": 53
+        },
+        {
+            "x": 0,
+            "y": 133,
+            "width": 201,
+            "height": 121
+        },
+        {
+            "x": 0,
+            "y": 270,
+            "width": 20,
+            "height": 20
+        }
+    ],
+    "contentHeights": [
+        87,
+        297
+    ],
+    "wholePixelResizeCases": [
+        [
+            225,
+            33
+        ],
+        [
+            226,
+            34
+        ],
+        [
+            227,
+            35
+        ],
+        [
+            228,
+            36
+        ],
+        [
+            229,
+            37
+        ],
+        [
+            230,
+            38
+        ],
+        [
+            231,
+            39
+        ],
+        [
+            232,
+            40
+        ],
+        [
+            233,
+            41
+        ],
+        [
+            234,
+            42
+        ],
+        [
+            235,
+            43
+        ],
+        [
+            236,
+            44
+        ],
+        [
+            237,
+            45
+        ],
+        [
+            238,
+            46
+        ],
+        [
+            239,
+            47
+        ],
+        [
+            240,
+            48
+        ]
+    ],
+    "dpr3ExactPixels": true,
+    "patternBanks": [
+        {
+            "input": "work/steel-panel-check/1-page.png",
+            "patterns": 66,
+            "backgroundBankLimit": 256
+        },
+        {
+            "input": "work/steel-panel-grown.png",
+            "patterns": 69,
+            "backgroundBankLimit": 256
+        }
+    ]
+}

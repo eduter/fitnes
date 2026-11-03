@@ -1,0 +1,8 @@
+{
+  "input": "http://127.0.0.1:4174/steel-panel.html?proof",
+  "screenshot": "work/steel-panel-built-check/1-page.png",
+  "status": "pass",
+  "width": 256,
+  "height": 409,
+  "problems": []
+}
