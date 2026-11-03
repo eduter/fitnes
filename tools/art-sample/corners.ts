@@ -38,20 +38,22 @@ function renderCorners(): void {
         F: ['11111', '11000', '11000', '11110', '11000', '11000', '11000'],
     };
     const sheet = Array.from({ length: 80 }, () => Array<number>(128).fill(0));
-    studies.forEach(({ id, rows }, i) => {
-        const x = 8 + (i % 3) * 40;
-        const y = 6 + Math.floor(i / 3) * 40;
-        labels[id].forEach((row, dy) => {
-            [...row].forEach((v, dx) => {
-                sheet[y + dy][x + dx] = Number(v) * 2;
+    studies
+        .filter(({ id }) => labels[id])
+        .forEach(({ id, rows }, i) => {
+            const x = 8 + (i % 3) * 40;
+            const y = 6 + Math.floor(i / 3) * 40;
+            labels[id].forEach((row, dy) => {
+                [...row].forEach((v, dx) => {
+                    sheet[y + dy][x + dx] = Number(v) * 2;
+                });
+            });
+            rows.forEach((row, dy) => {
+                [...row].forEach((v, dx) => {
+                    sheet[y + 12 + dy][x + dx] = Number(v);
+                });
             });
         });
-        rows.forEach((row, dy) => {
-            [...row].forEach((v, dx) => {
-                sheet[y + 12 + dy][x + dx] = Number(v);
-            });
-        });
-    });
     writeFileSync(
         `${out}/comparison-native.png`,
         png(
@@ -64,6 +66,65 @@ function renderCorners(): void {
         png(
             sheet.map((row) => row.join('')),
             8
+        )
+    );
+}
+
+/** Build 252-pixel panel tops from the chosen corners, preserving their indexed pixels. */
+function renderPanelTops(): void {
+    const selected = studies.filter(({ id }) => ['D', 'E', 'F', 'G', 'H'].includes(id));
+    const labels: Record<string, string[]> = {
+        D: ['11110', '11011', '11011', '11011', '11011', '11011', '11110'],
+        E: ['11111', '11000', '11000', '11110', '11000', '11000', '11111'],
+        F: ['11111', '11000', '11000', '11110', '11000', '11000', '11000'],
+        G: ['01111', '11000', '11000', '11011', '11011', '11011', '01111'],
+        H: ['11011', '11011', '11011', '11111', '11011', '11011', '11011'],
+    };
+    const sheet = Array.from({ length: selected.length * 40 }, () => Array<number>(256).fill(0));
+    selected.forEach(({ id, bar, rows }, i) => {
+        const top = Array.from({ length: 16 }, (_, y) =>
+            Array.from({ length: 252 }, (_, x): number => {
+                if (y < bar) {
+                    return y === 0 ? 2 : 1;
+                }
+                const edge = Math.min(x, 251 - x);
+                return edge < bar ? (edge === 0 ? 2 : 1) : 0;
+            })
+        );
+
+        // Remove the old study's outer padding, then mirror only the corner geometry
+        for (let y = 0; y < 11; y++) {
+            for (let x = 0; x < 11; x++) {
+                top[y][x] = Number(rows[y + 1][x + 1]);
+                top[y][251 - x] = top[y][x];
+            }
+        }
+        const art = top.map((row) => row.join(''));
+        writeFileSync(`${out}/${id}-top-native.png`, png(art, 1));
+        writeFileSync(`${out}/${id}-top-3x.png`, png(art, 3));
+        labels[id].forEach((row, dy) => {
+            [...row].forEach((v, dx) => {
+                sheet[i * 40 + dy][2 + dx] = Number(v) * 2;
+            });
+        });
+        top.forEach((row, dy) => {
+            row.forEach((v, dx) => {
+                sheet[i * 40 + 12 + dy][2 + dx] = v;
+            });
+        });
+    });
+    writeFileSync(
+        `${out}/panel-tops-native.png`,
+        png(
+            sheet.map((row) => row.join('')),
+            1
+        )
+    );
+    writeFileSync(
+        `${out}/panel-tops-3x.png`,
+        png(
+            sheet.map((row) => row.join('')),
+            3
         )
     );
 }
@@ -84,3 +145,4 @@ function png(rows: string[], scale: number): Uint8Array {
 }
 
 renderCorners();
+renderPanelTops();

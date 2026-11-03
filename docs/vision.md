@@ -36,6 +36,7 @@ charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,
 rivets, industrial gym scenery, and warm logo/character accents. Adapt texture
 and shading to NES constraints while retaining depth, silhouettes, and contrast.
+Reserve elaborate metal framing for top-level panels.
 
 ![FitNES style comparison, with the selected charcoal/steel design on the right](style-reference.png)
 
