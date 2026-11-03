@@ -32,12 +32,14 @@ owner adopts them.
 ## Design direction
 
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
-charcoal/steel design** in
-[this FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b)
-as the art reference; the comparison sheet is also attached in the project
-discussion. Carry forward its dark panels, steel frames, shaped corners,
+charcoal/steel design** in the [style reference](style-reference.png)
+as the art reference. Carry forward its dark panels, steel frames, shaped corners,
 rivets, industrial gym scenery, and warm logo/character accents. Adapt texture
 and shading to NES constraints while retaining depth, silhouettes, and contrast.
+
+![FitNES style comparison, with the selected charcoal/steel design on the right](style-reference.png)
+
+Use the [standalone FitNES logo](fitnes-logo.png) as the logo source.
 
 Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 for navigation: show a few choices, then expose further options through
