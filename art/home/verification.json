@@ -1,0 +1,49 @@
+{
+  "checkerCommit": "c910349a6cd90d29766ebd69fb64ec6032a5cc0c",
+  "panelCommit": "b32ab1bf88fd953bd145c2dc5141aeed42d34598",
+  "sourceSha256": "4f49e1f8dfea9d1b346ac1c67c74e33b5015c1947e4a663931a439066395b00b",
+  "source": {
+    "width": 1419,
+    "height": 1108,
+    "distinctColors": 176540,
+    "offPalettePixels": 1566780,
+    "totalPixels": 1572252
+  },
+  "staticPreviewMatchesSolidPixels": true,
+  "results": [
+    {
+      "path": "art/home/gym.png",
+      "width": 256,
+      "height": 200,
+      "visibleColors": [
+        "000000",
+        "7C0800",
+        "FC9838",
+        "747474",
+        "FCD8A8"
+      ],
+      "backgroundSubpalettes": 4,
+      "sprites": 0,
+      "uniqueBackgroundPatterns": 775,
+      "sha256": "aa629b7103005e37fce215eb8aab61bc473995368fc9046940c71fac35e56f15"
+    },
+    {
+      "path": "art/home/home-native.png",
+      "width": 256,
+      "height": 448,
+      "visibleColors": [
+        "000000",
+        "7C0800",
+        "747474",
+        "FC9838",
+        "FCD8A8",
+        "FCFCFC",
+        "BCBCBC"
+      ],
+      "backgroundSubpalettes": 4,
+      "sprites": 0,
+      "uniqueBackgroundPatterns": 1102,
+      "sha256": "dbfdbb8a59c2ef3af5fdde4fd0ba07af4b8dd632d8c7e52b55ce06e8cbfd4b1d"
+    }
+  ]
+}
