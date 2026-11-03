@@ -6,7 +6,7 @@
         "useIgnoreFile": true
     },
     "files": {
-        "includes": ["src/**", "vite.config.ts", "index.html", "steel-panel.html", "tools/steel-panel/**"]
+        "includes": ["src/**", "vite.config.ts", "index.html"]
     },
     "formatter": {
         "enabled": true,

@@ -1,7 +1,6 @@
 import { For, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { SteelPanel } from './SteelPanel.tsx';
-import './SteelPanel.preview.css';
 
 const proof = new URLSearchParams(location.search).has('proof');
 const cases = [

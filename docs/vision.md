@@ -39,7 +39,7 @@ and shading to NES constraints while retaining depth, silhouettes, and contrast.
 
 Reserve elaborate metal framing for top-level panels. The approved frame uses
 4-pixel metal bars, riveted H-style corners with only the outermost corner pixel
-cut off, and a 2-pixel black surround. The reusable [SteelPanel component](design/steel-panel/README.md)
+cut off, and a 2-pixel black surround. The reusable [SteelPanel component](../src/components/SteelPanel/README.md)
 implements this border; its uses and contents remain to be designed.
 
 ![FitNES style comparison, with the selected charcoal/steel design on the right](style-reference.png)
