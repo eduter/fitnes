@@ -11,8 +11,7 @@ actual performance, actions, and session progress must be readable on a phone.
 The existing model is a good starting point. Preserve its measurement and load
 meanings when designing the interface; raise concrete gaps separately.
 
-Explore a character moving as the workout advances. This does not imply XP,
-levels, rewards, combat, or a persistent map.
+Use top-down character movement between sets to communicate workout progress.
 
 ## NES visual contract
 
@@ -29,6 +28,26 @@ Record an approved exception's rationale, affected rule, and scope here.
 Visual fidelity does not require an NES emulator, CPU timing, audio hardware,
 or controller-only input. Research and prototypes are candidates until the
 owner adopts them.
+
+## Design direction
+
+Aim for the detail and finish of a well-made NES game. Use the **rightmost
+charcoal/steel design** in
+[this FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b)
+as the art reference; the comparison sheet is also attached in the project
+discussion. Carry forward its dark panels, steel frames, shaped corners,
+rivets, industrial gym scenery, and warm logo/character accents. Adapt texture
+and shading to NES constraints while retaining depth, silhouettes, and contrast.
+
+Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
+for navigation: show a few choices, then expose further options through
+subsequent menus, keeping workout interaction quick.
+
+Use the [corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/)
+for top-down character movement through the environment between sets. Develop
+the graphics for FitNES; timing and interaction remain to be designed.
+
+The [inventory](repo-status.md) locates useful existing code, artwork, and research.
 
 ## Preview in use
 
