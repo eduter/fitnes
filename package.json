@@ -17,7 +17,7 @@
     "test:watch": "vitest",
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run test",
     "fix": "npm run lint:fix && npm run format",
-    "art:render": "node tools/art-sample/render.ts"
+    "art:render": "node tools/art-sample/corners.ts"
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",
