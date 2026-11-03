@@ -37,10 +37,22 @@ detail and finish of a well-made NES game. The owner's preferred mood reference
 is the **rightmost image** in
 [this shared FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b).
 Use it for atmosphere and visual richness, adapting its modern level of detail
-to the console's constraints. Its presence in the repository is not yet verified;
-do not assume another concept sheet is the same reference.
+to the console's constraints. The owner supplied the three-color comparison
+sheet in the project discussion on 2026-11-03; the selected version is the
+rightmost charcoal/steel design. No matching standalone image was found in the
+inspected branches. The existing blue six-screen concept sheet is a different
+reference.
 The [repository inventory](repo-status.md) locates the concept art and existing
 asset candidates.
+
+Carry forward the selected design's dark charcoal panels, steel-gray framing,
+shaped corners, corner plates/rivets, and light/dark edges that suggest depth.
+Use detailed industrial gym scenery and warm orange/yellow logo and character
+accents as focal points. Translate those features into a small set of deliberate
+tiles and NES palette choices; simplify texture and shading while retaining
+the frame construction, silhouettes, and contrast. This is an art-direction
+reference. Its dense dashboard layout, XP, streaks, and other pictured features
+do not become product requirements.
 
 The owner selected these references on 2026-11-03:
 

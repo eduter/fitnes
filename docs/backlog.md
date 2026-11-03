@@ -10,8 +10,8 @@ recorded in [the vision](vision.md#design-direction).
   and preservation of real data.
 - [ ] Evaluate useful compact logging, previous-performance display, and navigation.
 - [ ] Assess visual experiments and artwork for reuse using the inventory's
-  pinned sources; locate and preserve the menu capture's source and the preferred
-  mood image, checking whether the latter already exists in the repository.
+  pinned sources; locate and preserve the menu capture's source and retain a
+  repository copy of the supplied charcoal/steel mood reference.
 - [ ] Review renderer and checker assumptions for sprite rules, tile banks on
   scrolling pages, device scaling, and letterboxing.
 - [ ] Choose typography, case, menu hierarchy, and layout.
