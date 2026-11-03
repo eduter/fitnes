@@ -21,9 +21,10 @@ without restoring the separate product-decisions document.
 - #8 is closed without merging, and its source branch is no longer advertised.
   Its last PR head remains retrievable; the experiment is not lost.
 - #1, #2, and #10 are merged. Their branches still exist.
-- The owner selected the two reference pages below on 2026-11-03. This adopts
-  directions for menus and set transitions, not their final graphics or any
-  existing FitNES implementation.
+- The owner selected the menu and corridor pages and a preferred mood image on
+  2026-11-03. The set transition must use the reference's top-down view; the
+  first-person corridor implementation is rejected for that flow. The mood
+  image guides adaptation within NES constraints, not literal reproduction.
 
 ## Baseline and data in use
 
@@ -55,7 +56,7 @@ means proposed work, not accepted product behavior or visual design.
 | `feat/nes-ui-check` | [`c910349`](https://github.com/eduter/fitnes/commit/c910349a6cd90d29766ebd69fb64ec6032a5cc0c) | [#11](https://github.com/eduter/fitnes/pull/11), open | Standalone PNG/live-Chrome checker, extracted from earlier checks. Replacement candidate for compliance tooling, not a visual design. Its branch-local contract permits unlimited tile patterns; reconcile scope with main's vision before adoption. |
 | `feat/focused-nes-ui` | [`f3df2a3`](https://github.com/eduter/fitnes/commit/f3df2a3eb2a7bb9337c92e418d6bd34a08511f04) | [#12](https://github.com/eduter/fitnes/pull/12), open | Complete functional UI adapted from compact logging, current-set presentation, local fonts, artwork, screenshots, and rendered checks. Useful behavior/evidence to inspect; checker success does not approve its appearance. Domain/fixture files match main. |
 | `feat/corridor-transition` | [`20bc327`](https://github.com/eduter/fitnes/commit/20bc3275240d723586f24877838c908bce5ffad3) | [#13](https://github.com/eduter/fitnes/pull/13), open draft | Reference capture page, video/audio, 60 sampled screens, contact sheets, and transition strips. This is the source of the owner-selected corridor page, not the FitNES implementation. |
-| `feat/corridor-interstitial` | [`709714a`](https://github.com/eduter/fitnes/commit/709714a206f2b5e2740db54235627648a045e088) | No PR found among #1–#13 | Separate renderer and demo with local stand-in sets. Not wired to real workout recording. Draws a first-person corridor, unlike the top-down reference; do not treat it as an accepted implementation. |
+| `feat/corridor-interstitial` | [`709714a`](https://github.com/eduter/fitnes/commit/709714a206f2b5e2740db54235627648a045e088) | No PR found among #1–#13 | Separate renderer and demo with local stand-in sets. Not wired to real workout recording. First-person corridor; owner rejected this direction for the set transition in favor of the top-down reference. Retain as historical work, not a candidate implementation of that direction. |
 
 The other four advertised branches are the baseline and merged work:
 
@@ -103,8 +104,9 @@ The intended uses below are recorded in [the vision](vision.md#design-direction)
 
 | Reference | What to carry forward | Location and verification |
 | --- | --- | --- |
+| [Preferred mood image: rightmost image in the shared FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b) | The owner identifies this as the best reference for the intended vibe. Adapt its level of detail to NES restrictions. | The share link exposes a sign-in shell to the available web tool, so the image could not be inspected. Current remote trees and their fetched history were searched for image assets, but a visual match cannot be established without the reference image. Do not equate it with the six-screen concept sheet below. |
 | [Menu capture](https://capture-487s.dw3-capture-preview.pages.dev/) | A few choices at a time, with subsequent menus exposing further options. The owner values its menu organization, not its simple border or final appearance. | Owner-supplied external reference. Its source repository/commit has not been located. Hosted page could not be accessed in this environment; this description records the owner's intent, not an independent visual assessment. |
-| [Corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/) | Preferred reference for moving between workout sets; develop the graphics to fit FitNES. | [Capture source and assets at `20bc327`](https://github.com/eduter/fitnes/tree/20bc3275240d723586f24877838c908bce5ffad3/docs/captures/corridor-transition). The hosted page could not be accessed; its committed HTML and all three contact sheets were inspected. They show top-down character movement through corridors and rooms. |
+| [Corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/) | Top-down character movement through the environment for transitioning between workout sets; develop the graphics to fit FitNES. | [Capture source and assets at `20bc327`](https://github.com/eduter/fitnes/tree/20bc3275240d723586f24877838c908bce5ffad3/docs/captures/corridor-transition). The hosted page could not be accessed; its committed HTML and all three contact sheets were inspected. They show top-down character movement through corridors and rooms. |
 
 The corridor manifest calls the footage first-person, but the contact sheets
 show a top-down view. The separate interstitial actually implements first-person
@@ -122,7 +124,7 @@ can be used unchanged under the visual contract.
 
 | Material | Pinned source | Notes |
 | --- | --- | --- |
-| Original modern concept sheet | [`public/nes-style-reference.png` on #5](https://github.com/eduter/fitnes/blob/f1bca218a5b0905bb688022decf43caa75f29126/public/nes-style-reference.png) | 1024×1536 sheet showing six screens, illustrated frames, gym scene, logo, character, and icons. Art-direction reference; its depicted XP/streak/goals do not add product requirements. |
+| Existing modern concept sheet | [`public/nes-style-reference.png` on #5](https://github.com/eduter/fitnes/blob/f1bca218a5b0905bb688022decf43caa75f29126/public/nes-style-reference.png) | 1024×1536 sheet showing six screens, illustrated frames, gym scene, logo, character, and icons. Its relationship to the owner's newly selected mood image is unverified. Its depicted XP/streak/goals do not add product requirements. |
 | Extracted gym, character, and logo | [`public/artwork/` on #5](https://github.com/eduter/fitnes/tree/f1bca218a5b0905bb688022decf43caa75f29126/public/artwork), [`public/fitnes-logo.png`](https://github.com/eduter/fitnes/blob/f1bca218a5b0905bb688022decf43caa75f29126/public/fitnes-logo.png) | Gym 294×138; fighter 92×132; logo 244×114. The fighter is a single stance, not a walk cycle. |
 | Thirteen extracted icons | [`public/pixel-icons/` on #5](https://github.com/eduter/fitnes/tree/f1bca218a5b0905bb688022decf43caa75f29126/public/pixel-icons) | Calendar, chart, clipboard, diamond, dumbbell, fire, gear, heart, home, progress, target, trend, trophy. Actual PNG sizes range from 36–45 pixels wide and 38–43 high, despite the concept's 16/32-pixel label. |
 | Palette-reduced artwork | [`src/assets/` on #6](https://github.com/eduter/fitnes/tree/0f811ebbb16fd1df476369675c13c738110a8040/src/assets) | Gym/hero 256×128, logo 224×96, plus five 32×32 navigation images: body, history, home, move, plan. #12 contains byte-identical hero/logo PNGs, not additional versions of that art. |
@@ -131,7 +133,7 @@ can be used unchanged under the visual contract.
 | Four older set transitions | [Comparison and runnable prototype](https://github.com/eduter/fitnes/tree/40cfd1307322210aef9b32a4f82190e1fe054b30/prototypes/set-transitions) | Includes a copy of #5's fighter and a bob animation. Keep as historical alternatives; do not infer a finished walking system. |
 | Focused UI evidence | [Screenshots and reproduction notes](https://github.com/eduter/fitnes/tree/f3df2a3eb2a7bb9337c92e418d6bd34a08511f04/docs/design/focused-ui), [font sources and license notes](https://github.com/eduter/fitnes/tree/f3df2a3eb2a7bb9337c92e418d6bd34a08511f04/public/fonts) | Useful examples of logging and editor states. Saved checker reports are evidence for their captured states, not owner approval of the visuals. |
 | Corridor reference | [Video, contact sheets, sampled screens, transition strips, HTML, manifest](https://github.com/eduter/fitnes/tree/20bc3275240d723586f24877838c908bce5ffad3/docs/captures/corridor-transition) | Preserve the source reference independently of the implementation experiment. Original video is linked by the capture page. |
-| Corridor implementation experiment | [`src/nes/`](https://github.com/eduter/fitnes/tree/709714a206f2b5e2740db54235627648a045e088/src/nes) | Pure drawing/timing modules, canvas component, and demo. Different perspective from the selected reference; not a completed session transition. |
+| Corridor implementation experiment | [`src/nes/`](https://github.com/eduter/fitnes/tree/709714a206f2b5e2740db54235627648a045e088/src/nes) | Pure drawing/timing modules, canvas component, and demo. First-person direction rejected by the owner for this flow; not a completed session transition. |
 
 ## Verification and maintenance
 
@@ -144,5 +146,5 @@ test counts and PR claims were not rerun as part of assessing those experiments.
 On refresh, compare GitHub heads and PR states again, including branches without
 PRs. Update the snapshot date and pinned tips. Keep owner decisions in the
 vision. Before pruning an experiment, preserve its useful artwork/reference
-material in an agreed location. The menu capture's source is the remaining
-reference-location gap.
+material in an agreed location. Remaining reference-location gaps are the menu
+capture's source and whether the preferred mood image exists in the repository.

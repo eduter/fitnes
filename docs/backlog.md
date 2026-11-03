@@ -10,12 +10,13 @@ recorded in [the vision](vision.md#design-direction).
   and preservation of real data.
 - [ ] Evaluate useful compact logging, previous-performance display, and navigation.
 - [ ] Assess visual experiments and artwork for reuse using the inventory's
-  pinned sources; locate and preserve the menu capture's source.
+  pinned sources; locate and preserve the menu capture's source and the preferred
+  mood image, checking whether the latter already exists in the repository.
 - [ ] Review renderer and checker assumptions for sprite rules, tile banks on
   scrolling pages, device scaling, and letterboxing.
 - [ ] Choose typography, case, menu hierarchy, and layout.
 - [ ] Design the between-set flow from the selected corridor reference;
-  distinguish it from the existing first-person implementation experiment.
+  use its top-down view. The first-person implementation direction was rejected.
 - [ ] Implement the workout UI in small changes, checking native-resolution
   output and the actual phone experience.
 - [ ] Plan deployment and data transfer before replacing the preview.

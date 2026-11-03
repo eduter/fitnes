@@ -33,8 +33,12 @@ owner adopts them.
 ## Design direction
 
 NES compliance alone is not sufficient: the art should have the deliberate
-detail and finish of a well-made NES game. Use the modern concept art for
-atmosphere and visual richness, adapting it to the console's constraints.
+detail and finish of a well-made NES game. The owner's preferred mood reference
+is the **rightmost image** in
+[this shared FitNES showcase](https://chatgpt.com/s/m_6aea3a709a188191894ab84e01827e0b).
+Use it for atmosphere and visual richness, adapting its modern level of detail
+to the console's constraints. Its presence in the repository is not yet verified;
+do not assume another concept sheet is the same reference.
 The [repository inventory](repo-status.md) locates the concept art and existing
 asset candidates.
 
@@ -45,10 +49,11 @@ The owner selected these references on 2026-11-03:
   workout interaction. The reference's simple border does not establish the
   desired appearance; frames and graphics need further art direction.
 - [Corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/):
-  preferred direction for transitioning between sets, with graphics developed
-  for FitNES. This selects the captured example, not the separate corridor
-  implementation experiment or the older four transition concepts. Exact
-  timing, interaction, and final artwork remain to be designed.
+  use the **top-down view**, with a character moving through the environment,
+  for transitioning between sets. Develop the graphics for FitNES. The owner
+  rejected the separate first-person corridor animation for this flow. The
+  older four transition concepts are historical alternatives. Exact timing,
+  interaction, and final artwork remain to be designed.
 
 These directions do not grant visual exceptions or approve an entire existing
 UI branch.
