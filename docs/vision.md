@@ -52,6 +52,10 @@ Reserve elaborate metal framing for top-level panels. The approved frame uses
 cut off, and a 2-pixel black surround. The reusable [SteelPanel component](../src/components/SteelPanel/README.md)
 implements this border; its uses and contents remain to be designed.
 
+Use the [final home artwork's indexed palette and emphasis](../art/home/construction.json)
+as the material-color reference for future icons and steel panels. Validate their
+combined screen's shared palettes and budgets before adopting the composition.
+
 ![FitNES style comparison, with the selected charcoal/steel design on the right](style-reference.png)
 
 Use the [standalone FitNES logo](fitnes-logo.png) as the logo source.

@@ -10,11 +10,12 @@ function example() {
     const attributes = Array.from({ length: 64 }, (_, i) => i % 2);
     const colors = displayColors(1);
     const data = new Uint8Array(background.length * 3);
-    for (let y = 0; y < 16; y++)
+    for (let y = 0; y < 16; y++) {
         for (let x = 0; x < 256; x++) {
             const attribute = Math.floor(y / 8) * 32 + Math.floor(x / 8);
             data.set(colors[palettes[attributes[attribute]][1]], (y * 256 + x) * 3);
         }
+    }
     return {
         construction: {
             profile: 'mmc5-exattr',
