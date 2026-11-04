@@ -43,6 +43,15 @@ narrow, tall, minimum and content-sized examples. Add `?proof` to omit only the
 ordinary explanatory text, leaving the same components in a 256px black column.
 The demo never loads the app or IndexedDB.
 
+Open `/src/components/SteelPanel/popover.html` for the interactive **256×240**
+stepped-window experiment. A **208×96** SteelPanel opens top-down in either
+3px or 16px strips, holding each step for one or two nominal 60Hz frames.
+Its close button (or Escape) plays the same CSS animation backwards; the panel
+stays mounted until it finishes, then focus returns to the opener. Settings
+stay fixed while the panel is visible. Reduced motion finishes in 1ms.
+This isolated timing preview uses ordinary browser text, like the static panel
+preview; it is not a hardware-validated screen composition or adopted app UI.
+
 The NES checker remains a separate experiment. To reproduce the live check
 with Node 24+ and Chromium (`CHROME_PATH` may select the browser):
 
