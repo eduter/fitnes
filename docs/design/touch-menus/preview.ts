@@ -87,14 +87,27 @@ function mount(concept: Concept, frame: HTMLImageElement): void {
         edit: null,
     };
     const demo: Demo = { concept, frame, context, controls, layer: controls, screen, state };
-    const resize = new ResizeObserver(() => {
+    let scaleApplied = 0;
+    let resizeFrame = 0;
+    const applyScale = () => {
         const available = Math.min(article.clientWidth, 512);
         const scale = Math.max(1, Math.floor((available * devicePixelRatio) / width)) / devicePixelRatio;
+        if (scale === scaleApplied) {
+            return;
+        }
+        scaleApplied = scale;
         screen.style.transform = `scale(${scale})`;
         space.style.width = `${width * scale}px`;
         space.style.height = `${height * scale}px`;
+    };
+    // Reserve layout height outside the observer delivery cycle to avoid resize feedback
+    const resize = new ResizeObserver(() => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(applyScale);
     });
+    applyScale();
     resize.observe(article);
+    window.addEventListener('resize', applyScale);
     screen.addEventListener('keydown', (event) => handleKeys(demo, event));
     screen.addEventListener('pointerdown', (event) => {
         if (!state.edit) {
