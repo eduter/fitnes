@@ -6,8 +6,8 @@
   "displayPalette": "composite-direct-fbx",
   "emphasis": 1,
   "attributeSize": 8,
-  "visibleColors": 10,
-  "sprites": 46,
-  "maxSpritesPerScanline": 6,
+  "visibleColors": 9,
+  "sprites": 28,
+  "maxSpritesPerScanline": 4,
   "problems": []
 }

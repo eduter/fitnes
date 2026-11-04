@@ -1,10 +1,10 @@
 {
-  "revision": 3,
+  "revision": 4,
   "source": "docs/reference-home-screen-image.png",
   "preparedSource": "hardware/reference-256.png",
   "construction": "hardware/construction.json",
-  "hardware": "MMC5 extended 8×8 attributes; one whole-frame red emphasis state; explicit sprite shading",
-  "materialIntent": "Warm brown reference shading, yellow hazard stripes, rust/brick-colored exposed bricks",
+  "hardware": "MMC5 extended 8\u00d78 attributes; one whole-frame red emphasis state; explicit sprite shading",
+  "materialIntent": "No rust bleed onto concrete; readable two-ink sign; three warm skin shades; matching yellow hazard areas; yellow stippled lamp light",
   "reproduction": "npm run art:home",
   "verification": "npm run nes:proof -- art/home/hardware/construction.json art/home/gym.png"
 }

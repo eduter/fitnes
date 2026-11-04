@@ -1,5 +1,5 @@
 {
-  "revision": 3,
+  "revision": 4,
   "source": "docs/reference-home-screen-image.png",
   "sourceSha256": "4f49e1f8dfea9d1b346ac1c67c74e33b5015c1947e4a663931a439066395b00b",
   "native": {
@@ -13,20 +13,42 @@
   "displayPalette": "composite-direct-fbx",
   "emphasis": 1,
   "attributeSize": 8,
-  "visibleColors": 10,
-  "sprites": 46,
-  "maxSpritesPerScanline": 6,
+  "visibleColors": 9,
+  "sprites": 28,
+  "maxSpritesPerScanline": 4,
   "problems": [],
-  "metrics": {
-    "referenceMeanSquaredOklabError": 0.005776903671421556,
-    "previousV2MeanSquaredOklabError": 0.02788971541034478
+  "materialChecks": {
+    "forbiddenRustOutsideBrickOrSkin": 0,
+    "incorrectSkin": 0,
+    "incorrectHazards": 0,
+    "incorrectLampPoints": 0,
+    "skinPixels": 490,
+    "lampPoints": 624,
+    "hazardPixels": [
+      616,
+      136,
+      89
+    ]
+  },
+  "sign": {
+    "font": "5×7 NO heading and 4×6 EXCUSES; hard-edged native pixels",
+    "inks": 2,
+    "rivets": "2×2 pixels at each corner",
+    "underline": false
+  },
+  "skin": {
+    "codes": [
+      "$26",
+      "$27",
+      "$37"
+    ],
+    "shades": 3
   },
   "emulator": {
     "core": "FCEUmm",
     "commit": "e0f3086a8104f8fbbe49a2615b10401504a9533f",
     "displayPalette": "composite-direct-fbx",
     "region": "NTSC",
-    "overscan": "disabled",
     "frames": 180,
     "capture": "hardware/emulator-frame.png",
     "captureWidth": 256,
@@ -38,54 +60,17 @@
       "height": 200
     },
     "pixelDifferences": 0,
-    "sha256": "e9c926cba9042b89f6111e0aab4662daaf1ba39af2103eec3d6bd16fe1e822eb"
+    "sha256": "72cc542a70e68a9c5fdac4370b138deaec72fed182f81ebaaeee5ed02ca221c2"
   },
   "rom": {
     "file": "hardware/home-proof.nes",
     "mapper": 5,
-    "backgroundAttributes": "MMC5 8×8",
     "PPUMASK": "$3E",
-    "emphasis": "red, fixed for the entire frame",
-    "palettes": [
-      [
-        15,
-        45,
-        16,
-        56
-      ],
-      [
-        15,
-        7,
-        38,
-        23
-      ],
-      [
-        15,
-        0,
-        7,
-        16
-      ],
-      [
-        15,
-        0,
-        45,
-        7
-      ]
-    ],
-    "spritePalettes": [
-      [
-        15,
-        55,
-        45,
-        61
-      ]
-    ],
-    "sprites": 46,
-    "sha256": "d62d583294e632cc7f10e7426258e111f95a79129dc421a65471ce11699145dd"
+    "sha256": "500c87e58cce3ba3e74dc2ceb24b5f643f6f9e4cdb4b2a61ae2a0b975f134bce"
   },
   "files": {
-    "gym": "91f70f68ba9ec69063f9f1d2a9a938c817f9db7a258b63f4a5ce62f0d25dd378",
-    "gym3x": "8724c1d95f8d20c163eced7aedf1cb878240b809cdfacdcbd72c5d3ce0143319",
-    "construction": "d6b5c37e0854e72edf2f232317f78accbca91aecd808b914ca635183094b8cf4"
+    "gym": "cfdd58193769cde6517002ef7d2126306070d712501a5e0709e2dfacdfea2b62",
+    "gym3x": "6ff8021edb235910d78c69435f02d9980834c058663c3313c6d694a02f0de94b",
+    "construction": "507830c9506aa75ee7ad726dba1d254b1e7c61798273e082046a0e6644847989"
   }
 }

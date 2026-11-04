@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { decodePng, encodePng } from '../nes-hardware/png.ts';
 import { mkdirSync } from 'node:fs';
+import { describeMaterials, backgroundColorAllowed, MATERIAL } from './materials.ts';
 
 /** Quantize only the pushed reference, using four shared palettes and explicit material color roles. */
 function main(): void {
@@ -12,6 +13,7 @@ function main(): void {
         [0, 2, 4].map((j, i) => Math.min(255, Math.floor(parseInt(hex.slice(j, j + 2), 16) * multiplier[i])))
     );
     const source = decodePng(readFileSync('art/home/hardware/reference-256.png')).data;
+    const materials = describeMaterials(source);
     const n = 256 * 200,
         rows = Math.ceil(200 / region),
         cols = 256 / region,
@@ -20,17 +22,10 @@ function main(): void {
         labs = colors.map(lab),
         frequency = new Uint32Array(64);
     for (let p = 0; p < n; p++) {
-        const target = lab([...source.subarray(p * 3, p * 3 + 3)]),
-            x = p % 256,
-            y = Math.floor(p / 256),
-            [r, g, b] = source.subarray(p * 3, p * 3 + 3);
-        const colored = r - g > 45 && g - b > 20;
-        const stripes = colored && y >= 191 && x >= 52 && x <= 202;
-        const brick =
-            colored &&
-            ((x >= 44 && x <= 75 && y >= 33 && y <= 52) ||
-                (x >= 60 && x <= 87 && y >= 79 && y <= 98) ||
-                (x >= 228 && y >= 50 && y <= 99));
+        const target =
+            materials.kind[p] === MATERIAL.sign
+                ? labs[materials.desired[p]]
+                : lab([...source.subarray(p * 3, p * 3 + 3)]);
         let best = Infinity,
             nearest = 15;
         for (let c = 0; c < 64; c++) {
@@ -38,8 +33,7 @@ function main(): void {
                 (target[0] - labs[c][0]) ** 2 +
                 1.4 * (target[1] - labs[c][1]) ** 2 +
                 1.4 * (target[2] - labs[c][2]) ** 2;
-            if (stripes && ![0x38].includes(c)) d += 2;
-            if (brick && ![0x07, 0x16, 0x17, 0x26].includes(c)) d += 2;
+            if (!backgroundColorAllowed(materials.kind[p], materials.desired[p], c)) d += 100;
             if (c === 0x0d || [0x0e, 0x1d, 0x1e, 0x1f, 0x2e, 0x2f, 0x3e, 0x3f].includes(c)) d = 100;
             dist[p * 64 + c] = d;
             if (d < best) {
@@ -53,7 +47,7 @@ function main(): void {
         .filter((i) => i !== 15 && frequency[i] > 0)
         .sort((a, b) => frequency[b] - frequency[a])
         .slice(0, 18);
-    for (const i of [0x28, 0x38, 0x16, 0x17, 0x26]) if (!pool.includes(i)) pool.push(i);
+    for (const i of [0x00, 0x10, 0x2d, 0x38, 0x26, 0x17, 0x37]) if (!pool.includes(i)) pool.push(i);
     const candidates: number[][] = [];
     for (let a = 0; a < pool.length; a++)
         for (let b = a + 1; b < pool.length; b++)
