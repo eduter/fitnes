@@ -5,6 +5,11 @@ fixed numerical slots and an on-screen picker in an overlapping game window.
 All controls are semantic buttons; no text input or system keyboard is used.
 The selected bold leading action chevron and mixed-case content remain.
 
+The steel frame is used only for the top-level screen and cached as native
+bitmap artwork. Each popover has a continuous one-logical-pixel outline.
+Spinner arrows have no button borders; the 20-pixel-tall input corners align
+with their upper and lower tips. All three picker alternatives remain available.
+
 [Open the phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/?option=j)
 with the same ChatGPT account that owns this Site. This is a separate, private
 preview with sample workouts, not the workout app's existing origin.
@@ -29,6 +34,12 @@ tap areas. These adjust the whole quantity by one rep or that exercise's weight
 increment. `More` → `Edit increment` opens the same picker for the increment.
 `More` → `Change exercise` switches between the barbell, dumbbell and cable
 examples; each has an independent increment, initially 2.50, 1.00 and 5.00 kg.
+
+Pointer interactions activate on primary press, before release; the generated
+click does not apply the action a second time. Keyboard and assistive click
+activation remain supported. There is no artificial interaction timer or
+animation delay. Repaints reuse the cached native frame rather than drawing SVG
+slices repeatedly during each interaction.
 
 Edits take effect immediately. `Done`, Escape, or tapping outside the window
 closes it; `Done` does not save a draft. `Back` clears the preceding slot and
@@ -77,6 +88,9 @@ reload persistence, bounds, dialog focus/restoration, and phone taps. At 390 CSS
 pixels / DPR 3, popover targets were at least 44×44 CSS pixels with no overlaps
 or horizontal overflow. Fifteen captured states passed exact hardware checking
 (30 slices); six popover slices reproduced in FCEUmm with zero differing pixels.
+Additional checks verified changes before release, no duplicate release action,
+keyboard activation, secondary-click rejection, continuous thin popover edges,
+borderless spinner buttons, input/arrow alignment and cached bitmap-only repaints.
 Generated native captures, ROMs and reports stay under ignored `work/`.
 
 ## Hosting and sources

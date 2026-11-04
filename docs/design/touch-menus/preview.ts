@@ -38,6 +38,7 @@ async function start(): Promise<void> {
     const frame = new Image();
     frame.src = frameUrl;
     await frame.decode();
+    const panelArt = makeTopLevelPanel(frame);
     const requested = new URLSearchParams(location.search).get('option');
     const selected = requested ?? (matchMedia('(max-width: 1000px)').matches ? 'j' : 'all');
     if (concepts.some((concept) => concept.id === selected)) {
@@ -50,7 +51,7 @@ async function start(): Promise<void> {
     }
     for (const concept of concepts) {
         if (!document.body.dataset.single || selected === concept.id) {
-            mount(concept, frame);
+            mount(concept, panelArt);
         }
     }
     document.body.dataset.ready = 'true';
@@ -63,7 +64,7 @@ interface Concept {
     tradeoff: string;
 }
 
-function mount(concept: Concept, frame: HTMLImageElement): void {
+function mount(concept: Concept, panelArt: HTMLCanvasElement): void {
     const article = document.createElement('article');
     article.className = 'alternative';
     article.dataset.option = concept.id;
@@ -86,7 +87,7 @@ function mount(concept: Concept, frame: HTMLImageElement): void {
         pressed: '',
         edit: null,
     };
-    const demo: Demo = { concept, frame, context, controls, layer: controls, screen, state };
+    const demo: Demo = { concept, panelArt, context, controls, layer: controls, screen, state };
     let scaleApplied = 0;
     let resizeFrame = 0;
     const applyScale = () => {
@@ -109,6 +110,12 @@ function mount(concept: Concept, frame: HTMLImageElement): void {
     resize.observe(article);
     window.addEventListener('resize', applyScale);
     screen.addEventListener('keydown', (event) => handleKeys(demo, event));
+    window.addEventListener('pointerup', () => {
+        if (state.pressed) {
+            state.pressed = '';
+            render(demo, false);
+        }
+    });
     screen.addEventListener('pointerdown', (event) => {
         if (!state.edit) {
             return;
@@ -150,7 +157,7 @@ type Field = 'weight' | 'reps' | 'step';
 
 interface Demo {
     concept: Concept;
-    frame: HTMLImageElement;
+    panelArt: HTMLCanvasElement;
     context: CanvasRenderingContext2D;
     controls: HTMLDivElement;
     layer: HTMLElement;
@@ -209,7 +216,7 @@ function render(demo: Demo, rebuild = true): void {
     const interactive = rebuild && !state.edit;
     text(c, 'FitNES', 12, 12);
     text(c, 'Training', 244, 12, ink.muted, 'right');
-    panel(demo, 0, 40, 256, 360);
+    c.drawImage(demo.panelArt, 0, 40);
     text(c, 'Push day', 16, 56, ink.muted);
     text(c, exercise.name, 16, 80);
     text(c, `Set ${state.set} of 4`, 16, 104);
@@ -353,7 +360,7 @@ function spinner(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: 
     const label = mask(state.exercises[state.exercise][field], field);
     const center = x + Math.floor(w / 2);
     const measured = label.length * 7;
-    corners(c, center - measured / 2 - 4, y + 27, measured + 8, 18, state.focused === field ? 2 : 1);
+    corners(c, center - measured / 2 - 4, y + 25, measured + 8, 20, state.focused === field ? 2 : 1);
     text(c, label, center, y + 26, ink.light, 'center');
     control(
         demo,
@@ -368,11 +375,6 @@ function spinner(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: 
         false,
         true
     );
-    c.fillStyle = ink.muted;
-    c.fillRect(x + w + 4, y + 18, 18, 1);
-    c.fillRect(x + w + 4, y + 34, 18, 1);
-    c.fillRect(x + w + 4, y + 50, 18, 1);
-    c.fillRect(x + w + 21, y + 18, 1, 33);
     for (const direction of [1, -1] as const) {
         const key = `${field}-${direction}`;
         const amount = state.exercises[state.exercise][field];
@@ -433,7 +435,7 @@ function drawEditor(demo: Demo, rebuild: boolean): void {
     }
     const exercise = state.exercises[state.exercise];
     const top = popoverTop(concept);
-    panel(demo, 8, top, 240, 400 - top);
+    popoverPanel(c, 8, top, 240, 400 - top);
     text(c, `${fieldName(edit.field)}${edit.field === 'reps' ? '' : ' · kg'}`, 24, top + 16);
     const slotTop = concept.id === 'j' ? 176 : concept.id === 'k' ? 152 : 232;
     const digits = rawDigits(exercise[edit.field], edit.field);
@@ -666,16 +668,26 @@ function control(
     }
     button.disabled = disabled;
     Object.assign(button.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
-    button.addEventListener('click', invoke);
+    // Keyboard and assistive activation use click; pointer activation happens on press
+    button.addEventListener('click', (event) => {
+        if (event.detail === 0) {
+            invoke();
+        }
+    });
     button.addEventListener('pointerdown', (event) => {
+        if (!event.isPrimary || event.button !== 0) {
+            return;
+        }
         event.preventDefault();
         state.pressed = key;
-        render(demo, false);
+        invoke();
     });
-    for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
+    for (const event of ['pointercancel', 'pointerleave']) {
         button.addEventListener(event, () => {
-            state.pressed = '';
-            render(demo, false);
+            if (state.pressed === key) {
+                state.pressed = '';
+                render(demo, false);
+            }
         });
     }
     button.addEventListener('focus', () => {
@@ -738,8 +750,29 @@ function text(
     c.fillText(label, x, y);
 }
 
-function panel(demo: Demo, x: number, y: number, w: number, h: number): void {
-    const { context: c, frame } = demo;
+/** Rasterize the approved frame once at native size, then cache its complete top-level composition. */
+function makeTopLevelPanel(frame: HTMLImageElement): HTMLCanvasElement {
+    const tile = document.createElement('canvas');
+    tile.width = 18;
+    tile.height = 18;
+    const source = tile.getContext('2d');
+    if (!source) {
+        throw new Error('Cannot rasterize the top-level steel frame');
+    }
+    source.imageSmoothingEnabled = false;
+    source.fillStyle = ink.black;
+    source.fillRect(0, 0, 18, 18);
+    source.drawImage(frame, 0, 0, 18, 18);
+
+    const panel = document.createElement('canvas');
+    panel.width = 256;
+    panel.height = 360;
+    const c = panel.getContext('2d');
+    if (!c) {
+        throw new Error('Cannot compose the top-level steel panel');
+    }
+    const [x, y, w, h] = [0, 0, panel.width, panel.height];
+    c.imageSmoothingEnabled = false;
     c.fillStyle = ink.black;
     c.fillRect(x, y, w, h);
     for (const [sx, sw, dx, dw] of [
@@ -752,9 +785,20 @@ function panel(demo: Demo, x: number, y: number, w: number, h: number): void {
             [8, 2, y + 10, h - 20],
             [10, 8, y + h - 10, 8],
         ]) {
-            c.drawImage(frame, sx, sy, sw, sh, dx, dy, dw, dh);
+            c.drawImage(tile, sx, sy, sw, sh, dx, dy, dw, dh);
         }
     }
+    return panel;
+}
+
+function popoverPanel(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number): void {
+    c.fillStyle = ink.black;
+    c.fillRect(x, y, w, h);
+    c.fillStyle = ink.light;
+    c.fillRect(x, y, w, 1);
+    c.fillRect(x, y + h - 1, w, 1);
+    c.fillRect(x, y + 1, 1, h - 2);
+    c.fillRect(x + w - 1, y + 1, 1, h - 2);
 }
 
 function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, thickness: number): void {

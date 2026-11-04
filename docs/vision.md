@@ -63,6 +63,12 @@ Initial actual reps should match the plan; weight increments should be
 configurable per exercise and equipment. Review previews must have a hosted URL
 that works on the owner's phone, rather than a workspace-local HTML link.
 
+Owner refinement (2026-11-04): retain the digit grid, number pad and digit-spinner
+alternatives. Use a thin continuous border for numerical popovers; reserve the
+steel component for the top level. Remove spinner-button borders and align the
+input corners vertically with the arrow tips. Numerical interactions should
+respond immediately, without a deliberate delay.
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,
