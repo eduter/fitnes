@@ -1,11 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
-import { checkConstruction } from './check.ts';
+import { checkConstruction, displayColors } from './check.ts';
 import { decodePng } from './png.ts';
 import type { HardwareConstruction } from './rom.ts';
 
+const ROOT = new URL('../../docs/design/corridor-interstitial/corridors/', import.meta.url);
+const VERSIONS = ['thin-top-view', 'wide-basement'];
+
 it('keeps the DW3-style corridor thin with pure black everywhere outside its top-view strip', () => {
-    const image = decodePng(readFileSync(new URL('../../art/corridor/vertical/overview.png', import.meta.url)));
+    const image = decodePng(readAsset('thin-top-view', 'overview.png'));
     let coloredOutsideCorridor = 0;
     for (let y = 0; y < image.height; y++) {
         for (let x = 0; x < image.width; x++) {
@@ -21,14 +24,12 @@ it('keeps the DW3-style corridor thin with pure black everywhere outside its top
     expect(coloredOutsideCorridor).toBe(0);
 });
 
-it('keeps the delivered corridor sample within the home palettes and NES sprite budgets', () => {
-    const construction = JSON.parse(
-        readFileSync(new URL('../../art/corridor/vertical/sample.json', import.meta.url), 'utf8')
-    ) as HardwareConstruction;
+it.each(VERSIONS)('keeps the %s sample within the home palettes and NES sprite budgets', (version) => {
+    const construction = JSON.parse(readAsset(version, 'sample.json').toString()) as HardwareConstruction;
     const home = JSON.parse(
         readFileSync(new URL('../../art/home/construction.json', import.meta.url), 'utf8')
     ) as HardwareConstruction;
-    const image = decodePng(readFileSync(new URL('../../art/corridor/vertical/sample.png', import.meta.url)));
+    const image = decodePng(readAsset(version, 'sample.png'));
     expect(construction.palettes).toEqual(home.palettes);
     expect(construction.emphasis).toEqual(home.emphasis);
     expect(construction.spritePalettes).toEqual(home.spritePalettes?.slice(0, 2));
@@ -42,13 +43,11 @@ it('keeps the delivered corridor sample within the home palettes and NES sprite 
     });
 });
 
-it('proves every tile-aligned viewport of the tall map and preserves the exact sample in its overview', () => {
-    const map = JSON.parse(
-        readFileSync(new URL('../../art/corridor/vertical/map.json', import.meta.url), 'utf8')
-    ) as HardwareConstruction;
-    const background = decodePng(readFileSync(new URL('../../art/corridor/vertical/background.png', import.meta.url)));
-    const overview = decodePng(readFileSync(new URL('../../art/corridor/vertical/overview.png', import.meta.url)));
-    const sample = decodePng(readFileSync(new URL('../../art/corridor/vertical/sample.png', import.meta.url)));
+it.each(VERSIONS)('proves every %s viewport and preserves the exact sample in its overview', (version) => {
+    const map = JSON.parse(readAsset(version, 'map.json').toString()) as HardwareConstruction;
+    const background = decodePng(readAsset(version, 'background.png'));
+    const overview = decodePng(readAsset(version, 'overview.png'));
+    const sample = decodePng(readAsset(version, 'sample.png'));
     expect([background.width, background.height]).toEqual([256, 384]);
     expect([overview.width, overview.height]).toEqual([256, 384]);
     for (let scrollY = 0; scrollY <= 144; scrollY += 8) {
@@ -66,3 +65,57 @@ it('proves every tile-aligned viewport of the tall map and preserves the exact s
     expect(overview.data.subarray(0, 144 * 768)).toEqual(background.data.subarray(0, 144 * 768));
     expect(overview.data.subarray(144 * 768)).toEqual(sample.data);
 });
+
+it.each(VERSIONS)('reconstructs the %s map and palette colors exactly from its delivered tile atlas', (version) => {
+    const map = JSON.parse(readAsset(version, 'map.json').toString()) as HardwareConstruction;
+    const atlas = JSON.parse(readAsset(version, 'tiles.json').toString()) as TileAtlas;
+    const image = decodePng(readAsset(version, 'tiles.png'));
+    expect(atlas.tileSize).toBe(8);
+    expect([atlas.width, atlas.height]).toEqual([map.width, map.height]);
+    expect(image.width).toBe(atlas.columns * 8);
+    expect(image.height).toBe(Math.ceil(atlas.tiles.length / atlas.columns) * 8);
+    expect(atlas.placements).toHaveLength(map.attributes.length);
+
+    const reconstructed = new Uint8Array(map.width * map.height);
+    const attributes: number[] = [];
+    for (const [index, tileId] of atlas.placements.entries()) {
+        const tile = atlas.tiles[tileId];
+        const pixels = Buffer.from(tile.pixels, 'base64');
+        attributes.push(tile.palette);
+        for (let y = 0; y < 8; y++) {
+            reconstructed.set(
+                pixels.subarray(y * 8, (y + 1) * 8),
+                (Math.floor(index / 32) * 8 + y) * 256 + (index % 32) * 8
+            );
+        }
+    }
+    expect(attributes).toEqual(map.attributes);
+    expect(Buffer.from(reconstructed)).toEqual(Buffer.from(map.backgroundPixels, 'base64'));
+
+    const expected = new Uint8Array(image.data.length);
+    const colors = displayColors(map.emphasis);
+    for (const [index, tile] of atlas.tiles.entries()) {
+        const pixels = Buffer.from(tile.pixels, 'base64');
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                const pixel =
+                    (Math.floor(index / atlas.columns) * 8 + y) * image.width + (index % atlas.columns) * 8 + x;
+                expected.set(colors[map.palettes[tile.palette][pixels[y * 8 + x]]], pixel * 3);
+            }
+        }
+    }
+    expect(image.data).toEqual(expected);
+});
+
+interface TileAtlas {
+    tileSize: number;
+    columns: number;
+    width: number;
+    height: number;
+    tiles: { palette: number; pixels: string }[];
+    placements: number[];
+}
+
+function readAsset(version: string, filename: string): Buffer {
+    return readFileSync(new URL(`${version}/${filename}`, ROOT));
+}

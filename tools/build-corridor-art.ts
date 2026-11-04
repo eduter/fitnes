@@ -4,14 +4,30 @@ import { checkConstruction, displayColors } from './nes-hardware/check.ts';
 import { encodePng, type RgbImage } from './nes-hardware/png.ts';
 import type { HardwareConstruction } from './nes-hardware/rom.ts';
 
-const DIRECTORY = 'art/corridor/vertical';
+const DIRECTORY = 'docs/design/corridor-interstitial';
 
-/** Rebuild the selected corridor sample and prove every tile-aligned viewport and retained character pose. */
+/** Rebuild both documented corridor versions, their tile atlases, and every retained view/pose proof. */
 function buildCorridorArt(): void {
-    const character = JSON.parse(readFileSync(join(DIRECTORY, 'character.json'), 'utf8')) as Character;
+    const character = JSON.parse(readFileSync(join(DIRECTORY, 'sprites/character-f.json'), 'utf8')) as Character;
     const home = JSON.parse(readFileSync('art/home/construction.json', 'utf8')) as HardwareConstruction;
-    const layout = JSON.parse(readFileSync(join(DIRECTORY, 'layout.json'), 'utf8')) as CorridorLayout;
-    const map = assembleMap(layout, home);
+    const thinDirectory = join(DIRECTORY, 'corridors/thin-top-view');
+    const layout = JSON.parse(readFileSync(join(thinDirectory, 'layout.json'), 'utf8')) as CorridorLayout;
+    const wideMap = JSON.parse(
+        readFileSync(join(DIRECTORY, 'corridors/wide-basement/map.json'), 'utf8')
+    ) as HardwareConstruction;
+    buildVersion(assembleMap(layout, home), character, home, 'thin-top-view');
+    buildVersion(wideMap, character, home, 'wide-basement');
+    for (const [pose, rows] of Object.entries(character.poses)) {
+        writeFileSync(join(DIRECTORY, `sprites/${pose}.svg`), characterSvg(character, rows, home.emphasis));
+    }
+}
+
+function buildVersion(
+    map: HardwareConstruction,
+    character: Character,
+    home: HardwareConstruction,
+    version: string
+): void {
     if (JSON.stringify(map.palettes) !== JSON.stringify(home.palettes) || map.emphasis !== home.emphasis) {
         throw new Error('The corridor must share the home background palettes and emphasis');
     }
@@ -21,7 +37,8 @@ function buildCorridorArt(): void {
     const background = renderBackground(map);
 
     // Overlapping hardware-sized views cover the tall map without treating it as one oversized NES frame
-    const proofDirectory = 'work/corridor-proof';
+    const outputDirectory = join(DIRECTORY, 'corridors', version);
+    const proofDirectory = join('work/corridor-proof', version);
     mkdirSync(proofDirectory, { recursive: true });
     let checks = 0;
     for (let scrollY = 0; scrollY <= map.height - 240; scrollY += 8) {
@@ -45,16 +62,16 @@ function buildCorridorArt(): void {
     const image = renderFrame(background, construction, scrollY);
     const overview = { ...background, data: background.data.slice() };
     overview.data.set(image.data, scrollY * map.width * 3);
-    writePair(DIRECTORY, 'sample', construction, image);
-    writeFileSync(join(DIRECTORY, 'map.json'), `${JSON.stringify(map, null, 2)}\n`);
-    writeFileSync(join(DIRECTORY, 'background.png'), encodePng(background));
-    writeFileSync(join(DIRECTORY, 'overview.png'), encodePng(overview));
-    for (const [pose, rows] of Object.entries(character.poses)) {
-        writeFileSync(join(DIRECTORY, `${pose}.svg`), characterSvg(character, rows, map.emphasis));
-    }
+    writePair(outputDirectory, 'sample', construction, image);
+    writeFileSync(join(outputDirectory, 'map.json'), `${JSON.stringify(map, null, 2)}\n`);
+    writeFileSync(join(outputDirectory, 'background.png'), encodePng(background));
+    writeFileSync(join(outputDirectory, 'overview.png'), encodePng(overview));
+    const tiles = writeTileAtlas(map, outputDirectory);
     console.log(
         JSON.stringify(
             {
+                version,
+                tiles,
                 checks,
                 viewports: (map.height - 240) / 8 + 1,
                 poses: Object.keys(character.poses).length,
@@ -64,6 +81,54 @@ function buildCorridorArt(): void {
             2
         )
     );
+}
+
+function writeTileAtlas(map: HardwareConstruction, directory: string): number {
+    const { width, height, attributes, backgroundPixels, palettes, emphasis } = map;
+    const source = Buffer.from(backgroundPixels, 'base64');
+    const tiles: { palette: number; pixels: string }[] = [];
+    const placements: number[] = [];
+    const lookup = new Map<string, number>();
+    for (let top = 0; top < height; top += 8) {
+        for (let left = 0; left < width; left += 8) {
+            const pixels = new Uint8Array(64);
+            for (let y = 0; y < 8; y++) {
+                pixels.set(source.subarray((top + y) * width + left, (top + y) * width + left + 8), y * 8);
+            }
+            const palette = attributes[(top / 8) * (width / 8) + left / 8];
+            const pattern = Buffer.from(pixels).toString('base64');
+            const key = `${palette}:${pattern}`;
+            let index = lookup.get(key);
+            if (index === undefined) {
+                index = tiles.length;
+                tiles.push({ palette, pixels: pattern });
+                lookup.set(key, index);
+            }
+            placements.push(index);
+        }
+    }
+
+    // Keep the original palette per tile so the atlas and placement grid reconstruct the source without color loss
+    const columns = Math.min(32, tiles.length);
+    const atlasWidth = columns * 8;
+    const atlasHeight = Math.ceil(tiles.length / columns) * 8;
+    const colors = displayColors(emphasis);
+    const data = new Uint8Array(atlasWidth * atlasHeight * 3);
+    for (const [index, tile] of tiles.entries()) {
+        const pixels = Buffer.from(tile.pixels, 'base64');
+        for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+                const offset = ((Math.floor(index / columns) * 8 + y) * atlasWidth + (index % columns) * 8 + x) * 3;
+                data.set(colors[palettes[tile.palette][pixels[y * 8 + x]]], offset);
+            }
+        }
+    }
+    writeFileSync(join(directory, 'tiles.png'), encodePng({ width: atlasWidth, height: atlasHeight, data }));
+    writeFileSync(
+        join(directory, 'tiles.json'),
+        `${JSON.stringify({ tileSize: 8, columns, width, height, tiles, placements }, null, 2)}\n`
+    );
+    return tiles.length;
 }
 
 interface Character {
