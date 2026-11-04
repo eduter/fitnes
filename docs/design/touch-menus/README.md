@@ -1,26 +1,31 @@
 # Touch menu alternatives
 
-Three interaction candidates, not an adopted product design. Every candidate
-uses genuine mixed-case Pixel Operator, the approved steel frame, the same
-workout content, and no selection cursor or hover dependency.
+Round 2 follows the owner's feedback: bracketed inputs remain a candidate;
+raised plates are rejected. Actions now use uppercase labels with permanent
+chevrons on their left. Other text stays mixed case. There are no right-side
+chevrons or underlined actions. All three variants use the approved steel frame
+and the same workout content, with no hover dependency.
 
-![Three touch-menu alternatives on the same workout screen](comparison.png)
+![Three leading-chevron alternatives with bracketed inputs](comparison-round-2.png)
 
-| Alternative | Persistent tap cue | Editing | Tradeoff |
-| --- | --- | --- | --- |
-| A: Menu rows | A chevron and rule on every command row | Tap a row, then type in the next menu | Closest to the documented DW3 menu hierarchy; one more tap |
-| B: Raised plates | A light top edge and hard bottom shadow | Tap the value and type directly | Strongest touch cue; most visible chrome |
-| C: Brackets and ink | Corner brackets around inputs; underlined action labels | Tap the value and type directly | Least chrome; bracket convention is less familiar |
+| Alternative | Leading marker | Tradeoff |
+| --- | --- | --- |
+| D: Slim chevron | One 4×7 chevron | Quietest marker |
+| E: Bold chevron | One 6×9 chevron with a two-pixel stroke | More legible at a glance |
+| F: Double chevron | Two fine chevrons in an 8×7 pattern | More directional emphasis; busier in menus |
 
-Start with A's short navigation menus and B's directly editable values as a
-candidate combination. C tests how much of the framing can be removed while
-keeping actions discoverable. Font and case stay identical across the three so
-they do not confound this comparison. No option has been selected by the owner.
+Font, case, input brackets, positions, spacing, and behavior stay identical so
+the chevron itself is the comparison. Every action has its own marker. Pressed
+or keyboard-focused actions invert temporarily; focused inputs retain their
+corner-only shape with slightly thicker brackets. E is the suggested next
+candidate; the owner has not selected a final variant.
+
+The [first comparison](comparison.png) is retained as a record of round 1.
 
 ## Try the mockups
 
 Run `npm run dev`, then open `/docs/design/touch-menus/`. Query parameters
-`?option=a`, `?option=b`, and `?option=c` show one alternative at a time.
+`?option=d`, `?option=e`, and `?option=f` show one alternative at a time.
 
 Change weight or reps, log a set, open More, view the previous session, or skip a
 set. Inputs use the phone's numeric keyboard. Changes remain in independent
@@ -47,18 +52,20 @@ mockup screens, not a future composition with gym artwork and bottom tabs.
 For a native PNG exported directly from a mockup's canvas:
 
 ```sh
-node tools/prove-touch-menus.ts work/touch-menus/a-native.png work/touch-menus/a-proof
+node tools/prove-touch-menus.ts work/touch-menus/round-2/d-native.png work/touch-menus/round-2/d-proof
 npm exec tsc -- --project docs/design/touch-menus/tsconfig.json
 ```
 
-Verification for this review: `npm run check` passed (183 tests), the independent
-prototype typecheck and static build passed, and Chromium interaction checks
-passed at desktop size and 390 CSS pixels / DPR 3. Every phone control was at
-least 44×44 CSS pixels. Eleven captured initial, editing, focus, pressed, and
-submenu states passed the exact hardware verifier (22 slices). The six initial
-screen slices reproduced in FCEUmm with zero differing pixels. Screenshots above
-are actual browser captures. Generated native captures, ROMs and reports stay
-under ignored `work/touch-menus/`.
+Round 2 verification passed `npm run check` (183 tests), the independent
+prototype typecheck and static build. Chromium checks covered uppercase action
+labels, left-only markers, absence of underlines, corner-only input focus,
+numeric editing, independent state, nested menus, press feedback and keyboard
+focus. Phone checks at 390 CSS pixels / DPR 3 confirmed whole-device-pixel
+scaling, no horizontal overflow, and controls at least 44×44 CSS pixels.
+Eighteen captured states passed exact hardware verification (36 slices), and
+all six initial screen slices reproduced in FCEUmm with zero differing pixels.
+Screenshots above are actual browser captures. Generated native captures, ROMs
+and reports stay under ignored `work/touch-menus/`.
 
 ## Sources and limits
 

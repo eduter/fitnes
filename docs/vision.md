@@ -45,6 +45,12 @@ Owner direction (2026-11-04): use genuine mixed-case text. An all-caps interface
 is tiring to read; do not use all caps throughout the product. Present several
 alternatives together in each design-review round to speed convergence.
 
+Owner refinement (2026-11-04): reject raised action/input plates. Explore corner
+brackets for input fields, with uppercase action labels and a persistent chevron
+on their left pointing toward the label. Keep other text mixed case. Do not use
+right-side action chevrons or underlined actions; they suggest expansion and web
+links respectively. Corner-bracket inputs remain a candidate pending review.
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,

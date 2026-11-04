@@ -5,22 +5,25 @@ const height = 448;
 const ink = { black: '#000000', shadow: '#451600', muted: '#7d5c4b', light: '#d8a082' };
 const concepts: Concept[] = [
     {
-        id: 'a',
-        title: 'A · Menu rows',
-        description: 'A small command menu. Permanent chevrons show every row you can tap.',
-        tradeoff: 'Closest to the DW3 menu direction. Clear choices; changing a value takes one extra tap.',
+        id: 'd',
+        title: 'D · Slim chevron',
+        description: 'A fine left chevron introduces each uppercase action. Inputs keep their corner brackets.',
+        tradeoff: 'Quietest treatment. Case and position distinguish actions from the mixed-case content.',
+        pointer: ['1000', '0100', '0010', '0001', '0010', '0100', '1000'],
     },
     {
-        id: 'b',
-        title: 'B · Raised plates',
-        description: 'Values sit on small tactile plates. Tap a number and type directly.',
-        tradeoff: 'Strongest touch affordance. Fast entry; more visible button shapes.',
+        id: 'e',
+        title: 'E · Bold chevron',
+        description: 'A thicker left chevron gives the same actions a stronger pixel silhouette.',
+        tradeoff: 'Most legible marker at a glance. The button label and chevron share the same text color.',
+        pointer: ['110000', '011000', '001100', '000110', '000011', '000110', '001100', '011000', '110000'],
     },
     {
-        id: 'c',
-        title: 'C · Brackets & ink',
-        description: 'Corner brackets mark editable values. Underlines mark actions.',
-        tradeoff: 'Lightest visual treatment. Fast entry; the bracket convention needs learning.',
+        id: 'f',
+        title: 'F · Double chevron',
+        description: 'Two fine left chevrons make each action marker more prominent without a button box.',
+        tradeoff: 'Strongest directional cue. Slightly busier when a menu contains several actions.',
+        pointer: ['10001000', '01000100', '00100010', '00010001', '00100010', '01000100', '10001000'],
     },
 ];
 
@@ -55,10 +58,11 @@ async function start(): Promise<void> {
 }
 
 interface Concept {
-    id: 'a' | 'b' | 'c';
+    id: 'd' | 'e' | 'f';
     title: string;
     description: string;
     tradeoff: string;
+    pointer: string[];
 }
 
 function mount(concept: Concept, frame: HTMLImageElement): void {
@@ -92,7 +96,7 @@ interface State {
     weight: string;
     reps: string;
     set: number;
-    view: 'set' | 'more' | 'weight' | 'reps' | 'history';
+    view: 'set' | 'more' | 'history';
     message: string;
     focused: string;
     pressed: string;
@@ -107,7 +111,7 @@ interface Demo {
 }
 
 function render(demo: Demo, rebuild = true): void {
-    const { context: c, state, concept, controls } = demo;
+    const { context: c, state, controls } = demo;
     c.imageSmoothingEnabled = false;
     c.fillStyle = ink.black;
     c.fillRect(0, 0, width, height);
@@ -173,40 +177,16 @@ function render(demo: Demo, rebuild = true): void {
             },
             rebuild
         );
-    } else if (state.view === 'weight' || state.view === 'reps') {
-        const field = state.view;
-        text(c, field === 'weight' ? 'Edit weight (kg)' : 'Edit reps', 16, 152);
-        text(c, 'Type a value', 16, 176, ink.muted);
-        value(demo, field, 16, 208, 224, rebuild);
-        action(
-            demo,
-            'Back to set',
-            16,
-            288,
-            224,
-            40,
-            () => {
-                state.view = 'set';
-                state.focused = '';
-                render(demo);
-            },
-            rebuild
-        );
     } else {
         text(c, 'Target', 16, 144, ink.muted);
         text(c, '60 kg x 8', 240, 144, ink.light, 'right');
         text(c, 'Last time', 16, 168, ink.muted);
         text(c, '60 kg x 8', 240, 168, ink.light, 'right');
         text(c, 'This set', 16, 200);
-        if (concept.id === 'a') {
-            action(demo, 'Weight', 16, 224, 224, 40, () => edit(demo, 'weight'), rebuild, `${state.weight} kg`);
-            action(demo, 'Reps', 16, 264, 224, 40, () => edit(demo, 'reps'), rebuild, state.reps);
-        } else {
-            text(c, 'Weight (kg)', 16, 224, ink.muted);
-            text(c, 'Reps', 136, 224, ink.muted);
-            value(demo, 'weight', 16, 248, 104, rebuild);
-            value(demo, 'reps', 136, 248, 104, rebuild);
-        }
+        text(c, 'Weight (kg)', 16, 224, ink.muted);
+        text(c, 'Reps', 136, 224, ink.muted);
+        value(demo, 'weight', 16, 248, 104, rebuild);
+        value(demo, 'reps', 136, 248, 104, rebuild);
         action(demo, 'Log set', 16, 312, 224, 40, () => advance(demo, 'Set logged'), rebuild);
         action(
             demo,
@@ -223,19 +203,6 @@ function render(demo: Demo, rebuild = true): void {
         );
     }
     text(c, state.message || 'Your session stays on this device.', 12, 408, ink.muted);
-    if (state.focused) {
-        const target = controls.querySelector<HTMLElement>(`[data-key="${state.focused}"]`);
-        if (target) {
-            c.strokeStyle = ink.light;
-            c.lineWidth = 1;
-            c.strokeRect(
-                Number.parseInt(target.style.left) + 2.5,
-                Number.parseInt(target.style.top) + 2.5,
-                Number.parseInt(target.style.width) - 5,
-                Number.parseInt(target.style.height) - 5
-            );
-        }
-    }
 }
 
 function text(
@@ -280,44 +247,26 @@ function action(
     w: number,
     h: number,
     invoke: () => void,
-    rebuild: boolean,
-    suffix = ''
+    rebuild: boolean
 ): void {
     const { context: c, state, concept } = demo;
     const key = label;
     const pressed = state.pressed === key;
-    const offset = pressed && concept.id === 'b' ? 2 : 0;
-    const baseline = y + Math.floor((h - 16) / 2) + offset;
-    if (concept.id === 'a') {
-        c.fillStyle = ink.muted;
-        c.fillRect(x, y + h - 1, w, 1);
-    } else if (concept.id === 'b') {
-        c.fillStyle = pressed ? ink.muted : ink.shadow;
-        c.fillRect(x, y + offset, w, h - 4);
+    const active = pressed || state.focused === key;
+    const baseline = y + Math.floor((h - 16) / 2);
+    const color = active ? ink.black : ink.light;
+
+    // Inversion provides immediate touch and keyboard feedback without permanent button chrome
+    if (active) {
         c.fillStyle = ink.light;
-        c.fillRect(x, y + offset, w, 1);
-        c.fillRect(x, y + offset, 1, h - 4);
-        c.fillStyle = ink.muted;
-        c.fillRect(x + 1, y + h - 4 + offset, w - 1, 2);
+        c.fillRect(x, y + 2, w, h - 4);
     }
-    text(c, label, x + 8, baseline);
-    if (suffix) {
-        text(c, suffix, x + w - 24, baseline, ink.light, 'right');
-    }
-    if (concept.id === 'c') {
-        c.fillStyle = ink.light;
-        c.fillRect(x + 8, baseline + 15, c.measureText(label).width, 1);
-    } else {
-        chevron(c, x + w - 14, baseline + 4);
-    }
-    if (pressed && concept.id !== 'b') {
-        c.fillStyle = ink.light;
-        c.fillRect(x, y + 4, 2, h - 8);
-    }
+    text(c, label.toUpperCase(), x + 24, baseline, color);
+    chevron(c, concept.pointer, x + 8, y + Math.floor((h - concept.pointer.length) / 2), color);
     if (rebuild) {
         const button = document.createElement('button');
         button.type = 'button';
-        button.textContent = suffix ? `${label}: ${suffix}` : label;
+        button.textContent = label.toUpperCase();
         position(button, key, x, y, w, h);
         button.addEventListener('click', invoke);
         button.addEventListener('pointerdown', () => {
@@ -343,22 +292,13 @@ function action(
 }
 
 function value(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: number, rebuild: boolean): void {
-    const { context: c, state, concept } = demo;
-    if (concept.id === 'b') {
-        c.fillStyle = ink.shadow;
-        c.fillRect(x, y, w, 48);
-        c.fillStyle = ink.light;
-        c.fillRect(x, y, w, 1);
-        c.fillRect(x, y, 1, 48);
-        c.fillStyle = ink.muted;
-        c.fillRect(x + 1, y + 48, w - 1, 2);
-    } else {
-        c.fillStyle = ink.light;
-        for (const xx of [x, x + w - 8]) {
-            for (const yy of [y + 4, y + 42]) {
-                c.fillRect(xx, yy, 8, 2);
-                c.fillRect(xx === x ? xx : xx + 6, yy === y + 4 ? yy : yy - 4, 2, 6);
-            }
+    const { context: c, state } = demo;
+    const thickness = state.focused === field ? 3 : 2;
+    c.fillStyle = ink.light;
+    for (const xx of [x, x + w - 8]) {
+        for (const yy of [y + 4, y + 42]) {
+            c.fillRect(xx, yy, 8, thickness);
+            c.fillRect(xx === x ? xx : xx + 8 - thickness, yy === y + 4 ? yy : yy - 4, thickness, 6);
         }
     }
     text(c, state[field], x + w / 2, y + 16, ink.light, 'center');
@@ -405,19 +345,15 @@ function position(element: HTMLElement, key: string, x: number, y: number, w: nu
     Object.assign(element.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
 }
 
-function chevron(c: CanvasRenderingContext2D, x: number, y: number): void {
-    c.fillStyle = ink.light;
-    for (let i = 0; i < 4; i++) {
-        c.fillRect(x + i, y + i, 1, 1);
-        c.fillRect(x + i, y + 6 - i, 1, 1);
+function chevron(c: CanvasRenderingContext2D, pixels: string[], x: number, y: number, color: string): void {
+    c.fillStyle = color;
+    for (let row = 0; row < pixels.length; row++) {
+        for (let column = 0; column < pixels[row].length; column++) {
+            if (pixels[row][column] === '1') {
+                c.fillRect(x + column, y + row, 1, 1);
+            }
+        }
     }
-}
-
-function edit(demo: Demo, field: 'weight' | 'reps'): void {
-    demo.state.view = field;
-    demo.state.focused = '';
-    render(demo);
-    demo.controls.querySelector<HTMLInputElement>('input')?.focus();
 }
 
 function advance(demo: Demo, message: string): void {
