@@ -1,8 +1,8 @@
 {
-  "input": "http://127.0.0.1:5174/preview/",
-  "screenshot": "work/static-check/1-page.png",
+  "input": "http://127.0.0.1:5173/art/home/preview/",
+  "screenshot": "work/revision/home-check/1-page.png",
   "status": "pass",
   "width": 256,
-  "height": 448,
+  "height": 464,
   "problems": []
 }

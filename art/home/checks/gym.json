@@ -1,6 +1,6 @@
 {
-  "input": "work/home-preview/gym.png",
-  "screenshot": "work/final-assets/1-gym.png",
+  "input": "art/home/gym.png",
+  "screenshot": "work/revision/asset-checks/1-gym.png",
   "status": "pass",
   "width": 256,
   "height": 200,

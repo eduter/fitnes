@@ -1,75 +1,97 @@
-# Home artwork candidate
+# Home artwork: neutral revision
 
-[Private review page](https://fitnes-home-art-review.eduardo-terroso.chatgpt.site)
+[Private review page](https://fitnes-home-art-review.eduardo-terroso.chatgpt.site) ·
+[Checked gray/gold PNG](gym.png) · [Checked warmer alternative](gym-warm.png) ·
+[Home concept](preview/index.html)
 
-[Verified gym, native](gym.png) · [Gym at exact 3×](gym-3x.png) ·
-[Home concept at 3×](home-3x.png) · [HTML home concept](preview/index.html)
+The previous conversion passed the checker but was visually poor. It introduced
+red shadows and scattered orange highlights, then exaggerated their contrast
+through nearest-neighbor shrinking and sharpening. Passing did not establish
+faithfulness to the reference. Those rejected images are retained in `previous/`
+for a clearly labeled comparison.
 
-This is review artwork, not an adopted home-screen design. The original
-[reference](../../docs/reference-home-screen-image.png) is unchanged.
+## Revised conversion
 
-The source fails the pinned checker at 1419×1108. An independent pixel audit
-finds 176,540 colors, with 1,566,780 of its 1,572,252 pixels off the checker’s
-FCEUX palette. The source is fully opaque.
+The revised art uses the **gray generated study shown in chat** as its visual
+source. That study was itself unverified: its 1419×1108 image contains 182,511
+colors, with 1,422,191 pixels outside the checker’s palette. The stored
+`sources/gray-study-256.png` is its smooth Lanczos3 reduction, an intermediate
+that is **not** claimed compliant. The owner-supplied sepia reference remains
+unchanged at `docs/reference-home-screen-image.png`.
 
-The selected conversion is **256×200**, retaining the entire composition.
-Height rounding changes aspect ratio by about 0.06%. Its five visible colors
-are black, dark red, gray, orange and pale peach. Nearest-neighbor reduction
-plus mild sharpening retained the sign, lifter, equipment and source texture
-more clearly than the smooth reduction. Region palette choices preserve warm
-highlights; additional diffusion made the small details noisier and was rejected.
-A regenerated candidate was also compared, but the selected image is derived
-directly from the original. Brown tones necessarily shift under this palette.
+Both final gym PNGs are 256×200 and use **seven visible colors**:
 
-`conversion.json` records the regional palette assignment and selected colors.
-The source was reduced with Sharp’s `nearest` kernel, `sharpen({sigma: 0.5})`,
-and mapped per pixel to the nearest color in its region’s palette using squared
-Oklab distance (lightness weight 1, chroma weights 1.5). The palette search
-reserved one steel/white palette for the surrounding UI, then selected three
-warm palettes by greedy selection and coordinate descent. This is a reviewed
-tradeoff between detail and warmth, not a proof of a global quality optimum.
+- `gym.png`: neutral gray, pale cream/peach and restrained gold. No orange or red.
+- `gym-warm.png`: the same neutral materials with orange/peach object accents,
+  closer to the gray study’s warm objects. No red shadows or saturated floor light.
 
-## Home concept
+The compiler applies no sharpening or dithering. Neutral source pixels must
+remain neutral. The sign and the illuminated floor cannot receive the saturated
+accent. Each aligned 16×16 region selects one of three curated art palettes;
+a fourth palette is reserved for the logo. The steel palette is available for
+neutral highlights and the surrounding frame. This is an image-specific visual
+conversion, not a general image optimizer or a proof of minimum possible error.
 
-The composition shows the logo, gym image, two plain menu actions, and five
-placeholder tabs. The frame’s CSS and SVG are exact snapshots from
-[PR #17](https://github.com/eduter/fitnes/pull/17), commit
-`b32ab1bf88fd953bd145c2dc5141aeed42d34598`. The static HTML uses its rendered
-wrapper structure; its pixels match a capture rendered by the actual Solid
-component. The tabs sit inside the panel with 1px gray separators.
+The original 244×114 logo is now preserved at **native size**, centered in a
+256×128 header, and mapped to a dedicated red/gold/cream palette. Its geometry
+is not shrunk. The complete home study is 256×464. The gold and warm concepts
+use eight and nine visible colors respectively.
 
-The tab glyphs come from PR #16 / `babdaad9eb405860c1a46734628135b7f48d3acb`.
-The grid font and its CC0 notice come from PR #12 /
-`f3df2a3eb2a7bb9337c92e418d6bd34a08511f04`. The logo is a palette-constrained
-preview derivative of the existing standalone logo. Actions and tabs are static
-placeholders; labels/order and interaction design remain open.
+## Reproduction
 
-## Verification
-
-The checker is the unmodified experiment at
-`c910349a6cd90d29766ebd69fb64ec6032a5cc0c` (PR #11).
-The native gym image, 256×448 Chrome capture, static HTML capture, and exact
-3× PNGs all pass. An independent construction check verifies each 16×16 region
-against the four declared palettes, sharing black; no sprites are needed.
-`checks/` stores checker results; `verification.json` records hashes and the
-independent construction. Each screenshot certifies only that static state.
-
-The checker allows unlimited tile patterns: the gym uses 775 distinct background
-patterns, and the complete home concept uses 1,102. Passing this checker does
-not prove that either fits a conventional 256-pattern CHR bank.
-
-To reproduce with Node 24+ and Chromium, from the repository root:
+Node 24+ and the checker from PR #11 are required; the compiler uses the pinned
+checker’s PNG I/O helpers. It has no new package dependency and does not modify
+the checker. From the repository root:
 
 ```sh
 mkdir -p /tmp/fitnes-home-checker
-# Fetch if this experiment is not already available locally.
 git fetch origin c910349a6cd90d29766ebd69fb64ec6032a5cc0c
 git archive c910349a6cd90d29766ebd69fb64ec6032a5cc0c tools/nes | tar -x -C /tmp/fitnes-home-checker
-node /tmp/fitnes-home-checker/tools/nes/cli.ts art/home/gym.png art/home/home-native.png
-node /tmp/fitnes-home-checker/tools/nes/cli.ts art/home/gym-3x.png art/home/home-3x.png --scale 3
+node tools/home-art/convert.ts /tmp/fitnes-home-checker/tools/nes
+node /tmp/fitnes-home-checker/tools/nes/cli.ts art/home/gym.png art/home/gym-warm.png
+node /tmp/fitnes-home-checker/tools/nes/cli.ts art/home/gym-3x.png art/home/gym-warm-3x.png --scale 3
 python3 -m http.server 5174 --directory art/home
 # In another terminal:
 node /tmp/fitnes-home-checker/tools/nes/cli.ts --url http://localhost:5174/preview/ --ready '.tab-items img'
+node /tmp/fitnes-home-checker/tools/nes/cli.ts --url http://localhost:5174/preview/warm.html --ready '.tab-items img'
 ```
 
-The 3× assets are exact nearest-neighbor enlargements; they add no detail.
+`conversion.json` and `conversion-warm.json` record source hashes, palettes and
+region assignments. `checks/` contains results for the two gym assets and the
+two actual Chrome captures. `verification.json` records independent palette
+construction checks and output hashes. Both images have zero red pixels, zero
+neutral-to-color leaks under the documented source threshold, and zero saturated
+floor-light pixels. Every 16×16 region fits the four declared palettes, sharing
+black, without sprites. The static gold HTML matches a fresh capture rendered
+with the actual merged Solid SteelPanel component.
+
+The pinned checker allows unlimited tile patterns. The revised gym uses 741
+patterns (743 for the warm variant); the home concepts use 1,094 and 1,096.
+Passing does not establish compatibility with a conventional 256-pattern CHR
+bank. These checks cover the static states shown, including exact 3× enlargements.
+
+## Preview provenance
+
+The CSS/SVG frame is copied unchanged from merged PR #17; its two-pixel black
+surround, four-pixel bars and one-pixel corner cut remain intact. Tabs sit inside
+it with 1px gray separators. The tab glyphs come from PR #16 /
+`babdaad9eb405860c1a46734628135b7f48d3acb`. The grid fonts and CC0 notice come
+from PR #12 / `f3df2a3eb2a7bb9337c92e418d6bd34a08511f04`.
+
+Actions, tab labels/order and final layout remain provisional. No application
+flow or persisted workout data is changed by this art study.
+
+## Color limits
+
+Ordinary NES rendering provides four shared background palettes, each with
+three colors plus a common backdrop (up to 13 background colors), and four
+three-color sprite palettes (up to 12 additional colors). The 16×16 rule selects
+one background palette for each attribute region; it does not allocate four new
+colors independently to every region. Raster palette changes and other special
+techniques are outside this checker’s scope.
+
+The hardware’s 64 color codes are not arbitrary RGB colors. This checker uses
+one fixed FCEUX RGB interpretation. Its limited brown and dark-gray choices
+constrain exact source matching, but do not require red shadows or false orange
+texture. See [NESdev palettes](https://www.nesdev.org/wiki/PPU_palettes) and
+[attribute tables](https://www.nesdev.org/wiki/PPU_attribute_tables).
