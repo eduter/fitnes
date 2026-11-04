@@ -3,18 +3,15 @@ import { SteelPanel } from '../SteelPanel/SteelPanel.tsx';
 import './BottomTabs.css';
 
 const tabItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'templates', label: 'Templates' },
-    { id: 'exercises', label: 'Exercises' },
-    { id: 'weight', label: 'Weight' },
-    { id: 'history', label: 'History' },
-    { id: 'settings', label: 'Settings' },
+    { id: 'home', label: 'Home', icon: new URL('./icons/home.png', import.meta.url).href },
+    { id: 'templates', label: 'Templates', icon: new URL('./icons/templates.png', import.meta.url).href },
+    { id: 'exercises', label: 'Exercises', icon: new URL('./icons/exercises.png', import.meta.url).href },
+    { id: 'weight', label: 'Weight', icon: new URL('./icons/weight.png', import.meta.url).href },
+    { id: 'history', label: 'History', icon: new URL('./icons/history.png', import.meta.url).href },
+    { id: 'settings', label: 'Settings', icon: new URL('./icons/settings.png', import.meta.url).href },
 ] as const;
-const iconVariants = ['a', 'b', 'c'] as const;
-const acceptedTabs = new Set<TabId>(['templates', 'exercises', 'weight', 'history', 'settings']);
-const iconFiles = import.meta.glob<string>('./icons/*.png', { eager: true, query: '?url', import: 'default' });
 
-/** A candidate icon-only bar; routing and Settings contents belong to the consuming app. */
+/** The six selected icons in the steel frame; routing belongs to the consuming app. */
 function BottomTabs(props: BottomTabsProps): JSX.Element {
     return (
         <SteelPanel class="bottom-tabs" role="navigation" aria-label="Main">
@@ -29,7 +26,7 @@ function BottomTabs(props: BottomTabsProps): JSX.Element {
                             aria-current={props.active === item.id ? 'page' : undefined}
                             onClick={() => props.onSelect?.(item.id)}
                         >
-                            <img src={tabIconUrl(item.id, props.choices[item.id])} width="24" height="24" alt="" />
+                            <img src={item.icon} width="24" height="24" alt="" />
                         </button>
                     )}
                 </For>
@@ -38,24 +35,13 @@ function BottomTabs(props: BottomTabsProps): JSX.Element {
     );
 }
 
-/** Resolve one of the 8 standalone, native-resolution PNG sprites. */
-function tabIconUrl(tab: TabId, variant: IconVariant): string {
-    const choice = acceptedTabs.has(tab) ? 'a' : variant;
-    return iconFiles[`./icons/${tab}-${choice}.png`];
-}
-
 /** IDs match the compact preview's five destinations, with Settings added for Data and future options. */
 type TabId = (typeof tabItems)[number]['id'];
-/** Three independently selectable alternatives for every tab. */
-type IconVariant = (typeof iconVariants)[number];
-/** The chosen artwork for each destination. */
-type IconChoices = Record<TabId, IconVariant>;
 /** Controlled selection keeps the reusable bar independent of routing and storage. */
 interface BottomTabsProps {
-    choices: IconChoices;
     active?: TabId;
     onSelect?: (tab: TabId) => void;
 }
 
-export type { BottomTabsProps, IconChoices, IconVariant, TabId };
-export { acceptedTabs, BottomTabs, iconVariants, tabIconUrl, tabItems };
+export type { BottomTabsProps, TabId };
+export { BottomTabs, tabItems };

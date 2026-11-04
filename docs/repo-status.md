@@ -6,11 +6,10 @@ visual and interaction references, and [the backlog](backlog.md) for next tasks.
 Selected assets: [style reference](style-reference.png) (rightmost charcoal/steel
 design) and [standalone logo](fitnes-logo.png).
 
-Bottom tabs: [PNG sprites and a mix-and-match steel-bar preview](../src/components/BottomTabs/README.md).
-Owner selected A for every tab. Only the house details remain under review:
-three gray-wall variants with lit yellow windows, using the same home palette
-and emphasis. Combined hardware/emulator proofs retain the home artwork and
-use 59 sprites including two window overlays. App integration remains open.
+Selected bottom tabs: [six PNG icons and the steel bar](../src/components/BottomTabs/README.md).
+Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
+hardware proof share the home artwork's palettes and use 59 sprites, including
+two window overlays. App integration remains open.
 
 | Branch / PR | Useful material |
 | --- | --- |
