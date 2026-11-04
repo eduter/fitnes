@@ -4,6 +4,23 @@ import { checkConstruction } from './check.ts';
 import { decodePng } from './png.ts';
 import type { HardwareConstruction } from './rom.ts';
 
+it('keeps the DW3-style corridor thin with pure black everywhere outside its top-view strip', () => {
+    const image = decodePng(readFileSync(new URL('../../art/corridor/vertical/overview.png', import.meta.url)));
+    let coloredOutsideCorridor = 0;
+    for (let y = 0; y < image.height; y++) {
+        for (let x = 0; x < image.width; x++) {
+            if (x >= 104 && x < 152 && y >= 16 && y < 368) {
+                continue;
+            }
+            const offset = (y * image.width + x) * 3;
+            if (image.data.subarray(offset, offset + 3).some((channel) => channel !== 0)) {
+                coloredOutsideCorridor++;
+            }
+        }
+    }
+    expect(coloredOutsideCorridor).toBe(0);
+});
+
 it('keeps the delivered corridor sample within the home palettes and NES sprite budgets', () => {
     const construction = JSON.parse(
         readFileSync(new URL('../../art/corridor/vertical/sample.json', import.meta.url), 'utf8')

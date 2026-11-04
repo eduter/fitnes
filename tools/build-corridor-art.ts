@@ -8,9 +8,10 @@ const DIRECTORY = 'art/corridor/vertical';
 
 /** Rebuild the selected corridor sample and prove every tile-aligned viewport and retained character pose. */
 function buildCorridorArt(): void {
-    const map = JSON.parse(readFileSync(join(DIRECTORY, 'map.json'), 'utf8')) as HardwareConstruction;
     const character = JSON.parse(readFileSync(join(DIRECTORY, 'character.json'), 'utf8')) as Character;
     const home = JSON.parse(readFileSync('art/home/construction.json', 'utf8')) as HardwareConstruction;
+    const layout = JSON.parse(readFileSync(join(DIRECTORY, 'layout.json'), 'utf8')) as CorridorLayout;
+    const map = assembleMap(layout, home);
     if (JSON.stringify(map.palettes) !== JSON.stringify(home.palettes) || map.emphasis !== home.emphasis) {
         throw new Error('The corridor must share the home background palettes and emphasis');
     }
@@ -45,13 +46,23 @@ function buildCorridorArt(): void {
     const overview = { ...background, data: background.data.slice() };
     overview.data.set(image.data, scrollY * map.width * 3);
     writePair(DIRECTORY, 'sample', construction, image);
+    writeFileSync(join(DIRECTORY, 'map.json'), `${JSON.stringify(map, null, 2)}\n`);
     writeFileSync(join(DIRECTORY, 'background.png'), encodePng(background));
     writeFileSync(join(DIRECTORY, 'overview.png'), encodePng(overview));
     for (const [pose, rows] of Object.entries(character.poses)) {
         writeFileSync(join(DIRECTORY, `${pose}.svg`), characterSvg(character, rows, map.emphasis));
     }
     console.log(
-        JSON.stringify({ checks, viewports: 19, poses: 4, ...checkConstruction(construction, image) }, null, 2)
+        JSON.stringify(
+            {
+                checks,
+                viewports: (map.height - 240) / 8 + 1,
+                poses: Object.keys(character.poses).length,
+                ...checkConstruction(construction, image),
+            },
+            null,
+            2
+        )
     );
 }
 
@@ -61,6 +72,54 @@ interface Character {
     spritePalettes: number[][];
     inks: Record<string, { palette: number; slot: number }>;
     poses: Record<string, string[]>;
+}
+
+function assembleMap(layout: CorridorLayout, home: HardwareConstruction): HardwareConstruction {
+    const { width, height, tileSize, tiles, grid } = layout;
+    if (tileSize !== 8) {
+        throw new Error('The top-view corridor uses native 8×8 tiles');
+    }
+    if (grid.length !== height / 8 || grid.some((row) => row.length !== width / 8)) {
+        throw new Error('Corridor placement rows do not cover the native map');
+    }
+    const attributes: number[] = [];
+    const pixels = new Uint8Array(width * height);
+    for (const [ty, row] of grid.entries()) {
+        for (const [tx, symbol] of [...row].entries()) {
+            const tile = tiles[symbol];
+            if (!tile) {
+                throw new Error(`Unknown corridor tile '${symbol}' at (${tx}, ${ty})`);
+            }
+            if (tile.rows.length !== 8 || tile.rows.some((pattern) => !/^[0-3]{8}$/.test(pattern))) {
+                throw new Error(`Corridor tile '${symbol}' must contain exact 8×8 two-bit pixels`);
+            }
+            attributes.push(tile.palette);
+            for (const [y, pattern] of tile.rows.entries()) {
+                for (const [x, slot] of [...pattern].entries()) {
+                    pixels[(ty * 8 + y) * width + tx * 8 + x] = Number(slot);
+                }
+            }
+        }
+    }
+    return {
+        profile: 'mmc5-exattr',
+        displayPalette: home.displayPalette,
+        emphasis: home.emphasis,
+        width,
+        height,
+        regionSize: 8,
+        palettes: home.palettes,
+        attributes,
+        backgroundPixels: Buffer.from(pixels).toString('base64'),
+    };
+}
+
+interface CorridorLayout {
+    width: number;
+    height: number;
+    tileSize: number;
+    tiles: Record<string, { palette: number; rows: string[] }>;
+    grid: string[];
 }
 
 function renderBackground(map: HardwareConstruction): RgbImage {

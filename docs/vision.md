@@ -75,6 +75,11 @@ sides and the final exit at the top, to suit phone screens. The
 [native sample](../art/corridor/vertical/README.md) develops that selection;
 animation timing and workout integration remain open.
 
+Owner correction (2026-11-04): match the DW3 reference's **thin, top-view
+corridor on a black screen**. Use narrow wall caps and small door thresholds
+seen from above. Keep the screen outside the corridor pure black; avoid tall
+wall faces or upright door facades.
+
 The [inventory](repo-status.md) locates useful existing code, artwork, and research.
 
 ## Preview in use

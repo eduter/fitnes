@@ -5,10 +5,17 @@ phones. The entrance is at the bottom; four alternating side doors represent
 sets; the final exit is at the top. This sample develops that composition without
 integrating workout behavior.
 
+Following the owner's DW3 perspective correction, the corridor is a **32-pixel
+walking lane with 8-pixel wall caps on either side**, 48 pixels total. Everything
+outside this strip is pure black. The brick caps and small door crossbars are
+seen from above; there are no tall wall faces or upright door facades.
+
 ![Native 256×384 corridor overview, with the 16×16 character near the entrance](overview.png)
 
 - [256×240 checked sample](sample.png) and [its hardware construction](sample.json).
 - [Background PNG](background.png) and [indexed map](map.json), 256×384.
+- [Native tile definitions and placement grid](layout.json), with brick caps,
+  four concrete floor patterns, side-door thresholds, an entrance and an end gate.
 - [Character source](character.json): exact 16×16 cells, front idle plus rear idle
   and two rear walking poses. Transparent, crisp SVG exports accompany it.
 - [Phone review](preview.html): full-height composition and the checked viewport.
@@ -50,17 +57,18 @@ npm run nes:emulate -- work/corridor-proof/scroll-72.json work/corridor-proof/sc
 
 ## Construction and remaining art work
 
-The vertical background began as an image-generation composition using the home
-art and selected corridor concept. Its native indexed source was then resolved
-to one of the home's four palettes per 8×8 tile. The original generated image
-is not the proof input; the retained PNGs are reconstructed from actual PPU
-codes. Character F was redrawn as a native 16×16 two-palette sprite.
+The background is built from explicit reusable 8×8 patterns and a 32×48 tile
+placement grid. Its colors follow the selected basement art, while its narrow
+floor-plan composition follows the DW3 corridor reference. Each tile selects
+one of the home's four background palettes. Character F uses native 16×16
+two-palette sprites. The proof inputs are the indexed constructions and exact
+PNGs, independent of the generated composition study.
 
-The canonical files are `map.json` and `character.json`; the TypeScript build
-reconstructs all delivered sample pixels from them. Their four shared palettes
+The canonical files are `layout.json` and `character.json`; the TypeScript build
+assembles `map.json` and reconstructs all delivered sample pixels. Their four shared palettes
 and display interpretation are documented in the [hardware verifier](../../../tools/nes-hardware/README.md).
 
-This is a composition sample. Opening doors, complete walk cycles, modular
-reusable corridor sections and workout transitions remain to be developed after
-visual feedback. The background uses indexed tiles but does not yet provide a
-semantic wall/floor/door placement kit.
+This is a composition sample with reusable tile patterns and a placement grid.
+Opening doors, complete walk cycles, configurable corridor sections and workout
+transitions remain to be developed after visual feedback. A regression check
+requires every pixel outside the 48-pixel corridor strip to remain pure black.

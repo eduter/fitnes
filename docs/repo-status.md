@@ -13,7 +13,8 @@ two window overlays. App integration remains open.
 
 Corridor art: the owner selected character F and corridor A from the
 [interstitial studies](../art/corridor/README.md), running vertically for phones.
-The [native sample](../art/corridor/vertical/README.md) includes indexed source,
+The [native sample](../art/corridor/vertical/README.md) uses the DW3 reference's
+thin top-view corridor on black, with reusable 8×8 tile patterns, indexed source,
 exact NES checks and emulator reproduction. The original generated comparison
 boards remain concept studies.
 
