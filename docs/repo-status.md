@@ -1,6 +1,6 @@
 # Useful existing work
 
-Updated 2026-11-03. Use [the vision](vision.md#design-direction) for the selected
+Updated 2026-11-04. Use [the vision](vision.md#design-direction) for the selected
 visual and interaction references, and [the backlog](backlog.md) for next tasks.
 
 Selected assets: [style reference](style-reference.png) (rightmost charcoal/steel
@@ -10,6 +10,12 @@ Selected bottom tabs: [six PNG icons and the steel bar](../src/components/Bottom
 Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
 hardware proof share the home artwork's palettes and use 59 sprites, including
 two window overlays. App integration remains open.
+
+Reusable [input controls](../src/components/Controls/README.md): Button, Popover,
+Spinner and TextInput. The spinner uses the selected number pad; the thin
+popover incorporates PR #23's stepped opening and reverse closing. The isolated
+[phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
+uses these Solid components directly. Workout-app integration remains open.
 
 | Branch / PR | Useful material |
 | --- | --- |

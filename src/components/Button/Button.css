@@ -1,0 +1,36 @@
+.nes-button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+    min-block-size: 36px;
+    border: 0;
+    border-radius: 0;
+    padding: 0 8px;
+    color: var(--nes-ink);
+    background: var(--nes-ground);
+    font: 400 16px / 16px var(--nes-font);
+    font-synthesis: none;
+    text-transform: uppercase;
+    touch-action: manipulation;
+    cursor: pointer;
+}
+.nes-button svg {
+    flex: none;
+}
+.nes-button[data-variant="plain"] {
+    justify-content: center;
+    padding: 0;
+    text-transform: none;
+}
+.nes-button:active:not(:disabled),
+.nes-button:focus-visible:not(:disabled) {
+    color: var(--nes-ground);
+    background: var(--nes-ink);
+    outline: none;
+}
+.nes-button:disabled {
+    color: var(--nes-muted);
+    cursor: default;
+}

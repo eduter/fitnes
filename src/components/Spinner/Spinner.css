@@ -1,0 +1,63 @@
+.nes-spinner {
+    display: grid;
+    gap: 4px;
+    justify-content: start;
+    min-inline-size: 0;
+}
+.nes-spinner__label {
+    color: var(--nes-muted);
+}
+.nes-spinner__controls {
+    display: flex;
+    align-items: center;
+    block-size: 68px;
+}
+.nes-spinner__value-frame {
+    display: block;
+    block-size: 20px;
+}
+.nes-spinner__value {
+    position: absolute;
+    inset: -24px 0;
+    inline-size: 100%;
+    block-size: 68px;
+}
+.nes-spinner__value:focus-visible {
+    background: var(--nes-ground);
+    color: var(--nes-ink);
+}
+.nes-spinner__arrows {
+    display: grid;
+    grid-template-rows: 34px 34px;
+    inline-size: 34px;
+    block-size: 68px;
+}
+.nes-spinner__arrow {
+    position: relative;
+    inline-size: 34px;
+    min-block-size: 34px;
+    block-size: 34px;
+}
+.nes-spinner__arrow svg {
+    position: absolute;
+    left: 9px;
+}
+.nes-spinner__arrow--up svg {
+    top: 24px;
+}
+.nes-spinner__arrow--down svg {
+    top: 6px;
+}
+.nes-spinner__arrow:active:not(:disabled) {
+    background: var(--nes-ground);
+    color: var(--nes-ink);
+}
+.nes-spinner {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+.nes-spinner__label {
+    padding: 0;
+    margin-block-end: 4px;
+}
