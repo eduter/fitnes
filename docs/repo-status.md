@@ -11,6 +11,10 @@ Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
 hardware proof share the home artwork's palettes and use 59 sprites, including
 two window overlays. App integration remains open.
 
+Pending art choices: [corridor interstitial studies](../art/corridor/README.md),
+with eight character treatments and four environment kits. These generated
+comparison boards are not selected or validated native NES assets.
+
 | Branch / PR | Useful material |
 | --- | --- |
 | `feat/compact-workout-ui` · [#4](https://github.com/eduter/fitnes/pull/4) | Compact logging, previous-performance display, navigation, and persistence. Source for the [preview in use](https://feat-compact-workout-ui.fitnes-preview.pages.dev/). |
