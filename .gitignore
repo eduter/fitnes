@@ -4,3 +4,6 @@ dev-dist
 .idea
 *.local
 *.log
+
+# Generated artwork proofs and emulator builds
+work/
