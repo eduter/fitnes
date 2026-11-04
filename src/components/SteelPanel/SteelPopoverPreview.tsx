@@ -4,8 +4,8 @@ import './SteelPopoverPreview.css';
 
 /** Standalone 256-pixel experiment comparing stepped reveals of the shared steel frame. */
 function SteelPopoverPreview(): JSX.Element {
-    const [stepPixels, setStepPixels] = createSignal(3);
-    const [frames, setFrames] = createSignal(1);
+    const [stepPixels, setStepPixels] = createSignal(16);
+    const [frames, setFrames] = createSignal(2);
     const [phase, setPhase] = createSignal<'closed' | 'opening' | 'open' | 'closing'>('closed');
     let opener!: HTMLButtonElement;
     let closer!: HTMLButtonElement;

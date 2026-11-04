@@ -46,6 +46,7 @@ The demo never loads the app or IndexedDB.
 Open `/src/components/SteelPanel/popover.html` for the interactive **256×240**
 stepped-window experiment. A **208×96** SteelPanel opens top-down in either
 3px or 16px strips, holding each step for one or two nominal 60Hz frames.
+The default is 16px strips held for two frames (200ms for the 96px panel).
 Its close button (or Escape) plays the same CSS animation backwards; the panel
 stays mounted until it finishes, then focus returns to the opener. Settings
 stay fixed while the panel is visible. Reduced motion finishes in 1ms.

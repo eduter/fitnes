@@ -42,9 +42,14 @@ describe('SteelPopoverPreview', () => {
     it('offers 3px and 16px presets and holds their settings until the popover closes', () => {
         render(() => <SteelPopoverPreview />);
         const chunky = screen.getByRole('button', { name: '16px' });
-        fireEvent.click(chunky);
         const preview = screen.getByRole('main');
+        expect(chunky.getAttribute('aria-pressed')).toBe('true');
         expect(preview.style.getPropertyValue('--reveal-steps')).toBe('6');
+        expect(preview.style.getPropertyValue('--reveal-duration')).toBe('200ms');
+        fireEvent.click(screen.getByRole('button', { name: '3px' }));
+        expect(preview.style.getPropertyValue('--reveal-steps')).toBe('32');
+        fireEvent.click(chunky);
+        fireEvent.click(screen.getByRole('button', { name: '1 frame' }));
         expect(preview.style.getPropertyValue('--reveal-duration')).toBe('100ms');
         fireEvent.click(screen.getByRole('button', { name: '2 frames' }));
         expect(preview.style.getPropertyValue('--reveal-duration')).toBe('200ms');
