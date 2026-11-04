@@ -1,8 +1,13 @@
 {
   "input": "art/home/gym.png",
-  "screenshot": "work/revision/asset-checks/1-gym.png",
+  "construction": "art/home/hardware/construction.json",
   "status": "pass",
-  "width": 256,
-  "height": 200,
+  "profile": "mmc5-exattr",
+  "displayPalette": "composite-direct-fbx",
+  "emphasis": 1,
+  "attributeSize": 8,
+  "visibleColors": 10,
+  "sprites": 46,
+  "maxSpritesPerScanline": 6,
   "problems": []
 }

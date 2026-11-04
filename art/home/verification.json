@@ -1,97 +1,91 @@
 {
-  "revision": 2,
-  "checkerCommit": "c910349a6cd90d29766ebd69fb64ec6032a5cc0c",
-  "panelBaseCommit": "eeb222adab160d2208010bd83d78b56a10c0e85e",
+  "revision": 3,
+  "source": "docs/reference-home-screen-image.png",
   "sourceSha256": "4f49e1f8dfea9d1b346ac1c67c74e33b5015c1947e4a663931a439066395b00b",
-  "grayStudy": {
-    "unverified": true,
-    "originalGeneratedWidth": 1419,
-    "originalGeneratedHeight": 1108,
-    "originalGeneratedDistinctColors": 182511,
-    "originalGeneratedOffPalettePixels": 1422191
+  "native": {
+    "width": 256,
+    "height": 200
   },
-  "staticPreviewMatchesCurrentSolidPixels": true,
-  "results": [
-    {
-      "path": "art/home/gym.png",
+  "input": "art/home/gym.png",
+  "construction": "art/home/hardware/construction.json",
+  "status": "pass",
+  "profile": "mmc5-exattr",
+  "displayPalette": "composite-direct-fbx",
+  "emphasis": 1,
+  "attributeSize": 8,
+  "visibleColors": 10,
+  "sprites": 46,
+  "maxSpritesPerScanline": 6,
+  "problems": [],
+  "metrics": {
+    "referenceMeanSquaredOklabError": 0.005776903671421556,
+    "previousV2MeanSquaredOklabError": 0.02788971541034478
+  },
+  "emulator": {
+    "core": "FCEUmm",
+    "commit": "e0f3086a8104f8fbbe49a2615b10401504a9533f",
+    "displayPalette": "composite-direct-fbx",
+    "region": "NTSC",
+    "overscan": "disabled",
+    "frames": 180,
+    "capture": "hardware/emulator-frame.png",
+    "captureWidth": 256,
+    "captureHeight": 240,
+    "comparedCrop": {
+      "x": 0,
+      "y": 0,
       "width": 256,
-      "height": 200,
-      "visibleColors": [
-        "000000",
-        "747474",
-        "F0BC3C",
-        "FCD8A8",
-        "BCBCBC",
-        "FCE4A0",
-        "FCFCFC"
-      ],
-      "declaredBackgroundPalettes": 4,
-      "sprites": 0,
-      "uniqueBackgroundPatterns": 741,
-      "neutralColorLeaks": 0,
-      "redPixels": 0,
-      "saturatedFloorPixels": 0,
-      "sha256": "14d35dd4e5b0687907423918dd60ddb73de7fd6cf4acae1e047603d0bde0408d"
+      "height": 200
     },
-    {
-      "path": "art/home/gym-warm.png",
-      "width": 256,
-      "height": 200,
-      "visibleColors": [
-        "000000",
-        "FC9838",
-        "747474",
-        "FCD8A8",
-        "BCBCBC",
-        "FCE4A0",
-        "FCFCFC"
+    "pixelDifferences": 0,
+    "sha256": "e9c926cba9042b89f6111e0aab4662daaf1ba39af2103eec3d6bd16fe1e822eb"
+  },
+  "rom": {
+    "file": "hardware/home-proof.nes",
+    "mapper": 5,
+    "backgroundAttributes": "MMC5 8×8",
+    "PPUMASK": "$3E",
+    "emphasis": "red, fixed for the entire frame",
+    "palettes": [
+      [
+        15,
+        45,
+        16,
+        56
       ],
-      "declaredBackgroundPalettes": 4,
-      "sprites": 0,
-      "uniqueBackgroundPatterns": 743,
-      "neutralColorLeaks": 0,
-      "redPixels": 0,
-      "saturatedFloorPixels": 0,
-      "sha256": "b02f7c6b83d6977ddb100dfbdf610ef19cc07c36ca25c9709ebf20d47b8aaac0"
-    },
-    {
-      "path": "art/home/home-native.png",
-      "width": 256,
-      "height": 464,
-      "visibleColors": [
-        "000000",
-        "A40000",
-        "F0BC3C",
-        "FCE4A0",
-        "747474",
-        "FCD8A8",
-        "BCBCBC",
-        "FCFCFC"
+      [
+        15,
+        7,
+        38,
+        23
       ],
-      "declaredBackgroundPalettes": 4,
-      "sprites": 0,
-      "uniqueBackgroundPatterns": 1094,
-      "sha256": "d5bb91f315603d1997d36c53b53419260f449bd488cd9b32037429dc4a72d9e9"
-    },
-    {
-      "path": "art/home/home-warm-native.png",
-      "width": 256,
-      "height": 464,
-      "visibleColors": [
-        "000000",
-        "A40000",
-        "F0BC3C",
-        "FCE4A0",
-        "FC9838",
-        "747474",
-        "FCD8A8",
-        "BCBCBC",
-        "FCFCFC"
+      [
+        15,
+        0,
+        7,
+        16
       ],
-      "declaredBackgroundPalettes": 4,
-      "sprites": 0,
-      "uniqueBackgroundPatterns": 1096,
-      "sha256": "4a9a7b042e7e0a4e9a54f688b0b2afccbb25e6e1eea3f6f3762a0cb0dcb73256"
-    }
-  ]
+      [
+        15,
+        0,
+        45,
+        7
+      ]
+    ],
+    "spritePalettes": [
+      [
+        15,
+        55,
+        45,
+        61
+      ]
+    ],
+    "sprites": 46,
+    "sha256": "d62d583294e632cc7f10e7426258e111f95a79129dc421a65471ce11699145dd"
+  },
+  "files": {
+    "gym": "91f70f68ba9ec69063f9f1d2a9a938c817f9db7a258b63f4a5ce62f0d25dd378",
+    "gym3x": "8724c1d95f8d20c163eced7aedf1cb878240b809cdfacdcbd72c5d3ce0143319",
+    "construction": "d6b5c37e0854e72edf2f232317f78accbca91aecd808b914ca635183094b8cf4"
+  }
 }

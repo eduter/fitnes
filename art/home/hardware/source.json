@@ -1,0 +1,7 @@
+{
+  "original": "docs/reference-home-screen-image.png",
+  "originalSha256": "4f49e1f8dfea9d1b346ac1c67c74e33b5015c1947e4a663931a439066395b00b",
+  "normalized": "art/home/hardware/reference-256.png",
+  "normalizedSha256": "d909a01afdb683b427b3c08a79f0754e7e73fffc33ca8a020e2ddc5d9c70a616",
+  "method": "Full uncropped original resized to 256\u00d7200 using Lanczos3, no sharpening or dithering; the normalized input retains arbitrary RGB before hardware conversion."
+}
