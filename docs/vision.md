@@ -41,6 +41,10 @@ owner adopts them.
 
 ## Design direction
 
+Owner direction (2026-11-04): use genuine mixed-case text. An all-caps interface
+is tiring to read; do not use all caps throughout the product. Present several
+alternatives together in each design-review round to speed convergence.
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,

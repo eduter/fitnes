@@ -1,0 +1,37 @@
+:root {
+    color-scheme: dark;
+    font-family: system-ui, sans-serif;
+    color: #e9e6df;
+    background: #151719;
+    font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; padding: 48px 28px; }
+.intro, .chooser, .alternatives, .notes { max-width: 1680px; margin-inline: auto; }
+.eyebrow { color: #c6ac88; font-size: 13px; letter-spacing: 1px; }
+h1 { margin: 14px 0; font-size: clamp(28px, 4vw, 48px); font-weight: 550; letter-spacing: -1.5px; }
+.intro > p:last-child { max-width: 680px; color: #b5b4af; line-height: 1.6; }
+.chooser { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 28px 36px; }
+.chooser a { color: #c9c5bb; font-size: 13px; text-decoration: none; padding: 12px 16px; border: 1px solid #3a3a37; }
+.chooser a[aria-current="page"] { background: #dfc49e; color: #151719; border-color: #dfc49e; }
+.alternatives { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; }
+.alternative { min-width: 0; }
+.alternative h2 { margin: 0 0 8px; font-size: 22px; font-weight: 500; }
+.alternative .description { min-height: 48px; margin: 0 0 20px; color: #b5b4af; font-size: 14px; line-height: 1.6; }
+.screen-space { position: relative; margin-inline: auto; }
+.screen { position: relative; width: 256px; height: 448px; transform-origin: top left; background: #000; }
+.screen canvas { display: block; width: 256px; height: 448px; image-rendering: pixelated; }
+.screen button, .screen input { position: absolute; margin: 0; padding: 0; border: 0; opacity: 0; font-size: 16px; touch-action: manipulation; }
+.screen button { cursor: pointer; }
+.screen input { width: 96px; background: transparent; }
+.tradeoff { margin-block: 22px 8px; font-size: 14px; color: #e3d8c7; line-height: 1.6; }
+.notes { border-top: 1px solid #383936; margin-top: 44px; padding-top: 14px; color: #a7a69f; font-size: 13px; line-height: 1.7; }
+body[data-single] .alternatives { grid-template-columns: minmax(0, 1fr); max-width: 512px; }
+body[data-single] .intro, body[data-single] .chooser, body[data-single] .notes { max-width: 512px; }
+body[data-single] .alternative .description { min-height: auto; }
+@media (max-width: 1000px) {
+    body { padding: 28px 16px; }
+    .alternatives { grid-template-columns: 1fr; gap: 40px; max-width: 512px; }
+    .alternative .description { min-height: auto; }
+}
