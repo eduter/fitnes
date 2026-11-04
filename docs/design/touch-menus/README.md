@@ -1,34 +1,43 @@
 # Touch menu alternatives
 
-Round 2 follows the owner's feedback: bracketed inputs remain a candidate;
-raised plates are rejected. Actions now use uppercase labels with permanent
-chevrons on their left. Other text stays mixed case. There are no right-side
-chevrons or underlined actions. All three variants use the approved steel frame
-and the same workout content, with no hover dependency.
+Round 3 keeps the selected thick action chevron, reduces its gap to the label
+from ten to two logical pixels, and tightens input brackets around the digits.
+Filled up/down triangles to the right of each value now support small changes
+without focusing an input or opening the virtual keyboard. Other text stays
+mixed case. There are no raised plates, trailing action chevrons or underlines.
 
-![Three leading-chevron alternatives with bracketed inputs](comparison-round-2.png)
+![Three compact spinner alternatives](comparison-round-3.png)
 
-| Alternative | Leading marker | Tradeoff |
+| Alternative | Spinner layout | Tradeoff |
 | --- | --- | --- |
-| D: Slim chevron | One 4×7 chevron | Quietest marker |
-| E: Bold chevron | One 6×9 chevron with a two-pixel stroke | More legible at a glance |
-| F: Double chevron | Two fine chevrons in an 8×7 pattern | More directional emphasis; busier in menus |
+| G: Stacked arrows | Up above down, to the right of each number | Narrowest control; taller tap areas |
+| H: Side-by-side arrows | Down then up, both to the right of each number | Shortest control; both fields fit beside each other |
+| I: Aligned rows | Label, number and side-by-side arrows share each row | Clear label/value pairing; two rows |
 
-Font, case, input brackets, positions, spacing, and behavior stay identical so
-the chevron itself is the comparison. Every action has its own marker. Pressed
-or keyboard-focused actions invert temporarily; focused inputs retain their
-corner-only shape with slightly thicker brackets. E is the suggested next
-candidate; the owner has not selected a final variant.
+The two-digit value's visible bracket box is now 22×16 logical pixels, down
+from 104×40. Its invisible input target remains at least 34 pixels wide. Arrow
+targets are separate 34×34 or 34×40 rectangles, with no overlapping hit areas.
+Brackets and target widths grow with longer values, without recreating the
+focused input. Every action retains its own bold 6×9 chevron.
 
-The [first comparison](comparison.png) is retained as a record of round 1.
+Weight changes by 2.5 kg and reps by 1. These are demo step sizes; exercise-
+specific increments remain undecided. Values clamp at zero and the editor's
+upper limit; the corresponding arrow disables at a limit. Integer hundredths
+preserve fractional weights across taps. Tap the number for keyboard entry, or
+use the keyboard's up/down arrows while editing. Pressed controls invert and
+focused inputs retain the compact corner-only treatment. H is the suggested
+next candidate; the final spinner layout remains open.
+
+The [first comparison](comparison.png) and [second comparison](comparison-round-2.png)
+are retained as the earlier review rounds.
 
 ## Try the mockups
 
 Run `npm run dev`, then open `/docs/design/touch-menus/`. Query parameters
-`?option=d`, `?option=e`, and `?option=f` show one alternative at a time.
+`?option=g`, `?option=h`, and `?option=i` show one alternative at a time.
 
-Change weight or reps, log a set, open More, view the previous session, or skip a
-set. Inputs use the phone's numeric keyboard. Changes remain in independent
+Adjust weight or reps with the triangles or tap a number for keyboard entry.
+Log a set, open More, view the previous session, or skip a set. Changes remain in independent
 in-memory demo state; the page imports no application boot code and never
 opens IndexedDB. Reload resets the data. This is not a complete workout flow.
 
@@ -52,18 +61,18 @@ mockup screens, not a future composition with gym artwork and bottom tabs.
 For a native PNG exported directly from a mockup's canvas:
 
 ```sh
-node tools/prove-touch-menus.ts work/touch-menus/round-2/d-native.png work/touch-menus/round-2/d-proof
+node tools/prove-touch-menus.ts work/touch-menus/round-3/g-native.png work/touch-menus/round-3/g-proof
 npm exec tsc -- --project docs/design/touch-menus/tsconfig.json
 ```
 
-Round 2 verification passed `npm run check` (183 tests), the independent
-prototype typecheck and static build. Chromium checks covered uppercase action
-labels, left-only markers, absence of underlines, corner-only input focus,
-numeric editing, independent state, nested menus, press feedback and keyboard
-focus. Phone checks at 390 CSS pixels / DPR 3 confirmed whole-device-pixel
-scaling, no horizontal overflow, and controls at least 44×44 CSS pixels.
-Eighteen captured states passed exact hardware verification (36 slices), and
-all six initial screen slices reproduced in FCEUmm with zero differing pixels.
+Round 3 passed `npm run check` (183 tests), the independent prototype typecheck
+and static build. Browser checks covered one- and two-tap adjustments without
+input focus, fractional weights, bounds and disabled arrows, widest-value
+target separation, direct typing, keyboard arrows, independent state, logging
+and nested menus. Phone checks at 390 CSS pixels / DPR 3 confirmed controls at
+least 44×44 CSS pixels with no overlapping targets or horizontal overflow.
+Twenty-four captured states passed exact hardware verification (48 slices),
+and six initial screen slices reproduced in FCEUmm with zero differing pixels.
 Screenshots above are actual browser captures. Generated native captures, ROMs
 and reports stay under ignored `work/touch-menus/`.
 

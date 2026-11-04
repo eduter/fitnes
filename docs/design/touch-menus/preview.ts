@@ -3,27 +3,28 @@ import frameUrl from '../../../src/components/SteelPanel/steel-panel.svg?url';
 const width = 256;
 const height = 448;
 const ink = { black: '#000000', shadow: '#451600', muted: '#7d5c4b', light: '#d8a082' };
+const pointer = ['110000', '011000', '001100', '000110', '000011', '000110', '001100', '011000', '110000'];
 const concepts: Concept[] = [
     {
-        id: 'd',
-        title: 'D · Slim chevron',
-        description: 'A fine left chevron introduces each uppercase action. Inputs keep their corner brackets.',
-        tradeoff: 'Quietest treatment. Case and position distinguish actions from the mixed-case content.',
-        pointer: ['1000', '0100', '0010', '0001', '0010', '0100', '1000'],
+        id: 'g',
+        title: 'G · Stacked arrows',
+        description: 'Compact number brackets, with filled up/down triangles stacked immediately to their right.',
+        tradeoff: 'Narrowest spinner. The vertical arrow pair needs more height for comfortable tapping.',
+        layout: 'stacked',
     },
     {
-        id: 'e',
-        title: 'E · Bold chevron',
-        description: 'A thicker left chevron gives the same actions a stronger pixel silhouette.',
-        tradeoff: 'Most legible marker at a glance. The button label and chevron share the same text color.',
-        pointer: ['110000', '011000', '001100', '000110', '000011', '000110', '001100', '011000', '110000'],
+        id: 'h',
+        title: 'H · Side-by-side arrows',
+        description: 'The down and up triangles sit side by side to the right of each tightly bracketed number.',
+        tradeoff: 'Shortest spinner. Both values still fit next to each other, with separate thumb targets.',
+        layout: 'inline',
     },
     {
-        id: 'f',
-        title: 'F · Double chevron',
-        description: 'Two fine left chevrons make each action marker more prominent without a button box.',
-        tradeoff: 'Strongest directional cue. Slightly busier when a menu contains several actions.',
-        pointer: ['10001000', '01000100', '00100010', '00010001', '00100010', '01000100', '10001000'],
+        id: 'i',
+        title: 'I · Aligned rows',
+        description: 'Labels and compact spinners share a line. Both arrow pairs align on the right.',
+        tradeoff: 'Clearest label-to-value pairing. Uses two rows while keeping each control compact.',
+        layout: 'rows',
     },
 ];
 
@@ -58,11 +59,11 @@ async function start(): Promise<void> {
 }
 
 interface Concept {
-    id: 'd' | 'e' | 'f';
+    id: 'g' | 'h' | 'i';
     title: string;
     description: string;
     tradeoff: string;
-    pointer: string[];
+    layout: 'stacked' | 'inline' | 'rows';
 }
 
 function mount(concept: Concept, frame: HTMLImageElement): void {
@@ -111,7 +112,7 @@ interface Demo {
 }
 
 function render(demo: Demo, rebuild = true): void {
-    const { context: c, state, controls } = demo;
+    const { context: c, state, concept, controls } = demo;
     c.imageSmoothingEnabled = false;
     c.fillStyle = ink.black;
     c.fillRect(0, 0, width, height);
@@ -183,10 +184,18 @@ function render(demo: Demo, rebuild = true): void {
         text(c, 'Last time', 16, 168, ink.muted);
         text(c, '60 kg x 8', 240, 168, ink.light, 'right');
         text(c, 'This set', 16, 200);
-        text(c, 'Weight (kg)', 16, 224, ink.muted);
-        text(c, 'Reps', 136, 224, ink.muted);
-        value(demo, 'weight', 16, 248, 104, rebuild);
-        value(demo, 'reps', 136, 248, 104, rebuild);
+        if (concept.layout === 'rows') {
+            text(c, 'Weight (kg)', 16, 236, ink.muted);
+            text(c, 'Reps', 16, 280, ink.muted);
+            value(demo, 'weight', 112, 224, rebuild);
+            value(demo, 'reps', 112, 268, rebuild);
+        } else {
+            text(c, 'Weight (kg)', 16, 224, ink.muted);
+            text(c, 'Reps', 136, 224, ink.muted);
+            const top = concept.layout === 'stacked' ? 240 : 248;
+            value(demo, 'weight', 16, top, rebuild);
+            value(demo, 'reps', 136, top, rebuild);
+        }
         action(demo, 'Log set', 16, 312, 224, 40, () => advance(demo, 'Set logged'), rebuild);
         action(
             demo,
@@ -249,7 +258,7 @@ function action(
     invoke: () => void,
     rebuild: boolean
 ): void {
-    const { context: c, state, concept } = demo;
+    const { context: c, state } = demo;
     const key = label;
     const pressed = state.pressed === key;
     const active = pressed || state.focused === key;
@@ -261,8 +270,8 @@ function action(
         c.fillStyle = ink.light;
         c.fillRect(x, y + 2, w, h - 4);
     }
-    text(c, label.toUpperCase(), x + 24, baseline, color);
-    chevron(c, concept.pointer, x + 8, y + Math.floor((h - concept.pointer.length) / 2), color);
+    text(c, label.toUpperCase(), x + 16, baseline, color);
+    chevron(c, pointer, x + 8, y + Math.floor((h - pointer.length) / 2), color);
     if (rebuild) {
         const button = document.createElement('button');
         button.type = 'button';
@@ -291,24 +300,35 @@ function action(
     }
 }
 
-function value(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: number, rebuild: boolean): void {
-    const { context: c, state } = demo;
-    const thickness = state.focused === field ? 3 : 2;
+function value(demo: Demo, field: 'weight' | 'reps', x: number, y: number, rebuild: boolean): void {
+    const { context: c, state, concept, controls } = demo;
+    const measured = c.measureText(state[field] || '0').width;
+    const inputWidth = Math.max(34, measured + 8);
+    const h = concept.layout === 'stacked' ? 68 : 40;
+    const textTop = y + Math.floor((h - 16) / 2);
+    const center = x + Math.floor(inputWidth / 2);
+    const bracketLeft = center - Math.ceil(measured / 2) - 4;
+    const thickness = state.focused === field ? 2 : 1;
+
+    // Visible brackets hug the glyphs while the independent hit areas remain thumb-sized
     c.fillStyle = ink.light;
-    for (const xx of [x, x + w - 8]) {
-        for (const yy of [y + 4, y + 42]) {
-            c.fillRect(xx, yy, 8, thickness);
-            c.fillRect(xx === x ? xx : xx + 8 - thickness, yy === y + 4 ? yy : yy - 4, thickness, 6);
+    for (const xx of [bracketLeft, bracketLeft + measured + 4]) {
+        for (const yy of [textTop + 1, textTop + 16]) {
+            c.fillRect(xx, yy, 4, thickness);
+            c.fillRect(xx === bracketLeft ? xx : xx + 4 - thickness, yy === textTop + 1 ? yy : yy - 3, thickness, 4);
         }
     }
-    text(c, state[field], x + w / 2, y + 16, ink.light, 'center');
+    text(c, state[field], center, textTop, ink.light, 'center');
     if (rebuild) {
         const input = document.createElement('input');
         input.type = 'text';
+        input.dataset.key = field;
         input.inputMode = field === 'weight' ? 'decimal' : 'numeric';
         input.setAttribute('aria-label', field === 'weight' ? 'Weight in kg' : 'Reps');
+        input.setAttribute('role', 'spinbutton');
+        input.setAttribute('aria-valuemin', '0');
+        input.setAttribute('aria-valuemax', field === 'weight' ? '999.99' : '999');
         input.value = state[field];
-        position(input, field, x, y, w, 48);
         input.addEventListener('focus', () => {
             state.focused = field;
             input.select();
@@ -332,12 +352,99 @@ function value(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: nu
             render(demo, false);
         });
         input.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                event.preventDefault();
+                adjust(demo, field, event.key === 'ArrowUp' ? 1 : -1);
+            }
             if (event.key === 'Enter') {
                 input.blur();
             }
         });
         demo.controls.append(input);
     }
+    const input = controls.querySelector<HTMLInputElement>(`input[data-key="${field}"]`);
+    if (input) {
+        position(input, field, x, y, inputWidth, h);
+        input.value = state[field];
+        input.setAttribute('aria-valuenow', String(Number(state[field])));
+    }
+    if (concept.layout === 'stacked') {
+        stepControl(demo, field, 1, x + inputWidth, y, 34, rebuild);
+        stepControl(demo, field, -1, x + inputWidth, y + 34, 34, rebuild);
+    } else {
+        stepControl(demo, field, -1, x + inputWidth, y, 40, rebuild);
+        stepControl(demo, field, 1, x + inputWidth + 34, y, 40, rebuild);
+    }
+}
+
+function stepControl(
+    demo: Demo,
+    field: 'weight' | 'reps',
+    direction: 1 | -1,
+    x: number,
+    y: number,
+    h: number,
+    rebuild: boolean
+): void {
+    const { context: c, state, controls } = demo;
+    const key = `${field}-${direction}`;
+    const limit = field === 'weight' ? 999.99 : 999;
+    const disabled = direction === -1 ? Number(state[field]) <= 0 : Number(state[field]) >= limit;
+    const active = !disabled && (state.pressed === key || state.focused === key);
+    if (active) {
+        c.fillStyle = ink.light;
+        c.fillRect(x + 2, y + 2, 30, h - 4);
+    }
+    c.fillStyle = disabled ? ink.muted : active ? ink.black : ink.light;
+    const top = y + Math.floor((h - 4) / 2);
+    for (let row = 0; row < 4; row++) {
+        const span = direction === 1 ? row : 3 - row;
+        c.fillRect(x + 14 + 3 - span, top + row, span * 2 + 1, 1);
+    }
+    if (rebuild) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.key = key;
+        const verb = direction === 1 ? 'Increase' : 'Decrease';
+        button.setAttribute('aria-label', `${verb} ${field}${field === 'weight' ? ' by 2.5 kg' : ' by 1'}`);
+        button.addEventListener('click', () => adjust(demo, field, direction));
+        button.addEventListener('pointerdown', (event) => {
+            // Arrow taps adjust immediately without focusing a text input or opening its keyboard
+            event.preventDefault();
+            state.pressed = key;
+            render(demo, false);
+        });
+        for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
+            button.addEventListener(event, () => {
+                state.pressed = '';
+                render(demo, false);
+            });
+        }
+        button.addEventListener('focus', () => {
+            state.focused = key;
+            render(demo, false);
+        });
+        button.addEventListener('blur', () => {
+            state.focused = '';
+            render(demo, false);
+        });
+        controls.append(button);
+    }
+    const button = controls.querySelector<HTMLButtonElement>(`button[data-key="${key}"]`);
+    if (button) {
+        position(button, key, x, y, 34, h);
+        button.disabled = disabled;
+    }
+}
+
+function adjust(demo: Demo, field: 'weight' | 'reps', direction: 1 | -1): void {
+    const { state } = demo;
+    const step = field === 'weight' ? 250 : 100;
+    const maximum = field === 'weight' ? 99999 : 99900;
+    // Integer hundredths preserve directly typed fractional loads across repeated taps
+    const current = Math.round(Number(state[field] || '0') * 100);
+    state[field] = String(Math.max(0, Math.min(maximum, current + direction * step)) / 100);
+    render(demo, false);
 }
 
 function position(element: HTMLElement, key: string, x: number, y: number, w: number, h: number): void {

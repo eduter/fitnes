@@ -51,6 +51,11 @@ on their left pointing toward the label. Keep other text mixed case. Do not use
 right-side action chevrons or underlined actions; they suggest expansion and web
 links respectively. Corner-bracket inputs remain a candidate pending review.
 
+Owner refinement (2026-11-04): use the thick single action chevron, positioned
+close to its label. Tighten input corner brackets around the value to conserve
+logical pixels. Explore spinner inputs with filled triangles to their right so
+small adjustments can be made in one or two taps without the virtual keyboard.
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,
