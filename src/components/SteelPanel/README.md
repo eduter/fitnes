@@ -18,8 +18,21 @@ also imports its CSS; it does not depend on the app's stylesheet.
 
 CSS nine-slices the editable **18×18 SVG**: 8px corners stay fixed while the
 straight edges stretch. The SVG is the canonical material source; no generator
-or build step is needed. Use its existing four NES inks and integer coordinates
-when editing. The frame has a 4px border and 4px content padding inside its 2px
+or build step is needed. Its four inks match background palette 1 of the
+[final home artwork](../../../art/home/construction.json), using the documented
+Composite Direct display model with red emphasis (`emphasis: 1`):
+
+| Material | PPU code | RGB |
+| --- | --- | --- |
+| Black | `$0F` | `#000000` |
+| Shadow | `$07` | `#451600` |
+| Midtone | `$00` | `#7d5c4b` |
+| Highlight | `$10` | `#d8a082` |
+
+Keep these inks and integer coordinates when editing. The asset palette regression
+checks them against the home construction's palette and emphasis. An assembled
+home/panel screen still needs its own shared-palette and budget validation.
+The frame has a 4px border and 4px content padding inside its 2px
 surround. Minimum outer size is **20×20**; a 67px child gives an 87px panel.
 
 Use whole logical-pixel sizes/positions and crisp scaling. Arbitrary children
