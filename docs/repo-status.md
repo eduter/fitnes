@@ -6,6 +6,11 @@ visual and interaction references, and [the backlog](backlog.md) for next tasks.
 Selected assets: [style reference](style-reference.png) (rightmost charcoal/steel
 design) and [standalone logo](fitnes-logo.png).
 
+Selected bottom tabs: [six PNG icons and the steel bar](../src/components/BottomTabs/README.md).
+Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
+hardware proof share the home artwork's palettes and use 59 sprites, including
+two window overlays. App integration remains open.
+
 | Branch / PR | Useful material |
 | --- | --- |
 | `feat/compact-workout-ui` · [#4](https://github.com/eduter/fitnes/pull/4) | Compact logging, previous-performance display, navigation, and persistence. Source for the [preview in use](https://feat-compact-workout-ui.fitnes-preview.pages.dev/). |
