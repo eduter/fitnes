@@ -20,6 +20,16 @@ actual NES palette, tile, background attribute, and sprite constraints.
 Use a 256-pixel logical content width; pages may extend vertically and scroll.
 Preserve crisp pixel art when scaling for a device.
 
+Owner decision (2026-11-04): pattern-bank/tile-count capacity is outside this
+visual contract; colors and resolution remain constrained by actual NES hardware.
+Legitimate hardware features such as MMC5 extended 8×8 attributes and PPUMASK
+color emphasis may be used with an explicit construction and reproduction
+proof. RGB must use a documented display interpretation of PPU codes, rather
+than treating one emulator's RGB table as the only possible NES output.
+Mid-frame palette rewrites need a verified timing/blanking plan before approval.
+The [hardware proof verifier](../tools/nes-hardware/README.md) records supported
+profiles and their limits.
+
 **Only the owner may approve a visual exception for UX.** Demonstrate the
 readability or interaction problem, explain the constraint, and propose
 alternatives. Keep the constraint in force until the owner decides.
