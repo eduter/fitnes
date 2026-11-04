@@ -1,17 +1,16 @@
 # Bottom tab icons
 
-Owner selections: **Home A, Templates A, Exercises A**. Their silhouettes are
-retained. History, Settings, and Weight each have three new candidates, for twelve
-native **24×24 PNG** assets. The chooser keeps the three approved icons selected.
-History uses back arrows rather than calendars. Weight offers an analog bathroom
-scale, digital glass platform, and upright medical balance scale. The new gears
-have straight-sided teeth, deep gaps, and large central bores.
+Owner selections: **A for every tab**. Templates, Exercises, Weight, History,
+and Settings are fixed to A. The house keeps A's gable, chimney and footprint,
+with three detail alternatives: simple lit windows, framed windows, and window
+panes with brickwork. Gray walls and light steel edges keep the structure visible
+against black; yellow appears only in the window glass. There are eight native
+**24×24 PNG** assets in the chooser.
 
-Run `npm run dev` and open `/src/components/BottomTabs/preview.html`. Choose each
-remaining icon, compare sets A/B/C, download PNGs, or bookmark the selection URL.
-PNG pixels remain crisp with `image-rendering: pixelated` and integer enlargement;
-SVG is unnecessary for this fixed logical grid. These PNG assets are drawn in
-NES background tiles, so they consume no additional hardware sprite entries.
+Run `npm run dev` and open `/src/components/BottomTabs/preview.html`. Compare the
+three houses in the bar, download PNGs, or bookmark the selection URL. PNG pixels
+remain crisp with `image-rendering: pixelated` and integer enlargement. The five
+other A icons are unchanged.
 
 ## Shared home hardware state
 
@@ -35,10 +34,12 @@ sit on integer pixels.
 
 The proof route places the scene above the bar in a **256×240** frame. It crops
 16 floor rows from the bottom of the scene for this composition study; it never
-changes `art/home/gym.png`. The indexed proof retains all 57 home sprites, its
-four background palettes, three sprite palettes, MMC5 8×8 attributes and one
-emphasis value. The combined frame still uses nine visible colors and at most
-eight sprites per scanline. Full-scene layout and final icon choices remain open.
+changes `art/home/gym.png`. The indexed proof retains all 57 home sprites and adds two 8×8 window overlays
+using the existing gold sprite palette. Light steel edges and gold windows can
+then share a house tile without changing any palette. The complete frame uses
+59 of 64 sprites, the same four background palettes and three sprite palettes,
+nine visible colors, and at most eight sprites per scanline. Full-scene layout
+and the final house detail choice remain open.
 
 ## Reproduction
 
@@ -58,10 +59,10 @@ npm run nes:emulate -- work/tab-proof/construction.json capture.png work/nes-emu
 ```
 
 Set up the emulator with `npm run nes:emulator:setup` once. `variant=b`/`variant=c`
-change only the three remaining choices. `choices=aaaabc` sets a mixed selection;
+change only the house. `choices=caaaaa` selects house C;
 `active=settings` changes the selected destination. The proof builder verifies
 the actual browser pixels, using the home construction unchanged above y=184 and
-assigning only its existing background palettes to the bar. It does not repair,
+assigning its existing background palettes and two gold window overlays to the bar. It does not repair,
 resample, or reduce colors in the capture.
 
 The gallery's explanatory text is ordinary review UI and outside the artwork

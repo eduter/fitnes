@@ -6,9 +6,7 @@ import { acceptedTabs, BottomTabs, iconVariants, tabIconUrl, tabItems } from './
 import './preview.css';
 
 const descriptions: Record<string, string[]> = {
-    weight: ['Analog bathroom scale', 'Digital glass platform', 'Medical balance scale'],
-    history: ['Back arrow and clock', 'Return arrow and clock', 'Previous workout log'],
-    settings: ['Eight-tooth gear', 'Six-tooth gear', 'Riveted eight-tooth gear'],
+    home: ['Simple lit windows', 'Framed windows', 'Window panes and brickwork'],
 };
 
 const parameters = new URLSearchParams(location.search);
@@ -47,16 +45,16 @@ function Preview() {
         <main classList={{ 'icon-gallery': !proof, 'icon-proof': proof }}>
             <Show when={!proof}>
                 <header class="gallery-header">
-                    <p class="eyebrow">FitNES / TAB ICONS · ROUND 2</p>
-                    <h1>Choose the remaining icons.</h1>
+                    <p class="eyebrow">FitNES / TAB ICONS · HOUSE DETAILS</p>
+                    <h1>Choose the house details.</h1>
                     <p class="intro">
-                        Home A, Templates A, and Exercises A are selected. Compare the new History, Settings, and Weight
-                        options in the home artwork’s warm palette.
+                        A is selected for every tab. Compare three versions of the same house: gray walls, visible steel
+                        edges, and small lit windows. Only the details change.
                     </p>
                     <div class="gallery-facts">
                         <span>24 × 24 PNG</span>
-                        <span>3 selected</span>
-                        <span>9 new alternatives</span>
+                        <span>5 icons selected</span>
+                        <span>3 house alternatives</span>
                     </div>
                 </header>
                 <details class="context-review" open>
@@ -77,7 +75,7 @@ function Preview() {
                     </p>
                 </details>
                 <div class="gallery-presets">
-                    <span>Try a set</span>
+                    <span>Try a house</span>
                     <For each={iconVariants}>
                         {(option) => (
                             <button
@@ -90,7 +88,7 @@ function Preview() {
                                     )
                                 }
                             >
-                                Set {option.toUpperCase()}
+                                House {option.toUpperCase()}
                             </button>
                         )}
                     </For>
@@ -104,7 +102,7 @@ function Preview() {
                                     <span>0{index() + 1}</span>
                                 </div>
                                 <Show when={acceptedTabs.has(item.id)}>
-                                    <p class="family-note">Selected · A silhouette retained</p>
+                                    <p class="family-note">Selected · A</p>
                                 </Show>
                                 <Show when={item.id === 'settings'}>
                                     <p class="family-note">Data lives here, with room for future settings.</p>

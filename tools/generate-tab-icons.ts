@@ -17,14 +17,14 @@ function generate(): void {
     mkdirSync(directory, { recursive: true });
     for (const name of destinations) {
         for (const [index, variant] of variants.entries()) {
-            if (['home', 'templates', 'exercises'].includes(name) && index > 0) {
+            if (name !== 'home' && index > 0) {
                 continue;
             }
             const art = new PixelArt();
             drawIcon(art, name, index);
-            const palette = reference.palettes[name === 'home' || name === 'exercises' ? 0 : 1];
+            const palette = reference.palettes[name === 'exercises' ? 0 : 1];
             // Opaque black is the bar's universal background, not a fourth visible sprite ink
-            const codes = [palette[0], palette[2], palette[1], palette[3]];
+            const codes = [palette[0], palette[2], palette[1], palette[3], reference.palettes[0][3]];
             const data = Uint8Array.from(art.pixels.flatMap((ink) => colors[codes[ink]]));
             writeFileSync(new URL(`${name}-${variant}.png`, directory), encodePng({ width: size, height: size, data }));
         }
@@ -72,24 +72,9 @@ function drawIcon(art: PixelArt, name: (typeof destinations)[number], option: nu
 }
 
 function home(p: PixelArt, v: number): void {
-    if (v === 2) {
-        p.rect(3, 8, 18, 14, 2);
-        p.rect(2, 6, 20, 3, 1);
-        p.rect(3, 5, 18, 2, 3);
-        p.rect(1, 21, 22, 2, 1);
-        p.rect(5, 10, 4, 6, 1);
-        p.rect(15, 10, 4, 6, 1);
-        p.rect(6, 11, 2, 3, 3);
-        p.rect(16, 11, 2, 3, 3);
-        p.rect(10, 14, 4, 8, 0);
-        p.rect(11, 15, 2, 6, 1);
-        p.rect(10, 9, 4, 3, 3);
-        p.rect(11, 2, 2, 3, 2);
-        p.rect(8, 1, 2, 4, 3);
-        p.rect(14, 1, 2, 4, 3);
-        return;
-    }
-    p.rect(17, 3, 3, 7, 1);
+    // Keep the approved gable, chimney and footprint; light steel defines edges against black
+    p.rect(17, 3, 3, 7, 2);
+    p.rect(17, 3, 1, 6, 3);
     p.rect(17, 2, 4, 2, 3);
     p.poly(
         [
@@ -116,24 +101,47 @@ function home(p: PixelArt, v: number): void {
         2
     );
     p.line(3, 9, 11, 1, 3);
-    p.rect(5, 11, 14, 11, 1);
-    p.rect(5, 11, 12, 9, 2);
-    p.rect(5, 11, 2, 9, 3);
-    p.rect(3, 21, 18, 2, 1);
-    p.rect(4, 20, 16, 1, 3);
+    p.line(13, 2, 21, 10, v === 1 ? 3 : 2);
+    p.rect(5, 11, 14, 10, 2);
+    p.rect(5, 11, 1, 10, 3);
+    p.rect(18, 12, 1, 9, 3);
+    p.rect(6, 11, 12, 1, 1);
+    p.rect(3, 21, 18, 2, 2);
+    p.rect(4, 21, 16, 1, 3);
+    p.rect(10, 13, 5, 8, 1);
+    p.rect(10, 13, 1, 8, 3);
+    p.rect(11, 13, 3, 1, 3);
+    p.dot(13, 17, 3);
+
+    // Yellow is confined to window glass; the structure stays steel gray
     if (v === 0) {
-        p.rect(10, 13, 5, 8, 0);
-        p.rect(11, 14, 3, 6, 1);
-        p.rect(13, 17, 1, 1, 3);
-        p.rect(7, 13, 2, 3, 3);
-        p.rect(16, 13, 2, 3, 3);
+        p.rect(7, 12, 2, 3, 4);
+        p.rect(16, 12, 2, 3, 4);
+        p.rect(7, 15, 2, 1, 1);
+        p.rect(16, 15, 2, 1, 1);
+    } else if (v === 1) {
+        for (const x of [6, 15]) {
+            p.rect(x, 11, 4, 5, 3);
+            p.rect(x + 1, 12, 2, 3, 4);
+            p.rect(x, 15, 4, 1, 2);
+        }
+        p.rect(7, 18, 2, 1, 1);
+        p.rect(16, 18, 2, 1, 1);
     } else {
-        p.rect(9, 12, 8, 5, 0);
-        p.rect(10, 13, 6, 3, 3);
-        p.rect(12, 13, 2, 3, 1);
-        p.rect(8, 18, 10, 2, 1);
-        p.rect(9, 17, 2, 3, 3);
-        p.rect(15, 17, 2, 3, 3);
+        p.rect(7, 12, 2, 4, 4);
+        p.rect(16, 12, 2, 4, 4);
+        p.rect(7, 14, 2, 1, 2);
+        p.rect(16, 14, 2, 1, 2);
+        for (const [x, y] of [
+            [7, 17],
+            [16, 17],
+            [8, 19],
+            [15, 19],
+        ]) {
+            p.dot(x, y, 1);
+        }
+        p.rect(11, 20, 3, 1, 3);
+        p.rect(9, 7, 6, 1, 1);
     }
 }
 

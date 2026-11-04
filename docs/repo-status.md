@@ -7,10 +7,10 @@ Selected assets: [style reference](style-reference.png) (rightmost charcoal/stee
 design) and [standalone logo](fitnes-logo.png).
 
 Bottom tabs: [PNG sprites and a mix-and-match steel-bar preview](../src/components/BottomTabs/README.md).
-Owner selected Home A, Templates A, and Exercises A. History, Settings, and Weight
-have revised candidates using the final home palette and emphasis. Combined
-hardware/emulator proofs reuse the home palettes and sprite budget. Final choices
-for the other three icons and app integration remain open.
+Owner selected A for every tab. Only the house details remain under review:
+three gray-wall variants with lit yellow windows, using the same home palette
+and emphasis. Combined hardware/emulator proofs retain the home artwork and
+use 59 sprites including two window overlays. App integration remains open.
 
 | Branch / PR | Useful material |
 | --- | --- |

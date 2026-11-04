@@ -11,7 +11,7 @@ const tabItems = [
     { id: 'settings', label: 'Settings' },
 ] as const;
 const iconVariants = ['a', 'b', 'c'] as const;
-const acceptedTabs = new Set<TabId>(['home', 'templates', 'exercises']);
+const acceptedTabs = new Set<TabId>(['templates', 'exercises', 'weight', 'history', 'settings']);
 const iconFiles = import.meta.glob<string>('./icons/*.png', { eager: true, query: '?url', import: 'default' });
 
 /** A candidate icon-only bar; routing and Settings contents belong to the consuming app. */
@@ -38,7 +38,7 @@ function BottomTabs(props: BottomTabsProps): JSX.Element {
     );
 }
 
-/** Resolve one of the 12 standalone, native-resolution PNG sprites. */
+/** Resolve one of the 8 standalone, native-resolution PNG sprites. */
 function tabIconUrl(tab: TabId, variant: IconVariant): string {
     const choice = acceptedTabs.has(tab) ? 'a' : variant;
     return iconFiles[`./icons/${tab}-${choice}.png`];

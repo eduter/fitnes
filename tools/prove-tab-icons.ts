@@ -16,6 +16,41 @@ function prove(): void {
     }
     const reference = JSON.parse(readFileSync('art/home/construction.json', 'utf8')) as HardwareConstruction;
     const colors = displayColors(reference.emphasis);
+    const backgroundData = image.data.slice();
+    const sprites = [...(reference.sprites ?? [])];
+    const windowCode = reference.palettes[0][3];
+    const spritePalette = (reference.spritePalettes ?? []).findIndex((codes) => codes.slice(1).includes(windowCode));
+    if (spritePalette < 0) {
+        throw new Error('The home construction needs its existing gold sprite palette for the lit windows');
+    }
+    const windowSlot = reference.spritePalettes?.[spritePalette].indexOf(windowCode) ?? 0;
+
+    // Two small window overlays allow light steel edges and gold glass to share the house's tiles
+    for (let top = 200; top < 224; top += 8) {
+        for (let left = 16; left < 48; left += 8) {
+            const pattern = new Uint8Array(64);
+            for (let y = top; y < top + 8; y++) {
+                for (let x = left; x < left + 8; x++) {
+                    if (x < 18 || x >= 42) {
+                        continue;
+                    }
+                    const offset = (y * 256 + x) * 3;
+                    if (colors[windowCode].every((value, channel) => value === image.data[offset + channel])) {
+                        pattern[(y - top) * 8 + x - left] = windowSlot;
+                        backgroundData.set(colors[reference.palettes[0][0]], offset);
+                    }
+                }
+            }
+            if (pattern.some((slot) => slot > 0)) {
+                sprites.push({
+                    x: left,
+                    y: top,
+                    palette: spritePalette,
+                    pixels: Buffer.from(pattern).toString('base64'),
+                });
+            }
+        }
+    }
     const attributes = reference.attributes.slice(0, 32 * 23);
     const slots = new Uint8Array(256 * 240);
     slots.set(Buffer.from(reference.backgroundPixels, 'base64').subarray(0, 256 * 184));
@@ -26,7 +61,7 @@ function prove(): void {
             const palette = reference.palettes.findIndex((codes) => {
                 for (let y = top; y < top + 8; y++) {
                     for (let x = left; x < left + 8; x++) {
-                        const rgb = image.data.subarray((y * 256 + x) * 3, (y * 256 + x) * 3 + 3);
+                        const rgb = backgroundData.subarray((y * 256 + x) * 3, (y * 256 + x) * 3 + 3);
                         if (!codes.some((code) => colors[code].every((value, channel) => value === rgb[channel]))) {
                             return false;
                         }
@@ -42,7 +77,7 @@ function prove(): void {
                 for (let x = left; x < left + 8; x++) {
                     const offset = (y * 256 + x) * 3;
                     slots[y * 256 + x] = reference.palettes[palette].findIndex((code) =>
-                        colors[code].every((value, channel) => value === image.data[offset + channel])
+                        colors[code].every((value, channel) => value === backgroundData[offset + channel])
                     );
                 }
             }
@@ -52,6 +87,7 @@ function prove(): void {
         ...reference,
         height: 240,
         attributes,
+        sprites,
         backgroundPixels: Buffer.from(slots).toString('base64'),
     };
     const report = checkConstruction(construction, image);
