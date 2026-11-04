@@ -2,8 +2,8 @@
 
 The six selected **24×24 PNG** icons: Home C; Templates, Exercises, Weight,
 History and Settings A. The PNGs in `icons/` are the canonical artwork, named
-by destination. The additional 18×18 PNG is the steel frame's palette-matched
-nine-slice material. No alternate icons, chooser, or drawing generator remain.
+by destination. The bar uses the shared `SteelPanel` SVG for its frame, including
+the home artwork's metal palette. No alternate icons, chooser, or drawing generator remain.
 
 ```tsx
 <BottomTabs active="home" onSelect={navigateToTab} />

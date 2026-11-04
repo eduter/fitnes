@@ -57,7 +57,3 @@
     outline: 1px solid #7d5c4b;
     outline-offset: -2px;
 }
-
-.bottom-tabs .steel-panel__frame {
-    border-image-source: url("./icons/steel-panel-home.png");
-}
