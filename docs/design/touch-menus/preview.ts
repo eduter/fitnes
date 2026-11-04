@@ -4,33 +4,31 @@ const width = 256;
 const height = 448;
 const ink = { black: '#000000', shadow: '#451600', muted: '#7d5c4b', light: '#d8a082' };
 const pointer = ['110000', '011000', '001100', '000110', '000011', '000110', '001100', '011000', '110000'];
+const storageKey = 'fitnes-input-study-increments-v1';
 const concepts: Concept[] = [
     {
-        id: 'g',
-        title: 'G · Stacked arrows',
-        description: 'Compact number brackets, with filled up/down triangles stacked immediately to their right.',
-        tradeoff: 'Narrowest spinner. The vertical arrow pair needs more height for comfortable tapping.',
-        layout: 'stacked',
+        id: 'j',
+        title: 'J · Digit grid',
+        description: 'Select a fixed digit slot, then choose 0–9 from a game-style grid.',
+        tradeoff: 'Closest to the name-entry reference. One tap replaces the selected digit.',
     },
     {
-        id: 'h',
-        title: 'H · Side-by-side arrows',
-        description: 'The down and up triangles sit side by side to the right of each tightly bracketed number.',
-        tradeoff: 'Shortest spinner. Both values still fit next to each other, with separate thumb targets.',
-        layout: 'inline',
+        id: 'k',
+        title: 'K · Number pad',
+        description: 'The same fixed slots, with a familiar three-column number pad.',
+        tradeoff: 'Familiar number positions. Uses a taller popover without opening the system keyboard.',
     },
     {
-        id: 'i',
-        title: 'I · Aligned rows',
-        description: 'Labels and compact spinners share a line. Both arrow pairs align on the right.',
-        tradeoff: 'Clearest label-to-value pairing. Uses two rows while keeping each control compact.',
-        layout: 'rows',
+        id: 'l',
+        title: 'L · Digit spinners',
+        description: 'Adjust individual places with up/down triangles in a popover.',
+        tradeoff: 'Good for small place-value changes; several digits take more taps.',
     },
 ];
 
 await start();
 
-/** Mount isolated alternatives after their shared bitmap font and frame have loaded. */
+/** Mount phone-ready alternatives without loading the workout app or its database. */
 async function start(): Promise<void> {
     const face = new FontFace(
         'FitNES study',
@@ -40,13 +38,13 @@ async function start(): Promise<void> {
     const frame = new Image();
     frame.src = frameUrl;
     await frame.decode();
-    const selected = new URLSearchParams(location.search).get('option');
+    const requested = new URLSearchParams(location.search).get('option');
+    const selected = requested ?? (matchMedia('(max-width: 1000px)').matches ? 'j' : 'all');
     if (concepts.some((concept) => concept.id === selected)) {
-        document.body.dataset.single = selected ?? '';
+        document.body.dataset.single = selected;
     }
     for (const link of document.querySelectorAll<HTMLAnchorElement>('.chooser a')) {
-        const option = new URL(link.href).searchParams.get('option');
-        if (option === selected) {
+        if (new URL(link.href).searchParams.get('option') === selected) {
             link.setAttribute('aria-current', 'page');
         }
     }
@@ -59,11 +57,10 @@ async function start(): Promise<void> {
 }
 
 interface Concept {
-    id: 'g' | 'h' | 'i';
+    id: 'j' | 'k' | 'l';
     title: string;
     description: string;
     tradeoff: string;
-    layout: 'stacked' | 'inline' | 'rows';
 }
 
 function mount(concept: Concept, frame: HTMLImageElement): void {
@@ -74,56 +71,134 @@ function mount(concept: Concept, frame: HTMLImageElement): void {
     document.querySelector('.alternatives')?.append(article);
     const screen = article.querySelector<HTMLDivElement>('.screen');
     const space = article.querySelector<HTMLDivElement>('.screen-space');
-    const canvas = article.querySelector('canvas');
     const controls = article.querySelector<HTMLDivElement>('.controls');
-    const context = canvas?.getContext('2d');
-    if (!screen || !space || !canvas || !controls || !context) {
+    const context = article.querySelector('canvas')?.getContext('2d');
+    if (!screen || !space || !controls || !context) {
         throw new Error(`Cannot mount alternative ${concept.id}`);
     }
-    const state: State = { weight: '60', reps: '8', set: 2, view: 'set', message: '', focused: '', pressed: '' };
-    const demo = { concept, frame, context, controls, state };
+    const state: State = {
+        exercise: 0,
+        exercises: makeExercises(),
+        set: 2,
+        view: 'set',
+        message: '',
+        focused: '',
+        pressed: '',
+        edit: null,
+    };
+    const demo: Demo = { concept, frame, context, controls, layer: controls, screen, state };
     const resize = new ResizeObserver(() => {
-        // Snap the whole logical screen to device pixels, including its font raster
-        const scale = Math.max(1, Math.floor((article.clientWidth * devicePixelRatio) / width)) / devicePixelRatio;
+        const available = Math.min(article.clientWidth, 512);
+        const scale = Math.max(1, Math.floor((available * devicePixelRatio) / width)) / devicePixelRatio;
         screen.style.transform = `scale(${scale})`;
         space.style.width = `${width * scale}px`;
         space.style.height = `${height * scale}px`;
     });
     resize.observe(article);
+    screen.addEventListener('keydown', (event) => handleKeys(demo, event));
+    screen.addEventListener('pointerdown', (event) => {
+        if (!state.edit) {
+            return;
+        }
+        const bounds = screen.getBoundingClientRect();
+        const x = ((event.clientX - bounds.x) * width) / bounds.width;
+        const y = ((event.clientY - bounds.y) * height) / bounds.height;
+        const top = popoverTop(concept);
+        if (x < 8 || x >= 248 || y < top || y >= 400) {
+            event.preventDefault();
+            closeEditor(demo);
+        }
+    });
     render(demo);
 }
 
+interface Exercise {
+    id: string;
+    name: string;
+    weight: number;
+    reps: number;
+    plannedWeight: number;
+    plannedReps: number;
+    step: number;
+}
+
 interface State {
-    weight: string;
-    reps: string;
+    exercise: number;
+    exercises: Exercise[];
     set: number;
-    view: 'set' | 'more' | 'history';
+    view: 'set' | 'more' | 'exercises';
     message: string;
     focused: string;
     pressed: string;
+    edit: { field: Field; slot: number } | null;
 }
+
+type Field = 'weight' | 'reps' | 'step';
 
 interface Demo {
     concept: Concept;
     frame: HTMLImageElement;
     context: CanvasRenderingContext2D;
     controls: HTMLDivElement;
+    layer: HTMLElement;
+    screen: HTMLDivElement;
     state: State;
 }
 
+function makeExercises(): Exercise[] {
+    const exercises = [
+        { id: 'bench', name: 'Bench press', weight: 6000, reps: 8, plannedWeight: 6000, plannedReps: 8, step: 250 },
+        {
+            id: 'dumbbell',
+            name: 'Dumbbell press',
+            weight: 3000,
+            reps: 10,
+            plannedWeight: 3000,
+            plannedReps: 10,
+            step: 100,
+        },
+        { id: 'cable', name: 'Cable row', weight: 4500, reps: 12, plannedWeight: 4500, plannedReps: 12, step: 500 },
+    ];
+    try {
+        const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
+        if (saved && typeof saved === 'object') {
+            for (const exercise of exercises) {
+                const step = (saved as Record<string, unknown>)[exercise.id];
+                if (typeof step === 'number' && Number.isInteger(step) && step > 0 && step <= 99999) {
+                    exercise.step = step;
+                }
+            }
+        }
+    } catch {
+        /* A preview must remain usable when browser storage is unavailable */
+    }
+    return exercises;
+}
+
 function render(demo: Demo, rebuild = true): void {
-    const { context: c, state, concept, controls } = demo;
+    const { context: c, state, controls } = demo;
+    const exercise = state.exercises[state.exercise];
     c.imageSmoothingEnabled = false;
     c.fillStyle = ink.black;
     c.fillRect(0, 0, width, height);
     if (rebuild) {
         controls.replaceChildren();
+        demo.layer = controls;
+        if (state.edit) {
+            const dialog = document.createElement('div');
+            dialog.setAttribute('role', 'dialog');
+            dialog.setAttribute('aria-modal', 'true');
+            dialog.setAttribute('aria-label', `Edit ${fieldName(state.edit.field)}`);
+            controls.append(dialog);
+            demo.layer = dialog;
+        }
     }
+    const interactive = rebuild && !state.edit;
     text(c, 'FitNES', 12, 12);
     text(c, 'Training', 244, 12, ink.muted, 'right');
     panel(demo, 0, 40, 256, 360);
     text(c, 'Push day', 16, 56, ink.muted);
-    text(c, 'Bench press', 16, 80);
+    text(c, exercise.name, 16, 80);
     text(c, `Set ${state.set} of 4`, 16, 104);
     for (let i = 0; i < 4; i++) {
         c.fillStyle = i < state.set - 1 ? ink.light : ink.muted;
@@ -132,74 +207,117 @@ function render(demo: Demo, rebuild = true): void {
     c.fillStyle = ink.muted;
     c.fillRect(16, 128, 224, 1);
     if (state.view === 'more') {
-        text(c, 'Set options', 16, 152);
+        text(c, 'This exercise', 16, 148, ink.muted);
+        text(c, 'Weight increment', 16, 172);
+        text(c, `${(exercise.step / 100).toFixed(2)} kg`, 240, 172, ink.light, 'right');
+        action(demo, 'Edit increment', 'edit-step', 16, 200, 224, 44, () => openEditor(demo, 'step'), interactive);
         action(
             demo,
-            'Last session',
+            'Change exercise',
+            'exercises',
             16,
-            184,
+            252,
             224,
-            40,
+            44,
             () => {
-                state.view = 'history';
+                state.view = 'exercises';
                 render(demo);
             },
-            rebuild
+            interactive
         );
-        action(demo, 'Skip this set', 16, 232, 224, 40, () => advance(demo, 'Set skipped'), rebuild);
         action(
             demo,
             'Back to set',
+            'back',
             16,
-            296,
+            328,
             224,
-            40,
+            44,
             () => {
                 state.view = 'set';
                 render(demo);
             },
-            rebuild
+            interactive
         );
-    } else if (state.view === 'history') {
-        text(c, 'Last session · 1 Nov', 16, 152);
-        text(c, 'Set 1      60 kg x 8', 16, 184);
-        text(c, 'Set 2      60 kg x 8', 16, 208);
-        text(c, 'Set 3      60 kg x 7', 16, 232);
+    } else if (state.view === 'exercises') {
+        text(c, 'Choose exercise', 16, 152, ink.muted);
+        state.exercises.forEach((item, index) => {
+            action(
+                demo,
+                item.name,
+                `exercise-${index}`,
+                16,
+                184 + index * 52,
+                224,
+                44,
+                () => {
+                    state.exercise = index;
+                    state.set = 1;
+                    state.view = 'set';
+                    state.message = '';
+                    render(demo);
+                },
+                interactive
+            );
+        });
         action(
             demo,
-            'Back to options',
+            'Back',
+            'back',
             16,
-            296,
+            348,
             224,
             40,
             () => {
                 state.view = 'more';
                 render(demo);
             },
-            rebuild
+            interactive
         );
     } else {
         text(c, 'Target', 16, 144, ink.muted);
-        text(c, '60 kg x 8', 240, 144, ink.light, 'right');
+        text(
+            c,
+            `${(exercise.plannedWeight / 100).toFixed(2)} kg x ${exercise.plannedReps}`,
+            240,
+            144,
+            ink.light,
+            'right'
+        );
         text(c, 'Last time', 16, 168, ink.muted);
-        text(c, '60 kg x 8', 240, 168, ink.light, 'right');
+        text(
+            c,
+            `${(exercise.plannedWeight / 100).toFixed(2)} kg x ${exercise.plannedReps}`,
+            240,
+            168,
+            ink.light,
+            'right'
+        );
         text(c, 'This set', 16, 200);
-        if (concept.layout === 'rows') {
-            text(c, 'Weight (kg)', 16, 236, ink.muted);
-            text(c, 'Reps', 16, 280, ink.muted);
-            value(demo, 'weight', 112, 224, rebuild);
-            value(demo, 'reps', 112, 268, rebuild);
-        } else {
-            text(c, 'Weight (kg)', 16, 224, ink.muted);
-            text(c, 'Reps', 136, 224, ink.muted);
-            const top = concept.layout === 'stacked' ? 240 : 248;
-            value(demo, 'weight', 16, top, rebuild);
-            value(demo, 'reps', 136, top, rebuild);
-        }
-        action(demo, 'Log set', 16, 312, 224, 40, () => advance(demo, 'Set logged'), rebuild);
+        text(c, 'Weight (kg)', 16, 224, ink.muted);
+        text(c, 'Reps', 136, 224, ink.muted);
+        spinner(demo, 'weight', 16, 228, 56, interactive);
+        spinner(demo, 'reps', 136, 228, 34, interactive);
+        action(
+            demo,
+            'Log set',
+            'log',
+            16,
+            312,
+            224,
+            40,
+            () => {
+                state.message = `Logged ${(exercise.weight / 100).toFixed(2)} kg x ${exercise.reps}`;
+                state.set = Math.min(4, state.set + 1);
+                exercise.reps = exercise.plannedReps;
+                render(demo);
+            },
+            interactive
+        );
         action(
             demo,
             'More',
+            'more',
             16,
             352,
             224,
@@ -208,10 +326,387 @@ function render(demo: Demo, rebuild = true): void {
                 state.view = 'more';
                 render(demo);
             },
-            rebuild
+            interactive
         );
     }
-    text(c, state.message || 'Your session stays on this device.', 12, 408, ink.muted);
+    text(c, state.message || `Weight step: ${(exercise.step / 100).toFixed(2)} kg`, 12, 408, ink.muted);
+    if (state.edit) {
+        drawEditor(demo, rebuild);
+    }
+}
+
+function spinner(demo: Demo, field: 'weight' | 'reps', x: number, y: number, w: number, rebuild: boolean): void {
+    const { context: c, state } = demo;
+    const label = mask(state.exercises[state.exercise][field], field);
+    const center = x + Math.floor(w / 2);
+    const measured = label.length * 7;
+    corners(c, center - measured / 2 - 4, y + 27, measured + 8, 18, state.focused === field ? 2 : 1);
+    text(c, label, center, y + 26, ink.light, 'center');
+    control(
+        demo,
+        field,
+        `${fieldName(field)} ${label}${field === 'weight' ? ' kg' : ''}; open number picker`,
+        x,
+        y,
+        w,
+        68,
+        () => openEditor(demo, field),
+        rebuild,
+        false,
+        true
+    );
+    c.fillStyle = ink.muted;
+    c.fillRect(x + w + 4, y + 18, 18, 1);
+    c.fillRect(x + w + 4, y + 34, 18, 1);
+    c.fillRect(x + w + 4, y + 50, 18, 1);
+    c.fillRect(x + w + 21, y + 18, 1, 33);
+    for (const direction of [1, -1] as const) {
+        const key = `${field}-${direction}`;
+        const amount = state.exercises[state.exercise][field];
+        const limit = field === 'weight' ? 99999 : 99;
+        const disabled = direction === 1 ? amount >= limit : amount <= 0;
+        const top = direction === 1 ? y : y + 34;
+        const visibleTop = direction === 1 ? y + 25 : y + 41;
+        const active = state.pressed === key || state.focused === key;
+        if (active && !disabled) {
+            c.fillStyle = ink.light;
+            c.fillRect(x + w + 5, direction === 1 ? y + 19 : y + 35, 16, 15);
+        }
+        triangle(c, x + w + 9, visibleTop, direction, disabled ? ink.muted : active ? ink.black : ink.light);
+        const step = field === 'weight' ? state.exercises[state.exercise].step / 100 : 1;
+        control(
+            demo,
+            key,
+            `${direction === 1 ? 'Increase' : 'Decrease'} ${fieldName(field)} by ${step}${field === 'weight' ? ' kg' : ''}`,
+            x + w,
+            top,
+            34,
+            34,
+            () => adjust(demo, field, direction),
+            rebuild,
+            disabled
+        );
+    }
+}
+
+function openEditor(demo: Demo, field: Field): void {
+    const { state } = demo;
+    state.edit = { field, slot: field === 'reps' ? 1 : 2 };
+    state.focused = '';
+    state.pressed = '';
+    render(demo);
+    demo.controls
+        .querySelector<HTMLButtonElement>(`[data-key="slot-${state.edit.slot}"]`)
+        ?.focus({ preventScroll: true });
+}
+
+function closeEditor(demo: Demo): void {
+    const { state } = demo;
+    const field = state.edit?.field;
+    state.edit = null;
+    state.focused = '';
+    state.pressed = '';
+    render(demo);
+    demo.controls
+        .querySelector<HTMLButtonElement>(`[data-key="${field === 'step' ? 'edit-step' : field}"]`)
+        ?.focus({ preventScroll: true });
+}
+
+function drawEditor(demo: Demo, rebuild: boolean): void {
+    const { context: c, state, concept } = demo;
+    const edit = state.edit;
+    if (!edit) {
+        return;
+    }
+    const exercise = state.exercises[state.exercise];
+    const top = popoverTop(concept);
+    panel(demo, 8, top, 240, 400 - top);
+    text(c, `${fieldName(edit.field)}${edit.field === 'reps' ? '' : ' · kg'}`, 24, top + 16);
+    const slotTop = concept.id === 'j' ? 176 : concept.id === 'k' ? 152 : 232;
+    const digits = rawDigits(exercise[edit.field], edit.field);
+    const positions = slotPositions(edit.field);
+    for (let i = 0; i < digits.length; i++) {
+        const left = positions[i];
+        const selected = i === edit.slot;
+        if (selected) {
+            c.fillStyle = ink.light;
+            c.fillRect(left, slotTop, 34, 36);
+            c.fillRect(left + 7, slotTop + 39, 20, 2);
+        }
+        text(c, digits[i], left + 17, slotTop + 2, selected ? ink.black : ink.light, 'center', 32);
+        control(
+            demo,
+            `slot-${i}`,
+            `Select ${placeName(edit.field, i)} digit: ${digits[i]}`,
+            left,
+            slotTop,
+            34,
+            40,
+            () => {
+                edit.slot = i;
+                render(demo, false);
+            },
+            rebuild,
+            false,
+            false,
+            selected
+        );
+        if (concept.id === 'l') {
+            for (const direction of [1, -1] as const) {
+                const y = direction === 1 ? 188 : 280;
+                triangle(c, left + 14, y + 15, direction, ink.light);
+                control(
+                    demo,
+                    `digit-${i}-${direction}`,
+                    `${direction === 1 ? 'Increase' : 'Decrease'} ${placeName(edit.field, i)} digit`,
+                    left,
+                    y,
+                    34,
+                    34,
+                    () => {
+                        edit.slot = i;
+                        changeDigit(demo, direction);
+                    },
+                    rebuild
+                );
+            }
+        }
+    }
+    if (edit.field !== 'reps') {
+        c.fillStyle = ink.light;
+        c.fillRect(145, slotTop + 26, 3, 3);
+    }
+    if (concept.id === 'j') {
+        for (let digit = 0; digit < 10; digit++) {
+            digitKey(demo, digit, 16 + (digit % 5) * 44, 232 + Math.floor(digit / 5) * 44, 40, 36, rebuild);
+        }
+        action(demo, 'Back', 'erase', 16, 344, 104, 40, () => erase(demo), rebuild);
+        action(demo, 'Done', 'done', 136, 344, 104, 40, () => closeEditor(demo), rebuild);
+    } else if (concept.id === 'k') {
+        for (let digit = 1; digit <= 9; digit++) {
+            digitKey(demo, digit, 24 + ((digit - 1) % 3) * 72, 208 + Math.floor((digit - 1) / 3) * 40, 64, 36, rebuild);
+        }
+        digitKey(demo, 0, 96, 328, 64, 36, rebuild);
+        action(demo, 'Back', 'erase', 24, 328, 64, 36, () => erase(demo), rebuild);
+        action(demo, 'Done', 'done', 168, 328, 64, 36, () => closeEditor(demo), rebuild);
+        text(c, 'Select a slot, then a digit.', 24, 376, ink.muted);
+    } else {
+        action(demo, 'Back', 'erase', 16, 344, 104, 40, () => erase(demo), rebuild);
+        action(demo, 'Done', 'done', 136, 344, 104, 40, () => closeEditor(demo), rebuild);
+    }
+    if (rebuild) {
+        const live = document.createElement('output');
+        live.className = 'sr-only';
+        live.setAttribute('aria-live', 'polite');
+        demo.layer.append(live);
+    }
+    const live = demo.layer.querySelector('output');
+    if (live) {
+        live.textContent = `${fieldName(edit.field)} ${mask(exercise[edit.field], edit.field)}`;
+    }
+}
+
+function digitKey(demo: Demo, digit: number, x: number, y: number, w: number, h: number, rebuild: boolean): void {
+    const { context: c, state } = demo;
+    const key = `key-${digit}`;
+    const active = state.pressed === key || state.focused === key;
+    if (active) {
+        c.fillStyle = ink.light;
+        c.fillRect(x, y, w, h);
+    }
+    text(c, String(digit), x + w / 2, y + (h - 16) / 2, active ? ink.black : ink.light, 'center');
+    control(demo, key, `Digit ${digit}`, x, y, w, h, () => chooseDigit(demo, digit), rebuild);
+}
+
+function chooseDigit(demo: Demo, digit: number): void {
+    const { state } = demo;
+    const edit = state.edit;
+    if (!edit) {
+        return;
+    }
+    const digits = rawDigits(state.exercises[state.exercise][edit.field], edit.field).split('');
+    digits[edit.slot] = String(digit);
+    setValue(demo, edit.field, Number(digits.join('')));
+    edit.slot = Math.min(digits.length - 1, edit.slot + 1);
+    render(demo, false);
+    demo.layer.querySelector<HTMLButtonElement>(`[data-key="slot-${edit.slot}"]`)?.focus({ preventScroll: true });
+}
+
+function changeDigit(demo: Demo, direction: 1 | -1): void {
+    const { state } = demo;
+    const edit = state.edit;
+    if (!edit) {
+        return;
+    }
+    const digits = rawDigits(state.exercises[state.exercise][edit.field], edit.field).split('');
+    digits[edit.slot] = String((Number(digits[edit.slot]) + direction + 10) % 10);
+    setValue(demo, edit.field, Number(digits.join('')));
+    render(demo, false);
+}
+
+function erase(demo: Demo): void {
+    const { state } = demo;
+    const edit = state.edit;
+    if (!edit) {
+        return;
+    }
+    edit.slot = Math.max(0, edit.slot - 1);
+    const digits = rawDigits(state.exercises[state.exercise][edit.field], edit.field).split('');
+    digits[edit.slot] = '0';
+    setValue(demo, edit.field, Number(digits.join('')));
+    render(demo, false);
+}
+
+function adjust(demo: Demo, field: 'weight' | 'reps', direction: 1 | -1): void {
+    const exercise = demo.state.exercises[demo.state.exercise];
+    setValue(demo, field, exercise[field] + direction * (field === 'weight' ? exercise.step : 1));
+    render(demo, false);
+}
+
+function setValue(demo: Demo, field: Field, value: number): void {
+    const { state } = demo;
+    const exercise = state.exercises[state.exercise];
+    exercise[field] = Math.min(field === 'reps' ? 99 : 99999, Math.max(field === 'step' ? 1 : 0, value));
+    if (field !== 'step') {
+        return;
+    }
+    try {
+        const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
+        const steps = saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+        localStorage.setItem(storageKey, JSON.stringify({ ...steps, [exercise.id]: exercise.step }));
+    } catch {
+        /* Adjustments still work in memory if local storage is blocked */
+    }
+}
+
+function handleKeys(demo: Demo, event: KeyboardEvent): void {
+    const { state } = demo;
+    if (!state.edit) {
+        const field = (event.target as HTMLElement).dataset.key;
+        if ((field === 'weight' || field === 'reps') && (event.key === 'ArrowUp' || event.key === 'ArrowDown')) {
+            event.preventDefault();
+            adjust(demo, field, event.key === 'ArrowUp' ? 1 : -1);
+        }
+        return;
+    }
+    if (/^\d$/.test(event.key)) {
+        event.preventDefault();
+        chooseDigit(demo, Number(event.key));
+    } else if (event.key === 'Escape') {
+        event.preventDefault();
+        closeEditor(demo);
+    } else if (event.key === 'Backspace' || event.key === 'Delete') {
+        event.preventDefault();
+        erase(demo);
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+        event.preventDefault();
+        const count = state.edit.field === 'reps' ? 2 : 5;
+        state.edit.slot = (state.edit.slot + (event.key === 'ArrowRight' ? 1 : count - 1)) % count;
+        render(demo, false);
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+        event.preventDefault();
+        changeDigit(demo, event.key === 'ArrowUp' ? 1 : -1);
+    } else if (event.key === 'Tab') {
+        const buttons = [...demo.layer.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')];
+        const index = buttons.indexOf(document.activeElement as HTMLButtonElement);
+        const next = (index + (event.shiftKey ? buttons.length - 1 : 1)) % buttons.length;
+        event.preventDefault();
+        buttons[next]?.focus();
+    }
+}
+
+function control(
+    demo: Demo,
+    key: string,
+    label: string,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    invoke: () => void,
+    rebuild: boolean,
+    disabled = false,
+    opens = false,
+    selected?: boolean
+): void {
+    if (!rebuild) {
+        const existing = demo.layer.querySelector<HTMLButtonElement>(`[data-key="${key}"]`);
+        if (existing) {
+            existing.disabled = disabled;
+            existing.setAttribute('aria-label', label);
+            if (selected !== undefined) {
+                existing.setAttribute('aria-pressed', String(selected));
+            }
+        }
+        return;
+    }
+    const { state } = demo;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.key = key;
+    button.setAttribute('aria-label', label);
+    if (opens) {
+        button.setAttribute('aria-haspopup', 'dialog');
+    }
+    if (selected !== undefined) {
+        button.setAttribute('aria-pressed', String(selected));
+    }
+    button.disabled = disabled;
+    Object.assign(button.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
+    button.addEventListener('click', invoke);
+    button.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        state.pressed = key;
+        render(demo, false);
+    });
+    for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
+        button.addEventListener(event, () => {
+            state.pressed = '';
+            render(demo, false);
+        });
+    }
+    button.addEventListener('focus', () => {
+        state.focused = key;
+        if (state.edit && /^slot-\d$/.test(key)) {
+            state.edit.slot = Number(key.slice(5));
+        }
+        render(demo, false);
+    });
+    button.addEventListener('blur', () => {
+        state.focused = '';
+        render(demo, false);
+    });
+    demo.layer.append(button);
+}
+
+function action(
+    demo: Demo,
+    label: string,
+    key: string,
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    invoke: () => void,
+    rebuild: boolean
+): void {
+    const { context: c, state } = demo;
+    const active = state.pressed === key || state.focused === key;
+    if (active) {
+        c.fillStyle = ink.light;
+        c.fillRect(x, y + 2, w, h - 4);
+    }
+    const color = active ? ink.black : ink.light;
+    text(c, label.toUpperCase(), x + 16, y + Math.floor((h - 16) / 2), color);
+    c.fillStyle = color;
+    for (let row = 0; row < pointer.length; row++) {
+        for (let column = 0; column < pointer[row].length; column++) {
+            if (pointer[row][column] === '1') {
+                c.fillRect(x + 8 + column, y + Math.floor((h - 9) / 2) + row, 1, 1);
+            }
+        }
+    }
+    control(demo, key, label.toUpperCase(), x, y, w, h, invoke, rebuild);
 }
 
 function text(
@@ -220,9 +715,10 @@ function text(
     x: number,
     y: number,
     color = ink.light,
-    align: CanvasTextAlign = 'left'
+    align: CanvasTextAlign = 'left',
+    size = 16
 ): void {
-    c.font = '16px "FitNES study"';
+    c.font = `${size}px "FitNES study"`;
     c.textBaseline = 'top';
     c.textAlign = align;
     c.fillStyle = color;
@@ -248,227 +744,40 @@ function panel(demo: Demo, x: number, y: number, w: number, h: number): void {
     }
 }
 
-function action(
-    demo: Demo,
-    label: string,
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    invoke: () => void,
-    rebuild: boolean
-): void {
-    const { context: c, state } = demo;
-    const key = label;
-    const pressed = state.pressed === key;
-    const active = pressed || state.focused === key;
-    const baseline = y + Math.floor((h - 16) / 2);
-    const color = active ? ink.black : ink.light;
-
-    // Inversion provides immediate touch and keyboard feedback without permanent button chrome
-    if (active) {
-        c.fillStyle = ink.light;
-        c.fillRect(x, y + 2, w, h - 4);
-    }
-    text(c, label.toUpperCase(), x + 16, baseline, color);
-    chevron(c, pointer, x + 8, y + Math.floor((h - pointer.length) / 2), color);
-    if (rebuild) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.textContent = label.toUpperCase();
-        position(button, key, x, y, w, h);
-        button.addEventListener('click', invoke);
-        button.addEventListener('pointerdown', () => {
-            state.pressed = key;
-            render(demo, false);
-        });
-        for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
-            button.addEventListener(event, () => {
-                state.pressed = '';
-                render(demo, false);
-            });
-        }
-        button.addEventListener('focus', () => {
-            state.focused = key;
-            render(demo, false);
-        });
-        button.addEventListener('blur', () => {
-            state.focused = '';
-            render(demo, false);
-        });
-        demo.controls.append(button);
-    }
-}
-
-function value(demo: Demo, field: 'weight' | 'reps', x: number, y: number, rebuild: boolean): void {
-    const { context: c, state, concept, controls } = demo;
-    const measured = c.measureText(state[field] || '0').width;
-    const inputWidth = Math.max(34, measured + 8);
-    const h = concept.layout === 'stacked' ? 68 : 40;
-    const textTop = y + Math.floor((h - 16) / 2);
-    const center = x + Math.floor(inputWidth / 2);
-    const bracketLeft = center - Math.ceil(measured / 2) - 4;
-    const thickness = state.focused === field ? 2 : 1;
-
-    // Visible brackets hug the glyphs while the independent hit areas remain thumb-sized
+function corners(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, thickness: number): void {
     c.fillStyle = ink.light;
-    for (const xx of [bracketLeft, bracketLeft + measured + 4]) {
-        for (const yy of [textTop + 1, textTop + 16]) {
+    for (const xx of [x, x + w - 4]) {
+        for (const yy of [y, y + h - thickness]) {
             c.fillRect(xx, yy, 4, thickness);
-            c.fillRect(xx === bracketLeft ? xx : xx + 4 - thickness, yy === textTop + 1 ? yy : yy - 3, thickness, 4);
+            c.fillRect(xx === x ? xx : xx + 4 - thickness, yy === y ? yy : yy - 3, thickness, 4);
         }
-    }
-    text(c, state[field], center, textTop, ink.light, 'center');
-    if (rebuild) {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.dataset.key = field;
-        input.inputMode = field === 'weight' ? 'decimal' : 'numeric';
-        input.setAttribute('aria-label', field === 'weight' ? 'Weight in kg' : 'Reps');
-        input.setAttribute('role', 'spinbutton');
-        input.setAttribute('aria-valuemin', '0');
-        input.setAttribute('aria-valuemax', field === 'weight' ? '999.99' : '999');
-        input.value = state[field];
-        input.addEventListener('focus', () => {
-            state.focused = field;
-            input.select();
-            render(demo, false);
-        });
-        input.addEventListener('blur', () => {
-            if (state[field] === '' || !Number.isFinite(Number(state[field]))) {
-                state[field] = field === 'weight' ? '60' : '8';
-                input.value = state[field];
-            }
-            state.focused = '';
-            render(demo, false);
-        });
-        input.addEventListener('input', () => {
-            const valid = field === 'weight' ? /^\d{0,3}([.,]\d{0,2})?$/ : /^\d{0,3}$/;
-            if (valid.test(input.value)) {
-                state[field] = input.value.replace(',', '.');
-            } else {
-                input.value = state[field];
-            }
-            render(demo, false);
-        });
-        input.addEventListener('keydown', (event) => {
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                event.preventDefault();
-                adjust(demo, field, event.key === 'ArrowUp' ? 1 : -1);
-            }
-            if (event.key === 'Enter') {
-                input.blur();
-            }
-        });
-        demo.controls.append(input);
-    }
-    const input = controls.querySelector<HTMLInputElement>(`input[data-key="${field}"]`);
-    if (input) {
-        position(input, field, x, y, inputWidth, h);
-        input.value = state[field];
-        input.setAttribute('aria-valuenow', String(Number(state[field])));
-    }
-    if (concept.layout === 'stacked') {
-        stepControl(demo, field, 1, x + inputWidth, y, 34, rebuild);
-        stepControl(demo, field, -1, x + inputWidth, y + 34, 34, rebuild);
-    } else {
-        stepControl(demo, field, -1, x + inputWidth, y, 40, rebuild);
-        stepControl(demo, field, 1, x + inputWidth + 34, y, 40, rebuild);
     }
 }
 
-function stepControl(
-    demo: Demo,
-    field: 'weight' | 'reps',
-    direction: 1 | -1,
-    x: number,
-    y: number,
-    h: number,
-    rebuild: boolean
-): void {
-    const { context: c, state, controls } = demo;
-    const key = `${field}-${direction}`;
-    const limit = field === 'weight' ? 999.99 : 999;
-    const disabled = direction === -1 ? Number(state[field]) <= 0 : Number(state[field]) >= limit;
-    const active = !disabled && (state.pressed === key || state.focused === key);
-    if (active) {
-        c.fillStyle = ink.light;
-        c.fillRect(x + 2, y + 2, 30, h - 4);
-    }
-    c.fillStyle = disabled ? ink.muted : active ? ink.black : ink.light;
-    const top = y + Math.floor((h - 4) / 2);
+function triangle(c: CanvasRenderingContext2D, x: number, y: number, direction: 1 | -1, color: string): void {
+    c.fillStyle = color;
     for (let row = 0; row < 4; row++) {
         const span = direction === 1 ? row : 3 - row;
-        c.fillRect(x + 14 + 3 - span, top + row, span * 2 + 1, 1);
-    }
-    if (rebuild) {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.dataset.key = key;
-        const verb = direction === 1 ? 'Increase' : 'Decrease';
-        button.setAttribute('aria-label', `${verb} ${field}${field === 'weight' ? ' by 2.5 kg' : ' by 1'}`);
-        button.addEventListener('click', () => adjust(demo, field, direction));
-        button.addEventListener('pointerdown', (event) => {
-            // Arrow taps adjust immediately without focusing a text input or opening its keyboard
-            event.preventDefault();
-            state.pressed = key;
-            render(demo, false);
-        });
-        for (const event of ['pointerup', 'pointercancel', 'pointerleave']) {
-            button.addEventListener(event, () => {
-                state.pressed = '';
-                render(demo, false);
-            });
-        }
-        button.addEventListener('focus', () => {
-            state.focused = key;
-            render(demo, false);
-        });
-        button.addEventListener('blur', () => {
-            state.focused = '';
-            render(demo, false);
-        });
-        controls.append(button);
-    }
-    const button = controls.querySelector<HTMLButtonElement>(`button[data-key="${key}"]`);
-    if (button) {
-        position(button, key, x, y, 34, h);
-        button.disabled = disabled;
+        c.fillRect(x + 3 - span, y + row, span * 2 + 1, 1);
     }
 }
 
-function adjust(demo: Demo, field: 'weight' | 'reps', direction: 1 | -1): void {
-    const { state } = demo;
-    const step = field === 'weight' ? 250 : 100;
-    const maximum = field === 'weight' ? 99999 : 99900;
-    // Integer hundredths preserve directly typed fractional loads across repeated taps
-    const current = Math.round(Number(state[field] || '0') * 100);
-    state[field] = String(Math.max(0, Math.min(maximum, current + direction * step)) / 100);
-    render(demo, false);
+function rawDigits(value: number, field: Field): string {
+    return String(value).padStart(field === 'reps' ? 2 : 5, '0');
 }
-
-function position(element: HTMLElement, key: string, x: number, y: number, w: number, h: number): void {
-    element.dataset.key = key;
-    Object.assign(element.style, { left: `${x}px`, top: `${y}px`, width: `${w}px`, height: `${h}px` });
+function mask(value: number, field: Field): string {
+    const digits = rawDigits(value, field);
+    return field === 'reps' ? digits : `${digits.slice(0, 3)}.${digits.slice(3)}`;
 }
-
-function chevron(c: CanvasRenderingContext2D, pixels: string[], x: number, y: number, color: string): void {
-    c.fillStyle = color;
-    for (let row = 0; row < pixels.length; row++) {
-        for (let column = 0; column < pixels[row].length; column++) {
-            if (pixels[row][column] === '1') {
-                c.fillRect(x + column, y + row, 1, 1);
-            }
-        }
-    }
+function slotPositions(field: Field): number[] {
+    return field === 'reps' ? [80, 142] : [20, 62, 104, 154, 196];
 }
-
-function advance(demo: Demo, message: string): void {
-    const { state } = demo;
-    state.message = state.set === 4 ? 'Exercise complete. Nice work!' : `${message}. Next set ready.`;
-    state.set = Math.min(4, state.set + 1);
-    state.view = 'set';
-    state.focused = '';
-    state.pressed = '';
-    render(demo);
+function fieldName(field: Field): string {
+    return field === 'weight' ? 'Weight' : field === 'reps' ? 'Reps' : 'Weight increment';
+}
+function placeName(field: Field, slot: number): string {
+    return (field === 'reps' ? ['tens', 'ones'] : ['hundreds', 'tens', 'ones', 'tenths', 'hundredths'])[slot];
+}
+function popoverTop(concept: Concept): number {
+    return concept.id === 'j' ? 128 : concept.id === 'k' ? 104 : 144;
 }

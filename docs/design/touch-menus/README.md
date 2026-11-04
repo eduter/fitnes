@@ -1,95 +1,98 @@
 # Touch menu alternatives
 
-Round 3 keeps the selected thick action chevron, reduces its gap to the label
-from ten to two logical pixels, and tightens input brackets around the digits.
-Filled up/down triangles to the right of each value now support small changes
-without focusing an input or opening the virtual keyboard. Other text stays
-mixed case. There are no raised plates, trailing action chevrons or underlines.
+Round 4 uses the supplied NES name-entry menu as the interaction reference:
+fixed numerical slots and an on-screen picker in an overlapping game window.
+All controls are semantic buttons; no text input or system keyboard is used.
+The selected bold leading action chevron and mixed-case content remain.
 
-![Three compact spinner alternatives](comparison-round-3.png)
+[Open the phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/?option=j)
+with the same ChatGPT account that owns this Site. This is a separate, private
+preview with sample workouts, not the workout app's existing origin.
 
-| Alternative | Spinner layout | Tradeoff |
+![Three numerical popovers](comparison-round-4.png)
+
+| Alternative | Popover | Tradeoff |
 | --- | --- | --- |
-| G: Stacked arrows | Up above down, to the right of each number | Narrowest control; taller tap areas |
-| H: Side-by-side arrows | Down then up, both to the right of each number | Shortest control; both fields fit beside each other |
-| I: Aligned rows | Label, number and side-by-side arrows share each row | Clear label/value pairing; two rows |
+| J: Digit grid | Select a digit slot, then tap 0–9 in two rows | Closest to the supplied game menu |
+| K: Number pad | The same fixed slots, with a three-column keypad | Familiar key positions; taller window |
+| L: Digit spinners | Up/down triangles for individual digit places | Convenient place-value changes; more taps for several digits |
 
-The two-digit value's visible bracket box is now 22×16 logical pixels, down
-from 104×40. Its invisible input target remains at least 34 pixels wide. Arrow
-targets are separate 34×34 or 34×40 rectangles, with no overlapping hit areas.
-Brackets and target widths grow with longer values, without recreating the
-focused input. Every action retains its own bold 6×9 chevron.
+Actual reps start at the planned value. The fixed masks are `08` for reps and
+`060.00` kg for weight; the monospaced grid font and fixed control widths do not
+move when values change. Pickers initially select the ones digit, making nearby
+values quick to enter. Choosing a digit replaces that slot and advances the
+caret. The decimal point is fixed, rather than another selectable slot.
 
-Weight changes by 2.5 kg and reps by 1. These are demo step sizes; exercise-
-specific increments remain undecided. Values clamp at zero and the editor's
-upper limit; the corresponding arrow disables at a limit. Integer hundredths
-preserve fractional weights across taps. Tap the number for keyboard entry, or
-use the keyboard's up/down arrows while editing. Pressed controls invert and
-focused inputs retain the compact corner-only treatment. H is the suggested
-next candidate; the final spinner layout remains open.
+Each value also has a compact, conventional stacked up/down pair on its right.
+The small visible arrows are sixteen logical pixels apart, with separate larger
+tap areas. These adjust the whole quantity by one rep or that exercise's weight
+increment. `More` → `Edit increment` opens the same picker for the increment.
+`More` → `Change exercise` switches between the barbell, dumbbell and cable
+examples; each has an independent increment, initially 2.50, 1.00 and 5.00 kg.
 
-The [first comparison](comparison.png) and [second comparison](comparison-round-2.png)
-are retained as the earlier review rounds.
+Edits take effect immediately. `Done`, Escape, or tapping outside the window
+closes it; `Done` does not save a draft. `Back` clears the preceding slot and
+moves the caret there. Weight/reps clamp at 999.99 kg / 99 reps. A weight
+increment must be at least 0.01 kg. Integer hundredths avoid floating-point
+errors. After logging a set, reps prefill from the plan again.
 
-## Try the mockups
+Only the demo's per-exercise increments persist, under the separate key
+`fitnes-input-study-increments-v1` in localStorage. No application boot code,
+IndexedDB access or real workout data is included. Blocking localStorage leaves
+the preview functional in memory. The comparison alternatives have independent
+in-memory values; settings are read from localStorage on reload.
 
-Run `npm run dev`, then open `/docs/design/touch-menus/`. Query parameters
-`?option=g`, `?option=h`, and `?option=i` show one alternative at a time.
+The dialog has named buttons, a live value announcement, a focus loop and focus
+restoration. Physical digit keys, left/right selection, up/down digit changes,
+Backspace and Escape work. This preserves basic keyboard and assistive-technology
+access without requiring the virtual keyboard.
 
-Adjust weight or reps with the triangles or tap a number for keyboard entry.
-Log a set, open More, view the previous session, or skip a set. Changes remain in independent
-in-memory demo state; the page imports no application boot code and never
-opens IndexedDB. Reload resets the data. This is not a complete workout flow.
+## Run and build
 
-Build an isolated static preview without the app or its service worker:
-
-```sh
-npm exec vite build docs/design/touch-menus -- --outDir /workspace/fitnes/work/touch-menus/preview
-```
-
-The visible screen is rasterized at 256×448, then enlarged by a whole number of
-device pixels per logical pixel. Transparent semantic buttons and inputs sit
-over their drawn counterparts. They remain keyboard-accessible; focus is drawn
-on the canvas. This is prototype scaffolding, not a proposed production renderer.
-
-The four inks are the home's material palette, PPU `$0F`, `$07`, `$00`, `$10`
-under Composite Direct with red emphasis. Each complete screen uses just that
-one background palette and zero sprites. The verifier accepts at most 240 rows,
-so check the upper and lower 224-row slices separately. The claim covers these
-mockup screens, not a future composition with gym artwork and bottom tabs.
-
-For a native PNG exported directly from a mockup's canvas:
+Run `npm run dev` and open `/docs/design/touch-menus/`. Query parameters
+`?option=j`, `?option=k`, and `?option=l` show one alternative; `?option=all`
+compares all three. Phones default to J and put the working screen near the top.
 
 ```sh
-node tools/prove-touch-menus.ts work/touch-menus/round-3/g-native.png work/touch-menus/round-3/g-proof
 npm exec tsc -- --project docs/design/touch-menus/tsconfig.json
+npm exec vite build docs/design/touch-menus -- --outDir /workspace/fitnes/work/touch-menus/round-4/preview --emptyOutDir
 ```
 
-Round 3 passed `npm run check` (183 tests), the independent prototype typecheck
-and static build. Browser checks covered one- and two-tap adjustments without
-input focus, fractional weights, bounds and disabled arrows, widest-value
-target separation, direct typing, keyboard arrows, independent state, logging
-and nested menus. Phone checks at 390 CSS pixels / DPR 3 confirmed controls at
-least 44×44 CSS pixels with no overlapping targets or horizontal overflow.
-Twenty-four captured states passed exact hardware verification (48 slices),
-and six initial screen slices reproduced in FCEUmm with zero differing pixels.
-Screenshots above are actual browser captures. Generated native captures, ROMs
-and reports stay under ignored `work/touch-menus/`.
+The workout screen is rasterized at 256×448 and enlarged by a whole number of
+device pixels per logical pixel. Transparent semantic buttons overlay the
+rendering. This remains prototype scaffolding, not a production renderer.
 
-## Sources and limits
+All screen inks use the approved frame palette: PPU `$0F`, `$07`, `$00`, `$10`,
+Composite Direct with red emphasis. The screen uses one background palette and
+no sprites. The verifier checks its upper/lower 224-row crops without resizing:
+
+```sh
+node tools/prove-touch-menus.ts work/touch-menus/round-4/j-popover-native.png work/touch-menus/round-4/j-proof
+```
+
+Validation: `npm run check` passed (183 tests), as did the prototype typecheck
+and static build. Chromium checks covered all three pickers, fixed masks,
+immediate edits, no text inputs, planned rep reset, exercise-specific increments,
+reload persistence, bounds, dialog focus/restoration, and phone taps. At 390 CSS
+pixels / DPR 3, popover targets were at least 44×44 CSS pixels with no overlaps
+or horizontal overflow. Fifteen captured states passed exact hardware checking
+(30 slices); six popover slices reproduced in FCEUmm with zero differing pixels.
+Generated native captures, ROMs and reports stay under ignored `work/`.
+
+## Hosting and sources
+
+The dedicated Sites project is `appgprj_6aeb936db9a08191ac56e4ab6b58683b`.
+Its checkout is `/workspace/sites/fitnes-numeric-preview`, with identity and
+static configuration in `.openai/hosting.json`. Keep this identity on subsequent
+updates. The configured `dist/` contains the exact isolated static build above;
+the canonical TypeScript remains in this repository. Preserve owner-only access.
 
 - [Product direction](../../vision.md), [steel frame](../../../src/components/SteelPanel/README.md),
   and [home palette](../../../art/home/construction.json).
-- Typography diagnosis from research commit `385e4a92773e26e82564fd527c8ab4038baa4e1f`.
-- Licensed grid font retained byte for byte from `feat/focused-nes-ui` at
+- The supplied name-entry screenshot informs fixed slots, a selected-digit
+  indicator, an overlapping picker and Back/Done commands. Its commercial font
+  and game artwork are not copied.
+- Licensed grid font retained from `feat/focused-nes-ui` at
   `f3df2a3eb2a7bb9337c92e418d6bd34a08511f04`; provenance and CC0 license are in `fonts/`.
-- The [selected DW3 menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
-  could not be opened: the web tool could not access it and the environment's
-  outbound policy rejected its host. Its source is not in the fetched branches.
-  These candidates follow the vision's recorded short-menu direction; a direct
-  visual comparison with that capture remains unverified. The available
-  corridor frames were inspected, but do not substitute for the menu capture.
-
-The repository refers to a `deploy-static-preview` skill that is not available
-in this environment. The static build and screenshots can be reviewed locally;
-an external branch preview is not deployed by this study.
+- Earlier comparisons: [round 1](comparison.png), [round 2](comparison-round-2.png),
+  and [round 3](comparison-round-3.png).

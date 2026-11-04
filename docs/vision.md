@@ -56,6 +56,13 @@ close to its label. Tighten input corner brackets around the value to conserve
 logical pixels. Explore spinner inputs with filled triangles to their right so
 small adjustments can be made in one or two taps without the virtual keyboard.
 
+Owner refinement (2026-11-04): explore monospaced fixed numerical masks and
+game-style popovers for number entry, following the supplied name-entry menu
+reference. Keep compact, conventional stacked spinner arrows for small changes.
+Initial actual reps should match the plan; weight increments should be
+configurable per exercise and equipment. Review previews must have a hosted URL
+that works on the owner's phone, rather than a workspace-local HTML link.
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,
