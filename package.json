@@ -18,6 +18,7 @@
     "check": "npm run lint && npm run typecheck && npm run format:check && npm run test",
     "fix": "npm run lint:fix && npm run format",
     "nes:proof": "node tools/nes-hardware/cli.ts",
+    "art:corridor": "node tools/build-corridor-art.ts",
     "nes:rom": "node tools/nes-hardware/rom-cli.ts",
     "nes:emulate": "node tools/nes-hardware/emulate.ts",
     "nes:emulator:setup": "node tools/nes-hardware/setup-emulator.ts"

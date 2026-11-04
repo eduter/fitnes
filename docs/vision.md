@@ -68,6 +68,13 @@ Use the [corridor capture](https://feat-corridor-transition.fitnes-corridor-capt
 for top-down character movement through the environment between sets. Develop
 the graphics for FitNES; timing and interaction remain to be designed.
 
+Owner direction (2026-11-04): use character **F — Boulder** and corridor
+**A — Basement** from the [art studies](../art/corridor/README.md). Run the
+corridor **vertically**, with the entrance at the bottom, set doors along the
+sides and the final exit at the top, to suit phone screens. The
+[native sample](../art/corridor/vertical/README.md) develops that selection;
+animation timing and workout integration remain open.
+
 The [inventory](repo-status.md) locates useful existing code, artwork, and research.
 
 ## Preview in use

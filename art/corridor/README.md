@@ -1,7 +1,10 @@
 # Corridor interstitial art studies
 
 First-round alternatives, 2026-11-04. These are generated **art-direction
-studies**, pending owner selection. No direction is adopted by this addition.
+studies**. The owner selected **character F — Boulder** and **corridor A —
+Basement**, with a vertical corridor for phones. See the [native sample and
+hardware proof](vertical/README.md). The remaining alternatives are retained
+for comparison.
 
 ## Character choices
 

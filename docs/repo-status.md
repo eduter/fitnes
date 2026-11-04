@@ -11,9 +11,11 @@ Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
 hardware proof share the home artwork's palettes and use 59 sprites, including
 two window overlays. App integration remains open.
 
-Pending art choices: [corridor interstitial studies](../art/corridor/README.md),
-with eight character treatments and four environment kits. These generated
-comparison boards are not selected or validated native NES assets.
+Corridor art: the owner selected character F and corridor A from the
+[interstitial studies](../art/corridor/README.md), running vertically for phones.
+The [native sample](../art/corridor/vertical/README.md) includes indexed source,
+exact NES checks and emulator reproduction. The original generated comparison
+boards remain concept studies.
 
 | Branch / PR | Useful material |
 | --- | --- |
