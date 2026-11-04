@@ -1,47 +1,68 @@
-# Bottom tab icon candidates
+# Bottom tab icons
 
-Three **24×24** SVG alternatives for each destination in the compact preview:
-Home, Templates, Exercises, Weight, History; plus a Settings cog for Data and
-future preferences. These are artwork candidates, with a controlled bar and an
-isolated chooser. They do not replace the workout app or its stored data.
+Owner selections: **Home A, Templates A, Exercises A**. Their silhouettes are
+retained. History, Settings, and Weight each have three new candidates, for twelve
+native **24×24 PNG** assets. The chooser keeps the three approved icons selected.
+History uses back arrows rather than calendars. Weight offers an analog bathroom
+scale, digital glass platform, and upright medical balance scale. The new gears
+have straight-sided teeth, deep gaps, and large central bores.
 
 Run `npm run dev` and open `/src/components/BottomTabs/preview.html`. Choose each
-icon independently, try complete sets A/B/C, download an SVG, and compare the bar
-at integer scales. Choices persist in the URL, which can be bookmarked or shared.
+remaining icon, compare sets A/B/C, download PNGs, or bookmark the selection URL.
+PNG pixels remain crisp with `image-rendering: pixelated` and integer enlargement;
+SVG is unnecessary for this fixed logical grid. These PNG assets are drawn in
+NES background tiles, so they consume no additional hardware sprite entries.
 
-The **256×56** bar reuses `SteelPanel`, leaving 236×36 content pixels. Slots are
-39/39/40/39/39/40 pixels wide. Icons have integer positions; ordinary grid centering
-would blur them in odd-width slots. Five **1×24** gray separators stop six pixels
-short of the content edges and ten pixels short of the metal. The active tab has
-an eight-pixel gray marker. Accessible button names identify every destination.
+## Shared home hardware state
 
-The three icon palettes share steel gray `#747474` and use these pairs:
+The icons use the exact PPU codes, Composite Direct display interpretation, and
+red emphasis from [the final home artwork](../../../art/home/README.md). No new
+palette or emphasis state is introduced:
 
-| Tabs | Midtone | Highlight |
+| Material | PPU entries | RGB under emphasis 1 |
 | --- | --- | --- |
-| Home, Exercises | `#fc9838` | `#fce4a0` |
-| Templates, History, Settings | `#3cbcfc` | `#a8e4fc` |
-| Weight | `#58f898` | `#b0fccc` |
+| Dark shadow | `$07` | `#451600` |
+| Steel | `$00` | `#7d5c4b` |
+| Light steel | `$10` | `#d8a082` |
+| Gold, Home and Exercises | `$38` | `#ffd679` |
+| Universal background | `$0F` | `#000000` |
 
-Together with the panel's black/gray/white palette, the tested bar fits four NES
-background subpalettes and needs no sprites. Positions keep differently colored
-icons out of shared 16×16 attribute regions. Preserve the horizontal layout and
-align the bar's origin to an eight-pixel vertical boundary when integrating it;
-check the complete screen again with its eventual fonts/content and focus states.
+The **256×56** bar reuses the approved `SteelPanel` geometry with a palette-matched
+18×18 PNG nine-slice, scoped to this bar. Slots remain 39/39/40/39/39/40 pixels.
+Five **1×24** steel dividers stop six pixels short of the content edges and ten
+pixels short of the metal. Icons, selection markers and keyboard focus outlines
+sit on integer pixels.
 
-The SVGs are standalone assets; the optional TypeScript drawing source is
-`tools/generate-tab-icons.ts`. Run `node tools/generate-tab-icons.ts` on Node 24+
-to regenerate them. It paints directly on a 24×24 integer grid without resampling.
+The proof route places the scene above the bar in a **256×240** frame. It crops
+16 floor rows from the bottom of the scene for this composition study; it never
+changes `art/home/gym.png`. The indexed proof retains all 57 home sprites, its
+four background palettes, three sprite palettes, MMC5 8×8 attributes and one
+emphasis value. The combined frame still uses nine visible colors and at most
+eight sprites per scanline. Full-scene layout and final icon choices remain open.
 
-Use the pinned checker setup in [SteelPanel's README](../SteelPanel/README.md), then:
+## Reproduction
+
+Regenerate pixels directly from TypeScript on Node 24+:
 
 ```sh
-node work/nes-checker/tools/nes/cli.ts \
-  --url 'http://localhost:5173/src/components/BottomTabs/preview.html?proof&variant=a' \
-  --ready '.bottom-tabs img' --out work/tab-check-a
+node tools/generate-tab-icons.ts
 ```
 
-Repeat with `variant=b` and `variant=c`; `choices=abcabc` sets a mixed combination,
-and `active=settings` selects another destination. The proof route captures the
-same component at the bottom of a 256×240 screen. The surrounding chooser is an
-ordinary review page; its explanatory text is outside the NES artwork contract.
+Capture `/src/components/BottomTabs/preview.html?proof&variant=a` at exactly
+256×240 in Chromium, after all images have loaded, then run:
+
+```sh
+node tools/prove-tab-icons.ts capture.png work/tab-proof
+npm run nes:proof -- work/tab-proof/construction.json capture.png
+npm run nes:emulate -- work/tab-proof/construction.json capture.png work/nes-emulator-core/fceumm_libretro.so
+```
+
+Set up the emulator with `npm run nes:emulator:setup` once. `variant=b`/`variant=c`
+change only the three remaining choices. `choices=aaaabc` sets a mixed selection;
+`active=settings` changes the selected destination. The proof builder verifies
+the actual browser pixels, using the home construction unchanged above y=184 and
+assigning only its existing background palettes to the bar. It does not repair,
+resample, or reduce colors in the capture.
+
+The gallery's explanatory text is ordinary review UI and outside the artwork
+contract. Workout routing, stored data and the live workout preview are unchanged.

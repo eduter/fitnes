@@ -1,50 +1,51 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { displayColors } from './nes-hardware/check.ts';
+import { encodePng } from './nes-hardware/png.ts';
+import type { HardwareConstruction } from './nes-hardware/rom.ts';
 
 const size = 24;
-const palettes = {
-    amber: ['#747474', '#fc9838', '#fce4a0'],
-    blue: ['#747474', '#3cbcfc', '#a8e4fc'],
-    mint: ['#747474', '#58f898', '#b0fccc'],
-};
+const reference = JSON.parse(
+    readFileSync(new URL('../art/home/construction.json', import.meta.url), 'utf8')
+) as HardwareConstruction;
+const colors = displayColors(reference.emphasis);
 const destinations = ['home', 'templates', 'exercises', 'weight', 'history', 'settings'] as const;
 const variants = ['a', 'b', 'c'] as const;
 
-/** Regenerate the editable, integer-grid SVG artwork; no image resampling is involved. */
+/** Paint native PNG assets using the adopted home construction's actual PPU codes and emphasis. */
 function generate(): void {
     const directory = new URL('../src/components/BottomTabs/icons/', import.meta.url);
     mkdirSync(directory, { recursive: true });
     for (const name of destinations) {
         for (const [index, variant] of variants.entries()) {
+            if (['home', 'templates', 'exercises'].includes(name) && index > 0) {
+                continue;
+            }
             const art = new PixelArt();
             drawIcon(art, name, index);
-            const palette =
-                name === 'home' || name === 'exercises'
-                    ? palettes.amber
-                    : name === 'weight'
-                      ? palettes.mint
-                      : palettes.blue;
-            const paths = palette.map((color, ink) => {
-                const runs: string[] = [];
-                for (let y = 0; y < size; y++) {
-                    for (let x = 0; x < size; x++) {
-                        if (art.pixels[y * size + x] !== ink + 1) {
-                            continue;
-                        }
-                        const start = x;
-                        while (x + 1 < size && art.pixels[y * size + x + 1] === ink + 1) {
-                            x++;
-                        }
-                        runs.push(`M${start} ${y}h${x - start + 1}v1H${start}z`);
-                    }
-                }
-                return `    <path fill="${color}" d="${runs.join('')}"/>`;
-            });
-            writeFileSync(
-                new URL(`${name}-${variant}.svg`, directory),
-                `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges">\n    <title>${name} — option ${variant.toUpperCase()}</title>\n${paths.join('\n')}\n</svg>\n`
-            );
+            const palette = reference.palettes[name === 'home' || name === 'exercises' ? 0 : 1];
+            // Opaque black is the bar's universal background, not a fourth visible sprite ink
+            const codes = [palette[0], palette[2], palette[1], palette[3]];
+            const data = Uint8Array.from(art.pixels.flatMap((ink) => colors[codes[ink]]));
+            writeFileSync(new URL(`${name}-${variant}.png`, directory), encodePng({ width: size, height: size, data }));
         }
     }
+    generateFrame(directory);
+}
+
+/** Preserve the approved frame geometry while matching its material inks to the home steel palette. */
+function generateFrame(directory: URL): void {
+    const svg = readFileSync(new URL('../src/components/SteelPanel/steel-panel.svg', import.meta.url), 'utf8');
+    const codes: Record<string, number> = { '#000000': 15, '#747474': 7, '#bcbcbc': 0, '#fcfcfc': 16 };
+    const data = new Uint8Array(18 * 18 * 3);
+    for (const path of svg.matchAll(/<path fill="([^"]+)" d="([^"]+)"/g)) {
+        for (const run of path[2].matchAll(/M(\d+) (\d+)h(\d+)v1H\d+z/g)) {
+            const [, x, y, width] = run.map(Number);
+            for (let i = x; i < x + width; i++) {
+                data.set(colors[codes[path[1]]], (y * 18 + i) * 3);
+            }
+        }
+    }
+    writeFileSync(new URL('steel-panel-home.png', directory), encodePng({ width: 18, height: 18, data }));
 }
 
 function drawIcon(art: PixelArt, name: (typeof destinations)[number], option: number): void {
@@ -219,132 +220,255 @@ function exercises(p: PixelArt, v: number): void {
 }
 
 function weight(p: PixelArt, v: number): void {
-    p.rect(3, 3, 18, 19, 1);
-    p.rect(2, 2, 18, 19, 2);
-    p.rect(3, 1, 16, 21, 2);
-    p.rect(3, 2, 16, 1, 3);
-    p.rect(2, 3, 1, 17, 3);
-    p.rect(5, 4, 12, 7, 1);
-    p.rect(6, 5, 10, 5, 3);
-    if (v === 1) {
-        p.rect(7, 6, 3, 1, 1);
-        p.rect(9, 7, 1, 2, 1);
-        p.rect(12, 6, 2, 3, 1);
-        p.dot(13, 7, 3);
-    } else {
-        p.line(10, 9, 13, 6, 1);
-        p.rect(7, 6, 1, 2, 2);
-        p.rect(14, 6, 1, 2, 2);
-        p.dot(11, 5, 1);
-    }
     if (v === 2) {
-        for (const x of [6, 14]) {
-            p.rect(x, 13, 3, 5, 1);
-            p.rect(x, 12, 3, 2, 3);
-            p.rect(x - 1, 17, 4, 2, 1);
+        // A medical balance scale has a beam and an upright, not a bathroom-platform silhouette
+        p.rect(2, 2, 20, 3, 2);
+        p.rect(2, 2, 20, 1, 3);
+        p.rect(3, 0, 3, 6, 3);
+        p.rect(4, 1, 1, 4, 1);
+        p.rect(15, 1, 3, 5, 3);
+        p.rect(16, 2, 1, 3, 1);
+        p.rect(10, 5, 4, 15, 1);
+        p.rect(10, 5, 2, 14, 3);
+        p.rect(12, 6, 1, 12, 2);
+        p.rect(9, 8, 6, 2, 2);
+        p.poly(
+            [
+                [5, 18],
+                [18, 18],
+                [23, 21],
+                [22, 23],
+                [1, 23],
+                [1, 21],
+            ],
+            2
+        );
+        p.rect(5, 18, 13, 1, 3);
+        p.rect(3, 21, 18, 1, 1);
+        p.rect(4, 20, 4, 1, 3);
+        p.rect(15, 20, 4, 1, 3);
+        return;
+    }
+    if (v === 1) {
+        // A shallow glass platform uses corner sensors and a rectangular LCD
+        p.poly(
+            [
+                [3, 5],
+                [20, 5],
+                [23, 16],
+                [21, 20],
+                [2, 20],
+                [0, 16],
+            ],
+            1
+        );
+        p.poly(
+            [
+                [3, 4],
+                [20, 4],
+                [23, 15],
+                [20, 18],
+                [3, 18],
+                [0, 15],
+            ],
+            2
+        );
+        p.line(3, 4, 20, 4, 3);
+        p.line(1, 14, 3, 5, 3);
+        p.rect(8, 6, 8, 5, 1);
+        p.rect(9, 7, 6, 3, 3);
+        p.rect(10, 8, 1, 1, 1);
+        p.rect(13, 8, 1, 1, 1);
+        for (const [x, y] of [
+            [4, 6],
+            [18, 6],
+            [4, 14],
+            [18, 14],
+        ]) {
+            p.rect(x, y, 2, 2, 3);
+            p.dot(x + 1, y + 1, 1);
         }
-    } else {
-        for (const x of [5, 13]) {
-            p.rect(x, 13, 4, 6, 1);
-            p.rect(x, 13, 3, 1, 3);
-            p.rect(x, 15, 3, 1, 2);
-            p.rect(x, 17, 3, 1, 2);
-        }
+        p.rect(6, 13, 2, 3, 1);
+        p.rect(16, 13, 2, 3, 1);
+        return;
+    }
+    p.poly(
+        [
+            [7, 1],
+            [16, 1],
+            [21, 5],
+            [22, 20],
+            [19, 23],
+            [4, 23],
+            [1, 20],
+            [2, 5],
+        ],
+        1
+    );
+    p.poly(
+        [
+            [7, 0],
+            [16, 0],
+            [20, 4],
+            [21, 19],
+            [18, 21],
+            [4, 21],
+            [2, 19],
+            [3, 4],
+        ],
+        2
+    );
+    p.line(7, 0, 16, 0, 3);
+    p.line(3, 5, 2, 18, 3);
+    p.disc(11, 8, 6, 1);
+    p.disc(11, 8, 5, 3);
+    p.rect(6, 9, 11, 5, 2);
+    p.line(11, 10, 14, 5, 1);
+    p.rect(7, 5, 1, 2, 2);
+    p.rect(15, 5, 1, 2, 2);
+    p.dot(11, 3, 1);
+    for (const x of [5, 14]) {
+        p.rect(x, 14, 4, 5, 1);
+        p.rect(x, 14, 3, 1, 3);
+        p.rect(x, 16, 3, 1, 2);
     }
 }
 
 function history(p: PixelArt, v: number): void {
-    if (v === 1) {
-        p.rect(3, 3, 18, 19, 1);
-        p.rect(2, 2, 18, 19, 2);
-        p.rect(3, 7, 15, 12, 3);
-        p.rect(5, 0, 2, 5, 3);
-        p.rect(14, 0, 2, 5, 3);
-        for (const y of [9, 13, 16]) {
-            for (const x of [5, 10, 15]) {
-                p.rect(x, y, 2, 2, 1);
-            }
-        }
-        p.rect(9, 12, 4, 4, 2);
-        p.rect(10, 13, 2, 2, 3);
+    if (v === 2) {
+        p.rect(10, 3, 12, 19, 1);
+        p.rect(8, 1, 12, 19, 2);
+        p.rect(9, 2, 9, 16, 3);
+        p.rect(12, 5, 5, 1, 1);
+        p.rect(12, 8, 5, 1, 2);
+        p.rect(12, 11, 5, 1, 2);
+        p.rect(12, 15, 5, 1, 1);
+        p.poly(
+            [
+                [0, 12],
+                [6, 6],
+                [6, 10],
+                [10, 10],
+                [14, 13],
+                [14, 18],
+                [11, 18],
+                [11, 14],
+                [9, 13],
+                [6, 13],
+                [6, 17],
+            ],
+            1
+        );
+        p.poly(
+            [
+                [0, 11],
+                [6, 5],
+                [6, 9],
+                [10, 9],
+                [14, 12],
+                [14, 17],
+                [11, 17],
+                [11, 13],
+                [9, 12],
+                [6, 12],
+                [6, 16],
+            ],
+            2
+        );
+        p.line(1, 10, 5, 6, 3);
+        p.rect(6, 9, 4, 1, 3);
         return;
     }
-    p.disc(12, 12, 11, 1);
-    p.disc(11, 11, 10, 2);
-    p.disc(11, 11, 8, 3);
-    p.disc(11, 11, 7, 1);
+    p.disc(13, 13, 10, 1);
+    p.disc(13, 12, 10, 2);
+    p.disc(13, 12, 8, 3);
+    p.disc(13, 12, 7, 0);
+    p.rect(12, 7, 2, 6, 3);
+    p.rect(13, 12, 5, 2, 3);
+    p.dot(13, 12, 2);
     for (const [x, y] of [
-        [11, 5],
-        [17, 11],
-        [11, 17],
-        [5, 11],
+        [13, 5],
+        [20, 12],
+        [13, 19],
     ]) {
-        p.dot(x, y, 3);
+        p.dot(x, y, 2);
     }
-    p.rect(10, 7, 2, 6, 3);
-    p.rect(11, 11, v === 0 ? 5 : 4, 2, 3);
-    p.dot(11, 11, 2);
-    if (v === 2) {
-        p.rect(0, 2, 6, 9, 0);
-        p.rect(1, 6, 3, 6, 2);
-        p.rect(1, 9, 7, 3, 2);
-        p.rect(1, 6, 1, 4, 3);
+    if (v === 0) {
+        p.rect(0, 1, 11, 8, 0);
+        p.poly(
+            [
+                [0, 6],
+                [6, 0],
+                [6, 4],
+                [13, 4],
+                [13, 7],
+                [6, 7],
+                [6, 11],
+            ],
+            2
+        );
+        p.line(1, 5, 5, 1, 3);
+        p.rect(6, 4, 7, 1, 3);
+    } else {
+        p.rect(0, 7, 10, 10, 0);
+        p.poly(
+            [
+                [0, 12],
+                [6, 6],
+                [6, 10],
+                [11, 10],
+                [11, 13],
+                [6, 13],
+                [6, 18],
+            ],
+            2
+        );
+        p.line(1, 11, 5, 7, 3);
+        p.rect(6, 10, 5, 1, 3);
     }
 }
 
 function settings(p: PixelArt, v: number): void {
-    const c = 11;
-    if (v === 1) {
-        p.disc(c, c, 8, 2);
-        for (const [x, y, w, h] of [
-            [9, 0, 5, 5],
-            [9, 18, 5, 5],
-            [0, 9, 5, 5],
-            [18, 9, 5, 5],
-            [3, 3, 5, 5],
-            [15, 3, 5, 5],
-            [3, 15, 5, 5],
-            [15, 15, 5, 5],
+    const teeth = [8, 6, 8][v];
+    const points: number[][] = [];
+    for (let tooth = 0; tooth < teeth; tooth++) {
+        const angle = (tooth * Math.PI * 2) / teeth - Math.PI / 2;
+        const step = (Math.PI * 2) / teeth;
+        // Four straight edges per tooth leave deep, open root gaps
+        for (const [fraction, radius] of [
+            [-0.5, 8],
+            [-0.28, 8],
+            [-0.22, 11.5],
+            [0.22, 11.5],
+            [0.28, 8],
         ]) {
-            p.rect(x, y, w, h, 2);
-        }
-    } else {
-        p.disc(c, c, 9, 2);
-        for (const [x, y, w, h] of [
-            [8, 0, 7, 5],
-            [8, 18, 7, 5],
-            [0, 8, 5, 7],
-            [18, 8, 5, 7],
-            [2, 2, 5, 5],
-            [16, 2, 5, 5],
-            [2, 16, 5, 5],
-            [16, 16, 5, 5],
-        ]) {
-            p.rect(x, y, w, h, 2);
+            const a = angle + fraction * step;
+            points.push([11.5 + Math.cos(a) * radius, 11.5 + Math.sin(a) * radius]);
         }
     }
+    p.poly(points, 2);
     const pixels = [...p.pixels];
     for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
             if (!pixels[y * size + x]) {
                 continue;
             }
-            if (!pixels[(y - 1) * size + x] || x === 0 || !pixels[y * size + x - 1]) {
+            if (y === 0 || !pixels[(y - 1) * size + x]) {
                 p.dot(x, y, 3);
-            } else if (!pixels[(y + 1) * size + x] || x === size - 1 || !pixels[y * size + x + 1]) {
+            } else if (y === size - 1 || !pixels[(y + 1) * size + x]) {
                 p.dot(x, y, 1);
             }
         }
     }
-    p.disc(c, c, v === 2 ? 6 : 5, 1);
-    p.disc(c - 1, c - 1, v === 2 ? 4 : 3, 3);
-    p.disc(c, c, v === 2 ? 3 : 2, 0);
+    p.disc(12, 12, 6, 1);
+    p.disc(11, 11, 5, 3);
+    p.disc(12, 12, 4, 0);
     if (v === 2) {
         for (const [x, y] of [
-            [11, 3],
-            [3, 11],
-            [19, 11],
-            [11, 19],
+            [12, 4],
+            [4, 12],
+            [20, 12],
+            [12, 20],
         ]) {
             p.dot(x, y, 1);
         }

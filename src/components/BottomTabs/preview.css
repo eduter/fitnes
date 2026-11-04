@@ -206,8 +206,7 @@ a:focus-visible {
     width: 256px;
     height: 240px;
     background: #000;
-    display: flex;
-    align-items: end;
+    display: block;
 }
 .icon-proof .bar-dock {
     position: static;
@@ -237,4 +236,51 @@ body:has(.icon-proof) {
     .icon-family {
         padding: 20px 16px;
     }
+}
+
+.context-review {
+    margin: 0 0 32px;
+    padding: 16px;
+    background: #15181d;
+    border: 1px solid #30353b;
+}
+.context-review summary {
+    cursor: pointer;
+    color: #d8a082;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+.context-screen {
+    width: 256px;
+    background: #000;
+}
+.gym-context {
+    display: block;
+    width: 256px;
+    height: 184px;
+    object-fit: cover;
+    object-position: top;
+    image-rendering: pixelated;
+}
+.context-review p {
+    color: #a6acb5;
+    font-size: 11px;
+    line-height: 1.6;
+    max-width: 470px;
+}
+.icon-choice span {
+    min-height: 28px;
+    padding: 0 4px;
+    font: 10px / 1.4 monospace;
+}
+.icon-family:has(.icon-option:only-child) .icon-options {
+    grid-template-columns: 1fr;
+}
+.icon-family:has(.icon-option:only-child) .icon-choice {
+    flex-direction: row;
+    justify-content: center;
+    gap: 24px;
+}
+.icon-family:has(.icon-option:only-child) .icon-choice span {
+    min-height: 0;
 }

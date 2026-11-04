@@ -6,9 +6,11 @@ visual and interaction references, and [the backlog](backlog.md) for next tasks.
 Selected assets: [style reference](style-reference.png) (rightmost charcoal/steel
 design) and [standalone logo](fitnes-logo.png).
 
-Current bottom-tab artwork candidates: [18 icons and a mix-and-match steel-bar
-preview](../src/components/BottomTabs/README.md), covering the compact preview's
-five tabs plus Settings. Final icon choices and app integration remain open.
+Bottom tabs: [PNG sprites and a mix-and-match steel-bar preview](../src/components/BottomTabs/README.md).
+Owner selected Home A, Templates A, and Exercises A. History, Settings, and Weight
+have revised candidates using the final home palette and emphasis. Combined
+hardware/emulator proofs reuse the home palettes and sprite budget. Final choices
+for the other three icons and app integration remain open.
 
 | Branch / PR | Useful material |
 | --- | --- |

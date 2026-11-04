@@ -11,7 +11,8 @@ const tabItems = [
     { id: 'settings', label: 'Settings' },
 ] as const;
 const iconVariants = ['a', 'b', 'c'] as const;
-const iconFiles = import.meta.glob<string>('./icons/*.svg', { eager: true, query: '?url', import: 'default' });
+const acceptedTabs = new Set<TabId>(['home', 'templates', 'exercises']);
+const iconFiles = import.meta.glob<string>('./icons/*.png', { eager: true, query: '?url', import: 'default' });
 
 /** A candidate icon-only bar; routing and Settings contents belong to the consuming app. */
 function BottomTabs(props: BottomTabsProps): JSX.Element {
@@ -37,9 +38,10 @@ function BottomTabs(props: BottomTabsProps): JSX.Element {
     );
 }
 
-/** Resolve one of the 18 standalone, native-resolution SVG assets. */
+/** Resolve one of the 12 standalone, native-resolution PNG sprites. */
 function tabIconUrl(tab: TabId, variant: IconVariant): string {
-    return iconFiles[`./icons/${tab}-${variant}.svg`];
+    const choice = acceptedTabs.has(tab) ? 'a' : variant;
+    return iconFiles[`./icons/${tab}-${choice}.png`];
 }
 
 /** IDs match the compact preview's five destinations, with Settings added for Data and future options. */
@@ -56,4 +58,4 @@ interface BottomTabsProps {
 }
 
 export type { BottomTabsProps, IconChoices, IconVariant, TabId };
-export { BottomTabs, iconVariants, tabIconUrl, tabItems };
+export { acceptedTabs, BottomTabs, iconVariants, tabIconUrl, tabItems };
