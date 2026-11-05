@@ -52,6 +52,13 @@ function Spinner(props: SpinnerProps): JSX.Element {
         if (!Number.isFinite(min) || !Number.isFinite(max) || min < 0 || max < min || max > capacity) {
             throw new Error('Spinner bounds must fit its nonnegative fixed mask');
         }
+        const scale = 10 ** fractionDigits;
+        if (
+            Math.abs(min * scale - Math.round(min * scale)) > 1e-6 ||
+            Math.abs(max * scale - Math.round(max * scale)) > 1e-6
+        ) {
+            throw new Error('Spinner bounds must be representable at the displayed precision');
+        }
         if (!Number.isFinite(local.value) || local.value < min || local.value > max) {
             throw new Error('Spinner value must be finite and within its configured bounds');
         }

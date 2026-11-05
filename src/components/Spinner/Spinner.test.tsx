@@ -30,6 +30,69 @@ describe('Spinner', () => {
         expect(value()).toBe(0.2);
     });
 
+    it('requires fractional bounds to be representable at the displayed precision', () => {
+        expect(() =>
+            render(() => (
+                <Spinner
+                    label="Weight"
+                    value={0.01}
+                    onChange={() => {}}
+                    integerDigits={2}
+                    fractionDigits={2}
+                    min={0.009}
+                />
+            ))
+        ).toThrow('Spinner bounds must be representable at the displayed precision');
+        cleanup();
+        expect(() =>
+            render(() => (
+                <Spinner
+                    label="Weight"
+                    value={0.99}
+                    onChange={() => {}}
+                    integerDigits={2}
+                    fractionDigits={2}
+                    max={0.999}
+                />
+            ))
+        ).toThrow('Spinner bounds must be representable at the displayed precision');
+    });
+
+    it('keeps number-pad edits within representable fractional bounds', () => {
+        const [lowerValue, setLowerValue] = createSignal(0.01);
+        render(() => (
+            <Spinner
+                label="Lower"
+                value={lowerValue()}
+                onChange={setLowerValue}
+                integerDigits={2}
+                fractionDigits={2}
+                min={0.01}
+                max={0.99}
+            />
+        ));
+        press(screen.getByRole('button', { name: /Lower: 00.01/ }));
+        press(screen.getByRole('button', { name: 'Digit 0' }));
+        expect(lowerValue()).toBe(0.01);
+        cleanup();
+
+        const [upperValue, setUpperValue] = createSignal(0.99);
+        render(() => (
+            <Spinner
+                label="Upper"
+                value={upperValue()}
+                onChange={setUpperValue}
+                integerDigits={2}
+                fractionDigits={2}
+                min={0.01}
+                max={0.99}
+            />
+        ));
+        press(screen.getByRole('button', { name: /Upper: 00.99/ }));
+        press(screen.getByRole('button', { name: 'Digit 9' }));
+        expect(upperValue()).toBe(0.99);
+    });
+
     it('opens the number pad without a native input and applies a selected digit immediately', () => {
         const [value, setValue] = createSignal(60);
         render(() => (

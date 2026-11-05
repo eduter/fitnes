@@ -60,8 +60,9 @@ const [step, setStep] = createSignal(2.5);
 Masks support at most five digit places, fitting the editor in the 256px screen.
 Callers supply a different `step` for each exercise/equipment configuration and
 persist edits immediately if required. These components do not select storage
-or add a Save action. Spinner steps must be positive and representable at the
-chosen precision; mask sizes and bounds are validated as programmer inputs.
+or add a Save action. Spinner steps and bounds must be representable at the
+chosen precision; mask sizes, steps and bounds are validated as programmer
+inputs.
 
 ## PR #23 animation
 
