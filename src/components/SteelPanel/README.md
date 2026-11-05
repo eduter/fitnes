@@ -16,9 +16,10 @@ Ordinary div attributes and refs pass through; reactive `class` and `classList`
 inputs are merged while preserving the required frame class. Importing the component
 also imports its CSS; it does not depend on the app's stylesheet.
 
-CSS nine-slices the editable **18×18 SVG**: 8px corners stay fixed while the
-straight edges stretch. The SVG is the canonical material source; no generator
-or build step is needed. Its four inks match background palette 1 of the
+CSS nine-slices a fixed **18×18 PNG**: 8px corners stay fixed while the
+straight edges stretch. This avoids SVG border-image repaint corruption on
+long, zoomed Android pages. The editable SVG remains the canonical material
+source; the PNG is its exact native-size rendering on black. Its four inks match background palette 1 of the
 [final home artwork](../../../art/home/construction.json), using the documented
 Composite Direct display model with red emphasis (`emphasis: 1`):
 
