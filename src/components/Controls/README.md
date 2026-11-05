@@ -106,8 +106,9 @@ its owner-only audience on subsequent updates.
 All control inks use the home artwork's approved material palette and emphasis.
 The CC0 grid font and its provenance are under `src/styles/fonts/`. The controls
 use native DOM elements, without the earlier canvas-and-invisible-button
-prototype. A 256px native capture currently contains exactly the four approved
-material colors. Device scaling and complete compositions still need their
+prototype. The original 256px native capture contained four approved material inks.
+The interactive gold refinement adds the home artwork's gold action ink,
+using shared background palettes with 8×8 attributes. Device scaling and complete compositions still need their
 own verification when integrated into the app.
 
 Capture `[data-testid="controls-preview-screen"]` at 256 CSS pixels / DPR 1
@@ -118,7 +119,8 @@ node tools/prove-control-preview.ts work/controls-review/native-pad.png work/con
 ```
 
 The proof splits the scrolling capture into crops of at most 240 rows and
-reconstructs every pixel using the approved material PPU codes. It never
+reconstructs every pixel using the material and action PPU codes with four
+shared background palettes. It never
 quantizes a screenshot. The main, native-text, open-pad and partial opening /
 closing captures passed; eight main/pad/animation crops also reproduced in
 FCEUmm with zero differing pixels.

@@ -4,7 +4,7 @@ import { checkConstruction, displayColors } from './nes-hardware/check.ts';
 import { decodePng, encodePng } from './nes-hardware/png.ts';
 import type { HardwareConstruction } from './nes-hardware/rom.ts';
 
-/** Reconstruct native controls captures with the approved four PPU inks, without quantizing any pixel. */
+/** Reconstruct native controls captures with the approved material and action PPU inks, without quantizing any pixel. */
 function main(): void {
     const [imagePath, output] = process.argv.slice(2);
     if (!imagePath || !output) {
@@ -15,32 +15,67 @@ function main(): void {
         throw new Error('Controls proof requires an unscaled 256-pixel-wide Chromium capture');
     }
     const reference = JSON.parse(readFileSync('art/home/construction.json', 'utf8')) as HardwareConstruction;
-    const palette = reference.palettes[1];
+    const material = reference.palettes[1];
+    const action = reference.palettes[0][3];
+    const palettes = [
+        material,
+        [material[0], material[1], material[2], action],
+        [material[0], material[1], material[3], action],
+        [material[0], material[2], material[3], action],
+    ];
+    const inks = [...new Set(palettes.flat())];
     const colors = displayColors(reference.emphasis);
     const slots = new Uint8Array(image.width * image.height);
     for (let pixel = 0; pixel < slots.length; pixel++) {
-        const slot = palette.findIndex((code) =>
+        const slot = inks.findIndex((code) =>
             colors[code].every((value, channel) => value === image.data[pixel * 3 + channel])
         );
         if (slot < 0) {
-            throw new Error(`Pixel (${pixel % 256},${Math.floor(pixel / 256)}) is outside the material palette`);
+            throw new Error(
+                `Pixel (${pixel % 256},${Math.floor(pixel / 256)}) is outside the shared material/action inks`
+            );
         }
-        slots[pixel] = slot;
+        slots[pixel] = inks[slot];
     }
     mkdirSync(output, { recursive: true });
     for (let top = 0; top < image.height; top += 240) {
         const height = Math.min(240, image.height - top);
         const crop = { width: 256, height, data: image.data.subarray(top * 256 * 3, (top + height) * 256 * 3) };
+        const attributes: number[] = [];
+        const background = new Uint8Array(256 * height);
+        for (let y = 0; y < height; y += 8) {
+            for (let x = 0; x < 256; x += 8) {
+                const palette = palettes.findIndex((codes) => {
+                    for (let dy = y; dy < Math.min(y + 8, height); dy++) {
+                        for (let dx = x; dx < x + 8; dx++) {
+                            if (!codes.includes(slots[(top + dy) * 256 + dx])) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                });
+                if (palette < 0) {
+                    throw new Error(`Tile (${x},${top + y}) exceeds a four-ink background palette`);
+                }
+                attributes.push(palette);
+                for (let dy = y; dy < Math.min(y + 8, height); dy++) {
+                    for (let dx = x; dx < x + 8; dx++) {
+                        background[dy * 256 + dx] = palettes[palette].indexOf(slots[(top + dy) * 256 + dx]);
+                    }
+                }
+            }
+        }
         const construction: HardwareConstruction = {
-            profile: 'stock',
+            profile: 'mmc5-exattr',
             displayPalette: reference.displayPalette,
             emphasis: reference.emphasis,
             width: 256,
             height,
-            regionSize: 16,
-            palettes: [palette],
-            attributes: Array(16 * Math.ceil(height / 16)).fill(0),
-            backgroundPixels: Buffer.from(slots.subarray(top * 256, (top + height) * 256)).toString('base64'),
+            regionSize: 8,
+            palettes,
+            attributes,
+            backgroundPixels: Buffer.from(background).toString('base64'),
         };
         const report = checkConstruction(construction, crop);
         if (report.status !== 'pass') {
