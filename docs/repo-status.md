@@ -11,8 +11,8 @@ Updated 2026-11-05. Use [the vision](vision.md) for product authority and
 - [BottomTabs](../src/components/BottomTabs/README.md), the selected six icons
   and steel tab bar.
 - [Reusable controls](../src/components/Controls/README.md): Button, Popover,
-  Spinner and TextInput. The selected number pad and stepped popover are
-  available; workout-app integration remains open. The isolated
+  Spinner and TextInput. The first application UI integrates these controls,
+  including the number pad and stepped workout/weight menus. The isolated
   [phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
   uses these components directly.
 - [Selected style reference](style-reference.png),
@@ -20,6 +20,15 @@ Updated 2026-11-05. Use [the vision](vision.md) for product authority and
   [original home composition reference](reference-home-screen-image.png).
 - Public PWA icons and component proof routes are build/runtime assets. Keep
   generated proof captures, reports, and ROMs under ignored `work/`.
+
+## First application preview
+
+The app now has the requested home composition, all six destinations, compact
+set logging with previous performance, catalog/template editing, weight history
+and import/export. Preview builds seed an empty database with three templates,
+four completed sessions and eight readings. The compact dogfood deployment is
+unchanged; preview data lives on a separate Sites origin. Run
+`npm run build:preview` to reproduce that build.
 
 ## Retained design sources
 

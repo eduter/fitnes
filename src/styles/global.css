@@ -1,51 +1,46 @@
+@font-face {
+    font-family: "Pixel Operator 8";
+    src: url("/fonts/PixelOperator8-grid.ttf") format("truetype");
+    font-display: block;
+}
+
 :root {
-    --bg-primary: #181818;
-    --bg-secondary: #1f1f1f;
-    --bg-surface: #252526;
-    --bg-surface-hover: #2d2d2d;
-    --bg-surface-active: #333333;
-    --bg-input: #1f1f1f;
-
-    --text-primary: #cccccc;
-    --text-secondary: #a0a0a0;
-    --text-muted: #6e6e6e;
-    --text-heading: #e8e8e8;
-
-    --accent: #7630b9;
-    --accent-hover: #9333ea;
-    --accent-subtle: rgba(168, 85, 247, 0.15);
-
-    --success: #34d399;
-    --success-subtle: rgba(52, 211, 153, 0.15);
-    --warning: #fbbf24;
-    --warning-subtle: rgba(251, 191, 36, 0.15);
-    --danger: #f87171;
-    --danger-subtle: rgba(248, 113, 113, 0.15);
-
-    --border: #3c3c3c;
-    --border-light: #4a4a4a;
-
-    --radius-sm: 4px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
-
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-
-    --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    --font-mono: ui-monospace, "Cascadia Code", Consolas, monospace;
-
+    --bg-primary: #000000;
+    --bg-secondary: #000000;
+    --bg-surface: #000000;
+    --bg-surface-hover: #451600;
+    --bg-surface-active: #451600;
+    --bg-input: #000000;
+    --text-primary: #d8a082;
+    --text-secondary: #d8a082;
+    --text-muted: #7d5c4b;
+    --text-heading: #ffd679;
+    --accent: #ffd679;
+    --accent-hover: #ffd679;
+    --accent-subtle: #451600;
+    --success: #ffd679;
+    --success-subtle: #451600;
+    --warning: #ffd679;
+    --warning-subtle: #451600;
+    --danger: #ffd679;
+    --danger-subtle: #451600;
+    --border: #7d5c4b;
+    --border-light: #d8a082;
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --font-sans: "FitNES Pixel", monospace;
+    --font-mono: "FitNES Pixel", monospace;
     --space-xs: 4px;
     --space-sm: 8px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-
-    --transition-fast: 150ms ease;
-    --transition-normal: 250ms ease;
-
+    --space-md: 12px;
+    --space-lg: 8px;
+    --space-xl: 16px;
+    --transition-fast: 0s;
+    --header-height: 0px;
+    --screen-scale: 1;
     color-scheme: dark;
+    font-synthesis: none;
 }
 
 *,
@@ -71,9 +66,10 @@ body {
 }
 
 #root {
-    max-width: 600px;
+    width: 256px;
+    zoom: var(--screen-scale);
     margin: 0 auto;
-    min-height: 100dvh;
+    min-height: calc(100dvh / var(--screen-scale));
     display: flex;
     flex-direction: column;
 }
@@ -99,7 +95,7 @@ select {
 
 .btn {
     border-radius: var(--radius-md);
-    font-size: 14px;
+    font-size: 16px;
     transition: background var(--transition-fast);
 }
 
@@ -107,8 +103,8 @@ select {
     padding: var(--space-sm) var(--space-md);
     border: none;
     background: var(--accent);
-    color: #fff;
-    font-weight: 600;
+    color: #000;
+    font-weight: 400;
 }
 
 .btn--primary:hover:not(:disabled) {
@@ -116,7 +112,8 @@ select {
 }
 
 .btn--primary:disabled {
-    opacity: 0.5;
+    color: var(--text-muted);
+    background: var(--bg-primary);
     cursor: default;
 }
 
@@ -138,11 +135,11 @@ select {
 }
 
 .form-label {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 400;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
 }
 
 .form-input {
@@ -161,4 +158,95 @@ select {
 
 .form-input::placeholder {
     color: var(--text-muted);
+}
+
+:focus-visible {
+    outline: none;
+}
+a {
+    color: var(--accent);
+    text-underline-offset: 2px;
+}
+button,
+input,
+select,
+textarea {
+    min-width: 0;
+}
+button:disabled {
+    cursor: default;
+}
+img {
+    image-rendering: pixelated;
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    text-decoration: none;
+}
+.form-input {
+    width: 100%;
+    min-height: 32px;
+    padding: 4px;
+}
+.form-label {
+    text-transform: none;
+}
+.form-field {
+    min-width: 0;
+}
+.inline-fields > .form-field {
+    flex: 1 1 96px;
+}
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: var(--accent);
+}
+
+select.form-input {
+    appearance: none;
+    padding-right: 18px;
+    background: #000
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='4' shape-rendering='crispEdges'%3E%3Cpath fill='%23d8a082' d='M0 0h8v1H0zM1 1h6v1H1zM2 2h4v1H2zM3 3h2v1H3z'/%3E%3C/svg%3E")
+        no-repeat right 6px center;
+}
+input::-webkit-calendar-picker-indicator {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    margin: 0;
+    background:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' shape-rendering='crispEdges'%3E%3Cpath fill='%23d8a082' d='M2 0h1v3H2zM9 0h1v3H9zM0 1h12v1H0zM0 2h1v10H0zM11 2h1v10h-1zM1 4h10v1H1zM1 11h10v1H1zM3 6h2v2H3zM7 6h2v2H7z'/%3E%3C/svg%3E")
+        center / 12px 12px no-repeat;
+}
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+input[type="checkbox"],
+input[type="radio"] {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: #000;
+}
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background: var(--accent);
+}
+summary {
+    cursor: pointer;
+    list-style: none;
+}
+summary::before {
+    content: "+ ";
+}
+details[open] > summary::before {
+    content: "- ";
 }
