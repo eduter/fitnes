@@ -13,6 +13,11 @@ meanings when designing the interface; raise concrete gaps separately.
 
 Use top-down character movement between sets to communicate workout progress.
 
+Owner feedback (2026-11-05): weight entry asks only for the collection date,
+defaulting to today. Keep the native date picker for occasional backdating.
+Store new date-only readings at local midnight; retain existing timestamps
+when editing unrelated fields.
+
 ## NES visual contract
 
 The interface should feel like an NES game menu built for training. Follow
@@ -55,6 +60,14 @@ Owner feedback (2026-11-05): controls retain their normal colors when pressed,
 focused or selected. Focus rings are omitted per owner feedback. The selected
 number-pad digit uses a terminal-style blinking underline (steady with reduced
 motion).
+
+Owner feedback (2026-11-05): option choices use the same anchored stepped
+popover as numeric spinners. Place menus by their opener, flipping and clamping
+to the visible viewport when scrolled. Gold (`#ffd679`, PPU `$38` with the home
+emphasis) identifies interactive buttons, value fields, corner marks and other
+controls. Noninteractive content uses the existing steel/skin inks. Keep the
+normal interaction colors stable. The logo uses the artwork's warm skin,
+orange and light inks (`#ff754e`, `#ff8b20`, `#ffcc83`); no gray in the logo.
 
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png) as the

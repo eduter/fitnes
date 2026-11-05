@@ -128,3 +128,21 @@ controlled spinner, clamping and exact fractional-number regressions. Chromium
 checks cover actual stepping and reverse animation, reduced motion, native text
 entry, focus restoration and phone layout. Generated captures and emulator
 artifacts belong under ignored `work/`.
+
+## Application refinements
+
+`OptionPicker` provides corner-framed option entry through the shared Popover;
+unit, measurement and other option fields use it instead of native selects.
+Changes apply immediately, with a Back action to cancel selection.
+
+Popover accepts `anchor` (an element getter), falls back to `returnFocus`, and
+positions beside that trigger in client coordinates. It flips above the trigger
+when needed, clamps to the visible viewport and scaled surface, and repositions
+on scroll, resize and visual-viewport changes. Nested option menus and number
+pads retain their parent menu and restore focus. Content scrolls when a small
+viewport cannot fit the whole menu.
+
+Gold `--nes-action` identifies interactive controls and their corner marks;
+`--nes-ink` is content text, with muted ink for disabled controls. Labels and
+popover titles retain content ink. These colors stay stable while pressed or
+selected. Weight dates remain native date-only inputs, defaulting to today.
