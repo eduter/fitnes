@@ -29,7 +29,7 @@
     left: 7px;
     inline-size: 20px;
     block-size: 2px;
-    background: var(--nes-ink);
+    background: var(--nes-action);
     animation: nes-digit-cursor 1s steps(1, end) infinite;
 }
 @keyframes nes-digit-cursor {

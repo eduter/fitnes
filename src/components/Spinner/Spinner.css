@@ -5,7 +5,7 @@
     min-inline-size: 0;
 }
 .nes-spinner__label {
-    color: var(--nes-muted);
+    color: var(--nes-ink);
 }
 .nes-spinner__controls {
     display: flex;
@@ -13,6 +13,7 @@
     block-size: 68px;
 }
 .nes-spinner__value-frame {
+    color: var(--nes-action);
     display: block;
     block-size: 20px;
 }
@@ -52,4 +53,11 @@
 .nes-spinner__label {
     padding: 0;
     margin-block-end: 4px;
+}
+
+.nes-spinner[data-disabled] .nes-spinner__value-frame {
+    color: var(--nes-ink);
+}
+.nes-spinner[data-disabled] .nes-button:disabled {
+    color: var(--nes-ink);
 }

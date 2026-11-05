@@ -143,7 +143,7 @@
     border: 0;
     border-radius: 0;
     background: var(--bg-surface);
-    color: inherit;
+    color: var(--nes-action);
     text-decoration: none;
     border-bottom: 1px solid var(--border);
 }
@@ -206,6 +206,7 @@
 }
 
 .check-item {
+    color: var(--nes-action);
     display: flex;
     gap: var(--space-xs);
     align-items: center;
@@ -434,7 +435,7 @@ legend.form-label {
 
 .session-progress__bar {
     height: 100%;
-    background: var(--accent);
+    background: var(--text-primary);
     transition: none;
 }
 
@@ -447,7 +448,7 @@ legend.form-label {
 }
 
 .reading-row__value {
-    color: var(--text-primary);
+    color: var(--nes-action);
     font-size: 16px;
 }
 
@@ -467,7 +468,7 @@ legend.form-label {
     padding: 0;
     border: none;
     background: transparent;
-    color: inherit;
+    color: var(--nes-action);
     text-align: left;
     cursor: pointer;
     min-width: 120px;
@@ -482,7 +483,7 @@ legend.form-label {
 
 .planned-set__name {
     overflow: hidden;
-    color: var(--text-primary);
+    color: var(--nes-action);
     font-size: 16px;
     text-overflow: ellipsis;
     white-space: normal;
@@ -494,7 +495,7 @@ legend.form-label {
 }
 
 .planned-set__caret {
-    color: var(--text-muted);
+    color: var(--nes-action);
     font-size: 16px;
 }
 
@@ -503,6 +504,7 @@ legend.form-label {
 }
 
 .btn--icon {
+    --text-muted: var(--nes-action);
     width: 32px;
     min-height: 32px;
     padding: 0;
@@ -554,7 +556,7 @@ legend.form-label {
     padding: 0 8px;
     border: 0;
     background: #000;
-    color: var(--nes-ink);
+    color: var(--nes-action);
     text-align: left;
     font-size: 16px;
 }
@@ -733,7 +735,7 @@ legend.form-label {
 }
 
 .set-check-button {
-    color: var(--nes-ink);
+    color: var(--nes-action);
     background: #000;
     border: 0;
 }
@@ -754,4 +756,8 @@ legend.form-label {
 }
 .set-table__check {
     width: 22px;
+}
+
+.weight-fields .nes-option-picker__frame {
+    margin-block-start: 16px;
 }
