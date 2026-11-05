@@ -56,9 +56,9 @@ function App(props: AppProps): JSX.Element {
                             values="0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0 0 0 1 0"
                         />
                         <feComponentTransfer>
-                            <feFuncR type="discrete" tableValues="0 0.272549 0.492157 1" />
-                            <feFuncG type="discrete" tableValues="0 0.088235 0.362745 0.841176" />
-                            <feFuncB type="discrete" tableValues="0 0 0.296078 0.476471" />
+                            <feFuncR type="discrete" tableValues="0 1 1 1" />
+                            <feFuncG type="discrete" tableValues="0 0.460784 0.547059 0.801961" />
+                            <feFuncB type="discrete" tableValues="0 0.307843 0.127451 0.515686" />
                         </feComponentTransfer>
                     </filter>
                 </defs>
