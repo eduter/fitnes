@@ -1,22 +1,55 @@
-# Useful existing work
+# Repository inventory
 
-Updated 2026-11-03. Use [the vision](vision.md#design-direction) for the selected
-visual and interaction references, and [the backlog](backlog.md) for next tasks.
+Updated 2026-11-05. Use [the vision](vision.md) for product authority and
+[the backlog](backlog.md) for open work.
 
-Selected assets: [style reference](style-reference.png) (rightmost charcoal/steel
-design) and [standalone logo](fitnes-logo.png).
+## Adopted in main
 
-Selected bottom tabs: [six PNG icons and the steel bar](../src/components/BottomTabs/README.md).
-Home C; Templates, Exercises, Weight, History and Settings A. The final demo and
-hardware proof share the home artwork's palettes and use 59 sprites, including
-two window overlays. App integration remains open.
+- [Final home artwork](../art/home/gym.png) and its
+  [construction/proof inputs](../art/home/construction.json).
+- [SteelPanel](../src/components/SteelPanel/README.md), the reusable steel frame.
+- [BottomTabs](../src/components/BottomTabs/README.md), the selected six icons
+  and steel tab bar.
+- [Selected style reference](style-reference.png),
+  [standalone logo](fitnes-logo.png), and
+  [original home composition reference](reference-home-screen-image.png).
+- Public PWA icons and component proof routes are build/runtime assets. Keep
+  generated proof captures, reports, and ROMs under ignored `work/`.
 
-| Branch / PR | Useful material |
-| --- | --- |
-| `feat/compact-workout-ui` · [#4](https://github.com/eduter/fitnes/pull/4) | Compact logging, previous-performance display, navigation, and persistence. Source for the [preview in use](https://feat-compact-workout-ui.fitnes-preview.pages.dev/). |
-| `cursor/nes-design-system-31db` · [#5](https://github.com/eduter/fitnes/pull/5) | [Gym and character art](https://github.com/eduter/fitnes/tree/f1bca218a5b0905bb688022decf43caa75f29126/public/artwork), [13 icons](https://github.com/eduter/fitnes/tree/f1bca218a5b0905bb688022decf43caa75f29126/public/pixel-icons), and a [secondary concept sheet](https://github.com/eduter/fitnes/blob/f1bca218a5b0905bb688022decf43caa75f29126/public/nes-style-reference.png). |
-| `cursor/nes-window-ui-81c6` · [#6](https://github.com/eduter/fitnes/pull/6) | [Palette-reduced gym, logo, and five navigation images](https://github.com/eduter/fitnes/tree/0f811ebbb16fd1df476369675c13c738110a8040/src/assets) to assess for reuse. |
-| `cursor/nes-typography-menu-research-33d8` · [#7](https://github.com/eduter/fitnes/pull/7) | [Readability research](https://github.com/eduter/fitnes/blob/385e4a92773e26e82564fd527c8ab4038baa4e1f/docs/design/nes-typography-and-menu-research.md) and [font specimens](https://github.com/eduter/fitnes/tree/385e4a92773e26e82564fd527c8ab4038baa4e1f/docs/design/typography-menu). |
-| `feat/nes-ui-check` · [#11](https://github.com/eduter/fitnes/pull/11) | [PNG and live-Chrome compliance checker](https://github.com/eduter/fitnes/blob/c910349a6cd90d29766ebd69fb64ec6032a5cc0c/tools/nes/README.md). Review its scope against the visual contract before adopting it. |
-| `feat/focused-nes-ui` · [#12](https://github.com/eduter/fitnes/pull/12) | Current-set logging, editors, and import/export flows; [screenshots and reproduction notes](https://github.com/eduter/fitnes/tree/f3df2a3eb2a7bb9337c92e418d6bd34a08511f04/docs/design/focused-ui) and [fonts](https://github.com/eduter/fitnes/tree/f3df2a3eb2a7bb9337c92e418d6bd34a08511f04/public/fonts). Assess functionality separately from the selected art direction. |
-| `feat/corridor-transition` · [#13](https://github.com/eduter/fitnes/pull/13) | [Top-down movement reference](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/) and [committed video, contact sheets, and frames](https://github.com/eduter/fitnes/tree/20bc3275240d723586f24877838c908bce5ffad3/docs/captures/corridor-transition). |
+## Pending source PRs
+
+These sources are under review and have not been merged into main. Do not treat
+them as adopted implementation until their PRs merge.
+
+| Source | Useful material | Status |
+| --- | --- | --- |
+| [#24 — Reusable NES controls](https://github.com/eduter/fitnes/pull/24) | Shared native controls proposed for integration with the adopted frame and tabs. | Pending PR and integration/review. |
+| [#22 — Corridor art package](https://github.com/eduter/fitnes/pull/22) | Editable corridor and character design sources, with reproduction notes. | Pending PR; its design decisions are recorded in the vision. Character F is provisional; timing and interaction were deferred. |
+
+The adopted [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
+is a navigation design reference, distinct from behavioral validation. The
+[corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/)
+and #22 sources record the selected thin top-down corridor, whole-workout travel,
+and set doors. See [retained reference notes and captures](references/README.md).
+
+## Behavioral reference
+
+The owner confirms the [compact workout preview](https://feat-compact-workout-ui.fitnes-preview.pages.dev/)
+is the only dogfooded UI. Its workflows are the behavioral reference for the
+new UI. The source PR is [#4](https://github.com/eduter/fitnes/pull/4), and the
+source commit to preserve is
+[`4b81ee5ee2516dcbe794d071fa83bfe7042c0d21`](https://github.com/eduter/fitnes/commit/4b81ee5ee2516dcbe794d071fa83bfe7042c0d21).
+This source reference is not verified as the exact deployed build. It is useful
+behavior evidence, not a direction to reuse its whole implementation or
+appearance. The deployment and its data should remain intact while the new UI
+is developed.
+
+NES UI proposals, including [#12](https://github.com/eduter/fitnes/pull/12),
+were not dogfooded and are not owner-validated UX references. Their proposals
+and screenshots are historical comparison material only.
+
+## Historical audit
+
+The detailed branch review and its findings remain available in the immutable
+[main snapshot at `bd99bdf`](https://github.com/eduter/fitnes/blob/bd99bdf/docs/branch-review.md).
+It is retained there as historical audit material, not as active task guidance.

@@ -38,11 +38,11 @@ to carry a change all the way to review, not to stop at a local commit:
 - **Open a pull request** against the default branch (`main`) describing
   the change, and update the same PR on follow-up commits rather than
   opening a new one.
-- **Deploy a preview** for the branch so the change can be tried on a real
+- **Deploy a preview** for runtime changes so they can be tried on a real
   device, and link the preview URL in the PR (body or a single, updated
-  comment). Previews must land on an origin separate from production — see
-  the `deploy-static-preview` skill. Do not push to `gh-pages` or change the
-  Pages source to serve a preview.
+  comment). Use an origin separate from production. Documentation-only changes
+  do not need a preview. Do not push to `gh-pages` or change the Pages source
+  to serve a preview.
 
 Never push or merge directly to `main`; all changes reach it through a PR.
 
