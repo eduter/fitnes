@@ -61,8 +61,8 @@ Masks support at most five digit places, fitting the editor in the 256px screen.
 Callers supply a different `step` for each exercise/equipment configuration and
 persist edits immediately if required. These components do not select storage
 or add a Save action. Spinner steps and bounds must be representable at the
-chosen precision; mask sizes, steps and bounds are validated as programmer
-inputs.
+chosen precision; bounds within floating-point tolerance are normalized to
+that precision. Mask sizes, steps and bounds are validated as programmer inputs.
 
 ## PR #23 animation
 

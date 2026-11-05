@@ -59,7 +59,9 @@ function Spinner(props: SpinnerProps): JSX.Element {
         ) {
             throw new Error('Spinner bounds must be representable at the displayed precision');
         }
-        if (!Number.isFinite(local.value) || local.value < min || local.value > max) {
+        const normalizedMin = Math.round(min * scale) / scale;
+        const normalizedMax = Math.round(max * scale) / scale;
+        if (!Number.isFinite(local.value) || local.value < normalizedMin || local.value > normalizedMax) {
             throw new Error('Spinner value must be finite and within its configured bounds');
         }
         const step = local.step ?? 1;
@@ -72,7 +74,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
         ) {
             throw new Error('Spinner step must be positive and representable at the displayed precision');
         }
-        return { integerDigits, fractionDigits, min, max };
+        return { integerDigits, fractionDigits, min: normalizedMin, max: normalizedMax };
     });
     const masked = () => formatMaskedNumber(local.value, mask());
     const adjust = (direction: 1 | -1) => local.onChange(stepNumber(local.value, local.step ?? 1, direction, mask()));

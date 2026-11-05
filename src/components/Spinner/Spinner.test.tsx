@@ -58,6 +58,32 @@ describe('Spinner', () => {
         ).toThrow('Spinner bounds must be representable at the displayed precision');
     });
 
+    it('normalizes floating-point bound dust for controlled arrow stepping', () => {
+        const [value, setValue] = createSignal(0.3);
+        render(() => (
+            <Spinner
+                label="Weight"
+                value={value()}
+                onChange={setValue}
+                step={0.1}
+                integerDigits={2}
+                fractionDigits={2}
+                min={0.1 + 0.2}
+                max={0.999999999}
+            />
+        ));
+        expect((screen.getByRole('button', { name: 'Decrease Weight' }) as HTMLButtonElement).disabled).toBe(true);
+        for (let i = 0; i < 7; i += 1) {
+            press(screen.getByRole('button', { name: 'Increase Weight' }));
+        }
+        expect(value()).toBe(1);
+        expect((screen.getByRole('button', { name: 'Increase Weight' }) as HTMLButtonElement).disabled).toBe(true);
+        press(screen.getByRole('button', { name: 'Decrease Weight' }));
+        expect(value()).toBe(0.9);
+        press(screen.getByRole('button', { name: 'Increase Weight' }));
+        expect(value()).toBe(1);
+    });
+
     it('keeps number-pad edits within representable fractional bounds', () => {
         const [lowerValue, setLowerValue] = createSignal(0.01);
         render(() => (
