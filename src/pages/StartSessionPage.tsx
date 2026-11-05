@@ -2,7 +2,7 @@ import { Button } from '../components/Button/Button.tsx';
 import { A, useNavigate, useParams } from '@solidjs/router';
 import { For, Show, createEffect, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { DateTimeField, NumberField, SelectField } from '../components/fields.tsx';
+import { DateField, NumberField, SelectField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { latestBodyweightAtOrBefore, type BodyweightMeasurement } from '../domain/bodyweight.ts';
@@ -11,7 +11,7 @@ import { generateBodyweightMeasurementId } from '../domain/generateIds.ts';
 import { templateUsesBodyweight } from '../domain/lookups.ts';
 import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
-import { formatDateTime } from '../utils/datetime.ts';
+import { formatDate, fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 type BodyweightMode = 'none' | 'latest' | 'new';
 
@@ -57,7 +57,7 @@ function StartSessionPage(): JSX.Element {
         } else if (mode() === 'new') {
             const saved = await app.saveBodyweight({
                 id: generateBodyweightMeasurementId(),
-                measuredAt: measuredAt(),
+                measuredAt: fromDateLocalValue(toDateLocalValue(measuredAt())),
                 value: value(),
                 unit: unit(),
             });
@@ -122,8 +122,7 @@ function StartSessionPage(): JSX.Element {
                                     {(measurement) => (
                                         <>
                                             {' '}
-                                            ({formatWeight(measurement())} at {formatDateTime(measurement().measuredAt)}
-                                            )
+                                            ({formatWeight(measurement())} at {formatDate(measurement().measuredAt)})
                                         </>
                                     )}
                                 </Show>
@@ -150,7 +149,7 @@ function StartSessionPage(): JSX.Element {
                                     ]}
                                     onChange={(next) => setUnit(next as WeightUnit)}
                                 />
-                                <DateTimeField label="Measured at" value={measuredAt()} onChange={setMeasuredAt} />
+                                <DateField label="Date" value={measuredAt()} onChange={setMeasuredAt} />
                             </div>
                         </Show>
                         <Show when={app.bodyweightMeasurements().length > 0}>
@@ -160,7 +159,7 @@ function StartSessionPage(): JSX.Element {
                                     <For each={app.bodyweightMeasurements()}>
                                         {(measurement) => (
                                             <li>
-                                                {formatWeight(measurement)} · {formatDateTime(measurement.measuredAt)}
+                                                {formatWeight(measurement)} · {formatDate(measurement.measuredAt)}
                                             </li>
                                         )}
                                     </For>

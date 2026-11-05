@@ -1,7 +1,7 @@
 import { Button } from '../components/Button/Button.tsx';
 import { For, Show, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { DateTimeField, NumberField, SelectField } from '../components/fields.tsx';
+import { DateField, NumberField, SelectField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
@@ -10,7 +10,7 @@ import { formatWeight } from '../domain/format.ts';
 import { generateBodyweightMeasurementId } from '../domain/generateIds.ts';
 import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
-import { formatDateTime } from '../utils/datetime.ts';
+import { formatDate, fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 /** Bodyweight history. New readings are added; existing ones persist as they are edited. */
 function BodyweightPage(): JSX.Element {
@@ -24,7 +24,7 @@ function BodyweightPage(): JSX.Element {
     async function add(): Promise<void> {
         const result = await app.saveBodyweight({
             id: generateBodyweightMeasurementId(),
-            measuredAt: measuredAt(),
+            measuredAt: fromDateLocalValue(toDateLocalValue(measuredAt())),
             value: value(),
             unit: unit(),
         });
@@ -63,7 +63,7 @@ function BodyweightPage(): JSX.Element {
                         ]}
                         onChange={(next) => setUnit(next as WeightUnit)}
                     />
-                    <DateTimeField label="Measured at" value={measuredAt()} onChange={setMeasuredAt} />
+                    <DateField label="Date" value={measuredAt()} onChange={setMeasuredAt} />
                 </div>
                 <Button type="button" onPress={() => void add()}>
                     Add
@@ -121,7 +121,7 @@ function ReadingRow(props: ReadingRowProps): JSX.Element {
                 >
                     <span class="planned-set__text">
                         <span class="reading-row__value">{formatWeight(props.measurement)}</span>
-                        <span class="planned-set__detail">{formatDateTime(props.measurement.measuredAt)}</span>
+                        <span class="planned-set__detail">{formatDate(props.measurement.measuredAt)}</span>
                     </span>
                     <span class="planned-set__caret" aria-hidden="true">
                         {props.expanded ? '-' : '+'}
@@ -155,8 +155,8 @@ function ReadingRow(props: ReadingRowProps): JSX.Element {
                             ]}
                             onChange={(next) => props.onEdit({ ...props.measurement, unit: next as WeightUnit })}
                         />
-                        <DateTimeField
-                            label="Measured at"
+                        <DateField
+                            label="Date"
                             value={props.measurement.measuredAt}
                             onChange={(next) => props.onEdit({ ...props.measurement, measuredAt: next })}
                         />

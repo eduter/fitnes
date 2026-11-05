@@ -1,7 +1,8 @@
+import { OptionPicker } from './OptionPicker/OptionPicker.tsx';
 import { Spinner } from './Spinner/Spinner.tsx';
 import { TextInput } from './TextInput/TextInput.tsx';
 import { For, type JSX } from 'solid-js';
-import { fromDatetimeLocalValue, toDatetimeLocalValue } from '../utils/datetime.ts';
+import { fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 interface TextFieldProps {
     label: string;
@@ -116,37 +117,34 @@ interface SelectFieldProps {
 /** Labeled select. */
 function SelectField(props: SelectFieldProps): JSX.Element {
     return (
-        <label class="form-field">
-            <span class="form-label">{props.label}</span>
-            <select
-                class="form-input"
-                value={props.value}
-                disabled={props.disabled}
-                onChange={(event) => props.onChange(event.currentTarget.value)}
-            >
-                <For each={props.options}>{(option) => <option value={option.value}>{option.label}</option>}</For>
-            </select>
-        </label>
+        <OptionPicker
+            label={props.label}
+            value={props.value}
+            options={props.options}
+            disabled={props.disabled}
+            onChange={props.onChange}
+            popoverMount={document.getElementById('root') ?? undefined}
+        />
     );
 }
 
-interface DateTimeFieldProps {
+interface DateFieldProps {
     label: string;
     value: number;
     onChange: (value: number) => void;
 }
 
-/** Labeled local datetime input stored as epoch millis. */
-function DateTimeField(props: DateTimeFieldProps): JSX.Element {
+/** A native date picker; the stored value remains local epoch millis. */
+function DateField(props: DateFieldProps): JSX.Element {
     return (
         <label class="form-field">
             <span class="form-label">{props.label}</span>
             <input
                 class="form-input"
-                type="datetime-local"
-                value={toDatetimeLocalValue(props.value)}
+                type="date"
+                value={toDateLocalValue(props.value)}
                 onInput={(event) => {
-                    const next = fromDatetimeLocalValue(event.currentTarget.value);
+                    const next = fromDateLocalValue(event.currentTarget.value);
                     if (Number.isNaN(next)) {
                         return;
                     }
@@ -192,5 +190,5 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
     );
 }
 
-export { CheckboxGroup, CompactNumberField, DateTimeField, NumberField, SelectField, TextAreaField, TextField };
+export { CheckboxGroup, CompactNumberField, DateField, NumberField, SelectField, TextAreaField, TextField };
 export type { CheckboxItem, SelectOption };

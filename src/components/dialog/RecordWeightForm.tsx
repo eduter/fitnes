@@ -1,10 +1,11 @@
 import { Button } from '../Button/Button.tsx';
 import { Spinner } from '../Spinner/Spinner.tsx';
+import { OptionPicker } from '../OptionPicker/OptionPicker.tsx';
 import { createEffect, createSignal, Show, type JSX } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
 import type { BodyweightMeasurement } from '../../domain/bodyweight.ts';
 import { generateBodyweightMeasurementId } from '../../domain/generateIds.ts';
-import { fromDatetimeLocalValue, toDatetimeLocalValue } from '../../utils/datetime.ts';
+import { fromDateLocalValue, toDateLocalValue } from '../../utils/datetime.ts';
 
 /** Record a validated reading and leave the form open if persistence fails. */
 function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
@@ -38,7 +39,7 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
                 id: generateBodyweightMeasurementId(),
                 value: value(),
                 unit: unit(),
-                measuredAt: fromDatetimeLocalValue(String(data.get('measuredAt'))),
+                measuredAt: fromDateLocalValue(String(data.get('measuredAt'))),
             });
             if (!result.ok) {
                 setError(result.errors.map((issue) => issue.message).join('. '));
@@ -65,28 +66,20 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
                     fractionDigits={2}
                     popoverMount={document.getElementById('root') ?? undefined}
                 />
-                <label class="form-field">
-                    <span class="form-label">Unit</span>
-                    <select
-                        class="form-input"
-                        name="unit"
-                        value={unit()}
-                        onChange={(event) => setUnit(event.currentTarget.value as 'kg' | 'lb')}
-                    >
-                        <option value="kg">kg</option>
-                        <option value="lb">lb</option>
-                    </select>
-                </label>
+                <OptionPicker
+                    label="Unit"
+                    value={unit()}
+                    onChange={(next) => setUnit(next as 'kg' | 'lb')}
+                    options={[
+                        { value: 'kg', label: 'kg' },
+                        { value: 'lb', label: 'lb' },
+                    ]}
+                    popoverMount={document.getElementById('root') ?? undefined}
+                />
             </div>
             <label class="form-field">
-                <span class="form-label">Measured at</span>
-                <input
-                    class="form-input"
-                    name="measuredAt"
-                    type="datetime-local"
-                    value={toDatetimeLocalValue(Date.now())}
-                    required
-                />
+                <span class="form-label">Date</span>
+                <input class="form-input" name="measuredAt" type="date" value={toDateLocalValue(Date.now())} required />
             </label>
             <Show when={error()}>
                 <p role="alert" class="error-text">

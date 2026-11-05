@@ -67,6 +67,8 @@ describe('home actions', () => {
         const reading = await db.bodyweightMeasurements.orderBy('measuredAt').last();
         expect(reading?.value).toBe(80.2);
         expect(reading?.unit).toBe('kg');
+        expect(new Date(reading?.measuredAt ?? 0).getHours()).toBe(0);
+        expect(view.container.querySelector('input[type="datetime-local"]')).toBeNull();
     });
 
     it('dismisses with Escape using the spinner popover closing lifecycle', async () => {
