@@ -32,6 +32,5 @@
     color: var(--nes-muted);
 }
 .nes-text-input__native::selection {
-    color: var(--nes-ground);
-    background: var(--nes-ink);
+    background: var(--nes-muted);
 }

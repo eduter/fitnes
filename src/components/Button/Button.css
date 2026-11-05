@@ -24,11 +24,9 @@
     padding: 0;
     text-transform: none;
 }
-.nes-button:active:not(:disabled),
 .nes-button:focus-visible:not(:disabled) {
-    color: var(--nes-ground);
-    background: var(--nes-ink);
-    outline: none;
+    outline: 1px solid var(--nes-ink);
+    outline-offset: -4px;
 }
 .nes-button:disabled {
     color: var(--nes-muted);

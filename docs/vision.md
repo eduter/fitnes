@@ -51,6 +51,10 @@ phone's virtual keyboard. Other numerical interactions activate immediately on
 press. The reusable [controls](../src/components/Controls/README.md) provide this
 API; integration into the workout app remains open.
 
+Owner feedback (2026-11-05): controls retain their normal colors when pressed,
+focused or selected. Keyboard focus uses an inset outline. The selected number-pad
+digit uses a terminal-style blinking underline (steady with reduced motion).
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png)
 as the art reference. Carry forward its dark panels, steel frames, shaped corners,

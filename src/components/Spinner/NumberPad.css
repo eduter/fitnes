@@ -22,10 +22,6 @@
     font-size: 32px;
     line-height: 32px;
 }
-.nes-number-pad__slot[aria-pressed="true"] {
-    color: var(--nes-ground);
-    background: var(--nes-ink);
-}
 .nes-number-pad__slot[aria-pressed="true"]::after {
     content: "";
     position: absolute;
@@ -34,6 +30,17 @@
     inline-size: 20px;
     block-size: 2px;
     background: var(--nes-ink);
+    animation: nes-digit-cursor 1s steps(1, end) infinite;
+}
+@keyframes nes-digit-cursor {
+    50% {
+        visibility: hidden;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nes-number-pad__slot[aria-pressed="true"]::after {
+        animation: none;
+    }
 }
 .nes-number-pad__decimal {
     flex: 0 0 8px;

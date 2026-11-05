@@ -64,6 +64,10 @@ or add a Save action. Spinner steps and bounds must be representable at the
 chosen precision; bounds within floating-point tolerance are normalized to
 that precision. Mask sizes, steps and bounds are validated as programmer inputs.
 
+Controls keep their normal foreground and background on press, focus and digit
+selection. Keyboard focus uses an inset outline. The selected digit's underline
+blinks on/off every 500ms; reduced motion keeps it steadily visible.
+
 ## PR #23 animation
 
 The reusable Popover carries the reveal/reverse-close technique from PR #23

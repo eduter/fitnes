@@ -22,10 +22,6 @@
     inline-size: 100%;
     block-size: 68px;
 }
-.nes-spinner__value:focus-visible {
-    background: var(--nes-ground);
-    color: var(--nes-ink);
-}
 .nes-spinner__arrows {
     display: grid;
     grid-template-rows: 34px 34px;
@@ -47,10 +43,6 @@
 }
 .nes-spinner__arrow--down svg {
     top: 6px;
-}
-.nes-spinner__arrow:active:not(:disabled) {
-    background: var(--nes-ground);
-    color: var(--nes-ink);
 }
 .nes-spinner {
     border: 0;
