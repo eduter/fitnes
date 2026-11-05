@@ -16,7 +16,11 @@ Use top-down character movement between sets to communicate workout progress.
 Owner feedback (2026-11-05): weight entry asks only for the collection date,
 defaulting to today. Keep the native date picker for occasional backdating.
 Store new date-only readings at local midnight; retain existing timestamps
-when editing unrelated fields.
+when editing unrelated fields. Display the date in the browser's locale with
+its label beside it. The reading popover uses adjacent Save and Cancel actions;
+bodyweight has one decimal place. Mass unit is configured only in Settings and
+used throughout entry, workout editing and history. Convert for display rather
+than relabelling or rewriting stored measurements.
 
 ## NES visual contract
 
@@ -65,7 +69,11 @@ Owner feedback (2026-11-05): option choices use the same anchored stepped
 popover as numeric spinners. Place menus by their opener, flipping and clamping
 to the visible viewport when scrolled. Gold (`#ffd679`, PPU `$38` with the home
 emphasis) identifies interactive buttons, value fields, corner marks and other
-controls. Noninteractive content uses the existing steel/skin inks. Keep the
+controls. Noninteractive content uses the existing steel/skin inks. Only the visible
+action label/chevron or value/icon accepts pointer input; black layout space
+and copper descriptions remain safe scrolling surfaces. Keep descriptions and
+dates outside action elements, and do not dismiss popovers by tapping blank
+background. Keep the
 normal interaction colors stable. The logo uses the artwork's warm skin,
 orange and light inks (`#ff754e`, `#ff8b20`, `#ffcc83`); no gray in the logo.
 

@@ -148,3 +148,11 @@ Gold `--nes-action` identifies interactive controls and their corner marks;
 `--nes-ink` is content text, with muted ink for disabled controls. Labels and
 popover titles retain content ink. These colors stay stable while pressed or
 selected. Weight dates remain native date-only inputs, defaulting to today.
+
+Pointer targets belong to the visible button label/chevron and value/icon,
+not the full layout box. Put explanatory copy outside Button and links;
+background space remains available for scrolling. Blank popover backgrounds
+are passive; dismiss through explicit actions or Escape. DateField displays a
+localized date next to its label and opens the native picker from that value.
+The weight dialog drafts one-decimal readings with adjacent Save/Cancel actions;
+mass unit is a persistent Settings preference used throughout the app.
