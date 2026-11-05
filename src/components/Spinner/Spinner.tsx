@@ -80,7 +80,12 @@ function Spinner(props: SpinnerProps): JSX.Element {
     const adjust = (direction: 1 | -1) => local.onChange(stepNumber(local.value, local.step ?? 1, direction, mask()));
 
     return (
-        <fieldset {...rest} class={controlClasses('nes-spinner nes-control', local)} aria-labelledby={labelId}>
+        <fieldset
+            {...rest}
+            class={controlClasses('nes-spinner nes-control', local)}
+            aria-labelledby={labelId}
+            data-disabled={local.disabled ? '' : undefined}
+        >
             <legend id={labelId} class="nes-spinner__label">
                 {local.label}
             </legend>
@@ -141,6 +146,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                 mount={local.popoverMount}
                 height={256}
                 returnFocus={() => opener}
+                anchor={() => opener}
             >
                 <NumberPad
                     label={local.label}

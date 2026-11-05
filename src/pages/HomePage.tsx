@@ -13,6 +13,8 @@ import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
 /** The two primary training actions, below the approved gym artwork. */
 function HomePage(): JSX.Element {
     const app = useAppData();
+    let workoutButton: HTMLButtonElement | undefined;
+    let weightButton: HTMLButtonElement | undefined;
     const navigate = useNavigate();
     const [menu, setMenu] = createSignal<'workout' | 'weight' | null>(null);
     const [busy, setBusy] = createSignal(false);
@@ -54,6 +56,9 @@ function HomePage(): JSX.Element {
             <div class="home-actions">
                 <Button
                     class="home-action"
+                    ref={(element) => {
+                        workoutButton = element;
+                    }}
                     type="button"
                     disabled={app.loadState() !== 'ready'}
                     onPress={() => {
@@ -66,6 +71,9 @@ function HomePage(): JSX.Element {
                 </Button>
                 <Button
                     class="home-action"
+                    ref={(element) => {
+                        weightButton = element;
+                    }}
                     type="button"
                     disabled={app.loadState() !== 'ready'}
                     onPress={() => {
@@ -81,7 +89,12 @@ function HomePage(): JSX.Element {
                     {message()}
                 </p>
             </Show>
-            <MenuDialog open={menu() === 'workout'} title="Start workout" onClose={() => setMenu(null)}>
+            <MenuDialog
+                anchor={() => workoutButton}
+                open={menu() === 'workout'}
+                title="Start workout"
+                onClose={() => setMenu(null)}
+            >
                 <div class="stack">
                     <Show when={active().length}>
                         <p class="muted">Continue a workout</p>
@@ -151,7 +164,13 @@ function HomePage(): JSX.Element {
                     </Show>
                 </div>
             </MenuDialog>
-            <MenuDialog open={menu() === 'weight'} height={320} title="Record weight" onClose={() => setMenu(null)}>
+            <MenuDialog
+                anchor={() => weightButton}
+                open={menu() === 'weight'}
+                height={320}
+                title="Record weight"
+                onClose={() => setMenu(null)}
+            >
                 <RecordWeightForm
                     onRecorded={(weight) => {
                         setMenu(null);

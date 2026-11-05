@@ -16,6 +16,8 @@ function MenuDialog(props: MenuDialogProps): JSX.Element {
             mount={document.getElementById('root') ?? undefined}
             height={props.height ?? 400}
             class="app-menu"
+            anchor={props.anchor}
+            returnFocus={props.anchor}
         >
             <div class="stack app-menu__body">
                 <h2 class="card-title">{props.title}</h2>
@@ -29,6 +31,7 @@ function MenuDialog(props: MenuDialogProps): JSX.Element {
 /** A controlled menu retains its reverse closing animation before leaving the DOM. */
 interface MenuDialogProps {
     title: string;
+    anchor?: () => HTMLElement | undefined;
     open: boolean;
     height?: number;
     onClose: () => void;

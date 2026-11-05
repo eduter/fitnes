@@ -1,5 +1,6 @@
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { placePopover } from './placement.ts';
 import { Button } from '../Button/Button.tsx';
 import { controlClasses } from '../Controls/controlClasses.ts';
 import '../../styles/controls.css';
@@ -18,6 +19,7 @@ function Popover(props: PopoverProps): JSX.Element {
         'framesPerStep',
         'initialFocus',
         'returnFocus',
+        'anchor',
         'class',
         'classList',
         'style',
@@ -62,6 +64,11 @@ function Popover(props: PopoverProps): JSX.Element {
                 return;
             }
             isolateBackground();
+            positionPanel();
+            window.addEventListener('resize', positionPanel);
+            window.addEventListener('scroll', positionPanel, true);
+            window.visualViewport?.addEventListener('resize', positionPanel);
+            window.visualViewport?.addEventListener('scroll', positionPanel);
             if (phase() === 'opening') {
                 panel?.focus({ preventScroll: true });
             }
@@ -74,6 +81,7 @@ function Popover(props: PopoverProps): JSX.Element {
         if (open && (current === 'closed' || current === 'closing')) {
             if (current === 'closed') {
                 opener =
+                    local.anchor?.() ??
                     local.returnFocus?.() ??
                     (document.activeElement instanceof HTMLElement ? document.activeElement : undefined);
             }
@@ -85,13 +93,70 @@ function Popover(props: PopoverProps): JSX.Element {
                     if (disposed || phase() !== 'measuring') {
                         return;
                     }
-                    reveal(Math.max(16, panel?.getBoundingClientRect().height ?? 16));
+                    reveal(Math.max(16, panel?.offsetHeight || 16));
                 });
             }
         } else if (!open && current !== 'closed' && current !== 'closing') {
             setPhase('closing');
         }
     });
+
+    /** Convert viewport placement back into the scaled portal's own coordinates. */
+    function positionPanel(): void {
+        if (!panel || !layer || phase() === 'closed') {
+            return;
+        }
+        const layerRect = layer.getBoundingClientRect();
+        const scale = layer.offsetWidth > 0 ? layerRect.width / layer.offsetWidth : 1;
+        if (scale <= 0) {
+            return;
+        }
+
+        // Use the visual viewport so a phone keyboard or a scrolled page cannot hide the menu
+        const visible = window.visualViewport;
+        const viewportLeft = visible?.offsetLeft ?? 0;
+        const viewportTop = visible?.offsetTop ?? 0;
+        const viewportWidth = visible?.width ?? window.innerWidth;
+        const viewportHeight = visible?.height ?? window.innerHeight;
+        const surface = local.mount?.getBoundingClientRect();
+        const margin = 8 * scale;
+        const bounds = {
+            left: Math.max(viewportLeft + margin, surface?.left ?? viewportLeft),
+            right: Math.min(viewportLeft + viewportWidth - margin, surface?.right ?? viewportLeft + viewportWidth),
+            top: viewportTop + margin,
+            bottom: viewportTop + viewportHeight - margin,
+        };
+        const availableWidth = Math.max(16, (bounds.right - bounds.left) / scale);
+        const availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
+        panel.style.inlineSize = `${Math.min(240, availableWidth)}px`;
+        panel.style.maxBlockSize = `${availableHeight}px`;
+        const size = panel.getBoundingClientRect();
+        const trigger = local.anchor?.() ?? opener;
+        const anchor = trigger?.getBoundingClientRect();
+        const fallback = {
+            left: bounds.left,
+            right: bounds.right,
+            top: (bounds.top + bounds.bottom - size.height) / 2,
+            bottom: (bounds.top + bounds.bottom - size.height) / 2,
+        };
+        const position = placePopover({
+            anchor: anchor ?? fallback,
+            viewport: bounds,
+            width: size.width,
+            height: size.height,
+            gap: anchor ? 4 * scale : 0,
+        });
+        panel.style.left = `${Math.round((position.left - layerRect.left) / scale)}px`;
+        panel.style.top = `${Math.round((position.top - layerRect.top) / scale)}px`;
+        panel.dataset.side = anchor ? position.side : 'center';
+    }
+
+    function stopPositioning(): void {
+        window.removeEventListener('resize', positionPanel);
+        window.removeEventListener('scroll', positionPanel, true);
+        window.visualViewport?.removeEventListener('resize', positionPanel);
+        window.visualViewport?.removeEventListener('scroll', positionPanel);
+    }
 
     function finishAnimation(event: AnimationEvent): void {
         if (
@@ -102,6 +167,7 @@ function Popover(props: PopoverProps): JSX.Element {
         }
         if (phase() === 'opening') {
             setPhase('open');
+            positionPanel();
             const target =
                 local.initialFocus?.() ??
                 panel?.querySelector<HTMLElement>('[data-popover-autofocus]') ??
@@ -111,6 +177,7 @@ function Popover(props: PopoverProps): JSX.Element {
         } else if (phase() === 'closing') {
             setPhase('closed');
             restoreBackground();
+            stopPositioning();
             if (opener?.isConnected) {
                 opener.focus({ preventScroll: true });
             }
@@ -148,6 +215,7 @@ function Popover(props: PopoverProps): JSX.Element {
 
     onCleanup(() => {
         disposed = true;
+        stopPositioning();
         restoreBackground();
         if (phase() !== 'closed' && opener?.isConnected) {
             opener.focus({ preventScroll: true });
@@ -211,6 +279,7 @@ interface PopoverProps
     framesPerStep?: 1 | 2;
     initialFocus?: () => HTMLElement | undefined;
     returnFocus?: () => HTMLElement | undefined;
+    anchor?: () => HTMLElement | undefined;
     style?: JSX.CSSProperties;
 }
 

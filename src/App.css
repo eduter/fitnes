@@ -649,15 +649,6 @@ legend.form-label {
     height: 57px;
 }
 
-/* App portals stay in the same scaled screen as the spinner's number pad */
-.nes-popover-layer[data-local] {
-    position: fixed;
-    inset: 0;
-    left: 50%;
-    width: 256px;
-    margin-left: -128px;
-    height: calc(100dvh / var(--screen-scale));
-}
 .app-menu {
     max-block-size: calc(100dvh / var(--screen-scale) - 16px);
 }
