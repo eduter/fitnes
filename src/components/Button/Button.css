@@ -25,8 +25,7 @@
     text-transform: none;
 }
 .nes-button:focus-visible:not(:disabled) {
-    outline: 1px solid var(--nes-ink);
-    outline-offset: -4px;
+    outline: none;
 }
 .nes-button:disabled {
     color: var(--nes-muted);
