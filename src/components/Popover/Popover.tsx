@@ -1,7 +1,6 @@
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { placePopover } from './placement.ts';
-import { Button } from '../Button/Button.tsx';
 import { controlClasses } from '../Controls/controlClasses.ts';
 import '../../styles/controls.css';
 import './Popover.css';
@@ -226,14 +225,7 @@ function Popover(props: PopoverProps): JSX.Element {
         <Show when={phase() !== 'closed'}>
             <Portal mount={local.mount}>
                 <div ref={layer} class="nes-popover-layer" data-local={local.mount ? '' : undefined}>
-                    <Button
-                        class="nes-popover__backdrop"
-                        variant="plain"
-                        tabindex="-1"
-                        aria-hidden="true"
-                        aria-label={`Dismiss ${local.label}`}
-                        onPress={() => local.onOpenChange(false)}
-                    />
+                    <div class="nes-popover__backdrop" aria-hidden="true" />
                     <div
                         {...rest}
                         ref={panel}

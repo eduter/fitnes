@@ -209,3 +209,8 @@ summary::before {
 details[open] > summary::before {
     content: "- ";
 }
+
+.form-field > .form-label,
+.nes-text-input__label {
+    pointer-events: none;
+}

@@ -12,7 +12,7 @@
     block-size: 100%;
     background: transparent;
     cursor: default;
-    touch-action: none;
+    touch-action: pan-y;
 }
 .nes-popover__backdrop:active {
     background: transparent;

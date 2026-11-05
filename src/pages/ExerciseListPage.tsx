@@ -19,18 +19,18 @@ function ExerciseListPage(): JSX.Element {
             <ul class="list">
                 <For each={app.exercises()} fallback={<li class="muted">No exercises yet.</li>}>
                     {(exercise) => (
-                        <li>
+                        <li class="card">
                             <A class="card-link" href={`/exercises/${exercise.id}`}>
                                 <strong>{exercise.name}</strong>
-                                <span class="muted">
-                                    {' '}
-                                    {exercise.measurements
-                                        .map((option) => `${option.measurement}/${option.countBasis}`)
-                                        .join(', ')}{' '}
-                                    · {exercise.executionModes.join(', ')} ·{' '}
-                                    {exercise.loads.map((load) => load.kind).join(', ')}
-                                </span>
                             </A>
+                            <span class="muted">
+                                {' '}
+                                {exercise.measurements
+                                    .map((option) => `${option.measurement}/${option.countBasis}`)
+                                    .join(', ')}{' '}
+                                · {exercise.executionModes.join(', ')} ·{' '}
+                                {exercise.loads.map((load) => load.kind).join(', ')}
+                            </span>
                         </li>
                     )}
                 </For>

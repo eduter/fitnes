@@ -14,16 +14,16 @@ function SessionListPage(): JSX.Element {
             <ul class="list">
                 <For each={app.sessions()} fallback={<li class="muted">No sessions yet.</li>}>
                     {(session) => (
-                        <li>
+                        <li class="card">
                             <A class="card-link" href={`/sessions/${session.id}`}>
                                 <strong>{session.snapshot.name}</strong>
-                                <span class="muted">
-                                    {' '}
-                                    {session.completedAt === undefined ? 'in progress' : 'completed'} ·{' '}
-                                    {formatDateTime(session.startedAt)} · {session.results.length}/
-                                    {session.snapshot.sequence.length} logged
-                                </span>
                             </A>
+                            <span class="muted">
+                                {' '}
+                                {session.completedAt === undefined ? 'in progress' : 'completed'} ·{' '}
+                                {formatDateTime(session.startedAt)} · {session.results.length}/
+                                {session.snapshot.sequence.length} logged
+                            </span>
                         </li>
                     )}
                 </For>

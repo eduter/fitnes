@@ -47,3 +47,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+.nes-option-picker__value:not(:disabled) > .nes-button__label {
+    pointer-events: none;
+}
+.nes-option-picker__value:not(:disabled) > .nes-button__label > span,
+.nes-option-picker__value:not(:disabled) > .nes-button__label > svg {
+    pointer-events: auto;
+    cursor: pointer;
+}

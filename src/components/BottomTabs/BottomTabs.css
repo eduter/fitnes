@@ -57,3 +57,10 @@
     outline: 1px solid #7d5c4b;
     outline-offset: -2px;
 }
+
+.bottom-tabs__item {
+    pointer-events: none;
+}
+.bottom-tabs__item img {
+    pointer-events: auto;
+}

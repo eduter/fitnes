@@ -31,3 +31,14 @@
     color: var(--nes-muted);
     cursor: default;
 }
+
+/* The visible label and chevron own taps; surrounding layout remains a scrolling surface */
+.nes-button {
+    pointer-events: none;
+    cursor: default;
+}
+.nes-button:not(:disabled) > .nes-button__label,
+.nes-button:not(:disabled) > svg {
+    pointer-events: auto;
+    cursor: pointer;
+}

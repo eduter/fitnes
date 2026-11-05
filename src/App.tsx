@@ -1,4 +1,4 @@
-import { A, useLocation, useNavigate } from '@solidjs/router';
+import { useLocation, useNavigate } from '@solidjs/router';
 import { onCleanup, onMount, Show, type JSX } from 'solid-js';
 import logoUrl from '../docs/fitnes-logo.png?url';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
@@ -65,9 +65,9 @@ function App(props: AppProps): JSX.Element {
             </svg>
             <div class="app" classList={{ 'app--home': home() }}>
                 <header class="app-header">
-                    <A href="/" class="app-title" aria-label="FitNES home" end>
+                    <div class="app-title">
                         <img src={logoUrl} class="fitnes-logo" alt="FitNES" width="244" height="114" />
-                    </A>
+                    </div>
                 </header>
                 <StatusBanner />
                 <main class="app-main">
