@@ -96,9 +96,8 @@ adjust weight/reps and equipment increment, and open a generic 96px popover.
 
 The private [phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
 uses the same ChatGPT owner account. Its existing Sites identity is
-`appgprj_6aeb936db9a08191ac56e4ab6b58683b`; the deployment checkout is
-`/workspace/sites/fitnes-numeric-preview`. Reuse that identity and preserve its
-owner-only audience on subsequent updates.
+`appgprj_6aeb936db9a08191ac56e4ab6b58683b`. Reuse that identity and preserve
+its owner-only audience on subsequent updates.
 
 All control inks use the home artwork's approved material palette and emphasis.
 The CC0 grid font and its provenance are under `src/styles/fonts/`. The controls
