@@ -1,0 +1,54 @@
+@font-face {
+    font-family: "FitNES Pixel";
+    src: url("./fonts/PixelOperator-grid.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: block;
+}
+
+:root {
+    --nes-ink: #d8a082;
+    --nes-muted: #7d5c4b;
+    --nes-shadow: #451600;
+    --nes-ground: #000;
+    --nes-font: "FitNES Pixel", monospace;
+}
+
+.nes-control {
+    box-sizing: border-box;
+    color: var(--nes-ink);
+    font: 400 16px / 16px var(--nes-font);
+    font-synthesis: none;
+}
+
+.nes-corners {
+    position: relative;
+    --nes-corner-stroke: 1px;
+}
+.nes-corners:focus-within {
+    --nes-corner-stroke: 2px;
+}
+.nes-corners::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(currentColor 0 0) left top / 4px var(--nes-corner-stroke) no-repeat,
+        linear-gradient(currentColor 0 0) right top / 4px var(--nes-corner-stroke) no-repeat,
+        linear-gradient(currentColor 0 0) left bottom / 4px var(--nes-corner-stroke) no-repeat,
+        linear-gradient(currentColor 0 0) right bottom / 4px var(--nes-corner-stroke) no-repeat,
+        linear-gradient(currentColor 0 0) left top / var(--nes-corner-stroke) 4px no-repeat,
+        linear-gradient(currentColor 0 0) right top / var(--nes-corner-stroke) 4px no-repeat,
+        linear-gradient(currentColor 0 0) left bottom / var(--nes-corner-stroke) 4px no-repeat,
+        linear-gradient(currentColor 0 0) right bottom / var(--nes-corner-stroke) 4px no-repeat;
+}
+
+.nes-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}

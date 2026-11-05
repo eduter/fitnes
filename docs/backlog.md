@@ -14,6 +14,8 @@ recorded in [the vision](vision.md#design-direction).
 - [ ] Review renderer and checker assumptions for sprite rules, tile banks on
   scrolling pages, device scaling, and letterboxing.
 - [ ] Choose typography, case, menu hierarchy, and layout.
+- [x] Extract the selected button, animated thin popover, number-pad spinner and
+  native text-input controls into reusable components.
 - [ ] Design the between-set flow from the selected corridor reference;
   use its thin top-down view. Start from the [retained art and owner decisions](design/corridor-interstitial/README.md)
   when the preceding work is ready. Character F is preferred provisionally;

@@ -1,0 +1,57 @@
+.nes-popover-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+}
+.nes-popover-layer[data-local] {
+    position: absolute;
+}
+.nes-popover__backdrop {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    background: transparent;
+    cursor: default;
+    touch-action: none;
+}
+.nes-popover__backdrop:active {
+    background: transparent;
+}
+.nes-popover {
+    position: relative;
+    box-sizing: border-box;
+    inline-size: min(240px, calc(100% - 16px));
+    min-block-size: 16px;
+    padding: 8px;
+    border: 1px solid var(--nes-ink);
+    background: var(--nes-ground);
+    outline: none;
+    clip-path: inset(0);
+}
+.nes-popover[data-phase="measuring"] {
+    visibility: hidden;
+}
+.nes-popover[data-phase="opening"],
+.nes-popover[data-phase="closing"] {
+    animation: nes-popover-reveal var(--nes-popover-motion-duration, var(--nes-popover-duration))
+        steps(var(--nes-popover-steps), end) both;
+}
+.nes-popover[data-phase="closing"] {
+    animation-direction: reverse;
+}
+@keyframes nes-popover-reveal {
+    from {
+        clip-path: inset(0 0 var(--nes-popover-height) 0);
+    }
+    to {
+        clip-path: inset(0);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nes-popover {
+        --nes-popover-motion-duration: 1ms;
+    }
+}

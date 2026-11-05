@@ -1,0 +1,74 @@
+body {
+    margin: 0;
+    color: #e9e6df;
+    background: #151719;
+    font-family: system-ui, sans-serif;
+}
+.nes-demo__intro,
+.nes-demo__notes {
+    max-inline-size: 512px;
+    margin: 16px auto;
+    padding-inline: 16px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.nes-demo__intro h1 {
+    margin: 0 0 4px;
+    font-size: 20px;
+    font-weight: 500;
+}
+.nes-demo__intro p {
+    margin: 0;
+    color: #b5b4af;
+}
+.nes-demo__space {
+    position: relative;
+    /* Clip stale transformed bounds during rotation before the next resize callback runs */
+    overflow-x: clip;
+}
+.nes-demo__screen {
+    position: relative;
+    inline-size: 256px;
+    min-block-size: 480px;
+    background: var(--nes-ground);
+    transform-origin: top left;
+}
+.nes-demo__brand {
+    padding: 12px;
+}
+.nes-demo__title {
+    margin: 4px 0 12px;
+    font: inherit;
+}
+.nes-demo__quantities {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-block-start: 12px;
+}
+.nes-demo__action {
+    display: flex;
+    inline-size: 100%;
+    margin-block-start: 4px;
+}
+.nes-demo__readout {
+    margin: 8px 0 4px;
+    min-block-size: 32px;
+    color: var(--nes-muted);
+}
+.nes-demo__about {
+    margin: 0 0 8px;
+}
+.nes-demo__notes {
+    color: #b5b4af;
+}
+@media (max-width: 600px) {
+    .nes-demo__intro,
+    .nes-demo__notes {
+        margin-block: 10px;
+        font-size: 12px;
+    }
+    .nes-demo__intro h1 {
+        font-size: 16px;
+    }
+}
