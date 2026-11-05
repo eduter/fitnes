@@ -38,9 +38,7 @@ describe('home actions', () => {
         fireEvent.click(button);
         const dialog = await view.findByRole('dialog');
         fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
-        const choices = within(dialog)
-            .getAllByRole('button')
-            .filter((choice) => choice.classList.contains('menu-choice'));
+        const choices = dialog.querySelectorAll('.menu-choice .nes-button');
         expect(choices).toHaveLength(3);
         fireEvent.click(within(dialog).getByRole('button', { name: /Strength A/ }));
         await view.findByRole('heading', { name: 'Workout started' });
@@ -58,9 +56,7 @@ describe('home actions', () => {
         const dialog = await view.findByRole('dialog');
         fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
         fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Weight' }));
-        fireEvent.submit(
-            within(dialog).getByRole('button', { name: 'Add reading' }).closest('form') as HTMLFormElement
-        );
+        fireEvent.submit(within(dialog).getByRole('button', { name: 'Save' }).closest('form') as HTMLFormElement);
         await view.findByText('Recorded 80.2 kg.');
         fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
         expect(view.queryByRole('dialog')).toBeNull();
@@ -69,6 +65,21 @@ describe('home actions', () => {
         expect(reading?.unit).toBe('kg');
         expect(new Date(reading?.measuredAt ?? 0).getHours()).toBe(0);
         expect(view.container.querySelector('input[type="datetime-local"]')).toBeNull();
+    });
+
+    it('discards a changed draft on Cancel without creating a reading', async () => {
+        const view = renderHome();
+        const trigger = view.getByRole('button', { name: 'Record weight' }) as HTMLButtonElement;
+        await waitFor(() => expect(trigger.disabled).toBe(false));
+        fireEvent.click(trigger);
+        const dialog = await view.findByRole('dialog');
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Weight' }));
+        expect(within(dialog).getByRole('button', { name: 'Weight: 080.2. Edit number' })).toBeTruthy();
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        expect(await db.bodyweightMeasurements.count()).toBe(8);
+        expect(view.queryByRole('dialog')).toBeNull();
     });
 
     it('dismisses with Escape using the spinner popover closing lifecycle', async () => {

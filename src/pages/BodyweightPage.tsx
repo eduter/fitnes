@@ -1,22 +1,28 @@
 import { Button } from '../components/Button/Button.tsx';
-import { For, Show, createSignal, type JSX } from 'solid-js';
+import { For, Show, createEffect, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { DateField, NumberField, SelectField } from '../components/fields.tsx';
+import { DateField, NumberField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { RawDocument } from '../components/RawDocument.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
-import { formatWeight } from '../domain/format.ts';
+import { formatMass, massValue } from '../domain/convertWeight.ts';
 import { generateBodyweightMeasurementId } from '../domain/generateIds.ts';
-import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { formatDate, fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 /** Bodyweight history. New readings are added; existing ones persist as they are edited. */
 function BodyweightPage(): JSX.Element {
     const app = useAppData();
-    const [value, setValue] = createSignal(80);
-    const [unit, setUnit] = createSignal<WeightUnit>('kg');
+    const [value, setValue] = createSignal(massValue({ value: 80, unit: 'kg' }, app.massUnit(), 1));
+    let initialized = false;
+    createEffect(() => {
+        const latest = app.bodyweightMeasurements()[0];
+        if (!initialized && latest) {
+            initialized = true;
+            setValue(massValue(latest, app.massUnit(), 1));
+        }
+    });
     const [measuredAt, setMeasuredAt] = createSignal(Date.now());
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const [expanded, setExpanded] = createSignal<string | null>(null);
@@ -26,7 +32,7 @@ function BodyweightPage(): JSX.Element {
             id: generateBodyweightMeasurementId(),
             measuredAt: fromDateLocalValue(toDateLocalValue(measuredAt())),
             value: value(),
-            unit: unit(),
+            unit: app.massUnit(),
         });
         setErrors(result.ok ? [] : result.errors);
         if (result.ok) {
@@ -53,15 +59,13 @@ function BodyweightPage(): JSX.Element {
             <div class="card stack">
                 <h2 class="card-title">Add reading</h2>
                 <div class="inline-fields">
-                    <NumberField label="Value" min={0} value={value()} onChange={setValue} />
-                    <SelectField
-                        label="Unit"
-                        value={unit()}
-                        options={[
-                            { value: 'kg', label: 'kg' },
-                            { value: 'lb', label: 'lb' },
-                        ]}
-                        onChange={(next) => setUnit(next as WeightUnit)}
+                    <NumberField
+                        label={`Weight (${app.massUnit()})`}
+                        min={0.1}
+                        step={0.1}
+                        fractionDigits={1}
+                        value={value()}
+                        onChange={setValue}
                     />
                     <DateField label="Date" value={measuredAt()} onChange={setMeasuredAt} />
                 </div>
@@ -109,24 +113,16 @@ interface ReadingRowProps {
  * list pays only for what is read.
  */
 function ReadingRow(props: ReadingRowProps): JSX.Element {
+    const app = useAppData();
     return (
         <div class="card reading-row" classList={{ 'reading-row--expanded': props.expanded }}>
             <div class="planned-set__row">
-                <Button
-                    variant="plain"
-                    class="planned-set__summary"
-                    type="button"
-                    aria-expanded={props.expanded}
-                    onPress={props.onToggle}
-                >
-                    <span class="planned-set__text">
-                        <span class="reading-row__value">{formatWeight(props.measurement)}</span>
-                        <span class="planned-set__detail">{formatDate(props.measurement.measuredAt)}</span>
-                    </span>
-                    <span class="planned-set__caret" aria-hidden="true">
-                        {props.expanded ? '-' : '+'}
-                    </span>
-                </Button>
+                <div class="planned-set__text">
+                    <Button class="planned-set__summary" aria-expanded={props.expanded} onPress={props.onToggle}>
+                        {formatMass(props.measurement, app.massUnit(), 1)}
+                    </Button>
+                    <span class="planned-set__detail">{formatDate(props.measurement.measuredAt)}</span>
+                </div>
                 <Button
                     variant="plain"
                     class="btn btn--icon"
@@ -141,19 +137,14 @@ function ReadingRow(props: ReadingRowProps): JSX.Element {
                 <div class="planned-set__body">
                     <div class="inline-fields">
                         <NumberField
-                            label="Value"
-                            min={0}
-                            value={props.measurement.value}
-                            onChange={(next) => props.onEdit({ ...props.measurement, value: next })}
-                        />
-                        <SelectField
-                            label="Unit"
-                            value={props.measurement.unit}
-                            options={[
-                                { value: 'kg', label: 'kg' },
-                                { value: 'lb', label: 'lb' },
-                            ]}
-                            onChange={(next) => props.onEdit({ ...props.measurement, unit: next as WeightUnit })}
+                            label={`Weight (${app.massUnit()})`}
+                            min={0.1}
+                            step={0.1}
+                            fractionDigits={1}
+                            value={massValue(props.measurement, app.massUnit(), 1)}
+                            onChange={(next) =>
+                                props.onEdit({ ...props.measurement, value: next, unit: app.massUnit() })
+                            }
                         />
                         <DateField
                             label="Date"

@@ -1,3 +1,6 @@
+import { useAppData } from '../../app/AppData.tsx';
+import { massValue } from '../../domain/convertWeight.ts';
+import type { WeightUnit } from '../../domain/units.ts';
 import { Button } from '../Button/Button.tsx';
 import { For, Show, type JSX } from 'solid-js';
 import { formatMeasurement } from '../../domain/format.ts';
@@ -6,7 +9,6 @@ import type { SequenceOccurrence } from '../../domain/lookups.ts';
 import type { ActualResult, WorkoutSession } from '../../domain/session.ts';
 import { CompactNumberField } from '../fields.tsx';
 import {
-    externalWeightValue,
     formatSetReference,
     resultCells,
     sideCountValues,
@@ -38,6 +40,7 @@ interface ExerciseBlockProps {
  * screens down.
  */
 function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
+    const app = useAppData();
     const targets = () =>
         props.occurrences.map((occurrence) => formatMeasurement(occurrence.set.prescription.measurement));
     const logged = () =>
@@ -64,7 +67,7 @@ function ExerciseBlock(props: ExerciseBlockProps): JSX.Element {
                             Prev
                         </th>
                         <th class="set-table__weight" scope="col">
-                            Weight
+                            {app.massUnit()}
                         </th>
                         <th class="set-table__count" scope="col">
                             {props.occurrences[0]?.set.prescription.measurement.measurement === 'duration'
@@ -114,6 +117,7 @@ interface SetRowProps {
 
 /** One set's row: a number, last time's numbers, editable numbers, and a done toggle. */
 function SetRow(props: SetRowProps): JSX.Element {
+    const app = useAppData();
     const cells = () => (props.draft ? resultCells(props.draft) : undefined);
     const prefix = () => `${props.occurrence.exercise.name} set ${props.index + 1}`;
 
@@ -124,7 +128,9 @@ function SetRow(props: SetRowProps): JSX.Element {
             </th>
             <td class="set-table__prev">
                 <Show when={props.previous} fallback={<span class="set-cell set-cell--muted">—</span>}>
-                    {(previous) => <span class="set-cell set-cell--muted">{formatSetReference(previous())}</span>}
+                    {(previous) => (
+                        <span class="set-cell set-cell--muted">{formatSetReference(previous(), app.massUnit())}</span>
+                    )}
                 </Show>
             </td>
             <td class="set-table__weight">
@@ -136,10 +142,12 @@ function SetRow(props: SetRowProps): JSX.Element {
                         >
                             <CompactNumberField
                                 label={`${prefix()} weight`}
-                                value={weightValue(props.draft)}
+                                value={weightValue(props.draft, app.massUnit())}
                                 min={0}
                                 disabled={props.readOnly}
-                                onChange={(value) => props.draft && props.onDraftChange(withWeight(props.draft, value))}
+                                onChange={(value) =>
+                                    props.draft && props.onDraftChange(withWeight(props.draft, value, app.massUnit()))
+                                }
                             />
                         </Show>
                     )}
@@ -221,8 +229,11 @@ function bodyweightMarker(draft: ActualResult | undefined): string {
     return draft?.load.kind === 'bodyweight' ? 'BW' : '—';
 }
 
-function weightValue(draft: ActualResult | undefined): number {
-    return draft ? (externalWeightValue(draft.load) ?? 0) : 0;
+function weightValue(draft: ActualResult | undefined, unit: WeightUnit): number {
+    if (!draft || (draft.load.kind !== 'external' && draft.load.kind !== 'bodyweightExternal')) {
+        return 0;
+    }
+    return massValue(draft.load.weight, unit);
 }
 
 function countValue(draft: ActualResult | undefined): number {

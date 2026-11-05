@@ -761,3 +761,74 @@ legend.form-label {
 .weight-fields .nes-option-picker__frame {
     margin-block-start: 16px;
 }
+
+.card-link {
+    display: inline;
+    padding: 0;
+    border: 0;
+}
+.card > .muted {
+    display: block;
+}
+.planned-set__summary {
+    flex: none;
+    min-width: 0;
+    min-height: 16px;
+    padding: 0;
+}
+.planned-set__summary > .nes-button__label {
+    display: inline;
+    width: auto;
+}
+.menu-choice {
+    display: block;
+    color: var(--text-primary);
+}
+.menu-choice p {
+    margin: 0;
+}
+
+.record-weight__row,
+.date-field,
+.record-weight__actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.record-weight__actions {
+    gap: 24px;
+}
+.record-weight__spinner .nes-spinner__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+}
+.date-field__native {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+.check-item {
+    pointer-events: none;
+}
+.check-item > input,
+.check-item > span {
+    pointer-events: auto;
+}
+
+.planned-set__text {
+    flex: 1 1 140px;
+}
+.record-weight__row,
+.record-weight .date-field {
+    display: grid;
+    grid-template-columns: 88px minmax(0, 1fr);
+    gap: 8px;
+}
+.record-weight .date-field > .nes-button {
+    justify-self: start;
+}

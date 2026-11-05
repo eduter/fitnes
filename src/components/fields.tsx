@@ -1,8 +1,9 @@
+import { Button } from './Button/Button.tsx';
 import { OptionPicker } from './OptionPicker/OptionPicker.tsx';
 import { Spinner } from './Spinner/Spinner.tsx';
 import { TextInput } from './TextInput/TextInput.tsx';
 import { For, type JSX } from 'solid-js';
-import { fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
+import { formatDate, fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 interface TextFieldProps {
     label: string;
@@ -52,12 +53,13 @@ interface NumberFieldProps {
     min?: number;
     step?: number | string;
     disabled?: boolean;
+    fractionDigits?: number;
     onChange: (value: number) => void;
 }
 
 /** The adopted spinner handles quantity entry and immediate stepping. */
 function NumberField(props: NumberFieldProps): JSX.Element {
-    const fractionDigits = () => (props.step === 1 ? 0 : 2);
+    const fractionDigits = () => props.fractionDigits ?? (props.step === 1 ? 0 : 2);
     return (
         <Spinner
             label={props.label}
@@ -136,22 +138,32 @@ interface DateFieldProps {
 
 /** A native date picker; the stored value remains local epoch millis. */
 function DateField(props: DateFieldProps): JSX.Element {
+    let input!: HTMLInputElement;
     return (
-        <label class="form-field">
+        <div class="date-field">
             <span class="form-label">{props.label}</span>
+            <Button
+                variant="plain"
+                aria-label={`${props.label}: ${formatDate(props.value)}`}
+                onPress={() => input.showPicker()}
+            >
+                {formatDate(props.value)}
+            </Button>
             <input
-                class="form-input"
+                ref={input}
+                class="date-field__native"
                 type="date"
+                hidden
+                aria-label={props.label}
                 value={toDateLocalValue(props.value)}
                 onInput={(event) => {
                     const next = fromDateLocalValue(event.currentTarget.value);
-                    if (Number.isNaN(next)) {
-                        return;
+                    if (!Number.isNaN(next)) {
+                        props.onChange(next);
                     }
-                    props.onChange(next);
                 }}
             />
-        </label>
+        </div>
     );
 }
 
@@ -181,7 +193,7 @@ function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
                                 checked={props.values.includes(option.value)}
                                 onChange={() => props.onToggle(option.value)}
                             />
-                            {option.label}
+                            <span>{option.label}</span>
                         </label>
                     )}
                 </For>

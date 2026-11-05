@@ -1,3 +1,5 @@
+import { massValue } from '../../domain/convertWeight.ts';
+import type { WeightUnit } from '../../domain/units.ts';
 import type { SetPrescription } from '../../domain/prescription.ts';
 
 /**
@@ -5,9 +7,9 @@ import type { SetPrescription } from '../../domain/prescription.ts';
  * reads it: what to do, then what to load. Kept short because it sits on a
  * collapsed row whose whole job is to be skimmable.
  */
-function prescriptionSummary(prescription: SetPrescription): string {
+function prescriptionSummary(prescription: SetPrescription, unit?: WeightUnit): string {
     const count = countSummary(prescription);
-    const load = loadSummary(prescription);
+    const load = loadSummary(prescription, unit);
 
     return load === '' ? count : `${count} @ ${load}`;
 }
@@ -23,7 +25,7 @@ function countSummary(prescription: SetPrescription): string {
     return `${measurement.seconds}s${side}`;
 }
 
-function loadSummary(prescription: SetPrescription): string {
+function loadSummary(prescription: SetPrescription, unit?: WeightUnit): string {
     const { load } = prescription;
 
     if (load.kind === 'none') {
@@ -34,7 +36,7 @@ function loadSummary(prescription: SetPrescription): string {
         return 'bodyweight';
     }
 
-    const weight = `${load.weight.value}${load.weight.unit}${load.basis === 'perSide' ? '/side' : ''}`;
+    const weight = `${massValue(load.weight, unit ?? load.weight.unit)}${unit ?? load.weight.unit}${load.basis === 'perSide' ? '/side' : ''}`;
     return load.kind === 'bodyweightExternal' ? `bodyweight + ${weight}` : weight;
 }
 

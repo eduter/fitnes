@@ -2,14 +2,13 @@ import { Button } from '../components/Button/Button.tsx';
 import { A, useNavigate, useParams } from '@solidjs/router';
 import { For, Show, createEffect, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { DateField, NumberField, SelectField } from '../components/fields.tsx';
+import { DateField, NumberField } from '../components/fields.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { latestBodyweightAtOrBefore, type BodyweightMeasurement } from '../domain/bodyweight.ts';
-import { formatWeight } from '../domain/format.ts';
+import { formatMass, massValue } from '../domain/convertWeight.ts';
 import { generateBodyweightMeasurementId } from '../domain/generateIds.ts';
 import { templateUsesBodyweight } from '../domain/lookups.ts';
-import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { formatDate, fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
@@ -25,8 +24,7 @@ function StartSessionPage(): JSX.Element {
 
     const [mode, setMode] = createSignal<BodyweightMode>('none');
     const [touchedMode, setTouchedMode] = createSignal(false);
-    const [value, setValue] = createSignal(80);
-    const [unit, setUnit] = createSignal<WeightUnit>('kg');
+    const [value, setValue] = createSignal(massValue({ value: 80, unit: 'kg' }, app.massUnit(), 1));
     const [measuredAt, setMeasuredAt] = createSignal(Date.now());
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
 
@@ -59,7 +57,7 @@ function StartSessionPage(): JSX.Element {
                 id: generateBodyweightMeasurementId(),
                 measuredAt: fromDateLocalValue(toDateLocalValue(measuredAt())),
                 value: value(),
-                unit: unit(),
+                unit: app.massUnit(),
             });
             if (!saved.ok) {
                 setErrors(saved.errors);
@@ -122,7 +120,8 @@ function StartSessionPage(): JSX.Element {
                                     {(measurement) => (
                                         <>
                                             {' '}
-                                            ({formatWeight(measurement())} at {formatDate(measurement().measuredAt)})
+                                            ({formatMass(measurement(), app.massUnit(), 1)} at{' '}
+                                            {formatDate(measurement().measuredAt)})
                                         </>
                                     )}
                                 </Show>
@@ -139,15 +138,13 @@ function StartSessionPage(): JSX.Element {
                         </fieldset>
                         <Show when={mode() === 'new'}>
                             <div class="inline-fields">
-                                <NumberField label="Value" min={0} value={value()} onChange={setValue} />
-                                <SelectField
-                                    label="Unit"
-                                    value={unit()}
-                                    options={[
-                                        { value: 'kg', label: 'kg' },
-                                        { value: 'lb', label: 'lb' },
-                                    ]}
-                                    onChange={(next) => setUnit(next as WeightUnit)}
+                                <NumberField
+                                    label={`Weight (${app.massUnit()})`}
+                                    min={0.1}
+                                    step={0.1}
+                                    fractionDigits={1}
+                                    value={value()}
+                                    onChange={setValue}
                                 />
                                 <DateField label="Date" value={measuredAt()} onChange={setMeasuredAt} />
                             </div>
@@ -159,7 +156,8 @@ function StartSessionPage(): JSX.Element {
                                     <For each={app.bodyweightMeasurements()}>
                                         {(measurement) => (
                                             <li>
-                                                {formatWeight(measurement)} · {formatDate(measurement.measuredAt)}
+                                                {formatMass(measurement, app.massUnit(), 1)} ·{' '}
+                                                {formatDate(measurement.measuredAt)}
                                             </li>
                                         )}
                                     </For>

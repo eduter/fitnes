@@ -1,45 +1,44 @@
-import { Button } from '../Button/Button.tsx';
-import { Spinner } from '../Spinner/Spinner.tsx';
-import { OptionPicker } from '../OptionPicker/OptionPicker.tsx';
 import { createEffect, createSignal, Show, type JSX } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
 import type { BodyweightMeasurement } from '../../domain/bodyweight.ts';
+import { massValue } from '../../domain/convertWeight.ts';
 import { generateBodyweightMeasurementId } from '../../domain/generateIds.ts';
 import { fromDateLocalValue, toDateLocalValue } from '../../utils/datetime.ts';
+import { Button } from '../Button/Button.tsx';
+import { DateField } from '../fields.tsx';
+import { Spinner } from '../Spinner/Spinner.tsx';
 
-/** Record a validated reading and leave the form open if persistence fails. */
+/** Keep a weight reading as a draft until Save; Cancel leaves stored data unchanged. */
 function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
     const app = useAppData();
     const latest = () => app.bodyweightMeasurements()[0];
-    const [value, setValue] = createSignal(latest()?.value ?? 80);
-    const [unit, setUnit] = createSignal<'kg' | 'lb'>(latest()?.unit ?? 'kg');
+    const [value, setValue] = createSignal(massValue(latest() ?? { value: 80, unit: 'kg' }, app.massUnit(), 1));
+    const [date, setDate] = createSignal(Date.now());
+    const [busy, setBusy] = createSignal(false);
+    const [error, setError] = createSignal('');
     let initialized = false;
+
     createEffect(() => {
         const reading = latest();
         if (!initialized && reading) {
             initialized = true;
-            setValue(reading.value);
-            setUnit(reading.unit);
+            setValue(massValue(reading, app.massUnit(), 1));
         }
     });
-    const [busy, setBusy] = createSignal(false);
-    const [error, setError] = createSignal('');
 
     async function submit(event: SubmitEvent): Promise<void> {
         event.preventDefault();
         if (busy()) {
             return;
         }
-        const form = event.currentTarget as HTMLFormElement;
-        const data = new FormData(form);
         setBusy(true);
         setError('');
         try {
             const result = await app.saveBodyweight({
                 id: generateBodyweightMeasurementId(),
                 value: value(),
-                unit: unit(),
-                measuredAt: fromDateLocalValue(String(data.get('measuredAt'))),
+                unit: app.massUnit(),
+                measuredAt: fromDateLocalValue(toDateLocalValue(date())),
             });
             if (!result.ok) {
                 setError(result.errors.map((issue) => issue.message).join('. '));
@@ -54,47 +53,43 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
     }
 
     return (
-        <form class="stack" onSubmit={(event) => void submit(event)}>
-            <div class="weight-fields">
+        <form class="stack record-weight" onSubmit={(event) => void submit(event)}>
+            <div class="record-weight__row">
+                <span class="form-label">Weight ({app.massUnit()})</span>
                 <Spinner
+                    class="record-weight__spinner compact-spinner"
                     label="Weight"
                     value={value()}
                     onChange={setValue}
-                    min={0.01}
+                    min={0.1}
                     step={0.1}
                     integerDigits={3}
-                    fractionDigits={2}
-                    popoverMount={document.getElementById('root') ?? undefined}
-                />
-                <OptionPicker
-                    label="Unit"
-                    value={unit()}
-                    onChange={(next) => setUnit(next as 'kg' | 'lb')}
-                    options={[
-                        { value: 'kg', label: 'kg' },
-                        { value: 'lb', label: 'lb' },
-                    ]}
+                    fractionDigits={1}
                     popoverMount={document.getElementById('root') ?? undefined}
                 />
             </div>
-            <label class="form-field">
-                <span class="form-label">Date</span>
-                <input class="form-input" name="measuredAt" type="date" value={toDateLocalValue(Date.now())} required />
-            </label>
+            <DateField label="Date" value={date()} onChange={setDate} />
             <Show when={error()}>
                 <p role="alert" class="error-text">
                     {error()}
                 </p>
             </Show>
-            <Button disabled={busy()} onPress={(event) => event.currentTarget.form?.requestSubmit()}>
-                {busy() ? 'Recording…' : 'Add reading'}
-            </Button>
+            <div class="record-weight__actions">
+                <Button disabled={busy()} onPress={(event) => event.currentTarget.form?.requestSubmit()}>
+                    {busy() ? 'Saving…' : 'Save'}
+                </Button>
+                <Button disabled={busy()} onPress={props.onCancel}>
+                    Cancel
+                </Button>
+            </div>
         </form>
     );
 }
 
+/** Both exits belong to the containing menu; only a saved reading reaches onRecorded. */
 interface RecordWeightFormProps {
     onRecorded: (weight: BodyweightMeasurement) => void;
+    onCancel: () => void;
 }
 
 export { RecordWeightForm };

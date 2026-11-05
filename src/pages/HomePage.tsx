@@ -6,7 +6,7 @@ import { useAppData } from '../app/AppData.tsx';
 import { MenuDialog } from '../components/dialog/MenuDialog.tsx';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
 
-import { formatWeight } from '../domain/format.ts';
+import { formatMass } from '../domain/convertWeight.ts';
 import { templateUsesBodyweight } from '../domain/lookups.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
 
@@ -100,18 +100,19 @@ function HomePage(): JSX.Element {
                         <p class="muted">Continue a workout</p>
                         <For each={active()}>
                             {(session) => (
-                                <Button
-                                    class="menu-choice"
-                                    onPress={() => {
-                                        setMenu(null);
-                                        navigate(`/sessions/${session.id}`);
-                                    }}
-                                >
-                                    Resume {session.snapshot.name}{' '}
-                                    <span class="muted">
+                                <div class="menu-choice">
+                                    <Button
+                                        onPress={() => {
+                                            setMenu(null);
+                                            navigate(`/sessions/${session.id}`);
+                                        }}
+                                    >
+                                        Resume {session.snapshot.name}
+                                    </Button>
+                                    <p class="muted">
                                         {session.results.length}/{session.snapshot.sequence.length} sets logged
-                                    </span>
-                                </Button>
+                                    </p>
+                                </div>
                             )}
                         </For>
                     </Show>
@@ -133,25 +134,24 @@ function HomePage(): JSX.Element {
                         }
                     >
                         {(template) => (
-                            <Button
-                                type="button"
-                                class="menu-choice"
-                                disabled={busy()}
-                                onPress={() => void start(template)}
-                            >
-                                <strong>{template.name}</strong>
-                                <span class="muted">
+                            <div class="menu-choice">
+                                <Button disabled={busy()} onPress={() => void start(template)}>
+                                    {template.name}
+                                </Button>
+                                <p class="muted">
                                     {template.exercises.length} exercises · {template.sequence.length} sets
-                                </span>
+                                </p>
                                 <Show when={template.description}>
-                                    <span class="muted">{template.description}</span>
+                                    <p class="muted">{template.description}</p>
                                 </Show>
-                            </Button>
+                            </div>
                         )}
                     </For>
                     <Show when={app.bodyweightMeasurements()[0]}>
                         {(weight) => (
-                            <p class="muted">Bodyweight sets use your latest reading: {formatWeight(weight())}.</p>
+                            <p class="muted">
+                                Bodyweight sets use your latest reading: {formatMass(weight(), app.massUnit(), 1)}.
+                            </p>
                         )}
                     </Show>
                     <Show when={busy()}>
@@ -167,14 +167,16 @@ function HomePage(): JSX.Element {
             <MenuDialog
                 anchor={() => weightButton}
                 open={menu() === 'weight'}
-                height={320}
+                showBack={false}
+                height={208}
                 title="Record weight"
                 onClose={() => setMenu(null)}
             >
                 <RecordWeightForm
+                    onCancel={() => setMenu(null)}
                     onRecorded={(weight) => {
                         setMenu(null);
-                        setMessage(`Recorded ${formatWeight(weight)}.`);
+                        setMessage(`Recorded ${formatMass(weight, app.massUnit(), 1)}.`);
                     }}
                 />
             </MenuDialog>

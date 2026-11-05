@@ -20,6 +20,7 @@ import {
     putTemplate,
     seedExampleExercises,
 } from '../db/repository.ts';
+import type { WeightUnit } from '../domain/units.ts';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
 import { parseDataExport, serializeDataExport, type DataExport } from '../domain/dataExport.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
@@ -31,6 +32,8 @@ import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
 type LoadState = 'loading' | 'ready' | 'error';
 
 interface AppData {
+    massUnit: () => WeightUnit;
+    setMassUnit: (unit: WeightUnit) => void;
     loadState: () => LoadState;
     loadError: () => string | null;
     exercises: () => ExerciseDefinition[];
@@ -62,6 +65,13 @@ const AppDataContext = createContext<AppData>();
 
 /** Load IndexedDB collections and expose persisted catalog/history operations. */
 function AppDataProvider(props: AppDataProviderProps): JSX.Element {
+    const [massUnit, setUnit] = createSignal<WeightUnit>(
+        localStorage.getItem('fitnes-mass-unit') === 'lb' ? 'lb' : 'kg'
+    );
+    function setMassUnit(unit: WeightUnit): void {
+        localStorage.setItem('fitnes-mass-unit', unit);
+        setUnit(unit);
+    }
     const [loadState, setLoadState] = createSignal<LoadState>('loading');
     const [loadError, setLoadError] = createSignal<string | null>(null);
     const [exercises, setExercises] = createSignal<ExerciseDefinition[]>([]);
@@ -201,6 +211,8 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
     }
 
     const value: AppData = {
+        massUnit,
+        setMassUnit,
         loadState,
         loadError,
         exercises,

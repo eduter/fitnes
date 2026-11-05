@@ -1,4 +1,4 @@
-import type { JSX } from 'solid-js';
+import { Show, type JSX } from 'solid-js';
 import { Button } from '../Button/Button.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 
@@ -22,7 +22,9 @@ function MenuDialog(props: MenuDialogProps): JSX.Element {
             <div class="stack app-menu__body">
                 <h2 class="card-title">{props.title}</h2>
                 {props.children}
-                <Button onPress={() => props.onClose()}>Back</Button>
+                <Show when={props.showBack !== false}>
+                    <Button onPress={() => props.onClose()}>Back</Button>
+                </Show>
             </div>
         </Popover>
     );
@@ -31,6 +33,7 @@ function MenuDialog(props: MenuDialogProps): JSX.Element {
 /** A controlled menu retains its reverse closing animation before leaving the DOM. */
 interface MenuDialogProps {
     title: string;
+    showBack?: boolean;
     anchor?: () => HTMLElement | undefined;
     open: boolean;
     height?: number;

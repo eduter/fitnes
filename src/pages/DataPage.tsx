@@ -1,6 +1,8 @@
 import { Button } from '../components/Button/Button.tsx';
 import { createSignal, Show, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
+import { OptionPicker } from '../components/OptionPicker/OptionPicker.tsx';
+import type { WeightUnit } from '../domain/units.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { countRecords, type DataExport } from '../domain/dataExport.ts';
@@ -54,7 +56,18 @@ function DataPage(): JSX.Element {
 
     return (
         <section class="page">
-            <PageHeader title="Data" />
+            <PageHeader title="Settings" />
+            <OptionPicker
+                label="Mass unit"
+                value={app.massUnit()}
+                options={[
+                    { value: 'kg', label: 'kg' },
+                    { value: 'lb', label: 'lb' },
+                ]}
+                onChange={(unit) => app.setMassUnit(unit as WeightUnit)}
+                popoverMount={document.getElementById('root') ?? undefined}
+            />
+            <h2 class="section-title">Data</h2>
             <p class="muted">
                 The whole database as one JSON document. Replacing is a full overwrite: anything not in the pasted
                 document is deleted.

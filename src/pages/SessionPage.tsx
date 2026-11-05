@@ -7,7 +7,7 @@ import { RawDocument } from '../components/RawDocument.tsx';
 import { ExerciseBlock } from '../components/session/ExerciseBlock.tsx';
 import { previousPerformance } from '../components/session/previousPerformance.ts';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
-import { formatWeight } from '../domain/format.ts';
+import { formatMass } from '../domain/convertWeight.ts';
 import type { SequenceEntryId } from '../domain/ids.ts';
 import { findOccurrence, groupSequenceEntries } from '../domain/lookups.ts';
 import {
@@ -194,7 +194,7 @@ function SessionPage(): JSX.Element {
                                 {(completedAt) => <> → {formatDateTime(completedAt())}</>}
                             </Show>
                             <Show when={current().bodyweight}>
-                                {(bodyweight) => <> · BW {formatWeight(bodyweight())}</>}
+                                {(bodyweight) => <> · BW {formatMass(bodyweight(), app.massUnit(), 1)}</>}
                             </Show>
                         </p>
                         <ValidationErrors errors={errors()} />

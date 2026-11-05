@@ -1,3 +1,5 @@
+import { useAppData } from '../../app/AppData.tsx';
+import { massValue } from '../../domain/convertWeight.ts';
 import { Show, type JSX } from 'solid-js';
 import type { ExerciseDefinition, LoadBasis, LoadOption } from '../../domain/exercise.ts';
 import type { LoadConfiguration, MeasurementValue, SetPrescription } from '../../domain/prescription.ts';
@@ -94,6 +96,7 @@ interface LoadConfigurationFieldsProps {
 
 /** Edit load kind (when unlocked), basis, weight, and unit. */
 function LoadConfigurationFields(props: LoadConfigurationFieldsProps): JSX.Element {
+    const app = useAppData();
     const selectedOption = (): LoadOption | undefined =>
         props.exercise.loads.find((option) => option.kind === props.value.kind);
 
@@ -131,39 +134,18 @@ function LoadConfigurationFields(props: LoadConfigurationFieldsProps): JSX.Eleme
                 />
                 <div class="inline-fields">
                     <NumberField
-                        label="External weight"
+                        label={`External weight (${app.massUnit()})`}
                         min={0}
                         value={
                             props.value.kind === 'external' || props.value.kind === 'bodyweightExternal'
-                                ? props.value.weight.value
+                                ? massValue(props.value.weight, app.massUnit())
                                 : 0
                         }
                         onChange={(value) => {
                             if (props.value.kind !== 'external' && props.value.kind !== 'bodyweightExternal') {
                                 return;
                             }
-                            props.onChange({ ...props.value, weight: { ...props.value.weight, value } });
-                        }}
-                    />
-                    <SelectField
-                        label="Unit"
-                        value={
-                            props.value.kind === 'external' || props.value.kind === 'bodyweightExternal'
-                                ? props.value.weight.unit
-                                : 'kg'
-                        }
-                        options={[
-                            { value: 'kg', label: 'kg' },
-                            { value: 'lb', label: 'lb' },
-                        ]}
-                        onChange={(unit) => {
-                            if (props.value.kind !== 'external' && props.value.kind !== 'bodyweightExternal') {
-                                return;
-                            }
-                            props.onChange({
-                                ...props.value,
-                                weight: { ...props.value.weight, unit: unit as 'kg' | 'lb' },
-                            });
+                            props.onChange({ ...props.value, weight: { value, unit: app.massUnit() } });
                         }}
                     />
                 </div>

@@ -1,3 +1,4 @@
+import { useAppData } from '../../app/AppData.tsx';
 import { Button } from '../Button/Button.tsx';
 import { For, Show, createSignal, type JSX } from 'solid-js';
 import { createWorkoutTemplate, refreshTemplateExercises } from '../../domain/createWorkoutTemplate.ts';
@@ -259,28 +260,22 @@ interface OccurrenceEditorProps {
  * scannable: only the set being changed pays the height cost.
  */
 function OccurrenceEditor(props: OccurrenceEditorProps): JSX.Element {
+    const app = useAppData();
     const drifted = (): boolean =>
         props.catalogExercise !== undefined && JSON.stringify(props.catalogExercise) !== JSON.stringify(props.exercise);
 
     return (
         <div class="planned-set" classList={{ 'planned-set--expanded': props.expanded }}>
             <div class="planned-set__row">
-                <Button
-                    variant="plain"
-                    class="planned-set__summary"
-                    type="button"
-                    aria-expanded={props.expanded}
-                    onPress={props.onToggle}
-                >
-                    <span class="set-badge">{props.index + 1}</span>
-                    <span class="planned-set__text">
-                        <span class="planned-set__name">{props.exercise.name}</span>
-                        <span class="planned-set__detail">{prescriptionSummary(props.set.prescription)}</span>
+                <span class="set-badge">{props.index + 1}</span>
+                <div class="planned-set__text">
+                    <Button class="planned-set__summary" aria-expanded={props.expanded} onPress={props.onToggle}>
+                        {props.exercise.name}
+                    </Button>
+                    <span class="planned-set__detail">
+                        {prescriptionSummary(props.set.prescription, app.massUnit())}
                     </span>
-                    <span class="planned-set__caret" aria-hidden="true">
-                        {props.expanded ? '-' : '+'}
-                    </span>
-                </Button>
+                </div>
                 <div class="button-row">
                     <Button
                         variant="plain"

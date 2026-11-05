@@ -1,3 +1,5 @@
+import { massValue } from '../../domain/convertWeight.ts';
+import type { WeightUnit } from '../../domain/units.ts';
 import type { ActualMeasurement, LoadConfiguration } from '../../domain/prescription.ts';
 import type { ActualResult } from '../../domain/session.ts';
 
@@ -69,14 +71,14 @@ function withSideCount(result: ActualResult, side: 'left' | 'right', value: numb
 }
 
 /** Replace the external mass of a result; ignores a result with no external load. */
-function withWeight(result: ActualResult, value: number): ActualResult {
+function withWeight(result: ActualResult, value: number, unit?: WeightUnit): ActualResult {
     const { load } = result;
 
     if (load.kind !== 'external' && load.kind !== 'bodyweightExternal') {
         return result;
     }
 
-    return { ...result, load: { ...load, weight: { ...load.weight, value } } };
+    return { ...result, load: { ...load, weight: { value, unit: unit ?? load.weight.unit } } };
 }
 
 /** The single count of a total-counted measurement, or undefined for any other shape. */
@@ -104,9 +106,9 @@ function externalWeightValue(load: LoadConfiguration): number | undefined {
  * terser than `formatLoad`/`formatMeasurement`: `60kg×8`, `BW×5`, `10/10`,
  * `BW×45s`.
  */
-function formatSetReference(result: ActualResult): string {
+function formatSetReference(result: ActualResult, unit?: WeightUnit): string {
     const count = formatReferenceCount(result.measurement);
-    const load = formatReferenceLoad(result.load);
+    const load = formatReferenceLoad(result.load, unit);
 
     return load === '' ? count : `${load}×${count}`;
 }
@@ -122,7 +124,7 @@ function formatReferenceCount(measurement: ActualMeasurement): string {
     return sides ? `${sides.left}/${sides.right}${suffix}` : `?${suffix}`;
 }
 
-function formatReferenceLoad(load: LoadConfiguration): string {
+function formatReferenceLoad(load: LoadConfiguration, unit?: WeightUnit): string {
     if (load.kind === 'none') {
         return '';
     }
@@ -131,8 +133,8 @@ function formatReferenceLoad(load: LoadConfiguration): string {
         return 'BW';
     }
 
-    const weight = externalWeightValue(load);
-    const amount = weight === undefined ? '?' : `${weight}${load.weight.unit}`;
+    const weight = massValue(load.weight, unit ?? load.weight.unit);
+    const amount = weight === undefined ? '?' : `${weight}${unit ?? load.weight.unit}`;
     return load.kind === 'bodyweightExternal' ? `BW+${amount}` : amount;
 }
 
