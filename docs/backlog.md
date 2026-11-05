@@ -15,7 +15,9 @@ recorded in [the vision](vision.md#design-direction).
   scrolling pages, device scaling, and letterboxing.
 - [ ] Choose typography, case, menu hierarchy, and layout.
 - [ ] Design the between-set flow from the selected corridor reference;
-  use its top-down view.
+  use its thin top-down view. Start from the [retained art and owner decisions](design/corridor-interstitial/README.md)
+  when the preceding work is ready. Character F is preferred provisionally;
+  keep the alternative sheets available.
 - [ ] Implement the workout UI in small changes, checking native-resolution
   output and the actual phone experience.
 - [ ] Plan deployment and data transfer before replacing the preview.

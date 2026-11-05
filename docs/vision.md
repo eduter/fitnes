@@ -68,6 +68,23 @@ Use the [corridor capture](https://feat-corridor-transition.fitnes-corridor-capt
 for top-down character movement through the environment between sets. Develop
 the graphics for FitNES; timing and interaction remain to be designed.
 
+Owner direction (2026-11-04): **F — Boulder** is the current character preference,
+subject to change; preserve all character alternatives. Use corridor
+**A — Basement** from the [art reference package](design/corridor-interstitial/README.md). Run the
+corridor **vertically**, with the entrance at the bottom, set doors along the
+sides and the final exit at the top, to suit phone screens. The
+[native sample](design/corridor-interstitial/corridors/thin-top-view/overview.png) develops that direction;
+animation timing and workout integration remain open.
+
+Owner correction (2026-11-04): match the DW3 reference's **thin, top-view
+corridor on a black screen**. Use narrow wall caps and small door thresholds
+seen from above. Keep the screen outside the corridor pure black; avoid tall
+wall faces or upright door facades.
+
+Implementation is deferred behind earlier backlog work. The reference package
+retains both corridor versions, their native tiles, sprites and all character
+sheets as the starting point when implementation becomes appropriate.
+
 The [inventory](repo-status.md) locates useful existing code, artwork, and research.
 
 ## Preview in use
