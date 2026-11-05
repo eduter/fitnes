@@ -17,7 +17,9 @@ recorded in [the vision](vision.md#design-direction).
 - [x] Extract the selected button, animated thin popover, number-pad spinner and
   native text-input controls into reusable components.
 - [ ] Design the between-set flow from the selected corridor reference;
-  use its top-down view.
+  use its thin top-down view. Start from the [retained art and owner decisions](design/corridor-interstitial/README.md)
+  when the preceding work is ready. Character F is preferred provisionally;
+  keep the alternative sheets available.
 - [ ] Implement the workout UI in small changes, checking native-resolution
   output and the actual phone experience.
 - [ ] Plan deployment and data transfer before replacing the preview.
