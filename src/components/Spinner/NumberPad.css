@@ -1,0 +1,75 @@
+.nes-number-pad {
+    display: grid;
+    gap: 8px;
+    inline-size: 208px;
+    margin-inline: auto;
+}
+.nes-number-pad__title {
+    margin: 0;
+    font: inherit;
+}
+.nes-number-pad__slots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2px;
+    block-size: 36px;
+}
+.nes-number-pad__slot {
+    position: relative;
+    flex: 0 0 34px;
+    block-size: 36px;
+    font-size: 32px;
+    line-height: 32px;
+}
+.nes-number-pad__slot[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 7px;
+    inline-size: 20px;
+    block-size: 2px;
+    background: var(--nes-ink);
+    animation: nes-digit-cursor 1s steps(1, end) infinite;
+}
+@keyframes nes-digit-cursor {
+    50% {
+        visibility: hidden;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .nes-number-pad__slot[aria-pressed="true"]::after {
+        animation: none;
+    }
+}
+.nes-number-pad__decimal {
+    flex: 0 0 8px;
+    align-self: end;
+    font-size: 32px;
+    line-height: 32px;
+}
+.nes-number-pad__keys {
+    display: grid;
+    grid-template-columns: repeat(3, 64px);
+    gap: 4px 8px;
+}
+.nes-number-pad__keys .nes-button {
+    block-size: 36px;
+}
+.nes-number-pad__announcement {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+.nes-number-pad {
+    border: 0;
+    padding: 0;
+    min-inline-size: 0;
+}
+.nes-number-pad__title {
+    padding: 0;
+    margin-block-end: 8px;
+}

@@ -10,34 +10,38 @@ Updated 2026-11-05. Use [the vision](vision.md) for product authority and
 - [SteelPanel](../src/components/SteelPanel/README.md), the reusable steel frame.
 - [BottomTabs](../src/components/BottomTabs/README.md), the selected six icons
   and steel tab bar.
+- [Reusable controls](../src/components/Controls/README.md): Button, Popover,
+  Spinner and TextInput. The selected number pad and stepped popover are
+  available; workout-app integration remains open. The isolated
+  [phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
+  uses these components directly.
 - [Selected style reference](style-reference.png),
   [standalone logo](fitnes-logo.png), and
   [original home composition reference](reference-home-screen-image.png).
 - Public PWA icons and component proof routes are build/runtime assets. Keep
   generated proof captures, reports, and ROMs under ignored `work/`.
 
-## Pending source PRs
+## Retained design sources
 
-These sources are under review and have not been merged into main. Do not treat
-them as adopted implementation until their PRs merge.
-
-| Source | Useful material | Status |
-| --- | --- | --- |
-| [#24 — Reusable NES controls](https://github.com/eduter/fitnes/pull/24) | Shared native controls proposed for integration with the adopted frame and tabs. | Pending PR and integration/review. |
-| [#22 — Corridor art package](https://github.com/eduter/fitnes/pull/22) | Editable corridor and character design sources, with reproduction notes. | Pending PR; its design decisions are recorded in the vision. Character F is provisional; timing and interaction were deferred. |
+The [corridor art package](design/corridor-interstitial/README.md) is available
+in main with editable sources, native tiles, proof samples, sprites and all
+character sheets. It records A — Basement materials, the thin vertical top-down
+corridor on black, whole-workout travel through set doors, and provisional
+character F. Preserve the alternatives. Implementation remains deferred behind
+earlier backlog work; timing and detailed interaction remain open.
 
 The adopted [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 is a navigation design reference, distinct from behavioral validation. The
 [corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/)
-and #22 sources record the selected thin top-down corridor, whole-workout travel,
-and set doors. See [retained reference notes and captures](references/README.md).
+and local art sources record the selected corridor direction. See
+[retained reference notes and captures](references/README.md).
 
 ## Behavioral reference
 
 The owner confirms the [compact workout preview](https://feat-compact-workout-ui.fitnes-preview.pages.dev/)
 is the only dogfooded UI. Its workflows are the behavioral reference for the
 new UI. The source PR is [#4](https://github.com/eduter/fitnes/pull/4), and the
-source commit to preserve is
+source snapshot is preserved under the `reference/compact-dogfood` Git tag at
 [`4b81ee5ee2516dcbe794d071fa83bfe7042c0d21`](https://github.com/eduter/fitnes/commit/4b81ee5ee2516dcbe794d071fa83bfe7042c0d21).
 This source reference is not verified as the exact deployed build. It is useful
 behavior evidence, not a direction to reuse its whole implementation or

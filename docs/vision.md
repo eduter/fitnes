@@ -41,6 +41,21 @@ owner adopts them.
 
 ## Design direction
 
+Owner-approved controls (2026-11-04): use uppercase action labels with the bold
+leading chevron close to the text, keeping other content mixed case. Numeric
+spinners use fixed monospaced masks, corner brackets, borderless stacked filled
+triangles and the selected number-pad editor. Popovers have a thin continuous
+border and stepped opening/reverse closing. Name fields use an ordinary native
+text input with the same corners, preserving the phone's virtual keyboard.
+Other numerical interactions activate immediately on press. The reusable
+[controls](../src/components/Controls/README.md) provide this API; integration
+into the workout app remains open.
+
+Owner feedback (2026-11-05): controls retain their normal colors when pressed,
+focused or selected. Focus rings are omitted per owner feedback. The selected
+number-pad digit uses a terminal-style blinking underline (steady with reduced
+motion).
+
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png) as the
 art reference. Carry forward its dark panels, steel frames, shaped
@@ -54,7 +69,7 @@ pixel cut off, and a 2-pixel black surround. The reusable
 [SteelPanel component](../src/components/SteelPanel/README.md) implements this
 border. The [selected bottom tabs](../src/components/BottomTabs/README.md)
 provide the six adopted 24×24 icons and 256×56 steel bar. These components are
-adopted building blocks; full-screen layout and typography remain open.
+adopted building blocks; full-screen layout and broader typography remain open.
 
 Use the [final home artwork's indexed palette and emphasis](../art/home/construction.json)
 as the material-color reference for future icons and steel panels. Validate
@@ -69,12 +84,20 @@ options through subsequent menus, keeping workout interaction quick. It is an
 adopted design reference, not a dogfooded UI.
 
 Use the [corridor capture](https://feat-corridor-transition.fitnes-corridor-capture-preview.pages.dev/)
-and the [corridor source package in #22](https://github.com/eduter/fitnes/pull/22)
-for a thin, top-down corridor on black, traversed by the character between sets
-through doors that represent workout sets. The source package records the
-whole-workout corridor direction and character F as provisional; timing and
-interaction details were deferred for later work. Preserve those decisions
-while planning integration; the PR is still pending.
+and the [retained corridor source package](design/corridor-interstitial/README.md)
+for a thin, top-down corridor on black. Use narrow wall caps and small door
+thresholds seen from above, with pure black outside the corridor; avoid tall
+wall faces or upright door facades. Corridor **A — Basement** supplies the
+material direction. The whole workout is one vertical corridor, with the
+entrance below, set doors along its sides and the final exit above. After
+logging a set, the character leaves the current room, walks to the next door
+and enters the next set's room; the last set leads to the terminal exit.
+
+**F — Boulder** is the provisional character preference; preserve all character
+alternatives. The package retains both corridor versions, native tiles, sprites
+and character sheets. The wide version is a material study, not an approved
+perspective. Implementation is deferred behind earlier backlog work; animation
+timing, detailed interaction and workout integration remain open.
 
 The owner confirms that the [compact workout preview](https://feat-compact-workout-ui.fitnes-preview.pages.dev/)
 is the only dogfooded UI and the behavioral reference for the new application.
@@ -83,11 +106,10 @@ and navigation, as behavioral evidence while building the new UI around the
 selected art and components above. Its appearance is temporary and its source
 branch is not a complete UI specification.
 
-The proposed [reusable controls in #24](https://github.com/eduter/fitnes/pull/24)
-and [corridor design sources in #22](https://github.com/eduter/fitnes/pull/22)
-are pending PRs, not yet adopted in main. The corridor's timing and detailed
-interaction remain open for implementation planning. See the
-[repository inventory](repo-status.md) for source status and the
+The reusable controls and corridor design sources are available in main.
+Component availability does not complete workout-app integration, and retained
+corridor art does not implement the transition. See the
+[repository inventory](repo-status.md) for current sources, the
 [reference notes and captures](references/README.md) for retained materials,
 and the [backlog](backlog.md) for next work.
 

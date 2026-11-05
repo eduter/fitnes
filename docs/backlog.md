@@ -3,14 +3,14 @@
 ## Integration order
 
 Use the [repository inventory](repo-status.md) to find adopted components and
-pending source PRs before starting implementation. The [vision](vision.md)
+retained design sources before starting implementation. The [vision](vision.md)
 records the selected art, adopted menu and corridor directions, and the compact
 preview's behavioral role.
 
 - [ ] Preserve preview data and review import/export behavior before changing
   persistence or replacing the current deployment.
 - [ ] Build the application UI around the compact preview's dogfooded workflows
-  and the adopted home art, SteelPanel, and BottomTabs components.
+  and the adopted home art, SteelPanel, BottomTabs, and reusable controls.
 - [ ] Review persistence and import/export for validation, atomic replacement,
   and preservation of real data.
 - [ ] Implement compact logging, previous-performance display, and navigation
@@ -20,11 +20,18 @@ preview's behavioral role.
   adopted direction, separate from the compact preview's dogfooded behavior.
 - [ ] Review renderer and checker assumptions for sprite rules, tile banks on
   scrolling pages, device scaling, and letterboxing.
-- [ ] Choose typography, case, menu hierarchy, and layout.
-- [ ] Integrate the pending corridor source package while preserving its
-  recorded direction: thin top-down corridor on black, whole-workout travel
-  through set doors, provisional character F, with timing and interaction
-  deferred for later work.
+- [x] Extract the selected button, animated thin popover, number-pad spinner and
+  native text-input controls into reusable components.
+- [x] Retain the corridor art, editable sources and owner decisions in the
+  [reference package](design/corridor-interstitial/README.md).
+- [ ] Choose the broader screen typography, menu hierarchy, and layout while
+  preserving the selected controls' case and interaction rules.
+- [ ] Implement the workout UI in small changes, checking native-resolution
+  output and the actual phone experience.
+- [ ] Design and integrate the between-set flow after earlier backlog work,
+  starting from the retained corridor sources: thin top-down corridor on black,
+  whole-workout travel through set doors, and provisional character F. Keep all
+  character alternatives available; timing and detailed interaction remain open.
 - [ ] Plan deployment and data transfer before replacing the preview.
 
 ## Model policies to resolve
