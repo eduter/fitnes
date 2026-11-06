@@ -2,22 +2,27 @@ import { createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js'
 import { render } from 'solid-js/web';
 import homeArt from '../../art/home/gym.png';
 import { Button, OptionPicker, Popover, Spinner, TextInput } from '../components/Controls/index.ts';
-import { SteelPanel } from '../components/SteelPanel/SteelPanel.tsx';
 import { homePalette } from './palette.ts';
 import './showcase.css';
 
 function Showcase(): JSX.Element {
+    const [page, setPage] = createSignal('framed');
+    const [sound, setSound] = createSignal('on');
+    const [unit, setUnit] = createSignal('kg');
+    const [routine, setRoutine] = createSignal('full');
     const [name, setName] = createSignal('Bench press');
     const [weight, setWeight] = createSignal(60);
-    const [reps, setReps] = createSignal(8);
-    const [unit, setUnit] = createSignal('kg');
-    const [sound, setSound] = createSignal('on');
-    const [routine, setRoutine] = createSignal('full');
-    const [message, setMessage] = createSignal('No sets recorded.');
-    const [confirm, setConfirm] = createSignal(false);
+    const [editor, setEditor] = createSignal(false);
     const [mount, setMount] = createSignal<HTMLDivElement>();
     let spacer: HTMLDivElement | undefined;
-    let reset: HTMLButtonElement | undefined;
+    let trigger: HTMLButtonElement | undefined;
+    const pages = [
+        { value: 'framed', label: 'A: Framed' },
+        { value: 'row', label: 'B: Rows' },
+        { value: 'windows', label: 'Windows' },
+        { value: 'palette', label: 'Palette' },
+        { value: 'art', label: 'Artwork' },
+    ];
 
     function scale(): void {
         const surface = mount();
@@ -25,18 +30,16 @@ function Showcase(): JSX.Element {
             return;
         }
         const ratio = devicePixelRatio || 1;
-        const width = document.documentElement.clientWidth;
-        const factor = Math.max(1, Math.floor((Math.min(width, 512) * ratio) / 256)) / ratio;
+        const factor =
+            Math.max(1, Math.floor((Math.min(document.documentElement.clientWidth, 512) * ratio) / 256)) / ratio;
         surface.style.transform = `scale(${factor})`;
         spacer.style.width = `${256 * factor}px`;
         spacer.style.height = `${surface.offsetHeight * factor}px`;
     }
-
     onMount(() => {
         const observer = new ResizeObserver(scale);
-        const surface = mount();
-        if (surface) {
-            observer.observe(surface);
+        if (mount()) {
+            observer.observe(mount() as HTMLDivElement);
         }
         scale();
         window.addEventListener('resize', scale);
@@ -50,235 +53,160 @@ function Showcase(): JSX.Element {
     return (
         <div class="ds-space" ref={spacer}>
             <main class="ds-screen nes-control" ref={setMount} data-testid="design-system-screen">
-                <img
-                    class="ds-home"
-                    src={homeArt}
-                    width="256"
-                    height="200"
-                    alt="FitNES industrial gym artwork: the palette source"
-                />
-                <header class="ds-section">
-                    <h1>Design system</h1>
-                    <p>Foundation review</p>
-                    <p>Try the controls. All demo values reset when you reload.</p>
-                </header>
-                <section class="ds-section" aria-labelledby="palette-heading">
-                    <h2 id="palette-heading">Home palette</h2>
-                    <p>All nine colors from the gym image.</p>
-                    <ul class="ds-palette">
-                        <For each={homePalette}>
-                            {(color) => (
-                                <li>
-                                    <span class="ds-swatch" style={{ background: `var(--nes-color-${color.token})` }} />
-                                    <span>
-                                        {color.name}
-                                        <br />
-                                        {color.hex}
-                                    </span>
-                                </li>
-                            )}
-                        </For>
-                    </ul>
-                </section>
-                <section class="ds-section" aria-labelledby="language-heading">
-                    <h2 id="language-heading">Text language</h2>
-                    <p>Passive text is copper.</p>
-                    <p>Gold text invites a tap.</p>
-                    <Button onPress={() => setMessage('Action pressed.')}>Try action</Button>
-                    <Button disabled>Unavailable</Button>
-                    <p>Actions are uppercase. Names and descriptions keep mixed case.</p>
-                </section>
-                <SteelPanel>
-                    <section class="ds-panel" aria-labelledby="controls-heading">
-                        <h2 id="controls-heading">Log a set</h2>
-                        <TextInput
-                            label="Exercise name"
-                            value={name()}
-                            onInput={(event) => setName(event.currentTarget.value)}
-                        />
-                        <Show when={mount()}>
-                            {(host) => (
-                                <>
-                                    <div class="ds-quantities">
-                                        <Spinner
-                                            label={`Weight (${unit()})`}
-                                            value={weight()}
-                                            onChange={setWeight}
-                                            step={2.5}
-                                            integerDigits={3}
-                                            fractionDigits={1}
-                                            popoverMount={host()}
-                                        />
-                                        <Spinner label="Reps" value={reps()} onChange={setReps} popoverMount={host()} />
-                                    </div>
-                                    <p>Tap a number for the pad. Arrows step immediately.</p>
-                                    <Button
-                                        onPress={() =>
-                                            setMessage(
-                                                `${name() || 'Exercise'}: ${weight().toFixed(1)} ${unit()} x ${reps()} recorded.`
-                                            )
-                                        }
-                                    >
-                                        Log set
-                                    </Button>
-                                </>
-                            )}
-                        </Show>
-                        <p class="ds-readout" role="status">
-                            {message()}
-                        </p>
-                    </section>
-                </SteelPanel>
-                <section class="ds-section" aria-labelledby="settings-heading">
-                    <h2 id="settings-heading">Choose a value</h2>
-                    <p>Tap the gold value. Choose an option to apply it and close.</p>
-                    <Show when={mount()}>
-                        {(host) => (
-                            <div class="ds-settings">
+                <Show when={mount()}>
+                    {(host) => (
+                        <>
+                            <header class="ds-nav nes-option-rows">
                                 <OptionPicker
-                                    label="Demo unit"
-                                    value={unit()}
-                                    onChange={setUnit}
+                                    label="Review"
+                                    layout="row"
+                                    value={page()}
+                                    onChange={setPage}
+                                    options={pages}
                                     popoverMount={host()}
-                                    options={[
-                                        { value: 'kg', label: 'kg' },
-                                        { value: 'lb', label: 'lb' },
-                                    ]}
                                 />
-                                <OptionPicker
-                                    label="Sound"
-                                    value={sound()}
-                                    onChange={setSound}
-                                    popoverMount={host()}
-                                    options={[
-                                        { value: 'on', label: 'On' },
-                                        { value: 'off', label: 'Off' },
-                                    ]}
-                                />
-                                <OptionPicker
-                                    label="Unavailable choice"
-                                    value="off"
-                                    onChange={() => undefined}
-                                    disabled
-                                    options={[{ value: 'off', label: 'Off' }]}
-                                />
-                            </div>
-                        )}
-                    </Show>
-                    <p>Same menu for on/off. Unit changes only this demo label.</p>
-                </section>
-                <section class="ds-section" aria-labelledby="compare-heading">
-                    <h2 id="compare-heading">Compare field layouts</h2>
-                    <p>The same choices in both layouts. Edit either to compare the feel.</p>
-                    <Show when={mount()}>
-                        {(host) => (
-                            <For each={['framed', 'row'] as const}>
-                                {(layout) => (
-                                    <section
-                                        class="ds-comparison"
-                                        aria-label={layout === 'framed' ? 'A: Framed fields' : 'B: Status rows'}
-                                    >
-                                        <h3>{layout === 'framed' ? 'A: Framed fields' : 'B: Status rows'}</h3>
-                                        <p>
-                                            {layout === 'framed'
-                                                ? 'Label in the top border. Tap the gold content.'
-                                                : 'Right-aligned labels, a colon, then a small gap. Tap the gold value.'}
-                                        </p>
-                                        <div class={layout === 'framed' ? 'ds-settings' : 'nes-option-rows'}>
-                                            <OptionPicker
-                                                label="Sound"
-                                                layout={layout}
-                                                value={sound()}
-                                                onChange={setSound}
-                                                popoverMount={host()}
-                                                options={[
-                                                    { value: 'on', label: 'On' },
-                                                    { value: 'off', label: 'Off' },
-                                                ]}
-                                            />
-                                            <OptionPicker
-                                                label="Demo unit"
-                                                layout={layout}
-                                                value={unit()}
-                                                onChange={setUnit}
-                                                popoverMount={host()}
-                                                options={[
-                                                    { value: 'kg', label: 'kg' },
-                                                    { value: 'lb', label: 'lb' },
-                                                ]}
-                                            />
-                                            <OptionPicker
-                                                label="Routine"
-                                                layout={layout}
-                                                value={routine()}
-                                                onChange={setRoutine}
-                                                popoverMount={host()}
-                                                options={[
-                                                    { value: 'full', label: 'Full body' },
-                                                    { value: 'upper', label: 'Upper body' },
-                                                    { value: 'lower', label: 'Lower body' },
-                                                ]}
-                                            />
-                                        </div>
-                                    </section>
-                                )}
-                            </For>
-                        )}
-                    </Show>
-                    <p>Unit changes only this demo label. Both layouts use the same choice menu.</p>
-                </section>
-                <section class="ds-section" aria-labelledby="messages-heading">
-                    <h2 id="messages-heading">Messages</h2>
-                    <p role="note">No workouts yet. Start with one set.</p>
-                    <p class="ds-error">Error: enter an exercise name.</p>
-                    <p>Errors include words; color is an extra cue.</p>
-                    <Button
-                        ref={(element) => {
-                            reset = element;
-                        }}
-                        onPress={() => setConfirm(true)}
-                    >
-                        Reset demo
-                    </Button>
-                    <Show when={mount()}>
-                        {(host) => (
-                            <Popover
-                                open={confirm()}
-                                onOpenChange={setConfirm}
-                                label="Reset demo?"
-                                mount={host()}
-                                anchor={() => reset}
-                                returnFocus={() => reset}
-                            >
-                                <p>Reset the sample values?</p>
-                                <Button
-                                    onPress={() => {
-                                        setName('Bench press');
-                                        setWeight(60);
-                                        setReps(8);
-                                        setUnit('kg');
-                                        setSound('on');
-                                        setRoutine('full');
-                                        setMessage('No sets recorded.');
-                                        setConfirm(false);
-                                    }}
+                            </header>
+                            <Show when={page() === 'framed' || page() === 'row'}>
+                                <section
+                                    class="ds-section"
+                                    aria-label={page() === 'framed' ? 'A: Framed fields' : 'B: Status rows'}
                                 >
-                                    Reset
-                                </Button>
-                                <Button onPress={() => setConfirm(false)}>Back</Button>
-                            </Popover>
-                        )}
-                    </Show>
-                </section>
-                <footer class="ds-section">
-                    <p>256 logical pixels. Native text entry. Stepped menus.</p>
-                    <p>Palette roles and new patterns are proposals for review.</p>
-                </footer>
+                                    <div class={page() === 'framed' ? 'ds-fields' : 'nes-option-rows'}>
+                                        <OptionPicker
+                                            label="Sound"
+                                            layout={page() === 'framed' ? 'framed' : 'row'}
+                                            value={sound()}
+                                            onChange={setSound}
+                                            popoverMount={host()}
+                                            options={[
+                                                { value: 'on', label: 'On' },
+                                                { value: 'off', label: 'Off' },
+                                            ]}
+                                        />
+                                        <OptionPicker
+                                            label="Unit"
+                                            layout={page() === 'framed' ? 'framed' : 'row'}
+                                            value={unit()}
+                                            onChange={setUnit}
+                                            popoverMount={host()}
+                                            options={[
+                                                { value: 'kg', label: 'kg' },
+                                                { value: 'lb', label: 'lb' },
+                                            ]}
+                                        />
+                                        <OptionPicker
+                                            label="Routine"
+                                            layout={page() === 'framed' ? 'framed' : 'row'}
+                                            value={routine()}
+                                            onChange={setRoutine}
+                                            popoverMount={host()}
+                                            options={[
+                                                { value: 'full', label: 'Full body' },
+                                                { value: 'upper', label: 'Upper body' },
+                                                { value: 'lower', label: 'Lower body' },
+                                            ]}
+                                        />
+                                    </div>
+                                    <p class="ds-note">
+                                        Gold values open menus.
+                                        <br />
+                                        Tap outside to dismiss.
+                                    </p>
+                                </section>
+                            </Show>
+                            <Show when={page() === 'windows'}>
+                                <section class="ds-section">
+                                    <Button
+                                        ref={(element) => {
+                                            trigger = element;
+                                        }}
+                                        onPress={() => setEditor(true)}
+                                    >
+                                        Edit exercise
+                                    </Button>
+                                    <p class="ds-note">
+                                        Open a value in the editor.
+                                        <br />
+                                        The next window overlays it.
+                                    </p>
+                                    <p role="status">
+                                        {name()}: {weight().toFixed(1)} {unit()}
+                                    </p>
+                                </section>
+                                <Popover
+                                    open={editor()}
+                                    onOpenChange={setEditor}
+                                    label="Edit exercise"
+                                    mount={host()}
+                                    anchor={() => trigger}
+                                    returnFocus={() => trigger}
+                                >
+                                    <TextInput
+                                        label="Name"
+                                        value={name()}
+                                        onInput={(event) => setName(event.currentTarget.value)}
+                                    />
+                                    <div class="nes-option-rows">
+                                        <OptionPicker
+                                            label="Sound"
+                                            layout="row"
+                                            value={sound()}
+                                            onChange={setSound}
+                                            popoverMount={host()}
+                                            options={[
+                                                { value: 'on', label: 'On' },
+                                                { value: 'off', label: 'Off' },
+                                            ]}
+                                        />
+                                    </div>
+                                    <Spinner
+                                        label={`Weight (${unit()})`}
+                                        value={weight()}
+                                        onChange={setWeight}
+                                        integerDigits={3}
+                                        fractionDigits={1}
+                                        step={2.5}
+                                        popoverMount={host()}
+                                    />
+                                </Popover>
+                            </Show>
+                            <Show when={page() === 'palette'}>
+                                <section class="ds-section" aria-label="Home palette">
+                                    <ul class="ds-palette">
+                                        <For each={homePalette}>
+                                            {(color) => (
+                                                <li>
+                                                    <span
+                                                        class="ds-swatch"
+                                                        style={{ background: `var(--nes-color-${color.token})` }}
+                                                    />
+                                                    <span>
+                                                        {color.name}
+                                                        <br />
+                                                        {color.hex}
+                                                    </span>
+                                                </li>
+                                            )}
+                                        </For>
+                                    </ul>
+                                </section>
+                            </Show>
+                            <Show when={page() === 'art'}>
+                                <img
+                                    class="ds-home"
+                                    src={homeArt}
+                                    width="256"
+                                    height="200"
+                                    alt="FitNES home artwork, the source of all nine colors"
+                                />
+                            </Show>
+                        </>
+                    )}
+                </Show>
             </main>
         </div>
     );
 }
-
 const target = document.getElementById('design-system');
 if (!target) {
     throw new Error('Missing design-system showcase root');

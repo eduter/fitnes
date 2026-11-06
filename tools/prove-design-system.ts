@@ -6,9 +6,9 @@ import type { HardwareConstruction } from './nes-hardware/rom.ts';
 
 /** Reconstruct a native showcase capture with the home's shared background and sprite palettes. */
 function main(): void {
-    const [imagePath, output] = process.argv.slice(2);
+    const [imagePath, output, mode] = process.argv.slice(2);
     if (!imagePath || !output) {
-        throw new Error('Usage: node tools/prove-design-system.ts native-capture.png output-directory');
+        throw new Error('Usage: node tools/prove-design-system.ts native-capture.png output-directory [ui]');
     }
     const image = decodePng(readFileSync(imagePath));
     if (image.width !== 256) {
@@ -45,13 +45,13 @@ function main(): void {
             sprites: [],
         };
         // Preserve the proven home composition rather than reassigning its sprite pixels
-        if (top === 0) {
+        if (top === 0 && mode !== 'ui') {
             background.set(Buffer.from(home.backgroundPixels, 'base64'));
             construction.sprites = [...(home.sprites ?? [])];
         }
         for (let y = 0; y < height; y += 8) {
             for (let x = 0; x < 256; x += 8) {
-                if (top === 0 && y < home.height) {
+                if (top === 0 && mode !== 'ui' && y < home.height) {
                     construction.attributes.push(home.attributes[(y / 8) * 32 + x / 8]);
                     continue;
                 }

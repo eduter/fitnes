@@ -16,6 +16,11 @@ before application integration; do not invent native selects, checkboxes,
 radios, switches, or web-style substitutes in screens. The primitive-boundary
 test enforces the native-control implementation allowlist.
 
+Use compact menu-driven windows. Never use inline expansion, accordions, or
+`details` to reveal editors. Deeper menus/editors overlay the previous window.
+Choice lists have no heading, Back action or chevrons; outside press dismisses
+only the top window. See the PR #26 coverage audit before integrating screens.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not

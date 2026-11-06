@@ -1,5 +1,4 @@
 @import "../styles/controls.css";
-
 body {
     margin: 0;
     background: var(--nes-ground);
@@ -10,67 +9,47 @@ body {
 }
 .ds-screen {
     position: relative;
-    inline-size: var(--nes-content-width);
+    inline-size: 256px;
+    min-block-size: 240px;
     background: var(--nes-ground);
     transform-origin: top left;
-    overflow-wrap: anywhere;
+}
+.ds-nav {
+    padding-inline: 8px;
+}
+.ds-section {
+    padding: 8px;
+}
+.ds-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 8px;
+}
+.ds-note {
+    margin-block: 12px 0;
+}
+.ds-screen p {
+    font: inherit;
 }
 .ds-home {
     display: block;
     image-rendering: pixelated;
 }
-.ds-section {
-    padding: var(--nes-space-4) var(--nes-space-2);
-}
-.ds-screen h1,
-.ds-screen h2,
-.ds-screen h3 {
-    margin: 0 0 var(--nes-space-4);
-    font: inherit;
-}
-.ds-screen p {
-    margin: 0 0 var(--nes-space-2);
-}
 .ds-palette {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--nes-space-2);
+    gap: 8px;
+    margin: 0;
     padding: 0;
-    margin: var(--nes-space-4) 0 0;
     list-style: none;
 }
 .ds-palette li {
     display: flex;
-    gap: var(--nes-space-2);
-    align-items: start;
+    gap: 8px;
 }
 .ds-swatch {
-    display: block;
     flex: 0 0 16px;
     block-size: 32px;
     outline: 1px solid var(--nes-ink);
-}
-.ds-panel {
-    padding: var(--nes-space-2) 0;
-}
-.ds-quantities {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--nes-space-2);
-    margin-block-start: var(--nes-space-4);
-}
-.ds-settings {
-    display: grid;
-    gap: var(--nes-space-4);
-    margin-block: var(--nes-space-4);
-}
-.ds-screen .ds-readout {
-    margin-block-start: var(--nes-space-2);
-}
-.ds-error {
-    color: var(--nes-error);
-}
-
-.ds-comparison {
-    margin-block-start: var(--nes-space-4);
 }

@@ -1,6 +1,8 @@
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { Button } from '../Button/Button.tsx';
 import { controlClasses } from '../Controls/controlClasses.ts';
+import { isTopModal, popModal, pushModal } from './modalStack.ts';
 import { placePopover } from './placement.ts';
 import '../../styles/controls.css';
 import './Popover.css';
@@ -20,6 +22,7 @@ function Popover(props: PopoverProps): JSX.Element {
         'initialFocus',
         'returnFocus',
         'anchor',
+        'placement',
         'class',
         'classList',
         'style',
@@ -30,26 +33,19 @@ function Popover(props: PopoverProps): JSX.Element {
     let layer: HTMLDivElement | undefined;
     let opener: HTMLElement | undefined;
     let disposed = false;
-    const inertElements = new Map<HTMLElement, boolean>();
     const stepPixels = () => local.stepPixels ?? 16;
     const steps = () => height() / stepPixels();
     const duration = () => `${(steps() * (local.framesPerStep ?? 2) * 1000) / 60}ms`;
 
     function restoreBackground(): void {
-        for (const [element, previous] of inertElements) {
-            element.toggleAttribute('inert', previous);
+        if (layer) {
+            popModal(layer);
         }
-        inertElements.clear();
     }
 
     function isolateBackground(): void {
-        const host = local.mount ?? document.body;
-        for (const element of host.children) {
-            if (!(element instanceof HTMLElement) || element.contains(layer ?? null) || inertElements.has(element)) {
-                continue;
-            }
-            inertElements.set(element, element.hasAttribute('inert'));
-            element.setAttribute('inert', '');
+        if (layer) {
+            pushModal(layer);
         }
     }
 
@@ -65,6 +61,7 @@ function Popover(props: PopoverProps): JSX.Element {
             }
             isolateBackground();
             positionPanel();
+            document.addEventListener('pointerdown', dismissOutside, true);
             window.addEventListener('resize', positionPanel);
             window.addEventListener('scroll', positionPanel, true);
             window.visualViewport?.addEventListener('resize', positionPanel);
@@ -81,8 +78,8 @@ function Popover(props: PopoverProps): JSX.Element {
         if (open && (current === 'closed' || current === 'closing')) {
             if (current === 'closed') {
                 opener =
-                    local.anchor?.() ??
                     local.returnFocus?.() ??
+                    local.anchor?.() ??
                     (document.activeElement instanceof HTMLElement ? document.activeElement : undefined);
             }
             if (local.height !== undefined) {
@@ -145,13 +142,27 @@ function Popover(props: PopoverProps): JSX.Element {
             width: size.width,
             height: size.height,
             gap: anchor ? 4 * scale : 0,
+            placement: local.placement,
         });
         panel.style.left = `${Math.round((position.left - layerRect.left) / scale)}px`;
         panel.style.top = `${Math.round((position.top - layerRect.top) / scale)}px`;
         panel.dataset.side = anchor ? position.side : 'center';
     }
 
+    function dismissOutside(event: PointerEvent): void {
+        if (!layer || !isTopModal(layer) || phase() === 'closing' || !event.isPrimary || event.button !== 0) {
+            return;
+        }
+        if (event.target instanceof Node && panel?.contains(event.target)) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        local.onOpenChange(false);
+    }
+
     function stopPositioning(): void {
+        document.removeEventListener('pointerdown', dismissOutside, true);
         window.removeEventListener('resize', positionPanel);
         window.removeEventListener('scroll', positionPanel, true);
         window.visualViewport?.removeEventListener('resize', positionPanel);
@@ -226,7 +237,14 @@ function Popover(props: PopoverProps): JSX.Element {
         <Show when={phase() !== 'closed'}>
             <Portal mount={local.mount}>
                 <div ref={layer} class="nes-popover-layer" data-local={local.mount ? '' : undefined}>
-                    <div class="nes-popover__backdrop" aria-hidden="true" />
+                    <Button
+                        class="nes-popover__backdrop"
+                        variant="plain"
+                        tabindex="-1"
+                        aria-hidden="true"
+                        aria-label="Dismiss window"
+                        onPress={() => local.onOpenChange(false)}
+                    />
                     <div
                         {...rest}
                         ref={panel}
@@ -274,6 +292,7 @@ interface PopoverProps
     initialFocus?: () => HTMLElement | undefined;
     returnFocus?: () => HTMLElement | undefined;
     anchor?: () => HTMLElement | undefined;
+    placement?: 'vertical' | 'right';
     style?: JSX.CSSProperties;
 }
 

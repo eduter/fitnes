@@ -1,23 +1,13 @@
 # Popover
 
-A thin bordered, controlled modal with the stepped reveal and reverse closing
-from PR #23. See [animation and lifecycle](../Controls/README.md#pr-23-animation).
+A thin-bordered stacked window with stepped reveal/reverse close. Pass `anchor`
+and `returnFocus` explicitly; they can differ when a passive label anchors the
+window. `placement="right"` aligns to the label's right edge and vertical center,
+flipping left/clamping at viewport edges. Default placement prefers below,
+then above. `width` specifies logical width; viewport bounds can reduce it.
 
-```tsx
-<Popover open={open()} onOpenChange={setOpen} label="Options" height={96}>
-    <Button onPress={() => setOpen(false)}>Close</Button>
-</Popover>
-```
-
-Pass `mount` to keep it inside a positioned/scaled logical-pixel surface. The
-component owns focus containment, background inertness and close lifecycle;
-callers own open state and content.
-
-Pass `anchor={() => trigger}` for placement beside a trigger. The menu flips and
-clamps to the visual viewport and follows scrolling/resizing in scaled surfaces.
-Outside taps are passive; include an explicit Back/Close action. Escape closes
-and focus returns to the trigger after reverse closing finishes.
-
-`width` sets a preferred logical-pixel width (default 240); viewport bounds may
-reduce it. OptionPicker uses 160px for its smaller choices, while number pads
-keep the default width.
+Only the uppermost layer is interactive. Outside primary press (including the
+margins around the scaled screen) or Escape dismisses that layer. Closing
+restores parent interaction/focus. Underlying windows stay mounted. Consumers
+own values and drafts; dismissal itself does not mutate or roll them back.
+Choice menus should contain only options, without headers or Back actions.

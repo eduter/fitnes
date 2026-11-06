@@ -1,9 +1,10 @@
 See the [design-system foundation](../../design-system/README.md) for the full
 home-image palette, proposed semantic roles, restricted component vocabulary,
 and new phone showcase. `OptionPicker` is also exported by `Controls/index.ts`.
-The historical four-color captures below predate gold interactive text; they do
-not certify the current composition. Popovers now use viewport-aware placement
-and explicit close actions; outside taps are passive.
+Owner revision: action chevrons are removed; outside press dismisses the top
+window. Choice menus contain only options. The new showcase is a set of small
+review screens with compact A/B fields and stacked windows. Historical proof
+results below describe earlier compositions, not the current showcase.
 
 # Reusable FitNES controls
 
@@ -37,8 +38,7 @@ const [step, setStep] = createSignal(2.5);
 
 ## Components
 
-- **Button** is a real button with uppercase action text and the selected thick
-  leading chevron at a two-pixel gap. `variant="plain"` omits the chevron and case
+- **Button** is a real button with uppercase gold action text. `variant="plain"` omits the chevron and case
   conversion for digits and icons. `onPress` fires on a primary pointer press;
   its generated click is ignored to prevent duplicate actions. Keyboard and
   assistive clicks still activate it. Native attributes, refs and other events
@@ -46,7 +46,7 @@ const [step, setStep] = createSignal(2.5);
   `button`. Use `onPress` instead of `onClick` for this immediate interaction.
 - **Popover** is controlled through `open` / `onOpenChange`, with a required
   accessible `label`. It portals into `mount` or the document body, makes the
-  surrounding content inert, traps focus, supports Escape and explicit dismissal,
+  surrounding content inert, traps focus, supports Escape and outside dismissal,
   and restores focus after closing. `initialFocus` / `returnFocus` accept element
   getters. Its thin one-pixel border deliberately does not use SteelPanel.
 - **Spinner** is a controlled, labelled nonnegative number. `value` / `onChange`

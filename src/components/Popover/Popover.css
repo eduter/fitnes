@@ -22,7 +22,7 @@
     box-sizing: border-box;
     inline-size: min(240px, calc(100% - 16px));
     min-block-size: 16px;
-    padding: 8px;
+    padding: 4px;
     border: 1px solid var(--nes-ink);
     background: var(--nes-ground);
     outline: none;

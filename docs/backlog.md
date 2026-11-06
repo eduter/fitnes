@@ -16,6 +16,11 @@ workflow evidence and a source for useful reusable pieces.
 - [ ] After the foundation merges, revise #26 using the system while preserving
   useful app behavior and existing data.
 
+See the [PR #26 UI audit](../src/design-system/pr26-audit.md) before further
+integration. Prioritize paginated catalogs, bounded editor windows, date and
+multiline entry, multi-choice membership, draft confirmation, import/export
+review, validation, and compact workout rows. Inline expansion is prohibited.
+
 ## Integration order
 
 Use the [repository inventory](repo-status.md) to find adopted components and

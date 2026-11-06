@@ -23,7 +23,10 @@ it('keeps native controls inside their approved component implementations', () =
             if (fields.type === 'JSXOpeningElement') {
                 const element = fields.name as { name?: string };
                 const tag = element.name ?? '';
-                if (['button', 'input', 'select', 'textarea'].includes(tag) && !implementations[tag]?.includes(path)) {
+                if (
+                    ['button', 'input', 'select', 'textarea', 'details'].includes(tag) &&
+                    !implementations[tag]?.includes(path)
+                ) {
                     violations.push(`${path}: use the design-system component instead of <${tag}>`);
                 }
             }

@@ -59,6 +59,15 @@ values. Neither is selected yet. All option lists, including On/Off, open
 anchored to the tapped value, below by default with an above fallback when space
 requires; keep menus visible after scrolling.
 
+Owner revision (2026-11-06): favor compact bounded screens and stacked overlay
+windows over scrolling forms or expanding rows. A fields shrink to their widest
+option (plus legend/padding). B menus open to the right of the label, vertically
+centered, with edge fallback. Choice windows contain options only; remove their
+headers, Back items and chevrons. Outside press dismisses the top choice without
+changing selection. Gold consistently signals interaction; action chevrons are
+no longer used. This supersedes earlier chevron/outside-tap guidance below.
+See the [PR #26 pattern audit](../src/design-system/pr26-audit.md) for gaps.
+
 ## Design direction
 
 Owner-approved controls (2026-11-04): use uppercase action labels with the bold

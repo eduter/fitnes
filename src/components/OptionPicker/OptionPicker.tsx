@@ -1,4 +1,4 @@
-import { createEffect, createSignal, createUniqueId, For, type JSX } from 'solid-js';
+import { createEffect, createSignal, createUniqueId, For, type JSX, onMount } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { Button } from '../Button/Button.tsx';
 import { Popover } from '../Popover/Popover.tsx';
@@ -8,6 +8,14 @@ import './OptionPicker.css';
 function OptionPicker(props: OptionPickerProps): JSX.Element {
     const [open, setOpen] = createSignal(false);
     const labelId = createUniqueId();
+    const [width, setWidth] = createSignal(64);
+    let label: HTMLElement | undefined;
+    let sizer: HTMLSpanElement | undefined;
+    onMount(() => {
+        const measure = () => setWidth((sizer?.offsetWidth ?? 54) + 10);
+        measure();
+        void document.fonts?.ready.then(measure);
+    });
     let trigger: HTMLButtonElement | undefined;
     const selected = () => props.options.find((option) => option.value === props.value);
     createEffect(() => {
@@ -30,11 +38,17 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
             <Dynamic
                 component={props.layout === 'framed' ? 'legend' : 'span'}
                 id={labelId}
+                ref={(element: HTMLElement) => {
+                    label = element;
+                }}
                 class="nes-option-picker__label"
             >
                 {props.label}
                 {props.layout === 'row' ? ':' : ''}
             </Dynamic>
+            <span class="nes-option-picker__sizer" aria-hidden="true" ref={sizer}>
+                <For each={props.options}>{(option) => <span>{option.label}</span>}</For>
+            </span>
             <Button
                 ref={(element) => {
                     trigger = element;
@@ -54,15 +68,16 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                 onOpenChange={setOpen}
                 label={`Choose ${props.label}`}
                 mount={props.popoverMount}
-                width={160}
-                anchor={() => trigger}
+                width={width()}
+                placement={props.layout === 'row' ? 'right' : 'vertical'}
+                anchor={() => (props.layout === 'row' ? label : trigger)}
                 returnFocus={() => trigger}
             >
                 <div class="nes-option-picker__menu">
-                    <p class="nes-option-picker__title">{props.label}</p>
                     <For each={props.options}>
                         {(option) => (
                             <Button
+                                variant="plain"
                                 aria-pressed={option.value === props.value}
                                 data-popover-autofocus={option.value === props.value ? '' : undefined}
                                 onPress={() => choose(option.value)}
@@ -71,7 +86,6 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                             </Button>
                         )}
                     </For>
-                    <Button onPress={() => setOpen(false)}>Back</Button>
                 </div>
             </Popover>
         </Dynamic>

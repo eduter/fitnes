@@ -79,3 +79,38 @@ describe('Popover', () => {
         background.remove();
     });
 });
+
+it('dismisses only the top stacked window and restores parent interaction', async () => {
+    const [parent, setParent] = createSignal(true);
+    const [child, setChild] = createSignal(false);
+    let trigger: HTMLButtonElement | undefined;
+    render(() => (
+        <>
+            <Popover open={parent()} onOpenChange={setParent} label="Parent" height={96}>
+                <button type="button" ref={trigger} onClick={() => setChild(true)}>
+                    Child
+                </button>
+            </Popover>
+            <Popover open={child()} onOpenChange={setChild} label="Child" height={64} returnFocus={() => trigger}>
+                <p>Options</p>
+            </Popover>
+        </>
+    ));
+    await Promise.resolve();
+    const outer = screen.getByRole('dialog', { name: 'Parent' });
+    fireEvent.animationEnd(outer);
+    fireEvent.click(screen.getByRole('button', { name: 'Child' }));
+    await Promise.resolve();
+    const inner = screen.getByRole('dialog', { name: 'Child' });
+    fireEvent.animationEnd(inner);
+    expect(outer.closest('[inert]')).not.toBeNull();
+    const backdrop = inner.closest('.nes-popover-layer')?.querySelector('button');
+    if (!backdrop) {
+        throw new Error('Missing dismissal surface');
+    }
+    fireEvent.click(backdrop);
+    fireEvent.animationEnd(inner);
+    expect(outer.closest('[inert]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    expect(screen.getByRole('dialog', { name: 'Parent' })).toBe(outer);
+});
