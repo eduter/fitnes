@@ -33,3 +33,25 @@ it('blacks out before changing page and blocks repeated navigation during redraw
     expect(page()).toBe(1);
     expect(screen.getByRole('button', { name: 'Previous page' }).hasAttribute('disabled')).toBe(true);
 });
+
+it('locks browser refresh only after the first page and restores it on cleanup', () => {
+    vi.stubGlobal(
+        'matchMedia',
+        vi.fn(() => ({ matches: true }))
+    );
+    const original = document.documentElement.style.overscrollBehaviorY;
+    const [page, setPage] = createSignal(1);
+    const view = render(() => (
+        <PagedWindow label="Refresh" page={page()} count={2} onChange={setPage}>
+            <p>Content</p>
+        </PagedWindow>
+    ));
+    expect(document.documentElement.style.overscrollBehaviorY).toBe(original);
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    expect(document.documentElement.style.overscrollBehaviorY).toBe('contain');
+    fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+    expect(document.documentElement.style.overscrollBehaviorY).toBe(original);
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    view.unmount();
+    expect(document.documentElement.style.overscrollBehaviorY).toBe(original);
+});

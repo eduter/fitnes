@@ -13,7 +13,18 @@ function Chevron(): JSX.Element {
 }
 
 /** A filled four-row triangle for a spinner's increment or decrement button. */
-function Triangle(props: { direction: 'up' | 'down' }): JSX.Element {
+function Triangle(props: { direction: 'up' | 'down' | 'left' | 'right' }): JSX.Element {
+    if (props.direction === 'left' || props.direction === 'right') {
+        return (
+            <svg width="4" height="7" viewBox="0 0 4 7" aria-hidden="true" shape-rendering="crispEdges">
+                <path
+                    fill="currentColor"
+                    transform={props.direction === 'right' ? 'translate(4 0) scale(-1 1)' : undefined}
+                    d="M3 0h1v7H3zM2 1h1v5H2zM1 2h1v3H1zM0 3h1v1H0z"
+                />
+            </svg>
+        );
+    }
     return (
         <svg width="7" height="4" viewBox="0 0 7 4" aria-hidden="true" shape-rendering="crispEdges">
             <path
