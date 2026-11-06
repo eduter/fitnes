@@ -39,6 +39,19 @@ Visual fidelity does not require an NES emulator, CPU timing, audio hardware,
 or controller-only input. Research and prototypes are candidates until the
 owner adopts them.
 
+## Design-system foundation
+
+Owner direction (2026-11-06): review a separate design-system PR before revising
+the complete UI in #26. Take the **full palette from the home-screen image**.
+Define tokens, semantic text/action roles, and a restricted component vocabulary
+with a phone-testable showcase. Choice menus open a popover from the current
+value and apply/close on selection; use this pattern for on/off settings as
+well. Avoid native select, radio and checkbox presentation. The
+[foundation](../src/design-system/README.md) records source tokens, proposed
+roles, the component API, and remaining gaps. New role assignments and patterns
+await owner review; this direction does not approve the current showcase's
+specific colors-for-roles or complete screen composition.
+
 ## Design direction
 
 Owner-approved controls (2026-11-04): use uppercase action labels with the bold

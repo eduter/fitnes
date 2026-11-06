@@ -21,9 +21,10 @@ function TextInput(props: TextInputProps): JSX.Element {
 }
 
 /** Native input attributes; classes style the wrapper, while ref and events target the actual input. */
-interface TextInputProps extends JSX.InputHTMLAttributes<HTMLInputElement> {
+interface TextInputProps extends Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+    type?: 'text' | 'search' | 'email' | 'tel' | 'url' | 'password';
     label: string;
 }
 
-export { TextInput };
 export type { TextInputProps };
+export { TextInput };

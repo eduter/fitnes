@@ -1,5 +1,21 @@
 # Backlog
 
+## Design-system review first
+
+Owner direction (2026-11-06): pause broad UI integration to review the separate
+[design-system foundation](../src/design-system/README.md). Keep #26 open as
+workflow evidence and a source for useful reusable pieces.
+
+- [ ] Review the complete home-image source palette, semantic roles, typography,
+  geometry and restricted component vocabulary in the phone showcase.
+- [ ] Approve/refine action text, editable values and popover choice menus,
+  including on/off choices; identify remaining patterns before screen use.
+- [x] Verify sampled closed-showcase compositions against NES attribute/palette/
+  sprite rules using the home construction; new screens and menu states still
+  require their own proofs.
+- [ ] After the foundation merges, revise #26 using the system while preserving
+  useful app behavior and existing data.
+
 ## Integration order
 
 Use the [repository inventory](repo-status.md) to find adopted components and

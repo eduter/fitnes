@@ -6,6 +6,16 @@ Read [the vision](docs/vision.md) before changing product behavior or visuals.
 Use [the backlog](docs/backlog.md) when choosing the next task.
 Update the owning document when an owner-approved decision changes.
 
+## Interface foundation
+
+Use the [design system](src/design-system/README.md) before changing UI. Its
+source tokens contain the full home-image palette; semantic roles and new
+patterns are review proposals until the owner approves them. Use its existing
+component vocabulary. Missing patterns must be added to the system/showcase
+before application integration; do not invent native selects, checkboxes,
+radios, switches, or web-style substitutes in screens. The primitive-boundary
+test enforces the native-control implementation allowlist.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not

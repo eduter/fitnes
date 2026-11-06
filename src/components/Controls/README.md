@@ -1,3 +1,10 @@
+See the [design-system foundation](../../design-system/README.md) for the full
+home-image palette, proposed semantic roles, restricted component vocabulary,
+and new phone showcase. `OptionPicker` is also exported by `Controls/index.ts`.
+The historical four-color captures below predate gold interactive text; they do
+not certify the current composition. Popovers now use viewport-aware placement
+and explicit close actions; outside taps are passive.
+
 # Reusable FitNES controls
 
 These Solid components implement the selected numerical controls and regular
@@ -39,7 +46,7 @@ const [step, setStep] = createSignal(2.5);
   `button`. Use `onPress` instead of `onClick` for this immediate interaction.
 - **Popover** is controlled through `open` / `onOpenChange`, with a required
   accessible `label`. It portals into `mount` or the document body, makes the
-  surrounding content inert, traps focus, supports Escape and outside dismissal,
+  surrounding content inert, traps focus, supports Escape and explicit dismissal,
   and restores focus after closing. `initialFocus` / `returnFocus` accept element
   getters. Its thin one-pixel border deliberately does not use SteelPanel.
 - **Spinner** is a controlled, labelled nonnegative number. `value` / `onChange`

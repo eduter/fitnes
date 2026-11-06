@@ -5,7 +5,7 @@
     min-inline-size: 0;
 }
 .nes-spinner__label {
-    color: var(--nes-muted);
+    color: var(--nes-ink);
 }
 .nes-spinner__controls {
     display: flex;
@@ -52,4 +52,8 @@
 .nes-spinner__label {
     padding: 0;
     margin-block-end: 4px;
+}
+
+.nes-spinner__value-frame {
+    color: var(--nes-action);
 }

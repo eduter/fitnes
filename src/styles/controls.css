@@ -1,3 +1,5 @@
+@import "../design-system/tokens.css";
+
 @font-face {
     font-family: "FitNES Pixel";
     src: url("./fonts/PixelOperator-grid.ttf") format("truetype");
@@ -6,18 +8,10 @@
     font-display: block;
 }
 
-:root {
-    --nes-ink: #d8a082;
-    --nes-muted: #7d5c4b;
-    --nes-shadow: #451600;
-    --nes-ground: #000;
-    --nes-font: "FitNES Pixel", monospace;
-}
-
 .nes-control {
     box-sizing: border-box;
     color: var(--nes-ink);
-    font: 400 16px / 16px var(--nes-font);
+    font: 400 var(--nes-font-size) / var(--nes-line-height) var(--nes-font);
     font-synthesis: none;
 }
 

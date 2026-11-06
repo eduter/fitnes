@@ -1,0 +1,24 @@
+.nes-option-picker {
+    display: grid;
+    gap: var(--nes-space-1);
+    justify-items: start;
+    min-inline-size: 0;
+}
+.nes-option-picker__value[data-variant="plain"] {
+    justify-content: start;
+    max-inline-size: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    text-transform: uppercase;
+}
+.nes-option-picker__menu {
+    display: flex;
+    flex-direction: column;
+    max-block-size: min(320px, 70vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.nes-option-picker__title {
+    margin: 0 0 var(--nes-space-2);
+}

@@ -4,11 +4,11 @@
     min-inline-size: 0;
 }
 .nes-text-input__label {
-    color: var(--nes-muted);
+    color: var(--nes-ink);
 }
 .nes-text-input__frame {
     display: block;
-    color: var(--nes-ink);
+    color: var(--nes-action);
 }
 .nes-text-input__native {
     box-sizing: border-box;
@@ -22,8 +22,8 @@
     border-radius: 0;
     outline: none;
     background: var(--nes-ground);
-    color: var(--nes-ink);
-    caret-color: var(--nes-ink);
+    color: var(--nes-action);
+    caret-color: var(--nes-action);
     font: inherit;
     text-transform: none;
     appearance: none;

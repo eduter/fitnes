@@ -2,12 +2,9 @@
     position: fixed;
     inset: 0;
     z-index: 100;
-    display: grid;
-    place-items: center;
+    display: block;
 }
-.nes-popover-layer[data-local] {
-    position: absolute;
-}
+
 .nes-popover__backdrop {
     position: absolute;
     inset: 0;
@@ -15,13 +12,13 @@
     block-size: 100%;
     background: transparent;
     cursor: default;
-    touch-action: none;
+    touch-action: pan-y;
 }
 .nes-popover__backdrop:active {
     background: transparent;
 }
 .nes-popover {
-    position: relative;
+    position: absolute;
     box-sizing: border-box;
     inline-size: min(240px, calc(100% - 16px));
     min-block-size: 16px;
@@ -54,4 +51,9 @@
     .nes-popover {
         --nes-popover-motion-duration: 1ms;
     }
+}
+
+.nes-popover__content {
+    max-block-size: 100%;
+    overflow-y: auto;
 }
