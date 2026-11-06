@@ -1,13 +1,17 @@
 # Popover
 
-A thin-bordered stacked window with stepped reveal/reverse close. Pass `anchor`
-and `returnFocus` explicitly; they can differ when a passive label anchors the
-window. `placement="right"` aligns to the label's right edge and vertical center,
-flipping left/clamping at viewport edges. Default placement prefers below,
-then above. `width` specifies logical width; viewport bounds can reduce it.
+Use for an anchored choice window, bounded editor or child window with the
+adopted two-pixel cut-corner frame. It opens below its anchor, flips above when
+needed, clamps to the visible viewport and tracks resizing/scrolling. Pass
+`mount` inside the logical-pixel screen and `returnFocus` for a stable trigger.
 
-Only the uppermost layer is interactive. Outside primary press (including the
-margins around the scaled screen) or Escape dismisses that layer. Closing
-restores parent interaction/focus. Underlying windows stay mounted. Consumers
-own values and drafts; dismissal itself does not mutate or roll them back.
-Choice menus should contain only options, without headers or Back actions.
+Default focus is the dialog surface. Choice/number components may explicitly
+focus a safe control. Do not focus text inputs automatically on open. The stack
+makes only the top window interactive, and outside/Escape closes that window
+without activating content beneath it. Reverse closing preserves the content
+until animation completes. Inputs own their values; dismissal is not rollback.
+
+Never put PagedWindow inside a dialog. Put common form fields together; place
+notes directly in the form rather than adding an unnecessary nested window.
+Single-choice menus and number pads have no visible header. Accessible `label`
+is still required. End closes an editor; confirmations use Yes/No.

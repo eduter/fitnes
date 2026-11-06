@@ -17,7 +17,8 @@ Use top-down character movement between sets to communicate workout progress.
 
 The interface should feel like an NES game menu built for training. Follow
 actual NES palette, tile, background attribute, and sprite constraints. Use a
-256-pixel logical content width; pages may extend vertically and scroll.
+256-pixel logical content width and use available screen height. Paginate
+page-level lists when necessary; do not paginate modal editors.
 Preserve crisp pixel art when scaling for a device.
 
 Owner decision (2026-11-04): pattern-bank/tile-count capacity is outside this
@@ -41,71 +42,28 @@ owner adopts them.
 
 ## Design-system foundation
 
-Owner direction (2026-11-06): review a separate design-system PR before revising
-the complete UI in #26. Take the **full palette from the home-screen image**.
-Define tokens, semantic text/action roles, and a restricted component vocabulary
-with a phone-testable showcase. Choice menus open a popover from the current
-value and apply/close on selection; use this pattern for on/off settings as
-well. Avoid native select, radio and checkbox presentation. The
-[foundation](../src/design-system/README.md) records source tokens, proposed
-roles, the component API, and remaining gaps. New role assignments and patterns
-await owner review; this direction does not approve the current showcase's
-specific colors-for-roles or complete screen composition.
+The [UI system contract](../src/design-system/README.md) records the single
+adopted vocabulary: framed fields, compact summary rows, bounded stacked windows,
+no inline expansion and no pagination inside a modal. Alternate field layouts
+are removed. Do not focus text inputs automatically on open; notes belong
+directly in the editor. Choice/numeric windows have no visible header; numeric
+and multi-choice editors finish with End. Multi checks sit immediately after
+the label; End is bottom-right. Use available screen height for page content.
 
-Owner comparison request (2026-11-06): keep both editable-choice alternatives
-in the showcase for phone review: a thin border interrupted by its top label,
-and compact status rows with right-aligned labels/colons and gold editable
-values. Neither is selected yet. All option lists, including On/Off, open
-anchored to the tapped value, below by default with an above fallback when space
-requires; keep menus visible after scrolling.
-
-Owner revision (2026-11-06): favor compact bounded screens and stacked overlay
-windows over scrolling forms or expanding rows. A fields shrink to their widest
-option (plus legend/padding). B menus open to the right of the label, vertically
-centered, with edge fallback. Choice windows contain options only; remove their
-headers, Back items and chevrons. Outside press dismisses the top choice without
-changing selection. Gold consistently signals interaction; action chevrons are
-no longer used. This supersedes earlier chevron/outside-tap guidance below.
-See the [PR #26 pattern audit](../src/design-system/pr26-audit.md) for gaps.
-
-Owner direction (2026-11-06, page examples): A is preferred provisionally, not
-selected over B. Prioritize home, exercise and workout flows. Use compact
-read-only summaries with Edit/Delete/Duplicate actions; editing opens a window,
-deleting opens a two-action confirmation. Multiple selection stays open until
-End. Its collapsed summary remains a review proposal. Use footer page counts
-and arrows with upward/downward swipe pagination and a brief black redraw.
-Bodyweight dates use a framed YYYY.MM.DD day spinner; tapping the date may open
-the native calendar as an explicitly approved rare escape hatch. Notes may use
-a dedicated native multiline editor. Import/export has lower priority.
-
-Owner adoption (2026-11-06): choose A, framed fields. All plain field/window
-frames use a two-pixel copper border with each outer corner pixel removed and
-one pixel added diagonally inward, following the captured DW3 reference.
-Native name entry also uses a legend in the frame, without gold corner marks.
-Numeric/date spinners share a compact 24px body and symmetric stacked arrows.
-Multi-selection uses a fixed right-hand check column; text never shifts.
-Pagination arrows use the spinner triangle style close to a stable-width count.
-Later pages suppress browser pull-to-refresh and swipe down to previous; page
-one leaves downward browser refresh available. Confirmations say Yes/No and
-retain their original subject through reverse closing. The nine-color palette
-is complete for the final 256×200 artwork, not the original high-res reference.
+The full nine-color palette is copied from the final 256×200 home artwork.
+Nine is not a hardware maximum: a future richer artwork pass may reconsider
+palette/tile allocation under the visual contract, subject to owner approval.
+Current palette tokens stay unchanged until that work is adopted.
 
 ## Design direction
 
-Owner-approved controls (2026-11-04): use uppercase action labels with the bold
-leading chevron close to the text, keeping other content mixed case. Numeric
-spinners use fixed monospaced masks, corner brackets, borderless stacked filled
-triangles and the selected number-pad editor. Popovers have a thin continuous
-border and stepped opening/reverse closing. Name fields use an ordinary native
-text input with the same corners, preserving the phone's virtual keyboard.
-Other numerical interactions activate immediately on press. The reusable
-[controls](../src/components/Controls/README.md) provide this API; integration
-into the workout app remains open.
-
-Owner feedback (2026-11-05): controls retain their normal colors when pressed,
-focused or selected. Focus rings are omitted per owner feedback. The selected
-number-pad digit uses a terminal-style blinking underline (steady with reduced
-motion).
+Owner-approved controls use gold interactive values/actions and copper passive
+text, with two-pixel cut-corner frames. Numeric/date spinners share compact
+symmetric geometry. Names and multiline notes use native text entry inside the
+same frame; preserve keyboard/selection behavior. The native date-picker escape
+hatch is explicitly approved for rare use. Confirmations use Yes/No. Controls
+retain normal colors on focus/press; digit selection uses a blinking underline
+(steady under reduced motion). Read the system contract for implementation.
 
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png) as the

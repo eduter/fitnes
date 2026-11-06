@@ -17,9 +17,11 @@ workflow evidence and a source for useful reusable pieces.
   useful app behavior and existing data.
 
 See the [PR #26 UI audit](../src/design-system/pr26-audit.md) before further
-integration. Prioritize paginated catalogs, bounded editor windows, date and
-multiline entry, multi-choice membership, draft confirmation, import/export
-review, validation, and compact workout rows. Inline expansion is prohibited.
+integration. Integrate the existing bounded editor, date, multiline, membership, confirmation
+and compact-summary components before inventing new controls. Catalog selection,
+real persistence/draft semantics and validation remain application work;
+import/export is lower priority. Inline expansion and modal pagination are
+prohibited. The adopted vocabulary is documented in the UI system contract.
 
 ## Integration order
 

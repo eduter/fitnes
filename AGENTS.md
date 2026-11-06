@@ -8,28 +8,23 @@ Update the owning document when an owner-approved decision changes.
 
 ## Interface foundation
 
-Use the [design system](src/design-system/README.md) before changing UI. Its
-source tokens contain the full home-image palette; semantic roles and new
-patterns are review proposals until the owner approves them. Use its existing
-component vocabulary. Missing patterns must be added to the system/showcase
-before application integration; do not invent native selects, checkboxes,
-radios, switches, or web-style substitutes in screens. The primitive-boundary
-test enforces the native-control implementation allowlist.
+Read the [UI system contract](src/design-system/README.md) before any UI work.
+It lists each exported component, when to use it and prohibited patterns.
+Use only the adopted framed-field style; alternative layout APIs are removed.
+Do not introduce native selects/radios/checkboxes/switches or new imitations.
+Missing patterns require a reviewed component, not a screen-local substitute.
 
-Use compact menu-driven windows. Never use inline expansion, accordions, or
-`details` to reveal editors. Deeper menus/editors overlay the previous window.
-Single-choice lists have no heading, Back action or chevrons; outside press dismisses
-only the top window. See the PR #26 coverage audit before integrating screens.
+No inline expansion/accordions. No pagination inside a modal. Use available
+screen height before paginating page lists. Put notes directly in the editor.
+Do not focus text inputs on dialog open; let the user request text entry.
+Single-choice menus and numeric pads have no visible header. Numeric/multi
+editors end with End; multi checks sit immediately after the label and End is
+bottom-right. Confirmations say Yes/No and retain their subject through closing.
+Atomic edits remain immediate. Native text entry and DateSpinner's rare native
+calendar are approved input exceptions, not blanket web-widget permission.
 
-Multi-choice lists apply membership changes without closing and finish with
-End. Use DateSpinner for bodyweight dates (native calendar on date press is
-owner-approved), ConfirmDialog for destructive confirmation, and PagedWindow
-for bounded lists. Keep exercise/workout summaries compact with short verbs.
-
-A (framed fields) is adopted. Use the shared two-pixel cut-corner frame for
-plain fields and windows. Spinners share compact symmetric geometry; selection
-checks have a reserved right column. Confirmations use Yes/No and preserve their
-subject until fully closed. See the current design-system revision notes.
+The nine-color token palette matches the current approved home artwork, not a
+hardware maximum. See the contract's palette explanation before future art work.
 
 ## Tech and conventions
 
