@@ -14,6 +14,7 @@ function Popover(props: PopoverProps): JSX.Element {
         'children',
         'mount',
         'height',
+        'width',
         'stepPixels',
         'framesPerStep',
         'initialFocus',
@@ -127,7 +128,7 @@ function Popover(props: PopoverProps): JSX.Element {
         };
         const availableWidth = Math.max(16, (bounds.right - bounds.left) / scale);
         const availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
-        panel.style.inlineSize = `${Math.min(240, availableWidth)}px`;
+        panel.style.inlineSize = `${Math.min(local.width ?? 240, availableWidth)}px`;
         panel.style.maxBlockSize = `${availableHeight}px`;
         const size = panel.getBoundingClientRect();
         const trigger = local.anchor?.() ?? opener;
@@ -267,6 +268,7 @@ interface PopoverProps
     children: JSX.Element;
     mount?: HTMLElement;
     height?: number;
+    width?: number;
     stepPixels?: number;
     framesPerStep?: 1 | 2;
     initialFocus?: () => HTMLElement | undefined;

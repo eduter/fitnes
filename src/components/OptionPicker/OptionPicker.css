@@ -22,3 +22,30 @@
 .nes-option-picker__title {
     margin: 0 0 var(--nes-space-2);
 }
+
+.nes-option-picker[data-layout="framed"] {
+    display: block;
+    inline-size: 100%;
+    margin: 0;
+    border: 1px solid var(--nes-ink);
+    padding: 0 var(--nes-space-2) var(--nes-space-1);
+}
+.nes-option-picker[data-layout="framed"] > .nes-option-picker__label {
+    padding-inline: var(--nes-space-1);
+}
+.nes-option-rows {
+    display: grid;
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+    column-gap: var(--nes-space-2);
+}
+.nes-option-picker[data-layout="row"] {
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    align-items: center;
+    column-gap: var(--nes-space-2);
+    row-gap: 0;
+}
+.nes-option-picker[data-layout="row"] > .nes-option-picker__label {
+    justify-self: stretch;
+    text-align: right;
+}

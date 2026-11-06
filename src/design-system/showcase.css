@@ -23,7 +23,8 @@ body {
     padding: var(--nes-space-4) var(--nes-space-2);
 }
 .ds-screen h1,
-.ds-screen h2 {
+.ds-screen h2,
+.ds-screen h3 {
     margin: 0 0 var(--nes-space-4);
     font: inherit;
 }
@@ -68,4 +69,8 @@ body {
 }
 .ds-error {
     color: var(--nes-error);
+}
+
+.ds-comparison {
+    margin-block-start: var(--nes-space-4);
 }

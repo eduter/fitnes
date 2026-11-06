@@ -1,4 +1,5 @@
 import { createEffect, createSignal, createUniqueId, For, type JSX } from 'solid-js';
+import { Dynamic } from 'solid-js/web';
 import { Button } from '../Button/Button.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 import './OptionPicker.css';
@@ -21,8 +22,19 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
     }
 
     return (
-        <div class="nes-option-picker nes-control">
-            <span id={labelId}>{props.label}</span>
+        <Dynamic
+            component={props.layout === 'framed' ? 'fieldset' : 'div'}
+            class="nes-option-picker nes-control"
+            data-layout={props.layout ?? 'stacked'}
+        >
+            <Dynamic
+                component={props.layout === 'framed' ? 'legend' : 'span'}
+                id={labelId}
+                class="nes-option-picker__label"
+            >
+                {props.label}
+                {props.layout === 'row' ? ':' : ''}
+            </Dynamic>
             <Button
                 ref={(element) => {
                     trigger = element;
@@ -42,6 +54,8 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                 onOpenChange={setOpen}
                 label={`Choose ${props.label}`}
                 mount={props.popoverMount}
+                width={160}
+                anchor={() => trigger}
                 returnFocus={() => trigger}
             >
                 <div class="nes-option-picker__menu">
@@ -60,7 +74,7 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                     <Button onPress={() => setOpen(false)}>Back</Button>
                 </div>
             </Popover>
-        </div>
+        </Dynamic>
     );
 }
 
@@ -73,6 +87,7 @@ interface PickerOption {
 /** Controlled selection; the caller owns persistence. */
 interface OptionPickerProps {
     label: string;
+    layout?: 'stacked' | 'framed' | 'row';
     value: string;
     options: readonly PickerOption[];
     disabled?: boolean;

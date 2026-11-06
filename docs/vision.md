@@ -52,6 +52,13 @@ roles, the component API, and remaining gaps. New role assignments and patterns
 await owner review; this direction does not approve the current showcase's
 specific colors-for-roles or complete screen composition.
 
+Owner comparison request (2026-11-06): keep both editable-choice alternatives
+in the showcase for phone review: a thin border interrupted by its top label,
+and compact status rows with right-aligned labels/colons and gold editable
+values. Neither is selected yet. All option lists, including On/Off, open
+anchored to the tapped value, below by default with an above fallback when space
+requires; keep menus visible after scrolling.
+
 ## Design direction
 
 Owner-approved controls (2026-11-04): use uppercase action labels with the bold

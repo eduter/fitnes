@@ -12,6 +12,7 @@ function Showcase(): JSX.Element {
     const [reps, setReps] = createSignal(8);
     const [unit, setUnit] = createSignal('kg');
     const [sound, setSound] = createSignal('on');
+    const [routine, setRoutine] = createSignal('full');
     const [message, setMessage] = createSignal('No sets recorded.');
     const [confirm, setConfirm] = createSignal(false);
     const [mount, setMount] = createSignal<HTMLDivElement>();
@@ -166,6 +167,66 @@ function Showcase(): JSX.Element {
                     </Show>
                     <p>Same menu for on/off. Unit changes only this demo label.</p>
                 </section>
+                <section class="ds-section" aria-labelledby="compare-heading">
+                    <h2 id="compare-heading">Compare field layouts</h2>
+                    <p>The same choices in both layouts. Edit either to compare the feel.</p>
+                    <Show when={mount()}>
+                        {(host) => (
+                            <For each={['framed', 'row'] as const}>
+                                {(layout) => (
+                                    <section
+                                        class="ds-comparison"
+                                        aria-label={layout === 'framed' ? 'A: Framed fields' : 'B: Status rows'}
+                                    >
+                                        <h3>{layout === 'framed' ? 'A: Framed fields' : 'B: Status rows'}</h3>
+                                        <p>
+                                            {layout === 'framed'
+                                                ? 'Label in the top border. Tap the gold content.'
+                                                : 'Right-aligned labels, a colon, then a small gap. Tap the gold value.'}
+                                        </p>
+                                        <div class={layout === 'framed' ? 'ds-settings' : 'nes-option-rows'}>
+                                            <OptionPicker
+                                                label="Sound"
+                                                layout={layout}
+                                                value={sound()}
+                                                onChange={setSound}
+                                                popoverMount={host()}
+                                                options={[
+                                                    { value: 'on', label: 'On' },
+                                                    { value: 'off', label: 'Off' },
+                                                ]}
+                                            />
+                                            <OptionPicker
+                                                label="Demo unit"
+                                                layout={layout}
+                                                value={unit()}
+                                                onChange={setUnit}
+                                                popoverMount={host()}
+                                                options={[
+                                                    { value: 'kg', label: 'kg' },
+                                                    { value: 'lb', label: 'lb' },
+                                                ]}
+                                            />
+                                            <OptionPicker
+                                                label="Routine"
+                                                layout={layout}
+                                                value={routine()}
+                                                onChange={setRoutine}
+                                                popoverMount={host()}
+                                                options={[
+                                                    { value: 'full', label: 'Full body' },
+                                                    { value: 'upper', label: 'Upper body' },
+                                                    { value: 'lower', label: 'Lower body' },
+                                                ]}
+                                            />
+                                        </div>
+                                    </section>
+                                )}
+                            </For>
+                        )}
+                    </Show>
+                    <p>Unit changes only this demo label. Both layouts use the same choice menu.</p>
+                </section>
                 <section class="ds-section" aria-labelledby="messages-heading">
                     <h2 id="messages-heading">Messages</h2>
                     <p role="note">No workouts yet. Start with one set.</p>
@@ -197,6 +258,7 @@ function Showcase(): JSX.Element {
                                         setReps(8);
                                         setUnit('kg');
                                         setSound('on');
+                                        setRoutine('full');
                                         setMessage('No sets recorded.');
                                         setConfirm(false);
                                     }}

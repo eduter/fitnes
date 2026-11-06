@@ -140,6 +140,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                 label={`Edit ${local.label}`}
                 mount={local.popoverMount}
                 height={256}
+                anchor={() => opener}
                 returnFocus={() => opener}
             >
                 <NumberPad
@@ -168,5 +169,5 @@ interface SpinnerProps extends Omit<JSX.FieldsetHTMLAttributes<HTMLFieldSetEleme
     popoverMount?: HTMLElement;
 }
 
-export { Spinner };
 export type { SpinnerProps };
+export { Spinner };

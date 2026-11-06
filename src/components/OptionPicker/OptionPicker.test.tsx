@@ -2,15 +2,16 @@
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
 import { afterEach, expect, it } from 'vitest';
-import { OptionPicker } from './OptionPicker.tsx';
+import { OptionPicker, type OptionPickerProps } from './OptionPicker.tsx';
 
 afterEach(cleanup);
 
-function example(disabled = false): void {
+function example(disabled = false, layout?: OptionPickerProps['layout']): void {
     const [value, setValue] = createSignal('on');
     render(() => (
         <OptionPicker
             label="Sound"
+            layout={layout}
             value={value()}
             onChange={setValue}
             disabled={disabled}
@@ -22,8 +23,8 @@ function example(disabled = false): void {
     ));
 }
 
-it('selects an on/off value immediately, closes, and restores trigger focus', async () => {
-    example();
+it.each(['stacked', 'framed', 'row'] as const)('selects and restores focus in the %s layout', async (layout) => {
+    example(false, layout);
     const trigger = screen.getByRole('button', { name: 'Sound: On' });
     fireEvent.click(trigger);
     await Promise.resolve();

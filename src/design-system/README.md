@@ -87,6 +87,31 @@ open; do not invent traffic-light colors or assign new roles ad hoc.
   one-pixel border and stepped 16px reveal/reversed close. No rounded cards,
   gradients, browser widget chrome, or extra metal frames around each field.
 
+## Compare editable choice layouts
+
+The showcase includes two owner-requested alternatives using the same Sound,
+Demo unit and Routine values. Editing either example updates the other, so the
+comparison changes presentation rather than behavior:
+
+- **A: Framed fields** — `layout="framed"` uses a real fieldset and legend. The
+  copper label interrupts the top edge of a thin copper border; the gold value
+  sits inside and opens the choice menu when tapped.
+- **B: Status rows** — `layout="row"` inside `.nes-option-rows` shares two grid
+  columns. Copper labels and colons align to the right, followed by an 8px gap
+  and left-aligned gold values. There is no field border. The shared grid keeps
+  the value column aligned as label lengths change.
+
+The original stacked layout remains the default. Both alternatives retain the
+same press behavior, selection/cancellation and focus restoration. They are
+comparison candidates, not an adopted winner or a decision that they must be
+mutually exclusive. Boolean values are ordinary On/Off option lists.
+
+Choice menus explicitly anchor to their value trigger. They open below when
+space permits, flip above otherwise, and clamp inside the visual viewport as
+needed. Choice menus use a 160px logical width so compact right-column values
+do not always open a screen-wide panel; numerical pads retain 240px. Scroll
+and resize reposition the panel relative to the current trigger bounds.
+
 ## Component vocabulary
 
 Import controls from `src/components/Controls/index.ts`.
@@ -152,7 +177,7 @@ background and three sprite palettes**, emphasis and MMC5 8×8 attribute profile
 It preserves the original home construction and allocates any additional UI
 colors to checked sprite tiles. Each crop (at most 240 rows) must reconstruct
 pixel-for-pixel and fit palette, attribute, 64-sprite and eight-per-scanline
-budgets; no quantization occurs. The closed showcase, open option menu, and open number pad pass 24
+budgets; no quantization occurs. The closed showcase, both open layout menus, and the open number pad pass 44
 crops in total, with at most 57 sprites and eight on a scanline. The old four-material
 screenshot recipe in the Controls README predates gold interactive text and
 must not certify this composition. New screen compositions and other menu states

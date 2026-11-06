@@ -17,3 +17,7 @@ Pass `anchor={() => trigger}` for placement beside a trigger. The menu flips and
 clamps to the visual viewport and follows scrolling/resizing in scaled surfaces.
 Outside taps are passive; include an explicit Back/Close action. Escape closes
 and focus returns to the trigger after reverse closing finishes.
+
+`width` sets a preferred logical-pixel width (default 240); viewport bounds may
+reduce it. OptionPicker uses 160px for its smaller choices, while number pads
+keep the default width.
