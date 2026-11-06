@@ -1,6 +1,5 @@
 .nes-multi-picker {
     margin: 0;
-    border: 1px solid var(--nes-ink);
     padding: 0 4px;
     min-inline-size: 0;
     width: fit-content;
@@ -24,4 +23,24 @@
     justify-content: start;
     min-block-size: 24px;
     text-align: left;
+}
+
+.nes-multi-picker__options .nes-button__label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 8px;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+.nes-multi-picker__mark {
+    width: 8px;
+    height: 8px;
+}
+.nes-multi-picker__mark {
+    display: flex;
+    align-items: center;
+    line-height: 0;
+}
+.nes-multi-picker__mark svg {
+    display: block;
 }

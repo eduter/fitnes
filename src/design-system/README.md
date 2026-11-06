@@ -3,19 +3,19 @@
 Review at https://fitnes-design-system.eduardo-terroso.chatgpt.site
 in [PR #27](https://github.com/eduter/fitnes/pull/27).
 
-Use the Review value to switch between A: Framed, B: Rows, Windows, Palette,
-and Artwork. These are small separate screens rather than one long scrolling
-showcase. A and B share Sound, Unit and Routine values. Windows demonstrates
-an exercise editor opening a choice menu or number pad over itself.
+Use Review to switch between Workout, Weight, Multiple, Fields, Windows,
+Palette and Artwork. A (framed fields) is adopted. These are small separate
+screens rather than a long scrolling showcase. Windows demonstrates an editor
+opening a choice menu or number pad over itself.
 
 ## Owner direction
 
 - Keep interfaces compact and menu-driven. Use overlaid windows for deeper
   choices/editors; do not expand rows or introduce accordions. Prefer bounded
   pages of choices over long scrolling catalogs.
-- A: thin framed fields size to the widest option plus border/padding, with
+- Adopted framed fields size to the widest option plus border/padding, with
   enough room for the legend. They can sit alongside one another.
-- B: right-aligned labels/colons and a small gap before gold values. Its menu
+- Legacy B (no longer offered in Review): right-aligned labels/colons and a small gap before gold values. Its menu
   opens to the right of the label, vertically centered on that label; screen
   edges clamp it or flip it left. A opens below the value, flipping above.
 - Choice windows contain only their options: no header, Back action or
@@ -135,6 +135,41 @@ currently use an action to open it; a tappable gold copy field is still an
 alternative. **ConfirmDialog** has a message and exactly two actions. Prefer
 short verbs (Edit/Delete/Duplicate/Record/End) over repeated object names.
 
-No A/B winner is recorded. A is used in the daily-use example while both remain
-available through Review. Import/export remains low priority; the page examples
+A is adopted and used throughout the daily-use examples. Import/export remains low priority; the page examples
 do not implement an import flow or persist/delete real app data.
+
+## Adopted frame revision
+
+A is now selected. The Review menu uses **Fields**; B is retained only as a
+legacy layout API, not a competing preview. Shared `.nes-frame` uses an 8×8
+pixel SVG border image: two-pixel bars, removed outer corner pixels and added
+inner diagonal pixels. This applies to choice/date/number/membership/name/note
+fields and Popover/confirmation windows. Elaborate SteelPanel artwork remains
+a separate adopted material. Text entry no longer uses gold corner brackets.
+
+Date and numeric spinners share a 24px body; two centered 12px arrow rows are
+symmetric about the value. Pagination uses rotated spinner triangles close to
+a fixed-width page counter; its width follows the digit capacity of page count.
+Membership checks occupy a reserved right column, leaving option labels fixed.
+
+ConfirmDialog now exposes Yes/No and snapshots its message at open, preserving
+the subject during reverse close even if the caller clears/deletes its state.
+
+Touch pagination uses a non-passive touch-move handler for upward pagination
+and downward pagination after page one. Root overscroll containment prevents
+browser refresh whenever any active paged window is beyond page one. Returning
+to page one (or disposing the window) restores the previous root style and
+allows downward native browser refresh. Native Chrome pull-to-refresh UI still
+needs the owner's real-phone check; Chromium touch emulation verifies both
+page directions and the conditional refresh policy, not the Android toolbar.
+
+Palette verification: final `art/home/gym.png` has exactly nine RGB colors;
+`docs/reference-home-screen-image.png` is a richer high-resolution reference.
+Tokens match the final approved native artwork pixel-for-pixel.
+
+Latest validation: all 226 tests pass. Phone touch emulation verifies upward
+then downward pagination without a reload, later-page overscroll containment
+and restoration on page one, stable confirmation text during closing, framed
+name entry, and a non-shifting right check column. Four current native captures
+(Fields, Weight, multiple-choice window, Workout) reconstruct exactly under the
+home palette/attribute/sprite rules, with at most four sprites/two per scanline.

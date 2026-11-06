@@ -22,7 +22,7 @@ function MultiPicker(props: MultiPickerProps): JSX.Element {
         );
     }
     return (
-        <fieldset class="nes-multi-picker nes-control">
+        <fieldset class="nes-multi-picker nes-frame nes-control">
             <legend>{props.label}</legend>
             <Button
                 variant="plain"
@@ -53,8 +53,23 @@ function MultiPicker(props: MultiPickerProps): JSX.Element {
                                 aria-pressed={props.values.includes(option.value)}
                                 onPress={() => toggle(option.value)}
                             >
-                                <span aria-hidden="true">{props.values.includes(option.value) ? '[x] ' : '[ ] '}</span>
-                                {option.label}
+                                <span class="nes-multi-picker__label">{option.label}</span>
+                                <span class="nes-multi-picker__mark" aria-hidden="true">
+                                    {props.values.includes(option.value) ? (
+                                        <svg
+                                            aria-hidden="true"
+                                            width="8"
+                                            height="8"
+                                            viewBox="0 0 8 8"
+                                            shape-rendering="crispEdges"
+                                        >
+                                            <path
+                                                fill="currentColor"
+                                                d="M0 3h2v2H0zM2 5h2v2H2zM3 4h2v2H3zM4 3h2v2H4zM5 2h2v2H5zM6 1h2v2H6z"
+                                            />
+                                        </svg>
+                                    ) : null}
+                                </span>
                             </Button>
                         )}
                     </For>

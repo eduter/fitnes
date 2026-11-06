@@ -248,7 +248,7 @@ function Popover(props: PopoverProps): JSX.Element {
                     <div
                         {...rest}
                         ref={panel}
-                        class={controlClasses('nes-popover nes-control', local)}
+                        class={controlClasses('nes-popover nes-frame nes-control', local)}
                         role="dialog"
                         aria-modal="true"
                         aria-label={local.label}

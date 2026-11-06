@@ -8,7 +8,7 @@ import './DateSpinner.css';
 function DateSpinner(props: DateSpinnerProps): JSX.Element {
     let input: HTMLInputElement | undefined;
     return (
-        <fieldset class="nes-date-spinner nes-control">
+        <fieldset class="nes-date-spinner nes-frame nes-control">
             <legend>{props.label}</legend>
             <div class="nes-date-spinner__body">
                 <Button

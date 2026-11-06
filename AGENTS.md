@@ -26,6 +26,11 @@ End. Use DateSpinner for bodyweight dates (native calendar on date press is
 owner-approved), ConfirmDialog for destructive confirmation, and PagedWindow
 for bounded lists. Keep exercise/workout summaries compact with short verbs.
 
+A (framed fields) is adopted. Use the shared two-pixel cut-corner frame for
+plain fields and windows. Spinners share compact symmetric geometry; selection
+checks have a reserved right column. Confirmations use Yes/No and preserve their
+subject until fully closed. See the current design-system revision notes.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not

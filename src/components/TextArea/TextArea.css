@@ -1,6 +1,6 @@
 .nes-text-area {
-    display: grid;
-    gap: 4px;
+    margin: 0;
+    padding: 0 4px 2px;
 }
 .nes-text-area textarea {
     box-sizing: border-box;
@@ -8,7 +8,7 @@
     height: 80px;
     padding: 4px;
     resize: none;
-    border: 1px solid var(--nes-ink);
+    border: 0;
     border-radius: 0;
     background: var(--nes-ground);
     color: var(--nes-action);

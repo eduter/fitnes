@@ -78,6 +78,18 @@ Bodyweight dates use a framed YYYY.MM.DD day spinner; tapping the date may open
 the native calendar as an explicitly approved rare escape hatch. Notes may use
 a dedicated native multiline editor. Import/export has lower priority.
 
+Owner adoption (2026-11-06): choose A, framed fields. All plain field/window
+frames use a two-pixel copper border with each outer corner pixel removed and
+one pixel added diagonally inward, following the captured DW3 reference.
+Native name entry also uses a legend in the frame, without gold corner marks.
+Numeric/date spinners share a compact 24px body and symmetric stacked arrows.
+Multi-selection uses a fixed right-hand check column; text never shifts.
+Pagination arrows use the spinner triangle style close to a stable-width count.
+Later pages suppress browser pull-to-refresh and swipe down to previous; page
+one leaves downward browser refresh available. Confirmations say Yes/No and
+retain their original subject through reverse closing. The nine-color palette
+is complete for the final 256×200 artwork, not the original high-res reference.
+
 ## Design direction
 
 Owner-approved controls (2026-11-04): use uppercase action labels with the bold

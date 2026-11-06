@@ -24,9 +24,7 @@
 .example-editor .nes-paged-window {
     height: 176px;
 }
-.example-editor .nes-button {
-    min-block-size: 24px;
-}
+
 .example-quantities {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -45,4 +43,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.example-editor > .nes-popover__content > .nes-button {
+    min-block-size: 24px;
 }

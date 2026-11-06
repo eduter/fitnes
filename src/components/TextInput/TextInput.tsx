@@ -3,20 +3,24 @@ import { controlClasses } from '../Controls/controlClasses.ts';
 import '../../styles/controls.css';
 import './TextInput.css';
 
-/** A corner-framed native input that retains normal selection, IME and virtual-keyboard behavior. */
+/** A legend-framed native input that retains normal selection, IME and virtual-keyboard behavior. */
 function TextInput(props: TextInputProps): JSX.Element {
     const [local, rest] = splitProps(props, ['label', 'id', 'class', 'classList']);
     const generatedId = createUniqueId();
     const id = () => local.id ?? generatedId;
     return (
-        <div class={controlClasses('nes-text-input nes-control', local)}>
-            <label class="nes-text-input__label" for={id()}>
-                {local.label}
-            </label>
-            <span class="nes-text-input__frame nes-corners">
-                <input {...rest} id={id()} type={props.type ?? 'text'} class="nes-text-input__native" />
+        <fieldset class={controlClasses('nes-text-input nes-frame nes-control', local)}>
+            <legend class="nes-text-input__label">{local.label}</legend>
+            <span class="nes-text-input__frame">
+                <input
+                    {...rest}
+                    aria-label={local.label}
+                    id={id()}
+                    type={props.type ?? 'text'}
+                    class="nes-text-input__native"
+                />
             </span>
-        </div>
+        </fieldset>
     );
 }
 

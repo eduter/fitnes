@@ -80,13 +80,17 @@ function Spinner(props: SpinnerProps): JSX.Element {
     const adjust = (direction: 1 | -1) => local.onChange(stepNumber(local.value, local.step ?? 1, direction, mask()));
 
     return (
-        <fieldset {...rest} class={controlClasses('nes-spinner nes-control', local)} aria-labelledby={labelId}>
+        <fieldset
+            {...rest}
+            class={controlClasses('nes-spinner nes-frame nes-control', local)}
+            aria-labelledby={labelId}
+        >
             <legend id={labelId} class="nes-spinner__label">
                 {local.label}
             </legend>
             <div class="nes-spinner__controls">
                 <span
-                    class="nes-spinner__value-frame nes-corners"
+                    class="nes-spinner__value-frame"
                     style={{ 'inline-size': `${Math.max(34, masked().length * 7 + 8)}px` }}
                 >
                     <Button

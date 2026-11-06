@@ -5,15 +5,16 @@ import './TextArea.css';
 function TextArea(props: TextAreaProps): JSX.Element {
     const id = createUniqueId();
     return (
-        <label class="nes-text-area nes-control" for={id}>
-            <span>{props.label}</span>
+        <fieldset class="nes-text-area nes-frame nes-control">
+            <legend>{props.label}</legend>
             <textarea
+                aria-label={props.label}
                 id={id}
                 value={props.value}
                 rows={4}
                 onInput={(event) => props.onChange(event.currentTarget.value)}
             />
-        </label>
+        </fieldset>
     );
 }
 /** Controlled multiline text; the caller owns persistence. */

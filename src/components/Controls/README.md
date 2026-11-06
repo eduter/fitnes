@@ -1,3 +1,10 @@
+Current adopted revision: use A-style framed fields with the shared two-pixel
+cut-corner border for fields and windows. Date/number spinners share a compact
+24px body with centered arrows; name inputs use legends rather than gold corner
+marks. Membership checks stay in a fixed right-hand column. Confirmations use
+Yes/No and retain their subject through closing. Older recipes below record
+previous revisions; see the design-system README for current validation.
+
 See the [design-system foundation](../../design-system/README.md) for the full
 home-image palette, proposed semantic roles, restricted component vocabulary,
 and new phone showcase. `OptionPicker` is also exported by `Controls/index.ts`.

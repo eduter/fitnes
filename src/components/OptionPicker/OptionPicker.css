@@ -27,7 +27,6 @@
     display: block;
     inline-size: max-content;
     margin: 0;
-    border: 1px solid var(--nes-ink);
     padding: 0 var(--nes-space-1);
 }
 .nes-option-picker[data-layout="framed"] > .nes-option-picker__label {

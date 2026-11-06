@@ -31,12 +31,13 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
 
     return (
         <Dynamic
-            component={props.layout === 'framed' ? 'fieldset' : 'div'}
+            component={(props.layout ?? 'framed') === 'framed' ? 'fieldset' : 'div'}
             class="nes-option-picker nes-control"
-            data-layout={props.layout ?? 'stacked'}
+            classList={{ 'nes-frame': props.layout === undefined || props.layout === 'framed' }}
+            data-layout={props.layout ?? 'framed'}
         >
             <Dynamic
-                component={props.layout === 'framed' ? 'legend' : 'span'}
+                component={(props.layout ?? 'framed') === 'framed' ? 'legend' : 'span'}
                 id={labelId}
                 ref={(element: HTMLElement) => {
                     label = element;
