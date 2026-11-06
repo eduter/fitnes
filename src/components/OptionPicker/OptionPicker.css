@@ -1,7 +1,5 @@
 .nes-option-picker {
-    display: grid;
-    gap: var(--nes-space-1);
-    justify-items: start;
+    display: block;
     min-inline-size: 0;
 }
 .nes-option-picker__value[data-variant="plain"] {
@@ -23,32 +21,15 @@
     margin: 0 0 var(--nes-space-2);
 }
 
-.nes-option-picker[data-layout="framed"] {
+.nes-option-picker {
     display: block;
     inline-size: max-content;
     margin: 0;
     padding: 0 var(--nes-space-1);
 }
-.nes-option-picker[data-layout="framed"] > .nes-option-picker__label {
+.nes-option-picker > .nes-option-picker__label {
     padding-inline: var(--nes-space-1);
 }
-.nes-option-rows {
-    display: grid;
-    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
-    column-gap: var(--nes-space-2);
-}
-.nes-option-picker[data-layout="row"] {
-    grid-column: 1 / -1;
-    grid-template-columns: subgrid;
-    align-items: center;
-    column-gap: var(--nes-space-2);
-    row-gap: 0;
-}
-.nes-option-picker[data-layout="row"] > .nes-option-picker__label {
-    justify-self: stretch;
-    text-align: right;
-}
-
 .nes-option-picker__sizer {
     display: grid;
     block-size: 0;
@@ -59,10 +40,7 @@
     grid-area: 1 / 1;
     white-space: pre;
 }
-.nes-option-picker[data-layout="row"] > .nes-option-picker__sizer {
-    position: absolute;
-    visibility: hidden;
-}
+
 .nes-option-picker__menu > .nes-button {
     justify-content: start;
     text-transform: uppercase;

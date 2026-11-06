@@ -91,7 +91,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
             <div class="nes-spinner__controls">
                 <span
                     class="nes-spinner__value-frame"
-                    style={{ 'inline-size': `${Math.max(34, masked().length * 7 + 8)}px` }}
+                    style={{ 'inline-size': `${Math.max(22, masked().length * 7 + 4)}px` }}
                 >
                     <Button
                         ref={(element) => {
@@ -143,7 +143,6 @@ function Spinner(props: SpinnerProps): JSX.Element {
                 onOpenChange={setOpen}
                 label={`Edit ${local.label}`}
                 mount={local.popoverMount}
-                height={256}
                 anchor={() => opener}
                 returnFocus={() => opener}
             >
@@ -152,7 +151,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                     value={local.value}
                     mask={mask()}
                     onChange={local.onChange}
-                    onDone={() => setOpen(false)}
+                    onEnd={() => setOpen(false)}
                 />
             </Popover>
         </fieldset>

@@ -49,27 +49,3 @@ describe('popover placement', () => {
         ).toEqual({ left: 8, top: 8, side: 'below' });
     });
 });
-
-it('centers a right-side menu on the label and flips left at the screen edge', () => {
-    const viewport = { left: 8, right: 248, top: 8, bottom: 232 };
-    expect(
-        placePopover({
-            anchor: { left: 20, right: 80, top: 100, bottom: 116 },
-            viewport,
-            width: 80,
-            height: 64,
-            gap: 4,
-            placement: 'right',
-        })
-    ).toEqual({ left: 84, top: 76, side: 'right' });
-    expect(
-        placePopover({
-            anchor: { left: 200, right: 240, top: 100, bottom: 116 },
-            viewport,
-            width: 80,
-            height: 64,
-            gap: 4,
-            placement: 'right',
-        })
-    ).toEqual({ left: 116, top: 76, side: 'left' });
-});

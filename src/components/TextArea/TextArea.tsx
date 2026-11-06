@@ -1,7 +1,7 @@
 import { createUniqueId, type JSX } from 'solid-js';
 import './TextArea.css';
 
-/** Native multiline entry inside a bounded editor window, retaining the phone keyboard. */
+/** Native multiline entry directly in a framed page or editor, retaining the phone keyboard. */
 function TextArea(props: TextAreaProps): JSX.Element {
     const id = createUniqueId();
     return (
@@ -11,7 +11,8 @@ function TextArea(props: TextAreaProps): JSX.Element {
                 aria-label={props.label}
                 id={id}
                 value={props.value}
-                rows={4}
+                rows={props.rows ?? 4}
+                style={{ height: `${(props.rows ?? 4) * 16 + 4}px` }}
                 onInput={(event) => props.onChange(event.currentTarget.value)}
             />
         </fieldset>
@@ -20,6 +21,7 @@ function TextArea(props: TextAreaProps): JSX.Element {
 /** Controlled multiline text; the caller owns persistence. */
 interface TextAreaProps {
     label: string;
+    rows?: number;
     value: string;
     onChange: (value: string) => void;
 }

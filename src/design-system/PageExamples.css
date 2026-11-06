@@ -21,14 +21,11 @@
     min-block-size: 20px;
     padding: 0;
 }
-.example-editor .nes-paged-window {
-    height: 176px;
-}
 
 .example-quantities {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
 }
 
 .example-weight > .nes-button {
@@ -47,4 +44,16 @@
 
 .example-editor > .nes-popover__content > .nes-button {
     min-block-size: 24px;
+}
+
+.example-workout {
+    flex: 1;
+    min-height: 0;
+}
+.example-workout > .nes-paged-window {
+    height: 100%;
+}
+.example-edit-fields {
+    display: grid;
+    gap: 0;
 }

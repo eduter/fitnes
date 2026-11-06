@@ -25,11 +25,11 @@
     text-align: left;
 }
 
-.nes-multi-picker__options .nes-button__label {
+.nes-multi-picker__options > .nes-button:not(:last-child) .nes-button__label {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 8px;
+    grid-template-columns: max-content 8px;
     align-items: center;
-    gap: 8px;
+    gap: 4px;
     width: 100%;
 }
 .nes-multi-picker__mark {
@@ -43,4 +43,9 @@
 }
 .nes-multi-picker__mark svg {
     display: block;
+}
+
+.nes-multi-picker__options > .nes-button:last-child {
+    justify-self: end;
+    padding-inline: 0;
 }

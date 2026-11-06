@@ -3,7 +3,7 @@ import { Button } from '../Button/Button.tsx';
 import { formatMaskedNumber, type NumberMask, replaceNumberDigit } from './numberMask.ts';
 import './NumberPad.css';
 
-/** A fixed-mask three-column keypad; edits apply immediately and Done only closes it. */
+/** A fixed-mask three-column keypad; edits apply immediately and End only closes it. */
 function NumberPad(props: NumberPadProps): JSX.Element {
     const [selected, setSelected] = createSignal(props.mask.integerDigits - 1);
     const slots = createMemo(() =>
@@ -44,7 +44,6 @@ function NumberPad(props: NumberPadProps): JSX.Element {
 
     return (
         <fieldset class="nes-number-pad" aria-label="Number pad" onKeyDown={handleKeys}>
-            <legend class="nes-number-pad__title">{props.label}</legend>
             <div class="nes-number-pad__slots">
                 <For each={slots()}>
                     {(slot) => (
@@ -84,7 +83,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
                 <Button variant="plain" aria-label="Digit 0" onPress={() => choose(0)}>
                     0
                 </Button>
-                <Button onPress={props.onDone}>Done</Button>
+                <Button onPress={props.onEnd}>End</Button>
             </div>
             <output class="nes-number-pad__announcement" aria-live="polite">
                 {props.label}: {formatMaskedNumber(props.value, props.mask)}
@@ -99,8 +98,8 @@ interface NumberPadProps {
     value: number;
     mask: NumberMask;
     onChange: (value: number) => void;
-    onDone: () => void;
+    onEnd: () => void;
 }
 
-export { NumberPad };
 export type { NumberPadProps };
+export { NumberPad };

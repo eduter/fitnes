@@ -10,12 +10,15 @@ body {
 .ds-screen {
     position: relative;
     inline-size: 256px;
-    min-block-size: 240px;
+    block-size: var(--nes-screen-height, 240px);
+    display: flex;
+    flex-direction: column;
     background: var(--nes-ground);
     transform-origin: top left;
 }
 .ds-nav {
-    padding-inline: 8px;
+    padding: 0 8px;
+    flex: none;
 }
 .ds-section {
     padding: 8px;

@@ -138,7 +138,7 @@ describe('Spinner', () => {
         press(screen.getByRole('button', { name: 'Digit 5' }));
         expect(value()).toBe(65);
         expect(dialog.querySelector('input')).toBeNull();
-        press(screen.getByRole('button', { name: 'Done' }));
+        press(screen.getByRole('button', { name: 'End' }));
         expect(dialog.dataset.phase).toBe('closing');
         fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
         expect(screen.queryByRole('dialog')).toBeNull();

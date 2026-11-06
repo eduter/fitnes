@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, type JSX, Show } from 'solid-js';
+import { createMemo, createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
 import {
     Button,
     ConfirmDialog,
@@ -33,77 +33,86 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
         { id: 7, name: 'Lunge', sets: 2, reps: 10, weight: 20, measurements: ['reps', 'weight'], notes: '' },
     ]);
     const [requested, setRequested] = createSignal(1);
-    const count = () => Math.max(1, Math.ceil(items().length / 3));
+    const [pageSize, setPageSize] = createSignal(3);
+    let overview: HTMLDivElement | undefined;
+    onMount(() => {
+        const observer = new ResizeObserver(() =>
+            setPageSize(Math.max(1, Math.floor(((overview?.clientHeight ?? 202) - 40) / 54)))
+        );
+        if (overview) {
+            observer.observe(overview);
+        }
+        onCleanup(() => observer.disconnect());
+    });
+    const count = () => Math.max(1, Math.ceil(items().length / pageSize()));
     const page = () => Math.min(requested(), count());
     const [editing, setEditing] = createSignal<number>();
     const selected = createMemo(() => items().find((item) => item.id === editing()));
-    const [editorPage, setEditorPage] = createSignal(1);
     const [deleting, setDeleting] = createSignal<number>();
-    const [notes, setNotes] = createSignal(false);
     const [notice, setNotice] = createSignal('Workout A');
     let action: HTMLElement | undefined;
-    let noteAction: HTMLElement | undefined;
     let nextId = 8;
     function patch(changes: Partial<ExampleExercise>): void {
         setItems((current) => current.map((item) => (item.id === editing() ? { ...item, ...changes } : item)));
     }
     return (
         <>
-            <PagedWindow label="Workout overview" page={page()} count={count()} onChange={setRequested}>
-                <h1 class="example-title" role="status">
-                    {notice()}
-                </h1>
-                <For
-                    each={items()
-                        .slice((page() - 1) * 3, page() * 3)
-                        .map((item) => item.id)}
-                >
-                    {(id) => (
-                        <Show when={items().find((entry) => entry.id === id)}>
-                            {(item) => (
-                                <article class="example-exercise" aria-label={item().name}>
-                                    <p>
-                                        <span class="example-name">{item().name}</span>
-                                        <span class="example-summary">
-                                            {item().sets} x {item().reps} / {item().weight} kg
-                                        </span>
-                                    </p>
-                                    <div class="example-actions">
-                                        <Button
-                                            onPress={(event) => {
-                                                action = event.currentTarget;
-                                                setEditorPage(1);
-                                                setEditing(item().id);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            onPress={(event) => {
-                                                action = event.currentTarget;
-                                                setDeleting(item().id);
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                        <Button
-                                            onPress={() => {
-                                                setItems((current) => [...current, { ...item(), id: nextId++ }]);
-                                                setNotice('Duplicated');
-                                            }}
-                                        >
-                                            Duplicate
-                                        </Button>
-                                    </div>
-                                </article>
-                            )}
-                        </Show>
-                    )}
-                </For>
-                <Show when={!items().length}>
-                    <p>No exercises.</p>
-                </Show>
-            </PagedWindow>
+            <div class="example-workout" ref={overview}>
+                <PagedWindow label="Workout overview" page={page()} count={count()} onChange={setRequested}>
+                    <h1 class="example-title" role="status">
+                        {notice()}
+                    </h1>
+                    <For
+                        each={items()
+                            .slice((page() - 1) * pageSize(), page() * pageSize())
+                            .map((item) => item.id)}
+                    >
+                        {(id) => (
+                            <Show when={items().find((entry) => entry.id === id)}>
+                                {(item) => (
+                                    <article class="example-exercise" aria-label={item().name}>
+                                        <p>
+                                            <span class="example-name">{item().name}</span>
+                                            <span class="example-summary">
+                                                {item().sets} x {item().reps} / {item().weight} kg
+                                            </span>
+                                        </p>
+                                        <div class="example-actions">
+                                            <Button
+                                                onPress={(event) => {
+                                                    action = event.currentTarget;
+                                                    setEditing(item().id);
+                                                }}
+                                            >
+                                                Edit
+                                            </Button>
+                                            <Button
+                                                onPress={(event) => {
+                                                    action = event.currentTarget;
+                                                    setDeleting(item().id);
+                                                }}
+                                            >
+                                                Delete
+                                            </Button>
+                                            <Button
+                                                onPress={() => {
+                                                    setItems((current) => [...current, { ...item(), id: nextId++ }]);
+                                                    setNotice('Duplicated');
+                                                }}
+                                            >
+                                                Duplicate
+                                            </Button>
+                                        </div>
+                                    </article>
+                                )}
+                            </Show>
+                        )}
+                    </For>
+                    <Show when={!items().length}>
+                        <p>No exercises.</p>
+                    </Show>
+                </PagedWindow>
+            </div>
             <Popover
                 open={editing() !== undefined}
                 onOpenChange={(open) => {
@@ -120,72 +129,50 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                 <Show when={selected()}>
                     {(item) => (
                         <>
-                            <PagedWindow label="Exercise fields" page={editorPage()} count={2} onChange={setEditorPage}>
-                                <Show
-                                    when={editorPage() === 1}
-                                    fallback={
-                                        <>
-                                            <Spinner
-                                                label="Weight (kg)"
-                                                value={item().weight}
-                                                onChange={(weight) => patch({ weight })}
-                                                step={2.5}
-                                                integerDigits={3}
-                                                fractionDigits={1}
-                                                popoverMount={props.mount}
-                                            />
-                                            <MultiPicker
-                                                label="Measures"
-                                                values={item().measurements}
-                                                onChange={(measurements) => patch({ measurements })}
-                                                options={measurementOptions}
-                                                popoverMount={props.mount}
-                                            />
-                                            <Button
-                                                ref={(element) => {
-                                                    noteAction = element;
-                                                }}
-                                                onPress={() => setNotes(true)}
-                                            >
-                                                Notes
-                                            </Button>
-                                        </>
-                                    }
-                                >
-                                    <TextInput
-                                        label="Name"
-                                        value={item().name}
-                                        onInput={(event) => patch({ name: event.currentTarget.value })}
+                            <div class="example-edit-fields">
+                                <TextInput
+                                    label="Name"
+                                    value={item().name}
+                                    onInput={(event) => patch({ name: event.currentTarget.value })}
+                                />
+                                <div class="example-quantities">
+                                    <Spinner
+                                        label="Sets"
+                                        value={item().sets}
+                                        onChange={(sets) => patch({ sets })}
+                                        popoverMount={props.mount}
                                     />
-                                    <div class="example-quantities">
-                                        <Spinner
-                                            label="Sets"
-                                            value={item().sets}
-                                            onChange={(sets) => patch({ sets })}
-                                            popoverMount={props.mount}
-                                        />
-                                        <Spinner
-                                            label="Reps"
-                                            value={item().reps}
-                                            onChange={(reps) => patch({ reps })}
-                                            popoverMount={props.mount}
-                                        />
-                                    </div>
-                                </Show>
-                            </PagedWindow>
+                                    <Spinner
+                                        label="Reps"
+                                        value={item().reps}
+                                        onChange={(reps) => patch({ reps })}
+                                        popoverMount={props.mount}
+                                    />
+                                    <Spinner
+                                        label="kg"
+                                        value={item().weight}
+                                        onChange={(weight) => patch({ weight })}
+                                        step={2.5}
+                                        integerDigits={3}
+                                        fractionDigits={1}
+                                        popoverMount={props.mount}
+                                    />
+                                </div>
+                                <MultiPicker
+                                    label="Measures"
+                                    values={item().measurements}
+                                    onChange={(measurements) => patch({ measurements })}
+                                    options={measurementOptions}
+                                    popoverMount={props.mount}
+                                />
+                                <TextArea
+                                    label="Notes"
+                                    rows={2}
+                                    value={item().notes}
+                                    onChange={(notes) => patch({ notes })}
+                                />
+                            </div>
                             <Button onPress={() => setEditing(undefined)}>End</Button>
-                            <Popover
-                                open={notes()}
-                                onOpenChange={setNotes}
-                                label="Notes"
-                                mount={props.mount}
-                                anchor={() => noteAction}
-                                returnFocus={() => noteAction}
-                            >
-                                <TextArea label="Note" value={item().notes} onChange={(notes) => patch({ notes })} />
-
-                                <Button onPress={() => setNotes(false)}>End</Button>
-                            </Popover>
                         </>
                     )}
                 </Show>

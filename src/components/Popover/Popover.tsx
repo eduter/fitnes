@@ -22,7 +22,6 @@ function Popover(props: PopoverProps): JSX.Element {
         'initialFocus',
         'returnFocus',
         'anchor',
-        'placement',
         'class',
         'classList',
         'style',
@@ -58,6 +57,9 @@ function Popover(props: PopoverProps): JSX.Element {
         queueMicrotask(() => {
             if (disposed || phase() === 'closed') {
                 return;
+            }
+            if (panel?.querySelector('.nes-paged-window')) {
+                throw new Error('Pagination belongs on the page, never inside a Popover');
             }
             isolateBackground();
             positionPanel();
@@ -142,7 +144,6 @@ function Popover(props: PopoverProps): JSX.Element {
             width: size.width,
             height: size.height,
             gap: anchor ? 4 * scale : 0,
-            placement: local.placement,
         });
         panel.style.left = `${Math.round((position.left - layerRect.left) / scale)}px`;
         panel.style.top = `${Math.round((position.top - layerRect.top) / scale)}px`;
@@ -180,10 +181,7 @@ function Popover(props: PopoverProps): JSX.Element {
             setPhase('open');
             positionPanel();
             const target =
-                local.initialFocus?.() ??
-                panel?.querySelector<HTMLElement>('[data-popover-autofocus]') ??
-                focusable()[0] ??
-                panel;
+                local.initialFocus?.() ?? panel?.querySelector<HTMLElement>('[data-popover-autofocus]') ?? panel;
             target?.focus({ preventScroll: true });
         } else if (phase() === 'closing') {
             setPhase('closed');
@@ -200,7 +198,7 @@ function Popover(props: PopoverProps): JSX.Element {
             ...(panel?.querySelectorAll<HTMLElement>(
                 'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])'
             ) ?? []),
-        ].filter((element) => !element.closest('[hidden]'));
+        ].filter((element) => element.tabIndex >= 0 && !element.closest('[hidden]'));
     }
 
     function handleKeys(event: KeyboardEvent): void {
@@ -292,7 +290,6 @@ interface PopoverProps
     initialFocus?: () => HTMLElement | undefined;
     returnFocus?: () => HTMLElement | undefined;
     anchor?: () => HTMLElement | undefined;
-    placement?: 'vertical' | 'right';
     style?: JSX.CSSProperties;
 }
 

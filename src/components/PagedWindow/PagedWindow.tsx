@@ -54,6 +54,10 @@ function PagedWindow(props: PagedWindowProps): JSX.Element {
         go(props.page + (y < 0 ? 1 : -1));
     }
     onMount(() => {
+        if (surface?.closest('[role="dialog"]')) {
+            throw new Error('PagedWindow cannot be used inside a dialog');
+        }
+
         let first: { x: number; y: number; time: number } | undefined;
         function startTouch(event: TouchEvent): void {
             first = undefined;

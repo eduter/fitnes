@@ -1,5 +1,4 @@
-import { createEffect, createSignal, createUniqueId, For, type JSX, onMount } from 'solid-js';
-import { Dynamic } from 'solid-js/web';
+import { createEffect, createSignal, For, type JSX, onMount } from 'solid-js';
 import { Button } from '../Button/Button.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 import './OptionPicker.css';
@@ -7,9 +6,7 @@ import './OptionPicker.css';
 /** A labelled text value opening a menu of choices, including two-choice settings. */
 function OptionPicker(props: OptionPickerProps): JSX.Element {
     const [open, setOpen] = createSignal(false);
-    const labelId = createUniqueId();
     const [width, setWidth] = createSignal(64);
-    let label: HTMLElement | undefined;
     let sizer: HTMLSpanElement | undefined;
     onMount(() => {
         const measure = () => setWidth((sizer?.offsetWidth ?? 54) + 10);
@@ -30,23 +27,8 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
     }
 
     return (
-        <Dynamic
-            component={(props.layout ?? 'framed') === 'framed' ? 'fieldset' : 'div'}
-            class="nes-option-picker nes-control"
-            classList={{ 'nes-frame': props.layout === undefined || props.layout === 'framed' }}
-            data-layout={props.layout ?? 'framed'}
-        >
-            <Dynamic
-                component={(props.layout ?? 'framed') === 'framed' ? 'legend' : 'span'}
-                id={labelId}
-                ref={(element: HTMLElement) => {
-                    label = element;
-                }}
-                class="nes-option-picker__label"
-            >
-                {props.label}
-                {props.layout === 'row' ? ':' : ''}
-            </Dynamic>
+        <fieldset class="nes-option-picker nes-frame nes-control">
+            <legend class="nes-option-picker__label">{props.label}</legend>
             <span class="nes-option-picker__sizer" aria-hidden="true" ref={sizer}>
                 <For each={props.options}>{(option) => <span>{option.label}</span>}</For>
             </span>
@@ -70,8 +52,7 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                 label={`Choose ${props.label}`}
                 mount={props.popoverMount}
                 width={width()}
-                placement={props.layout === 'row' ? 'right' : 'vertical'}
-                anchor={() => (props.layout === 'row' ? label : trigger)}
+                anchor={() => trigger}
                 returnFocus={() => trigger}
             >
                 <div class="nes-option-picker__menu">
@@ -89,7 +70,7 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
                     </For>
                 </div>
             </Popover>
-        </Dynamic>
+        </fieldset>
     );
 }
 
@@ -102,7 +83,6 @@ interface PickerOption {
 /** Controlled selection; the caller owns persistence. */
 interface OptionPickerProps {
     label: string;
-    layout?: 'stacked' | 'framed' | 'row';
     value: string;
     options: readonly PickerOption[];
     disabled?: boolean;

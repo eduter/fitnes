@@ -41,7 +41,7 @@ describe('Popover', () => {
         expect(panel.style.getPropertyValue('--nes-popover-steps')).toBe('6');
         expect(panel.style.getPropertyValue('--nes-popover-duration')).toBe('200ms');
         fireEvent.animationEnd(panel, { animationName: 'nes-popover-reveal' });
-        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
+        expect(document.activeElement).toBe(panel);
         fireEvent.click(screen.getByRole('button', { name: 'Close' }));
         expect(panel.dataset.phase).toBe('closing');
         expect(screen.getByRole('dialog')).toBe(panel);
@@ -113,4 +113,17 @@ it('dismisses only the top stacked window and restores parent interaction', asyn
     expect(outer.closest('[inert]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
     expect(screen.getByRole('dialog', { name: 'Parent' })).toBe(outer);
+});
+
+it('focuses the dialog rather than opening the text keyboard by default', async () => {
+    render(() => (
+        <Popover open onOpenChange={() => undefined} label="Editor" height={96}>
+            <input aria-label="Name" />
+            <textarea aria-label="Notes" />
+        </Popover>
+    ));
+    await Promise.resolve();
+    const dialog = screen.getByRole('dialog');
+    fireEvent.animationEnd(dialog);
+    expect(document.activeElement).toBe(dialog);
 });

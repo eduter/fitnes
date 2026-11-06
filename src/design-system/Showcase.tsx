@@ -37,6 +37,8 @@ function Showcase(): JSX.Element {
             Math.max(1, Math.floor((Math.min(document.documentElement.clientWidth, 512) * ratio) / 256)) / ratio;
         surface.style.transform = `scale(${factor})`;
         spacer.style.width = `${256 * factor}px`;
+        const available = Math.floor(window.innerHeight / factor);
+        surface.style.setProperty('--nes-screen-height', `${Math.max(240, available)}px`);
         spacer.style.height = `${surface.offsetHeight * factor}px`;
     }
     onMount(() => {
@@ -59,10 +61,9 @@ function Showcase(): JSX.Element {
                 <Show when={mount()}>
                     {(host) => (
                         <>
-                            <header class="ds-nav nes-option-rows">
+                            <header class="ds-nav">
                                 <OptionPicker
                                     label="Review"
-                                    layout="row"
                                     value={page()}
                                     onChange={setPage}
                                     options={pages}
@@ -78,15 +79,11 @@ function Showcase(): JSX.Element {
                             <Show when={page() === 'members'}>
                                 <MembershipExample mount={host()} />
                             </Show>
-                            <Show when={page() === 'framed' || page() === 'row'}>
-                                <section
-                                    class="ds-section"
-                                    aria-label={page() === 'framed' ? 'A: Framed fields' : 'B: Status rows'}
-                                >
-                                    <div class={page() === 'framed' ? 'ds-fields' : 'nes-option-rows'}>
+                            <Show when={page() === 'framed'}>
+                                <section class="ds-section" aria-label="Framed fields">
+                                    <div class="ds-fields">
                                         <OptionPicker
                                             label="Sound"
-                                            layout={page() === 'framed' ? 'framed' : 'row'}
                                             value={sound()}
                                             onChange={setSound}
                                             popoverMount={host()}
@@ -97,7 +94,6 @@ function Showcase(): JSX.Element {
                                         />
                                         <OptionPicker
                                             label="Unit"
-                                            layout={page() === 'framed' ? 'framed' : 'row'}
                                             value={unit()}
                                             onChange={setUnit}
                                             popoverMount={host()}
@@ -108,7 +104,6 @@ function Showcase(): JSX.Element {
                                         />
                                         <OptionPicker
                                             label="Routine"
-                                            layout={page() === 'framed' ? 'framed' : 'row'}
                                             value={routine()}
                                             onChange={setRoutine}
                                             popoverMount={host()}
@@ -158,10 +153,9 @@ function Showcase(): JSX.Element {
                                         value={name()}
                                         onInput={(event) => setName(event.currentTarget.value)}
                                     />
-                                    <div class="nes-option-rows">
+                                    <div class="ds-fields">
                                         <OptionPicker
                                             label="Sound"
-                                            layout="row"
                                             value={sound()}
                                             onChange={setSound}
                                             popoverMount={host()}

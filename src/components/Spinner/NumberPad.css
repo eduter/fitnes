@@ -4,10 +4,6 @@
     inline-size: 208px;
     margin-inline: auto;
 }
-.nes-number-pad__title {
-    margin: 0;
-    font: inherit;
-}
 .nes-number-pad__slots {
     display: flex;
     justify-content: center;
@@ -68,8 +64,4 @@
     border: 0;
     padding: 0;
     min-inline-size: 0;
-}
-.nes-number-pad__title {
-    padding: 0;
-    margin-block-end: 8px;
 }

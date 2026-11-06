@@ -55,3 +55,15 @@ it('locks browser refresh only after the first page and restores it on cleanup',
     view.unmount();
     expect(document.documentElement.style.overscrollBehaviorY).toBe(original);
 });
+
+it('rejects pagination inside a dialog', () => {
+    expect(() =>
+        render(() => (
+            <div role="dialog" aria-label="Invalid editor">
+                <PagedWindow label="Invalid pages" page={1} count={2} onChange={() => undefined}>
+                    <p>Fields</p>
+                </PagedWindow>
+            </div>
+        ))
+    ).toThrow('PagedWindow cannot be used inside a dialog');
+});
