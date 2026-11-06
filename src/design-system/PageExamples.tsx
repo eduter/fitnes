@@ -198,7 +198,6 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                     }
                 }}
                 message={`Delete ${items().find((item) => item.id === deleting())?.name ?? 'exercise'}?`}
-                action="Delete"
                 mount={props.mount}
                 trigger={() => action}
                 onConfirm={() => {
