@@ -18,8 +18,13 @@ test enforces the native-control implementation allowlist.
 
 Use compact menu-driven windows. Never use inline expansion, accordions, or
 `details` to reveal editors. Deeper menus/editors overlay the previous window.
-Choice lists have no heading, Back action or chevrons; outside press dismisses
+Single-choice lists have no heading, Back action or chevrons; outside press dismisses
 only the top window. See the PR #26 coverage audit before integrating screens.
+
+Multi-choice lists apply membership changes without closing and finish with
+End. Use DateSpinner for bodyweight dates (native calendar on date press is
+owner-approved), ConfirmDialog for destructive confirmation, and PagedWindow
+for bounded lists. Keep exercise/workout summaries compact with short verbs.
 
 ## Tech and conventions
 

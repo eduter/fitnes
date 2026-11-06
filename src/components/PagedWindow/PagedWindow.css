@@ -1,0 +1,30 @@
+.nes-paged-window {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 208px;
+    touch-action: pan-x;
+}
+.nes-paged-window__content {
+    flex: 1;
+    min-height: 0;
+}
+.nes-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.nes-pagination .nes-button {
+    min-block-size: 24px;
+    min-inline-size: 32px;
+}
+.nes-paged-window__black {
+    position: absolute;
+    inset: 0;
+    background: var(--nes-ground);
+    pointer-events: none;
+    visibility: hidden;
+}
+.nes-paged-window[data-redrawing] .nes-paged-window__black {
+    visibility: visible;
+}

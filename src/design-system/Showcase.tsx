@@ -2,11 +2,12 @@ import { createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js'
 import { render } from 'solid-js/web';
 import homeArt from '../../art/home/gym.png';
 import { Button, OptionPicker, Popover, Spinner, TextInput } from '../components/Controls/index.ts';
+import { MembershipExample, WeightExample, WorkoutExample } from './PageExamples.tsx';
 import { homePalette } from './palette.ts';
 import './showcase.css';
 
 function Showcase(): JSX.Element {
-    const [page, setPage] = createSignal('framed');
+    const [page, setPage] = createSignal('workout');
     const [sound, setSound] = createSignal('on');
     const [unit, setUnit] = createSignal('kg');
     const [routine, setRoutine] = createSignal('full');
@@ -17,6 +18,9 @@ function Showcase(): JSX.Element {
     let spacer: HTMLDivElement | undefined;
     let trigger: HTMLButtonElement | undefined;
     const pages = [
+        { value: 'workout', label: 'Workout' },
+        { value: 'weight', label: 'Weight' },
+        { value: 'members', label: 'Multiple' },
         { value: 'framed', label: 'A: Framed' },
         { value: 'row', label: 'B: Rows' },
         { value: 'windows', label: 'Windows' },
@@ -66,6 +70,15 @@ function Showcase(): JSX.Element {
                                     popoverMount={host()}
                                 />
                             </header>
+                            <Show when={page() === 'workout'}>
+                                <WorkoutExample mount={host()} />
+                            </Show>
+                            <Show when={page() === 'weight'}>
+                                <WeightExample mount={host()} />
+                            </Show>
+                            <Show when={page() === 'members'}>
+                                <MembershipExample mount={host()} />
+                            </Show>
                             <Show when={page() === 'framed' || page() === 'row'}>
                                 <section
                                     class="ds-section"

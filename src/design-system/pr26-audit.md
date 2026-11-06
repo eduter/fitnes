@@ -38,3 +38,13 @@ accordion/inline expansion or long scrolling form should fill a pattern gap.
 The showcase now offers small screens via the Review selector and a real
 parent-editor → choice menu / number-pad overlay example. This proves the
 stacking primitive; it does not claim the remaining domain workflows are built.
+
+## Follow-up coverage in PR #27
+
+The new Workout/Weight/Multiple examples cover the proposed PagedWindow,
+DateSpinner, MultiPicker, ConfirmDialog, TextArea, summary rows and bounded
+editors. The owner explicitly approved the date field's native calendar escape
+hatch and two-action confirmations. Import/export remains low priority.
+These examples use temporary data; integration of catalog selection, complete
+home/session workflows, field validation and composite draft semantics remains
+open. Multiple-selection summary and A/B presentation still await feedback.

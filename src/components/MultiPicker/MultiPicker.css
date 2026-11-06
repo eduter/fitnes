@@ -1,0 +1,27 @@
+.nes-multi-picker {
+    margin: 0;
+    border: 1px solid var(--nes-ink);
+    padding: 0 4px;
+    min-inline-size: 0;
+    width: fit-content;
+    max-width: 100%;
+}
+.nes-multi-picker legend {
+    padding-inline: 4px;
+}
+.nes-multi-picker > .nes-button {
+    display: block;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-block-size: 24px;
+    max-width: 100%;
+}
+.nes-multi-picker__options {
+    display: grid;
+}
+.nes-multi-picker__options .nes-button {
+    justify-content: start;
+    min-block-size: 24px;
+    text-align: left;
+}

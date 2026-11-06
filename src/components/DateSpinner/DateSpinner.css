@@ -1,0 +1,26 @@
+.nes-date-spinner {
+    position: relative;
+    width: max-content;
+    max-width: 100%;
+    margin: 0;
+    border: 1px solid var(--nes-ink);
+    padding: 0 4px 4px;
+}
+.nes-date-spinner legend {
+    padding-inline: 4px;
+}
+.nes-date-spinner__body {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.nes-date-spinner__body > .nes-button {
+    min-block-size: 32px;
+}
+.nes-date-spinner__arrows {
+    display: grid;
+}
+.nes-date-spinner__arrows > .nes-button {
+    min-block-size: 20px;
+    min-inline-size: 24px;
+}

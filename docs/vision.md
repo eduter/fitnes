@@ -68,6 +68,16 @@ changing selection. Gold consistently signals interaction; action chevrons are
 no longer used. This supersedes earlier chevron/outside-tap guidance below.
 See the [PR #26 pattern audit](../src/design-system/pr26-audit.md) for gaps.
 
+Owner direction (2026-11-06, page examples): A is preferred provisionally, not
+selected over B. Prioritize home, exercise and workout flows. Use compact
+read-only summaries with Edit/Delete/Duplicate actions; editing opens a window,
+deleting opens a two-action confirmation. Multiple selection stays open until
+End. Its collapsed summary remains a review proposal. Use footer page counts
+and arrows with upward/downward swipe pagination and a brief black redraw.
+Bodyweight dates use a framed YYYY.MM.DD day spinner; tapping the date may open
+the native calendar as an explicitly approved rare escape hatch. Notes may use
+a dedicated native multiline editor. Import/export has lower priority.
+
 ## Design direction
 
 Owner-approved controls (2026-11-04): use uppercase action labels with the bold

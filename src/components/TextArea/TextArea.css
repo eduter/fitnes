@@ -1,0 +1,17 @@
+.nes-text-area {
+    display: grid;
+    gap: 4px;
+}
+.nes-text-area textarea {
+    box-sizing: border-box;
+    width: 100%;
+    height: 80px;
+    padding: 4px;
+    resize: none;
+    border: 1px solid var(--nes-ink);
+    border-radius: 0;
+    background: var(--nes-ground);
+    color: var(--nes-action);
+    font: inherit;
+    outline: none;
+}

@@ -99,3 +99,42 @@ node tools/prove-design-system.ts capture.png output-directory ui
 
 The `ui` mode allocates every screenshot pixel; the historical default retains
 the home image at the top of a scrolling capture. Neither mode quantizes RGB.
+
+## Page examples and daily-use patterns
+
+The showcase starts on **Workout**, a temporary seven-exercise sample with three
+compact summaries per page. Each row shows name, sets × reps / kg, and Edit,
+Delete, Duplicate. Edit opens a bounded two-page field window, with child number
+pads, membership choices and a notes editor. Atomic edits immediately update
+the summary; End closes. Delete requires an explicit Delete/Cancel confirmation;
+outside dismissal cancels. Duplicate appends a sample record. The preview is
+not connected to saved workouts or production data.
+
+**PagedWindow** shows arrows around “1 of N”. An upward swipe on passive content
+advances; downward goes back. Native vertical scrolling is disabled on the page
+surface. Gestures starting on inputs/actions do not paginate. A single 80ms black
+redraw precedes a page change; reduced-motion preference skips the blackout.
+Page bounds, duplicate requests during redraw and cleanup are handled by the
+component. The demo uses sample lists rather than changing application routes.
+
+**Weight** combines DateSpinner, weight entry and Record. DateSpinner displays
+YYYY.MM.DD in a framed field; the stacked arrows advance or rewind one calendar
+day. Day arithmetic is independent of DST. The value is YYYY-MM-DD, initialized
+from the user's local today. Tapping the date invokes the native date picker.
+This rare native-picker escape hatch is explicitly owner-approved; it is not a
+ban on older dates. Empty/cancelled picker input does not change the value.
+
+**Multiple** proposes a naturally sized, wrapping framed gold summary: None,
+one or two selected labels, then +N for further selections. Selection menus use
+text membership marks and remain open on toggle. End closes them; outside
+closing also preserves applied membership edits. The summary is a proposal for
+owner feedback, not a finalized choice of presentation.
+
+**TextArea** preserves native multiline input in a bounded child window. Notes
+currently use an action to open it; a tappable gold copy field is still an
+alternative. **ConfirmDialog** has a message and exactly two actions. Prefer
+short verbs (Edit/Delete/Duplicate/Record/End) over repeated object names.
+
+No A/B winner is recorded. A is used in the daily-use example while both remain
+available through Review. Import/export remains low priority; the page examples
+do not implement an import flow or persist/delete real app data.
