@@ -2,6 +2,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
 import { defineConfig } from 'vitest/config';
 
+// GitHub Pages serves a project site under `/<repo>/`; the deploy workflow sets
+// PAGES_BASE_PATH to that path. A bare `npm run build` stays at the domain root.
+const rawBase = process.env.PAGES_BASE_PATH ?? '/';
+const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+
 const pwa = VitePWA({
     registerType: 'autoUpdate',
     includeAssets: [
@@ -14,15 +19,15 @@ const pwa = VitePWA({
         'maskable-icon-512x512.png',
     ],
     manifest: {
-        id: '/',
+        id: base,
         name: 'FitNES',
         short_name: 'FitNES',
         description: 'Personal offline-first workout tracker',
         theme_color: '#000000',
         background_color: '#000000',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: base,
+        start_url: base,
         icons: [
             {
                 src: 'pwa-64x64.png',
@@ -50,12 +55,13 @@ const pwa = VitePWA({
     },
     workbox: {
         // The isolated review page has its own HTML rather than the application's router shell.
-        navigateFallbackDenylist: [/^\/design-system(?:\/|$)/],
+        navigateFallbackDenylist: [new RegExp(`^${base}design-system(?:/|$)`)],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
     },
 });
 
 export default defineConfig(({ mode }) => ({
+    base,
     plugins: [solid(), pwa],
     server: {
         host: true,

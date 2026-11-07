@@ -5,6 +5,7 @@ import './styles/global.css';
 import { registerSW } from 'virtual:pwa-register';
 import { WorkoutPickerPage } from './pages/WorkoutPickerPage.tsx';
 import { App } from './App.tsx';
+import { basePath } from './app/basePath.ts';
 import { BodyweightPage } from './pages/BodyweightPage.tsx';
 import { DataPage } from './pages/DataPage.tsx';
 import { ExerciseEditPage } from './pages/ExerciseEditPage.tsx';
@@ -23,7 +24,7 @@ if (!root) {
 
 render(
     () => (
-        <Router root={App}>
+        <Router base={basePath} root={App}>
             <Route path="/" component={HomePage} />
             <Route path="/workouts" component={WorkoutPickerPage} />
             <Route path="/exercises" component={ExerciseListPage} />
