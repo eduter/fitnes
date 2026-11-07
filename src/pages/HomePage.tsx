@@ -2,6 +2,7 @@ import { useNavigate } from '@solidjs/router';
 import { createSignal, type JSX, Show } from 'solid-js';
 import gymUrl from '../../art/home/gym.png?url';
 import { useAppData } from '../app/AppData.tsx';
+import { DraftGuard } from '../app/DraftGuard.tsx';
 import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
 import { formatMass } from '../domain/convertWeight.ts';
@@ -18,6 +19,7 @@ function HomePage(): JSX.Element {
     const active = () => app.sessions().find((session) => session.completedAt === undefined);
     return (
         <section class="home-page" aria-label="Home">
+            <DraftGuard dirty={weightOpen() && readingDirty()} />
             <ConfirmDialog
                 open={discardReading()}
                 onOpenChange={setDiscardReading}

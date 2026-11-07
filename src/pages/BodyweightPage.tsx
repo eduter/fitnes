@@ -1,5 +1,6 @@
 import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
+import { DraftGuard } from '../app/DraftGuard.tsx';
 import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
 import { DialogActions } from '../components/DialogActions.tsx';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
@@ -31,6 +32,7 @@ function BodyweightPage(): JSX.Element {
     }
     return (
         <section class="page">
+            <DraftGuard dirty={adding() && readingDirty()} />
             <ConfirmDialog
                 open={discardReading()}
                 onOpenChange={setDiscardReading}
@@ -42,6 +44,7 @@ function BodyweightPage(): JSX.Element {
                 title="Bodyweight"
                 actions={
                     <Button
+                        disabled={app.loadState() !== 'ready'}
                         onPress={(event) => {
                             trigger = event.currentTarget;
                             setAdding(true);
