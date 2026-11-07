@@ -1,10 +1,10 @@
-import { createEffect, createSignal, Show, type JSX } from 'solid-js';
+import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
 import type { BodyweightMeasurement } from '../../domain/bodyweight.ts';
 import { massValue } from '../../domain/convertWeight.ts';
 import { generateBodyweightMeasurementId } from '../../domain/generateIds.ts';
 import { fromDateLocalValue, toDateLocalValue } from '../../utils/datetime.ts';
-import { Button } from '../Button/Button.tsx';
+import { DialogActions } from '../DialogActions.tsx';
 import { DateField } from '../fields.tsx';
 import { Spinner } from '../Spinner/Spinner.tsx';
 
@@ -20,6 +20,7 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
     const initialDate = toDateLocalValue(date());
     createEffect(() => props.onDirtyChange?.(value() !== initialValue || toDateLocalValue(date()) !== initialDate));
     let initialized = false;
+    let form: HTMLFormElement | undefined;
 
     createEffect(() => {
         const reading = latest();
@@ -56,8 +57,9 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
     }
 
     return (
-        <form class="stack record-weight" onSubmit={(event) => void submit(event)}>
+        <form ref={form} class="stack record-weight" onSubmit={(event) => void submit(event)}>
             <div class="record-weight__row">
+                <DateField label="Date" value={date()} onChange={setDate} />
                 <Spinner
                     label={`Weight (${app.massUnit()})`}
                     value={value()}
@@ -69,20 +71,17 @@ function RecordWeightForm(props: RecordWeightFormProps): JSX.Element {
                     popoverMount={document.getElementById('root') ?? undefined}
                 />
             </div>
-            <DateField label="Date" value={date()} onChange={setDate} />
             <Show when={error()}>
                 <p role="alert" class="error-text">
                     {error()}
                 </p>
             </Show>
-            <div class="record-weight__actions">
-                <Button disabled={busy()} onPress={(event) => event.currentTarget.form?.requestSubmit()}>
-                    {busy() ? 'Saving…' : 'Save'}
-                </Button>
-                <Button disabled={busy()} onPress={props.onCancel}>
-                    Cancel
-                </Button>
-            </div>
+            <DialogActions
+                kind="save"
+                disabled={busy()}
+                onCancel={props.onCancel}
+                onConfirm={() => form?.requestSubmit()}
+            />
         </form>
     );
 }

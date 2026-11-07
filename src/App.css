@@ -241,10 +241,6 @@
     flex: 1;
     min-height: 0;
 }
-.record-weight__actions {
-    display: flex;
-    gap: 16px;
-}
 .set-comparison {
     display: grid;
     grid-template-columns: 80px 90px 36px;
@@ -286,6 +282,14 @@
     text-overflow: ellipsis;
 }
 
+.record-weight__row {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+.record-weight__row > fieldset {
+    flex-shrink: 0;
+}
 .action-menu {
     display: flex;
     flex-direction: column;
