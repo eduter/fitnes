@@ -35,8 +35,6 @@
 .nes-multi-picker__mark {
     width: 8px;
     height: 8px;
-}
-.nes-multi-picker__mark {
     display: flex;
     align-items: center;
     line-height: 0;

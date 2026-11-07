@@ -16,29 +16,6 @@
     font-synthesis: none;
 }
 
-.nes-corners {
-    position: relative;
-    --nes-corner-stroke: 1px;
-}
-.nes-corners:focus-within {
-    --nes-corner-stroke: 2px;
-}
-.nes-corners::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-        linear-gradient(currentColor 0 0) left top / 4px var(--nes-corner-stroke) no-repeat,
-        linear-gradient(currentColor 0 0) right top / 4px var(--nes-corner-stroke) no-repeat,
-        linear-gradient(currentColor 0 0) left bottom / 4px var(--nes-corner-stroke) no-repeat,
-        linear-gradient(currentColor 0 0) right bottom / 4px var(--nes-corner-stroke) no-repeat,
-        linear-gradient(currentColor 0 0) left top / var(--nes-corner-stroke) 4px no-repeat,
-        linear-gradient(currentColor 0 0) right top / var(--nes-corner-stroke) 4px no-repeat,
-        linear-gradient(currentColor 0 0) left bottom / var(--nes-corner-stroke) 4px no-repeat,
-        linear-gradient(currentColor 0 0) right bottom / var(--nes-corner-stroke) 4px no-repeat;
-}
-
 .nes-visually-hidden {
     position: absolute;
     inline-size: 1px;
