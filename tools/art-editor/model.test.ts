@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { EditHistory, floodFill, paintLine, replaceRegion } from './model.ts';
+import { copyRegion, EditHistory, floodFill, paintLine, pasteRegion, replaceRegion } from './model.ts';
 
 it('flood fills only the connected region and keeps the input immutable', () => {
     const pixels = Uint8Array.from([1, 2, 1, 1, 2, 1]);
@@ -35,4 +35,27 @@ it('draws exact pixels along a continuous pencil stroke and undoes the stroke as
     history.commit(stroke, 'Pencil stroke');
     expect(history.undo()).toEqual(original);
     expect(history.canUndo).toBe(false);
+});
+
+it('copies a rectangle as an independent snapshot and pastes exact repeating pixels', () => {
+    const original = Uint8Array.from([1, 2, 9, 9, 3, 4, 9, 9]);
+    const patch = copyRegion(original, 4, { left: 0, top: 0, width: 2, height: 2 });
+    expect(Array.from(patch.pixels)).toEqual([1, 2, 3, 4]);
+    const result = pasteRegion(original, 4, patch, 2, 0);
+    expect(Array.from(result)).toEqual([1, 2, 1, 2, 3, 4, 3, 4]);
+    expect(Array.from(original)).toEqual([1, 2, 9, 9, 3, 4, 9, 9]);
+    original[0] = 8;
+    expect(patch.pixels[0]).toBe(1);
+});
+
+it('clips a paste at image edges without wrapping rows and undoes placement in one step', () => {
+    const original = new Uint8Array(6);
+    const patch = { width: 2, height: 2, pixels: Uint8Array.from([1, 2, 3, 4]) };
+    const pasted = pasteRegion(original, 3, patch, 2, 1);
+    expect(Array.from(pasted)).toEqual([0, 0, 0, 0, 0, 1]);
+    const history = new EditHistory(original);
+    history.commit(pasted, 'Paste selection');
+    expect(history.undo()).toEqual(original);
+    expect(history.canUndo).toBe(false);
+    expect(history.redo()).toEqual(pasted);
 });

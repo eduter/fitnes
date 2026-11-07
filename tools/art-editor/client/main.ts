@@ -1,4 +1,13 @@
-import { EditHistory, floodFill, paintLine, type Region, replaceRegion } from '../model.ts';
+import {
+    copyRegion,
+    EditHistory,
+    floodFill,
+    type PixelPatch,
+    paintLine,
+    pasteRegion,
+    type Region,
+    replaceRegion,
+} from '../model.ts';
 import type { EditorConfig, VerificationResult } from '../protocol.ts';
 import './style.css';
 
@@ -32,6 +41,9 @@ async function main(): Promise<void> {
     let active: 'from' | 'to' = 'to';
     let selection: Region | null = null;
     let anchor: { x: number; y: number } | null = null;
+    let clipboard: PixelPatch | null = null;
+    let floating: { patch: PixelPatch; left: number; top: number } | null = null;
+    let pasteDrag: { x: number; y: number } | null = null;
     let zoom = 3;
     let regions: Region[] = [];
     let timer: ReturnType<typeof setTimeout>;
@@ -96,6 +108,10 @@ async function main(): Promise<void> {
         renderControls();
         renderOverlay();
     };
+    element('copy').onclick = copySelection;
+    element('paste').onclick = beginPaste;
+    element('place-paste').onclick = placePaste;
+    element('cancel-paste').onclick = cancelPaste;
     element('replace').onclick = () => {
         if (selection) {
             commit(replaceRegion(history.pixels, 256, selection, from, to), 'Replace in selection');
@@ -173,6 +189,17 @@ async function main(): Promise<void> {
             return;
         }
         const point = position(event);
+        if (floating) {
+            const inside =
+                point.x >= floating.left &&
+                point.x < floating.left + floating.patch.width &&
+                point.y >= floating.top &&
+                point.y < floating.top + floating.patch.height;
+            pasteDrag = { x: inside ? point.x - floating.left : 0, y: inside ? point.y - floating.top : 0 };
+            art.setPointerCapture(event.pointerId);
+            movePaste(point.x - pasteDrag.x, point.y - pasteDrag.y);
+            return;
+        }
         const source = history.pixels[point.y * 256 + point.x];
         if (tool === 'pick' || event.altKey) {
             const pickingFrom = selection !== null || (tool === 'pick' ? previousTool === 'select' : tool === 'select');
@@ -218,6 +245,11 @@ async function main(): Promise<void> {
         renderOverlay();
     };
     art.onpointermove = (event) => {
+        if (floating && pasteDrag) {
+            const point = position(event);
+            movePaste(point.x - pasteDrag.x, point.y - pasteDrag.y);
+            return;
+        }
         if (stroke) {
             const point = position(event);
             stroke.pixels = paintLine(stroke.pixels, 256, stroke.last.x, stroke.last.y, point.x, point.y, stroke.color);
@@ -239,14 +271,29 @@ async function main(): Promise<void> {
         renderOverlay();
     };
     art.onpointerup = () => {
+        if (pasteDrag) {
+            pasteDrag = null;
+            placePaste();
+            return;
+        }
         anchor = null;
         finishStroke();
     };
     art.onpointercancel = () => {
+        if (pasteDrag) {
+            pasteDrag = null;
+            cancelPaste();
+            return;
+        }
         anchor = null;
         finishStroke();
     };
     art.onlostpointercapture = () => {
+        if (pasteDrag) {
+            pasteDrag = null;
+            cancelPaste();
+            return;
+        }
         anchor = null;
         finishStroke();
     };
@@ -270,7 +317,9 @@ async function main(): Promise<void> {
             if (!element<HTMLButtonElement>('save').disabled) {
                 void saveToRepository();
             } else {
-                element('save-state').textContent = 'Draft saved; waiting for verification';
+                element('save-state').textContent = floating
+                    ? 'Place or cancel the paste before saving'
+                    : 'Draft saved; waiting for verification';
             }
             return;
         }
@@ -279,6 +328,43 @@ async function main(): Promise<void> {
         }
         if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
             return;
+        }
+        const modifier = event.ctrlKey || event.metaKey;
+        if (
+            modifier &&
+            event.key.toLowerCase() === 'c' &&
+            (selection || floating) &&
+            !stroke &&
+            window.getSelection()?.isCollapsed !== false
+        ) {
+            event.preventDefault();
+            copySelection();
+            return;
+        }
+        if (modifier && event.key.toLowerCase() === 'v' && clipboard && !stroke) {
+            event.preventDefault();
+            beginPaste();
+            return;
+        }
+        if (floating && !modifier) {
+            const steps: Record<string, [number, number]> = {
+                ArrowLeft: [-1, 0],
+                ArrowRight: [1, 0],
+                ArrowUp: [0, -1],
+                ArrowDown: [0, 1],
+            };
+            const step = steps[event.key];
+            if (step) {
+                event.preventDefault();
+                const distance = event.shiftKey ? 8 : 1;
+                movePaste(floating.left + step[0] * distance, floating.top + step[1] * distance);
+                return;
+            }
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                placePaste();
+                return;
+            }
         }
         if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
             event.preventDefault();
@@ -291,6 +377,11 @@ async function main(): Promise<void> {
             event.preventDefault();
             redo();
         } else if (event.key === 'Escape') {
+            if (floating) {
+                event.preventDefault();
+                cancelPaste();
+                return;
+            }
             fileMenu.open = false;
             selection = null;
             renderControls();
@@ -320,6 +411,10 @@ async function main(): Promise<void> {
         }
     }
     function undo(): void {
+        if (floating) {
+            cancelPaste();
+            return;
+        }
         if (stroke) {
             stroke = null;
             render();
@@ -333,7 +428,7 @@ async function main(): Promise<void> {
         changed();
     }
     function redo(): void {
-        if (stroke) {
+        if (stroke || floating) {
             return;
         }
         if (!history.canRedo) {
@@ -346,6 +441,76 @@ async function main(): Promise<void> {
         revision++;
         regions = [];
         saveBackup();
+        render();
+        schedule();
+    }
+    function copySelection(): void {
+        if (stroke) {
+            return;
+        }
+        if (floating) {
+            clipboard = { ...floating.patch, pixels: floating.patch.pixels.slice() };
+        } else if (selection) {
+            clipboard = copyRegion(history.pixels, 256, selection);
+        }
+        renderControls();
+    }
+    function beginPaste(): void {
+        if (!clipboard || stroke) {
+            return;
+        }
+        if (floating) {
+            placePaste();
+        }
+        const left = Math.min(256 - clipboard.width, (selection?.left ?? 0) + (selection?.width ?? 0));
+        const top = Math.min(200 - clipboard.height, selection?.top ?? 0);
+        floating = { patch: { ...clipboard, pixels: clipboard.pixels.slice() }, left, top };
+        regions = [];
+        tool = 'select';
+        revision++;
+        clearTimeout(timer);
+        controller?.abort();
+        element<HTMLButtonElement>('save').disabled = true;
+        element('save').textContent = 'Save artwork';
+        element('save-state').textContent = 'Paste preview — release to place';
+        element<HTMLButtonElement>('export').disabled = true;
+        setStatus(
+            'checking',
+            'Positioning paste',
+            'Drag and release to place; arrows nudge, Enter places, Esc cancels.'
+        );
+        render();
+    }
+    function movePaste(left: number, top: number): void {
+        if (!floating) {
+            return;
+        }
+        floating.left = Math.max(0, Math.min(256 - floating.patch.width, left));
+        floating.top = Math.max(0, Math.min(200 - floating.patch.height, top));
+        render();
+    }
+    function placePaste(): void {
+        if (!floating) {
+            return;
+        }
+        const placed = floating;
+        floating = null;
+        pasteDrag = null;
+        selection = { left: placed.left, top: placed.top, width: placed.patch.width, height: placed.patch.height };
+        const pixels = pasteRegion(history.pixels, 256, placed.patch, placed.left, placed.top);
+        if (history.commit(pixels, 'Paste selection')) {
+            changed();
+        } else {
+            render();
+            schedule();
+        }
+    }
+    function cancelPaste(): void {
+        if (!floating) {
+            return;
+        }
+        floating = null;
+        pasteDrag = null;
         render();
         schedule();
     }
@@ -441,7 +606,11 @@ async function main(): Promise<void> {
         element('proof-toggle').setAttribute('aria-label', `${title}. ${message}`);
         element('proof-announcement').textContent = `${title}. ${message}`;
     }
-    function render(pixels = history.pixels): void {
+    function render(
+        pixels = floating
+            ? pasteRegion(history.pixels, 256, floating.patch, floating.left, floating.top)
+            : history.pixels
+    ): void {
         const data = new Uint8ClampedArray(256 * 200 * 4);
         for (let p = 0; p < pixels.length; p++) {
             data.set(config.colors[pixels[p]].rgb, p * 4);
@@ -457,19 +626,32 @@ async function main(): Promise<void> {
     function renderControls(): void {
         for (const name of ['pencil', 'fill', 'select', 'pick']) {
             element(name).setAttribute('aria-pressed', String(tool === name));
+            element<HTMLButtonElement>(name).disabled = !!floating;
         }
-        element<HTMLButtonElement>('undo').disabled = !history.canUndo && !stroke;
+        art.style.cursor = floating ? (pasteDrag ? 'grabbing' : 'grab') : 'crosshair';
+        element<HTMLButtonElement>('copy').disabled = (!selection && !floating) || !!stroke;
+        element<HTMLButtonElement>('paste').disabled = !clipboard || !!stroke;
+        element('place-paste').hidden = !floating;
+        element('cancel-paste').hidden = !floating;
+        for (const name of ['from', 'to', 'replace', 'clear', 'replace-arrow']) {
+            element(name).hidden = !!floating;
+        }
+        element<HTMLButtonElement>('open').disabled = !!floating;
+        element<HTMLButtonElement>('project').disabled = !!floating;
+        element<HTMLButtonElement>('undo').disabled = !history.canUndo && !stroke && !floating;
         element('undo').title = `Undo ${history.undoLabel} · Ctrl+Z`;
-        element<HTMLButtonElement>('redo').disabled = !history.canRedo;
-        element<HTMLButtonElement>('restore').disabled = !lastVerified;
-        element<HTMLButtonElement>('replace').disabled = !selection;
-        element<HTMLButtonElement>('clear').disabled = !selection;
+        element<HTMLButtonElement>('redo').disabled = !history.canRedo || !!floating;
+        element<HTMLButtonElement>('restore').disabled = !lastVerified || !!floating;
+        element<HTMLButtonElement>('replace').disabled = !selection || !!floating;
+        element<HTMLButtonElement>('clear').disabled = !selection || !!floating;
         element('replace-controls').hidden = !selection && tool !== 'select' && tool !== 'pick';
         element('undo').setAttribute('aria-label', 'Undo');
         element('redo').setAttribute('aria-label', 'Redo');
-        element('selection-label').textContent = selection
-            ? `${selection.width}×${selection.height} pixels at ${selection.left}, ${selection.top}`
-            : 'Select a rectangle to replace a color inside it.';
+        element('selection-label').textContent = floating
+            ? `Paste at ${floating.left}, ${floating.top} · drag / arrows · Enter places · Esc cancels`
+            : selection
+              ? `${selection.width}×${selection.height} pixels at ${selection.left}, ${selection.top}`
+              : 'Select a rectangle to replace a color inside it.';
         for (const slot of ['from', 'to'] as const) {
             const color = config.colors[slot === 'from' ? from : to];
             const button = element(slot);
@@ -487,14 +669,15 @@ async function main(): Promise<void> {
             button.append(dot, label);
             button.setAttribute('aria-pressed', String(active === slot));
         }
-        element('color-help').textContent =
-            tool === 'pencil'
-                ? 'Draw one pixel or drag a stroke.'
-                : tool === 'pick'
-                  ? 'Pick a source color.'
-                  : tool === 'select'
-                    ? 'Drag a region, then replace a color.'
-                    : 'Choose a color and fill a region.';
+        element('color-help').textContent = floating
+            ? 'Drag the copy into place, then release.'
+            : tool === 'pencil'
+              ? 'Draw one pixel or drag a stroke.'
+              : tool === 'pick'
+                ? 'Pick a source color.'
+                : tool === 'select'
+                  ? 'Drag a region, then replace a color.'
+                  : 'Choose a color and fill a region.';
     }
     function renderPalette(): void {
         const used = new Set(history.pixels);
@@ -526,11 +709,16 @@ async function main(): Promise<void> {
         element('other-group').hidden = element('other-colors').childElementCount === 0;
     }
     function renderOverlay(): void {
-        overlay.width = 256 * zoom;
-        overlay.height = 200 * zoom;
+        if (overlay.width !== 256 * zoom) {
+            overlay.width = 256 * zoom;
+        }
+        if (overlay.height !== 200 * zoom) {
+            overlay.height = 200 * zoom;
+        }
         if (!marks) {
             return;
         }
+        marks.clearRect(0, 0, overlay.width, overlay.height);
         if (zoom >= 8) {
             marks.strokeStyle = 'rgba(170,190,220,.18)';
             marks.lineWidth = 1;
@@ -557,7 +745,17 @@ async function main(): Promise<void> {
                 region.height * zoom - 2
             );
         }
-        if (selection) {
+        if (floating) {
+            marks.strokeStyle = '#80f0ba';
+            marks.setLineDash([5, 3]);
+            marks.strokeRect(
+                floating.left * zoom + 1,
+                floating.top * zoom + 1,
+                floating.patch.width * zoom - 2,
+                floating.patch.height * zoom - 2
+            );
+            marks.setLineDash([]);
+        } else if (selection) {
             marks.strokeStyle = '#84c5ff';
             marks.fillStyle = 'rgba(90,170,255,.12)';
             marks.setLineDash([5, 3]);

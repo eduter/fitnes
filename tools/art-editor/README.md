@@ -41,6 +41,17 @@ FCEUmm core can be supplied with `--core /absolute/path/fceumm_libretro.so`.
 
 ## Tools
 
+- **Copy / Paste:** select a rectangle, then use the buttons or Ctrl+C / Ctrl+V.
+  Paste creates a floating copy beside the source. Drag it at any zoom and
+  release to place, or nudge with arrow keys (Shift = eight pixels) and press
+  Enter / Place. Esc / Cancel discards the floating copy. Each placement is one
+  undo action and starts exact verification. Repeated pastes keep the same
+  copied pattern and start beside the previous placement, useful for stripes.
+  The clipboard belongs to this editor tab; no system clipboard permission is
+  needed. The live overview follows the preview. Save/export stay disabled until
+  the copy is placed and verified. A floating preview is not auto-saved until
+  placed; the underlying draft stays intact if it is cancelled.
+
 - **Pencil:** click one pixel or drag a one-pixel-wide stroke. Gaps between
   pointer samples are filled without smoothing. The complete stroke is one undo
   action and is checked when released. Pick color samples a drawing color when

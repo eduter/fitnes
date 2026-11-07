@@ -6,6 +6,53 @@ interface Region {
     height: number;
 }
 
+/** An exact, independent rectangle of indexed pixels held in the editor clipboard. */
+interface PixelPatch {
+    width: number;
+    height: number;
+    pixels: Uint8Array;
+}
+
+/** Copy a rectangle without retaining a mutable reference to the source image. */
+function copyRegion(pixels: Uint8Array, width: number, region: Region): PixelPatch {
+    const { left, top, width: columns, height: rows } = region;
+    if (
+        !Number.isInteger(left) ||
+        !Number.isInteger(top) ||
+        !Number.isInteger(columns) ||
+        !Number.isInteger(rows) ||
+        left < 0 ||
+        top < 0 ||
+        columns < 1 ||
+        rows < 1 ||
+        left + columns > width ||
+        top + rows > pixels.length / width
+    ) {
+        throw new Error('Copy selection must fit inside the image');
+    }
+    const copy = new Uint8Array(columns * rows);
+    for (let y = 0; y < rows; y++) {
+        copy.set(pixels.subarray((top + y) * width + left, (top + y) * width + left + columns), y * columns);
+    }
+    return { width: columns, height: rows, pixels: copy };
+}
+
+/** Paste opaque indexed pixels exactly, clipping at the image boundary without wrapping. */
+function pasteRegion(pixels: Uint8Array, width: number, patch: PixelPatch, left: number, top: number): Uint8Array {
+    const { width: columns, height: rows, pixels: source } = patch;
+    const result = pixels.slice();
+    for (let y = 0; y < rows; y++) {
+        for (let x = 0; x < columns; x++) {
+            const tx = left + x;
+            const ty = top + y;
+            if (tx >= 0 && tx < width && ty >= 0 && ty < pixels.length / width) {
+                result[ty * width + tx] = source[y * columns + x];
+            }
+        }
+    }
+    return result;
+}
+
 /** Fill one four-connected exact-color region without changing the input. */
 function floodFill(pixels: Uint8Array, width: number, x: number, y: number, replacement: number): Uint8Array {
     const height = pixels.length / width;
@@ -145,5 +192,5 @@ class EditHistory {
     }
 }
 
-export type { Region };
-export { EditHistory, floodFill, paintLine, replaceRegion };
+export type { PixelPatch, Region };
+export { copyRegion, EditHistory, floodFill, paintLine, pasteRegion, replaceRegion };
