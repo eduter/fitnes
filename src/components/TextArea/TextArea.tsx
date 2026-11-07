@@ -1,4 +1,5 @@
 import { createUniqueId, type JSX } from 'solid-js';
+import '../../styles/controls.css';
 import './TextArea.css';
 
 /** Native multiline entry directly in a framed page or editor, retaining the phone keyboard. */
