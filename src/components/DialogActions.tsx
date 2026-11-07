@@ -4,11 +4,13 @@ import './DialogActions.css';
 
 /** Shared action copy, kept separate from screen-specific form logic. */
 const dialogActionCopy = {
-    end: { confirm: 'End', cancel: 'Cancel' },
-    save: { confirm: 'Save', cancel: 'Cancel' },
-    create: { confirm: 'Create', cancel: 'Cancel' },
-    add: { confirm: 'Add', cancel: 'Cancel' },
-    confirm: { confirm: 'Yes', cancel: 'No' },
+    end: 'End',
+    save: 'Save',
+    create: 'Create',
+    add: 'Add',
+    confirm: 'Yes',
+    cancel: 'Cancel',
+    decline: 'No',
 };
 
 /** Negative action on the left, positive action (or End) on the right. */
@@ -17,11 +19,11 @@ function DialogActions(props: DialogActionsProps): JSX.Element {
         <div class="nes-dialog-actions">
             <Show when={props.onCancel}>
                 <Button disabled={props.disabled} onPress={() => props.onCancel?.()}>
-                    {dialogActionCopy[props.kind].cancel}
+                    {props.kind === 'confirm' ? dialogActionCopy.decline : dialogActionCopy.cancel}
                 </Button>
             </Show>
             <Button disabled={props.disabled || props.confirmDisabled} onPress={props.onConfirm}>
-                {dialogActionCopy[props.kind].confirm}
+                {dialogActionCopy[props.kind]}
             </Button>
         </div>
     );
@@ -29,7 +31,7 @@ function DialogActions(props: DialogActionsProps): JSX.Element {
 
 /** End closes immediate edits; other kinds explicitly commit a draft or action. */
 interface DialogActionsProps {
-    kind: keyof typeof dialogActionCopy;
+    kind: 'end' | 'save' | 'create' | 'add' | 'confirm';
     onConfirm: () => void;
     onCancel?: () => void;
     disabled?: boolean;

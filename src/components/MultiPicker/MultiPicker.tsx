@@ -74,7 +74,7 @@ function MultiPicker(props: MultiPickerProps): JSX.Element {
                             </Button>
                         )}
                     </For>
-                    <Button onPress={() => setOpen(false)}>{dialogActionCopy.end.confirm}</Button>
+                    <Button onPress={() => setOpen(false)}>{dialogActionCopy.end}</Button>
                 </div>
             </Popover>
         </fieldset>

@@ -84,7 +84,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
                 <Button variant="plain" aria-label="Digit 0" onPress={() => choose(0)}>
                     0
                 </Button>
-                <Button onPress={props.onEnd}>{dialogActionCopy.end.confirm}</Button>
+                <Button onPress={props.onEnd}>{dialogActionCopy.end}</Button>
             </div>
             <output class="nes-number-pad__announcement" aria-live="polite">
                 {props.label}: {formatMaskedNumber(props.value, props.mask)}
