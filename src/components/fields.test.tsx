@@ -7,6 +7,14 @@ import { CompactNumberField, NumberField } from './fields.tsx';
 afterEach(cleanup);
 
 describe('quantity fields', () => {
+    it('edits a three-digit rep target without exceeding the logging mask', () => {
+        const [value, setValue] = createSignal(100);
+        const view = render(() => <CompactNumberField label="Reps" value={value()} integer onChange={setValue} />);
+        fireEvent.click(view.getByRole('button', { name: 'Increase Reps' }));
+        expect(value()).toBe(101);
+        expect(view.getByRole('button', { name: 'Reps: 101. Edit number' })).toBeTruthy();
+    });
+
     it('uses the adopted spinner to apply fractional equipment increments immediately', () => {
         const [value, setValue] = createSignal(40);
         const view = render(() => <CompactNumberField label="Row weight" value={value()} onChange={setValue} />);

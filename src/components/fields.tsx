@@ -67,7 +67,7 @@ function CompactNumberField(props: CompactNumberFieldProps): JSX.Element {
             onChange={props.onChange}
             min={props.min}
             step={props.integer ? 1 : 0.25}
-            integerDigits={props.integer ? 2 : 3}
+            integerDigits={3}
             fractionDigits={props.integer ? 0 : 2}
             disabled={props.disabled}
             popoverMount={document.getElementById('root') ?? undefined}
