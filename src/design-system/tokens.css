@@ -1,0 +1,28 @@
+/* Source: art/home/construction.json; Composite Direct, red emphasis 1. */
+:root {
+    --nes-color-black: #000000;
+    --nes-color-steel: #7d5c4b;
+    --nes-color-shadow: #451600;
+    --nes-color-gold: #ffd679;
+    --nes-color-copper: #d8a082;
+    --nes-color-coral: #ff754e;
+    --nes-color-charcoal: #5e4538;
+    --nes-color-orange: #ff8b20;
+    --nes-color-skin: #ffcc83;
+
+    --nes-ground: var(--nes-color-black);
+    --nes-ink: var(--nes-color-copper);
+    --nes-action: var(--nes-color-gold);
+    --nes-muted: var(--nes-color-steel);
+    --nes-shadow: var(--nes-color-shadow);
+    --nes-error: var(--nes-color-coral);
+    --nes-font: "FitNES Pixel", monospace;
+    --nes-font-size: 16px;
+    --nes-line-height: 16px;
+    --nes-space-1: 4px;
+    --nes-space-2: 8px;
+    --nes-space-3: 12px;
+    --nes-space-4: 16px;
+    --nes-content-width: 256px;
+    --nes-target-size: 36px;
+}

@@ -115,7 +115,7 @@ function Preview(): JSX.Element {
                                         returnFocus={() => opener}
                                     >
                                         <p class="nes-demo__about">Thin border. Stepped reveal.</p>
-                                        <Button onPress={() => setAbout(false)}>Close</Button>
+                                        <Button onPress={() => setAbout(false)}>End</Button>
                                     </Popover>
                                 </>
                             )}

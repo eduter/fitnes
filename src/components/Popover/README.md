@@ -1,14 +1,19 @@
 # Popover
 
-A thin bordered, controlled modal with the stepped reveal and reverse closing
-from PR #23. See [animation and lifecycle](../Controls/README.md#pr-23-animation).
+Use for an anchored choice window, bounded editor or child window with the
+adopted two-pixel cut-corner frame. It opens below its anchor, flips above when
+needed, clamps to the visible viewport and tracks resizing/scrolling. Pass
+`mount` inside the logical-pixel screen and `returnFocus` for a stable trigger.
 
-```tsx
-<Popover open={open()} onOpenChange={setOpen} label="Options" height={96}>
-    <Button onPress={() => setOpen(false)}>Close</Button>
-</Popover>
-```
+Default focus is the dialog surface. Choice/number components may explicitly
+focus a safe control. Do not focus text inputs automatically on open. The stack
+makes only the top window interactive, and outside/Escape closes that window
+without activating content beneath it. Reverse closing preserves the content
+until animation completes. Keep the editor selection separate from its open
+flag so dismissing it does not clear the fields during that animation. Inputs
+own their values; dismissal is not rollback.
 
-Pass `mount` to keep it inside a positioned/scaled logical-pixel surface. The
-component owns focus containment, background inertness and close lifecycle;
-callers own open state and content.
+Never put PagedWindow inside a dialog. Put common form fields together; place
+notes directly in the form rather than adding an unnecessary nested window.
+Single-choice menus and number pads have no visible header. Accessible `label`
+is still required. End closes an editor; confirmations use Yes/No.

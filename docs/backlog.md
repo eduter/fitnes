@@ -1,5 +1,33 @@
 # Backlog
 
+## Design-system foundation
+
+The [UI system contract](../src/design-system/README.md) defines the adopted
+components and composition rules. [PR #26](https://github.com/eduter/fitnes/pull/26)
+remains open for application integration and useful workflow evidence.
+
+- [x] Establish shared palette tokens, framed fields, layered windows,
+  date/multiline/membership entry, confirmations and page pagination.
+- [x] Verify sampled overview, editor and nested number-pad compositions against
+  NES attribute/palette/sprite rules using the home construction. New screens
+  and states still require their own proofs.
+- [ ] Revise #26 using the system while preserving useful app behavior and
+  existing data. Integrate the available components before adding patterns.
+- [ ] Build catalog selection with bounded page-level lists and child editors;
+  preserve the selected page/row when a child closes.
+- [ ] Complete home/session workflows, compact workout rows, previous-performance
+  columns and result summaries while preserving measurement/load meanings.
+- [ ] Define composite Create/Save/Cancel flows, including dismissal of unsaved
+  batches. Existing atomic edits remain immediate.
+- [ ] Add field-linked validation and compact empty/loading/error/status examples.
+- [ ] Review native Android refresh behavior on a real device. Page one permits
+  refresh; later pages use downward swipes for previous-page navigation.
+
+Inline expansion and modal pagination are prohibited. Common edit fields and
+notes belong together in a bounded form. Import/export workflow polish remains
+lower priority; preserving real data is still a prerequisite to persistence or
+deployment changes.
+
 ## Integration order
 
 Use the [repository inventory](repo-status.md) to find adopted components and

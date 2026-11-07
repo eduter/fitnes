@@ -4,13 +4,13 @@
     align-items: center;
     justify-content: flex-start;
     gap: 2px;
-    min-block-size: 36px;
+    min-block-size: var(--nes-target-size);
     border: 0;
     border-radius: 0;
     padding: 0 8px;
-    color: var(--nes-ink);
+    color: var(--nes-action);
     background: var(--nes-ground);
-    font: 400 16px / 16px var(--nes-font);
+    font: 400 var(--nes-font-size) / var(--nes-line-height) var(--nes-font);
     font-synthesis: none;
     text-transform: uppercase;
     touch-action: manipulation;

@@ -1,6 +1,5 @@
-import { type JSX, Show, splitProps } from 'solid-js';
+import { type JSX, splitProps } from 'solid-js';
 import { controlClasses } from '../Controls/controlClasses.ts';
-import { Chevron } from '../Controls/Glyph.tsx';
 import '../../styles/controls.css';
 import './Button.css';
 
@@ -26,9 +25,6 @@ function Button(props: ButtonProps): JSX.Element {
                 }
             }}
         >
-            <Show when={local.variant !== 'plain'}>
-                <Chevron />
-            </Show>
             <span class="nes-button__label">{local.children}</span>
         </button>
     );
@@ -40,5 +36,5 @@ interface ButtonProps extends Omit<JSX.ButtonHTMLAttributes<HTMLButtonElement>, 
     variant?: 'action' | 'plain';
 }
 
-export { Button };
 export type { ButtonProps };
+export { Button };

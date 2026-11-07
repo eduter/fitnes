@@ -1,0 +1,59 @@
+.example-title {
+    margin: 0;
+    padding-inline: 8px;
+    font: inherit;
+    height: 16px;
+}
+.example-exercise {
+    padding: 2px 8px 0;
+}
+.example-exercise p {
+    margin: 0;
+}
+.example-summary {
+    display: block;
+}
+.example-actions {
+    display: flex;
+    justify-content: space-between;
+}
+.example-actions .nes-button {
+    min-block-size: 20px;
+    padding: 0;
+}
+
+.example-quantities {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.example-weight > .nes-button {
+    min-block-size: 24px;
+}
+.example-weight > p {
+    margin: 4px 0 0;
+}
+
+.example-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.example-editor > .nes-popover__content > .nes-button {
+    min-block-size: 24px;
+}
+
+.example-workout {
+    flex: 1;
+    min-height: 0;
+}
+.example-workout > .nes-paged-window {
+    height: 100%;
+}
+.example-edit-fields {
+    display: grid;
+    gap: 0;
+}

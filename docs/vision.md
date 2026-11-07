@@ -17,7 +17,8 @@ Use top-down character movement between sets to communicate workout progress.
 
 The interface should feel like an NES game menu built for training. Follow
 actual NES palette, tile, background attribute, and sprite constraints. Use a
-256-pixel logical content width; pages may extend vertically and scroll.
+256-pixel logical content width and use available screen height. Paginate
+page-level lists when necessary; do not paginate modal editors.
 Preserve crisp pixel art when scaling for a device.
 
 Owner decision (2026-11-04): pattern-bank/tile-count capacity is outside this
@@ -39,22 +40,30 @@ Visual fidelity does not require an NES emulator, CPU timing, audio hardware,
 or controller-only input. Research and prototypes are candidates until the
 owner adopts them.
 
+## Design-system foundation
+
+The [UI system contract](../src/design-system/README.md) records the single
+adopted vocabulary: framed fields, compact summary rows, bounded stacked windows,
+no inline expansion and no pagination inside a modal. Alternate field layouts
+are removed. Do not focus text inputs automatically on open; notes belong
+directly in the editor. Choice/numeric windows have no visible header; numeric
+and multi-choice editors finish with End. Multi checks sit immediately after
+the label; End is bottom-right. Use available screen height for page content.
+
+The full nine-color palette is copied from the final 256×200 home artwork.
+Nine is not a hardware maximum: a future richer artwork pass may reconsider
+palette/tile allocation under the visual contract, subject to owner approval.
+Current palette tokens stay unchanged until that work is adopted.
+
 ## Design direction
 
-Owner-approved controls (2026-11-04): use uppercase action labels with the bold
-leading chevron close to the text, keeping other content mixed case. Numeric
-spinners use fixed monospaced masks, corner brackets, borderless stacked filled
-triangles and the selected number-pad editor. Popovers have a thin continuous
-border and stepped opening/reverse closing. Name fields use an ordinary native
-text input with the same corners, preserving the phone's virtual keyboard.
-Other numerical interactions activate immediately on press. The reusable
-[controls](../src/components/Controls/README.md) provide this API; integration
-into the workout app remains open.
-
-Owner feedback (2026-11-05): controls retain their normal colors when pressed,
-focused or selected. Focus rings are omitted per owner feedback. The selected
-number-pad digit uses a terminal-style blinking underline (steady with reduced
-motion).
+Owner-approved controls use gold interactive values/actions and copper passive
+text, with two-pixel cut-corner frames. Numeric/date spinners share compact
+symmetric geometry. Names and multiline notes use native text entry inside the
+same frame; preserve keyboard/selection behavior. The native date-picker escape
+hatch is explicitly approved for rare use. Confirmations use Yes/No. Controls
+retain normal colors on focus/press; digit selection uses a blinking underline
+(steady under reduced motion). Read the system contract for implementation.
 
 Aim for the detail and finish of a well-made NES game. Use the **rightmost
 charcoal/steel design** in the [style reference](style-reference.png) as the

@@ -1,6 +1,6 @@
 # Repository inventory
 
-Updated 2026-11-05. Use [the vision](vision.md) for product authority and
+Updated 2026-11-07. Use [the vision](vision.md) for product authority and
 [the backlog](backlog.md) for open work.
 
 ## Adopted in main
@@ -10,11 +10,15 @@ Updated 2026-11-05. Use [the vision](vision.md) for product authority and
 - [SteelPanel](../src/components/SteelPanel/README.md), the reusable steel frame.
 - [BottomTabs](../src/components/BottomTabs/README.md), the selected six icons
   and steel tab bar.
-- [Reusable controls](../src/components/Controls/README.md): Button, Popover,
-  Spinner and TextInput. The selected number pad and stepped popover are
-  available; workout-app integration remains open. The isolated
-  [phone preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
-  uses these components directly.
+- [Design-system foundation](../src/design-system/README.md): Button,
+  OptionPicker, MultiPicker, Spinner/NumberPad, DateSpinner, TextInput, TextArea,
+  Popover, ConfirmDialog and PagedWindow. The
+  [private showcase](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
+  demonstrates the adopted vocabulary with temporary in-memory examples;
+  application persistence/integration remains open. Use it for current design
+  review. The older
+  [controls preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
+  remains available as a historical mechanical fixture.
 - [Selected style reference](style-reference.png),
   [standalone logo](fitnes-logo.png), and
   [original home composition reference](reference-home-screen-image.png).

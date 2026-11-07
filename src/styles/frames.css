@@ -1,0 +1,10 @@
+.nes-frame {
+    border: 2px solid transparent;
+    border-image: url("./frame.svg") 3 / 3px / 0 stretch;
+    background-color: var(--nes-ground);
+    border-radius: 0;
+}
+.nes-frame > legend {
+    padding-inline: 4px;
+    background: var(--nes-ground);
+}

@@ -1,0 +1,49 @@
+.nes-multi-picker {
+    margin: 0;
+    padding: 0 4px;
+    min-inline-size: 0;
+    width: fit-content;
+    max-width: 100%;
+}
+.nes-multi-picker legend {
+    padding-inline: 4px;
+}
+.nes-multi-picker > .nes-button {
+    display: block;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-block-size: 24px;
+    max-width: 100%;
+}
+.nes-multi-picker__options {
+    display: grid;
+}
+.nes-multi-picker__options .nes-button {
+    justify-content: start;
+    min-block-size: 24px;
+    text-align: left;
+}
+
+.nes-multi-picker__options > .nes-button:not(:last-child) .nes-button__label {
+    display: grid;
+    grid-template-columns: max-content 8px;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+.nes-multi-picker__mark {
+    width: 8px;
+    height: 8px;
+    display: flex;
+    align-items: center;
+    line-height: 0;
+}
+.nes-multi-picker__mark svg {
+    display: block;
+}
+
+.nes-multi-picker__options > .nes-button:last-child {
+    justify-self: end;
+    padding-inline: 0;
+}

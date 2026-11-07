@@ -27,6 +27,17 @@ future icons and metal panels. An assembled screen must also share its global
 palettes, emphasis and sprite budgets; individually valid assets alone do not
 prove the composition fits.
 
+## Color headroom
+
+Nine is the current image's actual distinct-color count, not the NES maximum.
+Ordinary shared palettes allow up to 13 distinct background colors and 12 sprite
+colors (25 total), with local region/sprite restrictions. This construction
+repeats material colors across its four background and three sprite palettes;
+it already reaches eight sprites on a scanline. A richer artwork revision could
+redistribute palettes/tiles and use more colors, but must re-prove the assembled
+image rather than assuming every unused slot is usable anywhere. The existing
+image and source are preserved until the owner approves a new artwork pass.
+
 ## Verification
 
 ```sh

@@ -1,0 +1,58 @@
+@import "../styles/controls.css";
+body {
+    margin: 0;
+    background: var(--nes-ground);
+}
+.ds-space {
+    position: relative;
+    margin-inline: auto;
+}
+.ds-screen {
+    position: relative;
+    inline-size: 256px;
+    block-size: var(--nes-screen-height, 240px);
+    display: flex;
+    flex-direction: column;
+    background: var(--nes-ground);
+    transform-origin: top left;
+}
+.ds-nav {
+    padding: 0 8px;
+    flex: none;
+}
+.ds-section {
+    padding: 8px;
+}
+.ds-fields {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: 8px;
+}
+.ds-note {
+    margin-block: 12px 0;
+}
+.ds-screen p {
+    font: inherit;
+}
+.ds-home {
+    display: block;
+    image-rendering: pixelated;
+}
+.ds-palette {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.ds-palette li {
+    display: flex;
+    gap: 8px;
+}
+.ds-swatch {
+    flex: 0 0 16px;
+    block-size: 32px;
+    outline: 1px solid var(--nes-ink);
+}

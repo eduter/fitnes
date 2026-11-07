@@ -1,0 +1,44 @@
+.nes-option-picker {
+    display: block;
+    min-inline-size: 0;
+    inline-size: max-content;
+    margin: 0;
+    padding: 0 var(--nes-space-1);
+}
+.nes-option-picker__value[data-variant="plain"] {
+    justify-content: start;
+    max-inline-size: max-content;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    text-transform: uppercase;
+}
+.nes-option-picker__menu {
+    display: flex;
+    flex-direction: column;
+    max-block-size: min(208px, 70vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.nes-option-picker > .nes-option-picker__label {
+    padding-inline: var(--nes-space-1);
+}
+.nes-option-picker__sizer {
+    display: grid;
+    block-size: 0;
+    visibility: hidden;
+    text-transform: uppercase;
+}
+.nes-option-picker__sizer > span {
+    grid-area: 1 / 1;
+    white-space: pre;
+}
+
+.nes-option-picker__menu > .nes-button {
+    justify-content: start;
+    text-transform: uppercase;
+    min-block-size: 24px;
+}
+.nes-option-picker__value[data-variant="plain"] {
+    min-block-size: 24px;
+}

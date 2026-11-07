@@ -80,14 +80,18 @@ function Spinner(props: SpinnerProps): JSX.Element {
     const adjust = (direction: 1 | -1) => local.onChange(stepNumber(local.value, local.step ?? 1, direction, mask()));
 
     return (
-        <fieldset {...rest} class={controlClasses('nes-spinner nes-control', local)} aria-labelledby={labelId}>
+        <fieldset
+            {...rest}
+            class={controlClasses('nes-spinner nes-frame nes-control', local)}
+            aria-labelledby={labelId}
+        >
             <legend id={labelId} class="nes-spinner__label">
                 {local.label}
             </legend>
             <div class="nes-spinner__controls">
                 <span
-                    class="nes-spinner__value-frame nes-corners"
-                    style={{ 'inline-size': `${Math.max(34, masked().length * 7 + 8)}px` }}
+                    class="nes-spinner__value-frame"
+                    style={{ 'inline-size': `${Math.max(22, masked().length * 7 + 4)}px` }}
                 >
                     <Button
                         ref={(element) => {
@@ -139,7 +143,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                 onOpenChange={setOpen}
                 label={`Edit ${local.label}`}
                 mount={local.popoverMount}
-                height={256}
+                anchor={() => opener}
                 returnFocus={() => opener}
             >
                 <NumberPad
@@ -147,7 +151,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                     value={local.value}
                     mask={mask()}
                     onChange={local.onChange}
-                    onDone={() => setOpen(false)}
+                    onEnd={() => setOpen(false)}
                 />
             </Popover>
         </fieldset>
@@ -168,5 +172,5 @@ interface SpinnerProps extends Omit<JSX.FieldsetHTMLAttributes<HTMLFieldSetEleme
     popoverMount?: HTMLElement;
 }
 
-export { Spinner };
 export type { SpinnerProps };
+export { Spinner };

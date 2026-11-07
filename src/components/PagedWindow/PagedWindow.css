@@ -1,0 +1,44 @@
+.nes-paged-window {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 208px;
+    touch-action: pan-y;
+}
+.nes-paged-window__content {
+    flex: 1;
+    min-height: 0;
+}
+.nes-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+.nes-pagination .nes-button {
+    min-block-size: 24px;
+    min-inline-size: 20px;
+    padding: 0;
+}
+.nes-paged-window__black {
+    position: absolute;
+    inset: 0;
+    background: var(--nes-ground);
+    pointer-events: none;
+    visibility: hidden;
+}
+.nes-paged-window[data-redrawing] .nes-paged-window__black {
+    visibility: visible;
+}
+
+.nes-pagination [role="status"] {
+    display: inline-flex;
+    align-items: center;
+    white-space: pre;
+    font-variant-numeric: tabular-nums;
+}
+.nes-pagination .nes-button__label {
+    display: flex;
+    align-items: center;
+    line-height: 0;
+}

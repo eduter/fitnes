@@ -6,6 +6,13 @@ Read [the vision](docs/vision.md) before changing product behavior or visuals.
 Use [the backlog](docs/backlog.md) when choosing the next task.
 Update the owning document when an owner-approved decision changes.
 
+## Interface foundation
+
+Read the [UI system contract](src/design-system/README.md) before any UI work.
+It owns the component registry, composition rules, approved native-input
+exceptions and palette limits. Use its components instead of screen-local
+imitations; missing patterns require a reviewed component before integration.
+
 ## Tech and conventions
 
 - **Android / Chromium only.** The sole user has no Apple devices — do not
