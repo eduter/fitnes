@@ -6,22 +6,26 @@ import type { ExerciseDefinition, LoadOption, MeasurementOption } from '../../do
 import type { ValidationIssue } from '../../domain/validation.ts';
 
 const measurements: { value: string; label: string; option: MeasurementOption }[] = [
-    { value: 'repetitions/total', label: 'Reps total', option: { measurement: 'repetitions', countBasis: 'total' } },
+    { value: 'repetitions/total', label: 'Reps', option: { measurement: 'repetitions', countBasis: 'total' } },
     {
         value: 'repetitions/perSide',
         label: 'Reps per side',
         option: { measurement: 'repetitions', countBasis: 'perSide' },
     },
-    { value: 'duration/total', label: 'Time total', option: { measurement: 'duration', countBasis: 'total' } },
-    { value: 'duration/perSide', label: 'Time per side', option: { measurement: 'duration', countBasis: 'perSide' } },
+    { value: 'duration/total', label: 'Seconds', option: { measurement: 'duration', countBasis: 'total' } },
+    {
+        value: 'duration/perSide',
+        label: 'Seconds per side',
+        option: { measurement: 'duration', countBasis: 'perSide' },
+    },
 ];
 const loads = [
-    { value: 'none', label: 'None' },
+    { value: 'none', label: 'No weight' },
     { value: 'bodyweight', label: 'Bodyweight' },
-    { value: 'external/total', label: 'External total' },
-    { value: 'external/perSide', label: 'External per side' },
-    { value: 'bodyweightExternal/total', label: 'BW + external total' },
-    { value: 'bodyweightExternal/perSide', label: 'BW + external per side' },
+    { value: 'external/total', label: 'Added weight' },
+    { value: 'external/perSide', label: 'Weight per side' },
+    { value: 'bodyweightExternal/total', label: 'BW + added weight' },
+    { value: 'bodyweightExternal/perSide', label: 'BW + weight per side' },
 ];
 
 /** Edit identity and all supported capabilities together in one bounded form. */
@@ -36,8 +40,9 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
     return (
         <div class="editor-fields">
             <TextField label="Name" value={props.value.name} required onChange={(name) => patch({ name })} />
+            <p>Tracking options</p>
             <MultiPicker
-                label="Measures"
+                label="Measure"
                 values={props.value.measurements.map((item) => `${item.measurement}/${item.countBasis}`)}
                 options={measurements}
                 onChange={(values) =>
@@ -50,17 +55,17 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
                 popoverMount={document.getElementById('root') ?? undefined}
             />
             <MultiPicker
-                label="Execution"
+                label="Movement"
                 values={props.value.executionModes}
                 options={[
-                    { value: 'bilateral', label: 'Bilateral' },
-                    { value: 'unilateral', label: 'Unilateral' },
+                    { value: 'bilateral', label: 'Both sides' },
+                    { value: 'unilateral', label: 'One side' },
                 ]}
                 onChange={(values) => patch({ executionModes: values as ExerciseDefinition['executionModes'] })}
                 popoverMount={document.getElementById('root') ?? undefined}
             />
             <MultiPicker
-                label="Loads"
+                label="Weight"
                 values={props.value.loads.flatMap((item) =>
                     item.kind === 'external' || item.kind === 'bodyweightExternal'
                         ? item.bases.map((basis) => `${item.kind}/${basis}`)

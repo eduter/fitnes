@@ -89,7 +89,7 @@ function StartSessionPage(): JSX.Element {
                 when={template()}
                 fallback={
                     <p class="muted">
-                        Template not found. <A href="/templates">Back to templates</A>
+                        Workout not found. <A href="/templates">Back to workouts</A>
                     </p>
                 }
             >

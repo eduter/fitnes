@@ -132,14 +132,14 @@ function TemplateEditPage(): JSX.Element {
             <ConfirmDialog
                 open={confirming()}
                 onOpenChange={setConfirming}
-                message={`Delete ${draft().name || 'template'}?`}
+                message={`Delete ${draft().name || 'workout'}?`}
                 onConfirm={() => void remove()}
                 trigger={() => trigger}
                 mount={document.getElementById('root') ?? undefined}
             />
             <ValidationErrors errors={errors()} />
             <PageHeader
-                title={created() ? draft().name || 'Template' : 'New template'}
+                title={created() ? draft().name || 'Workout' : 'New workout'}
                 actions={
                     <div class="button-row">
                         <Show when={created()}>
@@ -164,7 +164,7 @@ function TemplateEditPage(): JSX.Element {
                 when={!missing()}
                 fallback={
                     <p class="muted">
-                        Template not found. <A href="/templates">Back to templates</A>
+                        Workout not found. <A href="/templates">Back to workouts</A>
                     </p>
                 }
             >

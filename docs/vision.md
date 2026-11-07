@@ -127,6 +127,13 @@ corridor art does not implement the transition. See the
 [reference notes and captures](references/README.md) for retained materials,
 and the [backlog](backlog.md) for next work.
 
+Owner feedback (2026-11-07): exercise editing opens directly in a popover over
+its library row; secondary actions belong in a nested menu. Buttons activate only
+on their visible gold label or icon, with short verbs and passive black space.
+Use separators between library items, distinguish copper page headings from
+normal text and gold actions, and call the workout library Workouts. Remove the
+small FitNES header from all non-home pages.
+
 ## Preview data
 
 Preserve the compact preview's real workout data before clearing storage or

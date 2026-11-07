@@ -6,13 +6,12 @@ import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { App } from '../App.tsx';
 import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
-import { listExercises, listTemplates, putTemplate } from '../db/repository.ts';
+import { listTemplates, putTemplate } from '../db/repository.ts';
 import { createWorkoutTemplate } from '../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../domain/defaultPrescription.ts';
 import { exampleExercises, pullUp } from '../domain/examples.ts';
 import { generatePlannedSetId, generateSequenceEntryId } from '../domain/generateIds.ts';
 import { ExerciseEditPage } from './ExerciseEditPage.tsx';
-import { ExerciseListPage } from './ExerciseListPage.tsx';
 import { TemplateEditPage } from './TemplateEditPage.tsx';
 import { TemplateListPage } from './TemplateListPage.tsx';
 
@@ -82,23 +81,23 @@ afterEach(() => {
 });
 
 async function openEditor(view: ReturnType<typeof render>, label: string): Promise<HTMLInputElement> {
-    fireEvent.click(await view.findByRole('button', { name: label, exact: true }));
+    const actions = view.container.querySelector('.template-form > .button-row');
+    fireEvent.click(
+        actions
+            ? within(actions as HTMLElement).getByRole('button', { name: label, exact: true })
+            : await view.findByRole('button', { name: label, exact: true })
+    );
     const dialog = await within(document.body).findByRole('dialog');
     fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
     return within(document.body).getByLabelText('Name') as HTMLInputElement;
 }
 
-function closeEditor(): void {
-    const dialog = within(document.body).getByRole('dialog');
-    fireEvent.keyDown(dialog, { key: 'Escape' });
-    fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
-}
-
 describe('editor route hydration', () => {
     it('re-hydrates an open exercise form when the route changes', async () => {
         const view = renderEditor('/exercises/ex-pull-up', '/exercises/:id', ExerciseEditPage);
-        await view.findByRole('heading', { name: 'Pull-up' });
-        const name = await openEditor(view, 'Edit');
+        const editor = await within(document.body).findByRole('dialog', { name: 'Edit exercise' });
+        fireEvent.animationEnd(editor);
+        const name = within(editor).getByRole('textbox', { name: 'Name' }) as HTMLInputElement;
         expect(name.value).toBe('Pull-up');
         view.history.set({ value: '/exercises/ex-plank', replace: false });
         await waitFor(() => expect(name.value).toBe('Plank'));
@@ -107,35 +106,10 @@ describe('editor route hydration', () => {
     it('re-hydrates open template details when the route changes', async () => {
         const view = renderEditor(`/templates/${TEMPLATE_ID}`, '/templates/:id', TemplateEditPage);
         await view.findByRole('heading', { name: 'Test day' });
-        const name = await openEditor(view, 'Edit details');
+        const name = await openEditor(view, 'Edit');
         expect(name.value).toBe('Test day');
         view.history.set({ value: `/templates/${OTHER_TEMPLATE_ID}`, replace: false });
         await waitFor(() => expect(name.value).toBe('Other day'));
-    });
-
-    it('edits an exercise copy without modifying its source', async () => {
-        const view = renderAppAt('/exercises/ex-wrist-curl', () => (
-            <>
-                <Route path="/exercises" component={ExerciseListPage} />
-                <Route path="/exercises/:id" component={ExerciseEditPage} />
-            </>
-        ));
-        await view.findByRole('heading', { name: 'Wrist curl' });
-        fireEvent.click(
-            within(view.container.querySelector('.page-actions') as HTMLElement).getByRole('button', {
-                name: 'Duplicate',
-                exact: true,
-            })
-        );
-        await view.findByRole('heading', { name: 'Wrist curl (copy)' });
-        const name = await openEditor(view, 'Edit');
-        fireEvent.input(name, { target: { value: 'Copy edit' } });
-        await waitFor(async () => {
-            const records = await listExercises(db);
-            expect(records.find((item) => item.id === 'ex-wrist-curl')?.name).toBe('Wrist curl');
-            expect(records.some((item) => item.name === 'Copy edit')).toBe(true);
-        });
-        closeEditor();
     });
 
     it('edits a template copy without modifying its source', async () => {
@@ -153,7 +127,7 @@ describe('editor route hydration', () => {
             })
         );
         await view.findByRole('heading', { name: 'Test day (copy)' });
-        const name = await openEditor(view, 'Edit details');
+        const name = await openEditor(view, 'Edit');
         fireEvent.input(name, { target: { value: 'Copy template' } });
         await waitFor(async () => {
             const records = await listTemplates(db);

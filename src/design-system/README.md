@@ -13,7 +13,7 @@ Import controls from `src/components/Controls/index.ts`.
 
 | Component | Use | Contract |
 | --- | --- | --- |
-| Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. |
+| Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. Pointer input belongs only to visible text/icons; layout space stays passive. |
 | OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. There is no layout variant. |
 | MultiPicker | Multiple memberships | Framed summary (two names then +N, or None). Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
 | Spinner / NumberPad | Quantities, reps, sets, load | Framed fixed-mask value and compact symmetric day-style arrows. Value opens a keyboard-free numeric pad containing digits/keys only, no visible header, and End. Back erases a digit; it is not window navigation. Changes are immediate; End only closes. |
@@ -34,6 +34,13 @@ Import controls from `src/components/Controls/index.ts`.
   Both copper and steel borders use native-size PNGs at runtime to avoid the
   Android SVG border-image painting bug fixed in #26. Keep the SVGs as editable
   sources; preserve the raster painting path when integrating the components.
+- Action buttons size to their text and use a single verb where its meaning is
+  clear. Only the visible label/icon receives pointer input; never turn black
+  padding, a flex row or an item's background into an action target.
+- Page titles use 32px copper type, item names and body copy use 16px type, and
+  actions use 16px gold uppercase type. Separate list rows with a thin steel rule.
+  The FitNES wordmark appears on Home only. The workout library is called
+  Workouts in the interface; storage still uses the existing template records.
 - A popup choice menu contains only options. Multi-choice adds End at the bottom
   right. Numeric pads have no visible header and close with End. Keep accessible
   names even when decorative headers are absent.

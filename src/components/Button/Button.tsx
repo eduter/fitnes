@@ -13,7 +13,12 @@ function Button(props: ButtonProps): JSX.Element {
             class={controlClasses('nes-button', local)}
             data-variant={local.variant ?? 'action'}
             onPointerDown={(event) => {
-                if (event.currentTarget.matches(':disabled') || !event.isPrimary || event.button !== 0) {
+                if (
+                    event.currentTarget.matches(':disabled') ||
+                    !event.isPrimary ||
+                    event.button !== 0 ||
+                    !(event.target instanceof Element && event.target.closest('.nes-button__label'))
+                ) {
                     return;
                 }
                 event.preventDefault();

@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, on, createMemo, createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
 import { PagedWindow } from './Controls/index.ts';
 
 const rememberedPages = new Map<string, number>();
@@ -21,6 +21,20 @@ function PagedList<T>(props: PagedListProps<T>): JSX.Element {
     const size = () => Math.max(1, Math.floor((height() - 32) / (props.rowHeight ?? 72)));
     const count = () => Math.max(1, Math.ceil(props.items.length / size()));
     const page = () => Math.min(requested(), count());
+    createEffect(
+        on(
+            () => props.reveal,
+            (item) => {
+                if (item === undefined) {
+                    return;
+                }
+                const index = props.items.indexOf(item);
+                if (index >= 0) {
+                    setRequested(Math.floor(index / size()) + 1);
+                }
+            }
+        )
+    );
     const visible = createMemo(() => props.items.slice((page() - 1) * size(), page() * size()));
     return (
         <div class="paged-list" ref={surface}>
@@ -52,6 +66,7 @@ interface PagedListProps<T> {
     items: readonly T[];
     rowHeight?: number;
     empty?: string;
+    reveal?: T;
     children: (item: T) => JSX.Element;
 }
 

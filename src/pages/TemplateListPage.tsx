@@ -11,14 +11,11 @@ function TemplateListPage(): JSX.Element {
     const navigate = useNavigate();
     return (
         <section class="page">
-            <PageHeader
-                title="Templates"
-                actions={<Button onPress={() => navigate('/templates/new')}>Create</Button>}
-            />
-            <PagedList label="Templates" items={app.templates()} rowHeight={72} empty="No templates yet.">
+            <PageHeader title="Workouts" actions={<Button onPress={() => navigate('/templates/new')}>Create</Button>} />
+            <PagedList label="Workouts" items={app.templates()} rowHeight={72} empty="No workouts yet.">
                 {(item) => (
                     <article>
-                        <p>{item.name}</p>
+                        <h2 class="list-item__title">{item.name}</h2>
                         <p class="muted">
                             {item.sequence.length} sets · {item.exercises.length} exercises
                         </p>

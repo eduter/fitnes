@@ -16,7 +16,7 @@ function WorkoutPickerPage(): JSX.Element {
                 label="Choose workout"
                 items={app.templates()}
                 rowHeight={72}
-                empty="No templates yet. Create one in Templates."
+                empty="No workouts yet. Create one in Workouts."
             >
                 {(template) => (
                     <article>

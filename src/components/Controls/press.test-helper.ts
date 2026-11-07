@@ -4,7 +4,7 @@ import { fireEvent } from '@solidjs/testing-library';
 function press(button: HTMLElement): void {
     const event = new MouseEvent('pointerdown', { bubbles: true, button: 0 });
     Object.defineProperty(event, 'isPrimary', { value: true });
-    fireEvent(button, event);
+    fireEvent(button.querySelector('.nes-button__label') ?? button, event);
     fireEvent.click(button, { detail: 1 });
 }
 

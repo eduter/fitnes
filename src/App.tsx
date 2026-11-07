@@ -64,13 +64,13 @@ function App(props: AppProps): JSX.Element {
                 </defs>
             </svg>
             <div class="app" classList={{ 'app--home': home() }}>
-                <header class="app-header">
-                    <div class="app-title">
-                        <Show when={home()} fallback={<span>FitNES</span>}>
+                <Show when={home()}>
+                    <header class="app-header">
+                        <div class="app-title">
                             <img src={logoUrl} class="fitnes-logo" alt="FitNES" width="244" height="114" />
-                        </Show>
-                    </div>
-                </header>
+                        </div>
+                    </header>
+                </Show>
                 <StatusBanner />
                 <main class="app-main">
                     <Show when={home()} fallback={<SteelPanel class="page-panel">{props.children}</SteelPanel>}>

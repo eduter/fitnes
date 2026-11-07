@@ -116,7 +116,7 @@ function DataPage(): JSX.Element {
 /** Summarise an imported document as record counts, so a paste can be sanity-checked. */
 function describe(value: DataExport): string {
     const counts = countRecords(value);
-    return `${counts.exercises} exercises, ${counts.templates} templates, ${counts.sessions} sessions, ${counts.bodyweightMeasurements} bodyweight readings`;
+    return `${counts.exercises} exercises, ${counts.templates} workouts, ${counts.sessions} sessions, ${counts.bodyweightMeasurements} bodyweight readings`;
 }
 
 export { DataPage };

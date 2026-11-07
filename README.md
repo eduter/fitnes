@@ -22,11 +22,11 @@ npm run preview
 from PR #27. It replaces the screen implementation proposed in PR #26 while
 retaining its domain/repository behavior and regression coverage.
 
-Home starts workouts and records weight. The six tabs cover templates, catalog
+Home starts workouts and records weight. The six tabs cover workouts, catalog
 exercises, weight history, sessions and Settings. Lists use the available height
 before paging. Planned sets, exercise definitions and results use bounded shared
 editors; numeric/choice controls may open child windows. Valid existing edits
-persist immediately. New exercises/templates require Create, new readings use
+persist immediately. New exercises/workouts require Create, new readings use
 Save/Cancel, and leaving an unsaved composite asks before discarding it.
 
 `npm run build` creates the offline application. `npm run build:preview` additionally

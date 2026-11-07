@@ -155,9 +155,9 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                         setMetadataOpen(true);
                     }}
                 >
-                    Edit details
+                    Edit
                 </Button>
-                <Button onPress={refreshFromCatalog}>Refresh catalog</Button>
+                <Button onPress={refreshFromCatalog}>Refresh</Button>
             </div>
             <ValidationErrors errors={props.errors} />
             <AddSetControl catalog={props.catalog} onAdd={addSet} />
@@ -222,7 +222,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
             <Popover
                 open={metadataOpen()}
                 onOpenChange={setMetadataOpen}
-                label="Template details"
+                label="Workout details"
                 anchor={() => trigger}
                 returnFocus={() => trigger}
                 mount={document.getElementById('root') ?? undefined}
@@ -297,7 +297,7 @@ interface AddSetControlProps {
 function AddSetControl(props: AddSetControlProps): JSX.Element {
     const [picking, setPicking] = createSignal(false);
     return (
-        <Show when={picking()} fallback={<Button onPress={() => setPicking(true)}>Add set</Button>}>
+        <Show when={picking()} fallback={<Button onPress={() => setPicking(true)}>Add</Button>}>
             <div class="catalog-selection">
                 <div class="button-row">
                     <span>Choose exercise</span>

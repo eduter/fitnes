@@ -30,7 +30,7 @@
     grid-template-columns: max-content 8px;
     align-items: center;
     gap: 4px;
-    width: 100%;
+    width: max-content;
 }
 .nes-multi-picker__mark {
     width: 8px;

@@ -4,17 +4,22 @@
     align-items: center;
     justify-content: flex-start;
     gap: 2px;
-    min-block-size: var(--nes-target-size);
+    min-block-size: 16px;
+    inline-size: max-content;
+    max-inline-size: 100%;
+    align-self: flex-start;
+    flex: 0 0 auto;
     border: 0;
     border-radius: 0;
-    padding: 0 8px;
+    padding: 0;
     color: var(--nes-action);
     background: var(--nes-ground);
     font: 400 var(--nes-font-size) / var(--nes-line-height) var(--nes-font);
     font-synthesis: none;
     text-transform: uppercase;
     touch-action: manipulation;
-    cursor: pointer;
+    cursor: default;
+    pointer-events: none;
 }
 .nes-button svg {
     flex: none;
@@ -29,5 +34,18 @@
 }
 .nes-button:disabled {
     color: var(--nes-muted);
+    cursor: default;
+}
+
+/* Only visible action content owns pointer input; black layout space remains available for scrolling */
+.nes-button > .nes-button__label {
+    display: inline-flex;
+    inline-size: max-content;
+    max-inline-size: 100%;
+    pointer-events: auto;
+    cursor: pointer;
+}
+.nes-button:disabled > .nes-button__label {
+    pointer-events: none;
     cursor: default;
 }
