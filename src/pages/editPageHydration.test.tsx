@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 
 import { createMemoryHistory, MemoryRouter, Route, Router } from '@solidjs/router';
-import { cleanup, fireEvent, render, waitFor, within } from '@solidjs/testing-library';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@solidjs/testing-library';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { App } from '../App.tsx';
 import { AppDataProvider } from '../app/AppData.tsx';
@@ -106,7 +106,7 @@ describe('editor route hydration', () => {
     it('re-hydrates open template details when the route changes', async () => {
         const view = renderEditor(`/templates/${TEMPLATE_ID}`, '/templates/:id', TemplateEditPage);
         await view.findByRole('heading', { name: 'Test day' });
-        const name = await openEditor(view, 'Edit');
+        const name = await openEditor(view, 'Details');
         expect(name.value).toBe('Test day');
         view.history.set({ value: `/templates/${OTHER_TEMPLATE_ID}`, replace: false });
         await waitFor(() => expect(name.value).toBe('Other day'));
@@ -121,13 +121,17 @@ describe('editor route hydration', () => {
         ));
         await view.findByRole('heading', { name: 'Test day' });
         fireEvent.click(
-            within(view.container.querySelector('.page-actions') as HTMLElement).getByRole('button', {
-                name: 'Duplicate',
+            within(view.container.querySelector('.template-form > .button-row') as HTMLElement).getByRole('button', {
+                name: 'More',
                 exact: true,
             })
         );
+        const menu = await screen.findByRole('dialog', { name: 'Workout actions' });
+        fireEvent.animationEnd(menu);
+        fireEvent.click(within(menu).getByRole('button', { name: 'Duplicate', exact: true }));
+        fireEvent.animationEnd(menu);
         await view.findByRole('heading', { name: 'Test day (copy)' });
-        const name = await openEditor(view, 'Edit');
+        const name = await openEditor(view, 'Details');
         fireEvent.input(name, { target: { value: 'Copy template' } });
         await waitFor(async () => {
             const records = await listTemplates(db);

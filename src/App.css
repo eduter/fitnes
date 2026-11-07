@@ -241,15 +241,6 @@
     flex: 1;
     min-height: 0;
 }
-.catalog-selection {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: var(--nes-ground);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
 .record-weight__actions {
     display: flex;
     gap: 16px;
@@ -293,4 +284,11 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+.action-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
 }

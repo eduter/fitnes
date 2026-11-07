@@ -1,15 +1,24 @@
+import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
-import { Button, ConfirmDialog, Popover } from '../Controls/index.ts';
-import { PagedList } from '../PagedList.tsx';
-import { Show, createSignal, type JSX } from 'solid-js';
 import { createWorkoutTemplate, refreshTemplateExercises } from '../../domain/createWorkoutTemplate.ts';
 import { defaultPrescription } from '../../domain/defaultPrescription.ts';
 import type { ExerciseDefinition } from '../../domain/exercise.ts';
 import { generatePlannedSetId, generateSequenceEntryId } from '../../domain/generateIds.ts';
+import type { SetPrescription } from '../../domain/prescription.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
 import type { PlannedSet, WorkoutTemplate } from '../../domain/workoutTemplate.ts';
-import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
+import {
+    Button,
+    ConfirmDialog,
+    DialogActions,
+    DialogTitle,
+    OptionPicker,
+    Popover,
+    SectionHeading,
+} from '../Controls/index.ts';
 import { TextAreaField, TextField } from '../fields.tsx';
+import { PagedList } from '../PagedList.tsx';
+import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
 import { prescriptionSummary } from './prescriptionSummary.ts';
 
@@ -18,6 +27,9 @@ interface TemplateFormProps {
     catalog: ExerciseDefinition[];
     errors: ValidationIssue[];
     onChange: (value: WorkoutTemplate, errors: ValidationIssue[]) => void;
+    onDuplicate?: () => void;
+    onDelete?: () => void;
+    duplicating?: boolean;
 }
 
 /** Edit a template's metadata, planned sets, and execution sequence. */
@@ -27,6 +39,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
     const [editorOpen, setEditorOpen] = createSignal(false);
     const [metadataOpen, setMetadataOpen] = createSignal(false);
     const [deleting, setDeleting] = createSignal<number>();
+    const [moreOpen, setMoreOpen] = createSignal(false);
+    const [setMenuOpen, setSetMenuOpen] = createSignal(false);
+    const [menuEntry, setMenuEntry] = createSignal<string>();
+    const menuIndex = () => props.value.sequence.findIndex((entry) => entry.id === menuEntry());
+    let moreTrigger: HTMLElement | undefined;
+    let setMenuTrigger: HTMLElement | undefined;
     let trigger: HTMLElement | undefined;
     const selectedSet = () => props.value.sets.find((set) => set.id === editing());
     const selected = () => {
@@ -67,7 +85,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
         });
     }
 
-    function addSet(exerciseId: string): void {
+    function addSet(exerciseId: string, prescription: SetPrescription): void {
         const exercise =
             props.catalog.find((candidate) => candidate.id === exerciseId) ??
             props.value.exercises.find((candidate) => candidate.id === exerciseId);
@@ -79,7 +97,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
         rebuild({
             sets: [
                 ...props.value.sets,
-                { id: plannedSetId, exerciseId: exercise.id, prescription: defaultPrescription(exercise) },
+                { id: plannedSetId, exerciseId: exercise.id, prescription: structuredClone(prescription) },
             ],
             sequence: [...props.value.sequence, { id: generateSequenceEntryId(), plannedSetId }],
         });
@@ -155,16 +173,24 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                         setMetadataOpen(true);
                     }}
                 >
-                    Edit
+                    Details
                 </Button>
-                <Button onPress={refreshFromCatalog}>Refresh</Button>
+                <AddSetControl catalog={props.catalog} onAdd={addSet} />
+                <Button
+                    onPress={(event) => {
+                        moreTrigger = event.currentTarget;
+                        setMoreOpen(true);
+                    }}
+                >
+                    More
+                </Button>
             </div>
             <ValidationErrors errors={props.errors} />
-            <AddSetControl catalog={props.catalog} onAdd={addSet} />
+            <SectionHeading>Sets</SectionHeading>
             <PagedList
                 label={`Sets in ${props.value.id}`}
                 items={props.value.sequence.map((entry) => entry.id)}
-                rowHeight={96}
+                rowHeight={64}
                 empty="No sets. Add an exercise to begin."
             >
                 {(id) => {
@@ -194,25 +220,14 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                 >
                                     Edit
                                 </Button>
-                                <Button onPress={() => duplicateOccurrence(index())}>Duplicate</Button>
                                 <Button
                                     onPress={(event) => {
-                                        trigger = event.currentTarget;
-                                        setDeleting(index());
+                                        setMenuTrigger = event.currentTarget;
+                                        setMenuEntry(id);
+                                        setSetMenuOpen(true);
                                     }}
                                 >
-                                    Delete
-                                </Button>
-                            </div>
-                            <div class="button-row">
-                                <Button disabled={index() === 0} onPress={() => moveOccurrence(index(), -1)}>
-                                    Up
-                                </Button>
-                                <Button
-                                    disabled={index() === props.value.sequence.length - 1}
-                                    onPress={() => moveOccurrence(index(), 1)}
-                                >
-                                    Down
+                                    More
                                 </Button>
                             </div>
                         </article>
@@ -228,6 +243,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 mount={document.getElementById('root') ?? undefined}
             >
                 <div class="editor-fields">
+                    <DialogTitle>Workout details</DialogTitle>
                     <TextField label="Name" value={props.value.name} required onChange={(name) => rebuild({ name })} />
                     <TextAreaField
                         label="Description"
@@ -235,7 +251,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                         onChange={(description) => rebuild({ description })}
                     />
                     <ValidationErrors errors={props.errors} />
-                    <Button onPress={() => setMetadataOpen(false)}>End</Button>
+                    <DialogActions kind="end" onConfirm={() => setMetadataOpen(false)} />
                 </div>
             </Popover>
             <Popover
@@ -250,7 +266,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     {(selection) => (
                         <>
                             <div class="editor-fields">
-                                <p>{selection().exercise.name}</p>
+                                <DialogTitle>{selection().exercise.name}</DialogTitle>
                                 <PrescriptionFields
                                     exercise={selection().exercise}
                                     value={selection().set.prescription}
@@ -262,11 +278,99 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                     }
                                 />
                                 <ValidationErrors errors={props.errors} />
-                                <Button onPress={() => setEditorOpen(false)}>End</Button>
+                                <DialogActions kind="end" onConfirm={() => setEditorOpen(false)} />
                             </div>
                         </>
                     )}
                 </Show>
+            </Popover>
+            <Popover
+                open={moreOpen()}
+                onOpenChange={setMoreOpen}
+                label="Workout actions"
+                anchor={() => moreTrigger}
+                returnFocus={() => moreTrigger}
+                mount={document.getElementById('root') ?? undefined}
+                width={144}
+            >
+                <div class="action-menu">
+                    <Show when={props.onDuplicate}>
+                        <Button
+                            disabled={props.duplicating}
+                            onPress={() => {
+                                setMoreOpen(false);
+                                props.onDuplicate?.();
+                            }}
+                        >
+                            Duplicate
+                        </Button>
+                    </Show>
+                    <Button
+                        onPress={() => {
+                            setMoreOpen(false);
+                            refreshFromCatalog();
+                        }}
+                    >
+                        Refresh
+                    </Button>
+                    <Show when={props.onDelete}>
+                        <Button
+                            onPress={() => {
+                                setMoreOpen(false);
+                                props.onDelete?.();
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </Show>
+                    <DialogActions kind="end" onConfirm={() => setMoreOpen(false)} />
+                </div>
+            </Popover>
+            <Popover
+                open={setMenuOpen()}
+                onOpenChange={setSetMenuOpen}
+                label="Set actions"
+                anchor={() => setMenuTrigger}
+                returnFocus={() => setMenuTrigger}
+                mount={document.getElementById('root') ?? undefined}
+                width={144}
+            >
+                <div class="action-menu">
+                    <Button
+                        onPress={() => {
+                            duplicateOccurrence(menuIndex());
+                            setSetMenuOpen(false);
+                        }}
+                    >
+                        Duplicate
+                    </Button>
+                    <Button
+                        onPress={() => {
+                            setDeleting(menuIndex());
+                        }}
+                    >
+                        Delete
+                    </Button>
+                    <Button
+                        disabled={menuIndex() <= 0}
+                        onPress={() => {
+                            moveOccurrence(menuIndex(), -1);
+                            setSetMenuOpen(false);
+                        }}
+                    >
+                        Up
+                    </Button>
+                    <Button
+                        disabled={menuIndex() >= props.value.sequence.length - 1}
+                        onPress={() => {
+                            moveOccurrence(menuIndex(), 1);
+                            setSetMenuOpen(false);
+                        }}
+                    >
+                        Down
+                    </Button>
+                    <DialogActions kind="end" onConfirm={() => setSetMenuOpen(false)} />
+                </div>
             </Popover>
             <ConfirmDialog
                 open={deleting() !== undefined}
@@ -280,6 +384,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     const index = deleting();
                     if (index !== undefined) {
                         removeOccurrence(index);
+                        setSetMenuOpen(false);
                     }
                 }}
                 trigger={() => trigger}
@@ -291,37 +396,78 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
 
 interface AddSetControlProps {
     catalog: ExerciseDefinition[];
-    onAdd: (exerciseId: string) => void;
+    onAdd: (exerciseId: string, prescription: SetPrescription) => void;
 }
 
 function AddSetControl(props: AddSetControlProps): JSX.Element {
     const [picking, setPicking] = createSignal(false);
+    const [exerciseId, setExerciseId] = createSignal('');
+    const [prescription, setPrescription] = createSignal<SetPrescription>();
+    let trigger: HTMLElement | undefined;
+    const exercise = () => props.catalog.find((item) => item.id === exerciseId());
+    function choose(id: string): void {
+        const item = props.catalog.find((candidate) => candidate.id === id);
+        if (!item) {
+            return;
+        }
+        setExerciseId(id);
+        setPrescription(defaultPrescription(item));
+    }
     return (
-        <Show when={picking()} fallback={<Button onPress={() => setPicking(true)}>Add</Button>}>
-            <div class="catalog-selection">
-                <div class="button-row">
-                    <span>Choose exercise</span>
-                    <Button onPress={() => setPicking(false)}>Cancel</Button>
+        <>
+            <Button
+                onPress={(event) => {
+                    trigger = event.currentTarget;
+                    choose(props.catalog[0]?.id ?? '');
+                    setPicking(true);
+                }}
+            >
+                Add
+            </Button>
+            <Popover
+                open={picking()}
+                onOpenChange={setPicking}
+                label="Add set"
+                anchor={() => trigger}
+                returnFocus={() => trigger}
+                mount={document.getElementById('root') ?? undefined}
+            >
+                <div class="editor-fields">
+                    <DialogTitle>Add set</DialogTitle>
+                    <Show when={exercise() && prescription()} fallback={<p>Create an exercise first.</p>}>
+                        <OptionPicker
+                            label="Exercise"
+                            value={exerciseId()}
+                            options={props.catalog.map((item) => ({ value: item.id, label: item.name }))}
+                            onChange={choose}
+                            popoverMount={document.getElementById('root') ?? undefined}
+                        />
+                        <Show when={exercise()}>
+                            {(item) => (
+                                <PrescriptionFields
+                                    exercise={item()}
+                                    value={prescription() as SetPrescription}
+                                    onChange={setPrescription}
+                                />
+                            )}
+                        </Show>
+                    </Show>
+                    <DialogActions
+                        kind="add"
+                        confirmDisabled={!exercise() || !prescription()}
+                        onCancel={() => setPicking(false)}
+                        onConfirm={() => {
+                            const value = prescription();
+                            if (!value || !exercise()) {
+                                return;
+                            }
+                            props.onAdd(exerciseId(), value);
+                            setPicking(false);
+                        }}
+                    />
                 </div>
-                <PagedList
-                    label="Add set from catalog"
-                    items={props.catalog}
-                    rowHeight={48}
-                    empty="Create an exercise first."
-                >
-                    {(exercise) => (
-                        <Button
-                            onPress={() => {
-                                props.onAdd(exercise.id);
-                                setPicking(false);
-                            }}
-                        >
-                            {exercise.name}
-                        </Button>
-                    )}
-                </PagedList>
-            </div>
-        </Show>
+            </Popover>
+        </>
     );
 }
 

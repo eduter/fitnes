@@ -20,7 +20,7 @@ function TemplateListPage(): JSX.Element {
                             {item.sequence.length} sets · {item.exercises.length} exercises
                         </p>
                         <div class="button-row">
-                            <Button onPress={() => navigate(`/templates/${item.id}`)}>Open</Button>
+                            <Button onPress={() => navigate(`/templates/${item.id}`)}>Edit</Button>
                             <Button onPress={() => navigate(`/sessions/start/${item.id}`)}>Start</Button>
                         </div>
                     </article>

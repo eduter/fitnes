@@ -1,11 +1,11 @@
-import { Button, ConfirmDialog } from '../components/Controls/index.ts';
 import { A, useNavigate, useParams } from '@solidjs/router';
-import { Show, createEffect, createSignal, type JSX } from 'solid-js';
-import { DraftGuard } from '../app/DraftGuard.tsx';
+import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { ValidationErrors } from '../components/ValidationErrors.tsx';
+import { DraftGuard } from '../app/DraftGuard.tsx';
+import { Button, ConfirmDialog, DialogActions } from '../components/Controls/index.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { TemplateForm } from '../components/template/TemplateForm.tsx';
+import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { duplicateWorkoutTemplate } from '../domain/duplicateWorkoutTemplate.ts';
 import { generateWorkoutTemplateId } from '../domain/generateIds.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
@@ -20,7 +20,6 @@ function TemplateEditPage(): JSX.Element {
 
     const [discarded, setDiscarded] = createSignal(false);
     const [confirming, setConfirming] = createSignal(false);
-    let trigger: HTMLElement | undefined;
     const [draft, setDraft] = createSignal<WorkoutTemplate>(blankTemplate());
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const [created, setCreated] = createSignal(false);
@@ -134,31 +133,12 @@ function TemplateEditPage(): JSX.Element {
                 onOpenChange={setConfirming}
                 message={`Delete ${draft().name || 'workout'}?`}
                 onConfirm={() => void remove()}
-                trigger={() => trigger}
                 mount={document.getElementById('root') ?? undefined}
             />
             <ValidationErrors errors={errors()} />
             <PageHeader
                 title={created() ? draft().name || 'Workout' : 'New workout'}
-                actions={
-                    <div class="button-row">
-                        <Show when={created()}>
-                            <Button onPress={() => navigate(`/sessions/start/${draft().id}`)}> Start </Button>
-                            <Button type="button" disabled={duplicating()} onPress={() => void duplicate()}>
-                                Duplicate
-                            </Button>
-                            <Button
-                                type="button"
-                                onPress={(event) => {
-                                    trigger = event.currentTarget;
-                                    setConfirming(true);
-                                }}
-                            >
-                                Delete
-                            </Button>
-                        </Show>
-                    </div>
-                }
+                actions={<Button onPress={() => navigate('/templates')}>Back</Button>}
             />
             <Show
                 when={!missing()}
@@ -168,17 +148,24 @@ function TemplateEditPage(): JSX.Element {
                     </p>
                 }
             >
-                <Button onPress={() => navigate('/templates')}>{created() ? 'End' : 'Cancel'}</Button>
                 <TemplateForm
+                    onDuplicate={created() ? () => void duplicate() : undefined}
+                    onDelete={created() ? () => setConfirming(true) : undefined}
+                    duplicating={duplicating()}
                     value={draft()}
                     catalog={app.exercises()}
                     errors={errors()}
                     onChange={(next, nextErrors) => void persist(next, nextErrors)}
                 />
                 <Show when={!created()}>
-                    <Button type="button" onPress={() => void create()}>
-                        Create
-                    </Button>
+                    <DialogActions
+                        kind="create"
+                        onConfirm={() => void create()}
+                        onCancel={() => {
+                            setDiscarded(true);
+                            navigate('/templates');
+                        }}
+                    />
                 </Show>
             </Show>
         </section>
