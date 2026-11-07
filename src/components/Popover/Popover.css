@@ -20,9 +20,9 @@
 .nes-popover {
     position: absolute;
     box-sizing: border-box;
-    inline-size: min(240px, calc(100% - 16px));
+    inline-size: min(224px, calc(100% - 16px));
     min-block-size: 16px;
-    padding: 4px;
+    padding: 8px;
     background: var(--nes-ground);
     outline: none;
     clip-path: inset(0);

@@ -2,7 +2,7 @@
     margin: 0;
     padding: 0 4px;
     min-inline-size: 0;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
 }
 .nes-multi-picker legend {
@@ -13,7 +13,7 @@
     text-align: left;
     white-space: normal;
     overflow-wrap: anywhere;
-    min-block-size: 24px;
+    min-block-size: 32px;
     max-width: 100%;
 }
 .nes-multi-picker__options {

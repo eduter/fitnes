@@ -120,14 +120,17 @@ function Popover(props: PopoverProps): JSX.Element {
         const surface = local.mount?.getBoundingClientRect();
         const margin = 8 * scale;
         const bounds = {
-            left: Math.max(viewportLeft + margin, surface?.left ?? viewportLeft),
-            right: Math.min(viewportLeft + viewportWidth - margin, surface?.right ?? viewportLeft + viewportWidth),
+            left: Math.max(viewportLeft + margin, surface ? surface.left + margin : viewportLeft),
+            right: Math.min(
+                viewportLeft + viewportWidth - margin,
+                surface ? surface.right - margin : viewportLeft + viewportWidth
+            ),
             top: viewportTop + margin,
             bottom: viewportTop + viewportHeight - margin,
         };
         const availableWidth = Math.max(16, (bounds.right - bounds.left) / scale);
         const availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
-        panel.style.inlineSize = `${Math.min(local.width ?? 240, availableWidth)}px`;
+        panel.style.inlineSize = `${Math.min(local.width ?? 224, availableWidth)}px`;
         panel.style.maxBlockSize = `${availableHeight}px`;
         const size = panel.getBoundingClientRect();
         const trigger = local.anchor?.() ?? opener;

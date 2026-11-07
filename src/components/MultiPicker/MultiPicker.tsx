@@ -1,5 +1,6 @@
 import { createSignal, For, type JSX } from 'solid-js';
 import { Button } from '../Button/Button.tsx';
+import { dialogActionCopy } from '../DialogActions.tsx';
 import type { PickerOption } from '../OptionPicker/OptionPicker.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 import './MultiPicker.css';
@@ -43,7 +44,7 @@ function MultiPicker(props: MultiPickerProps): JSX.Element {
                 mount={props.popoverMount}
                 anchor={() => trigger}
                 returnFocus={() => trigger}
-                width={160}
+                width={176}
             >
                 <div class="nes-multi-picker__options">
                     <For each={props.options}>
@@ -73,7 +74,7 @@ function MultiPicker(props: MultiPickerProps): JSX.Element {
                             </Button>
                         )}
                     </For>
-                    <Button onPress={() => setOpen(false)}>End</Button>
+                    <Button onPress={() => setOpen(false)}>{dialogActionCopy.end.confirm}</Button>
                 </div>
             </Popover>
         </fieldset>
