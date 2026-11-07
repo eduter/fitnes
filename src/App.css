@@ -73,23 +73,14 @@
     gap: 8px;
     min-width: 0;
 }
-.row-split {
-    display: flex;
-    gap: 8px;
-    align-items: start;
-    justify-content: space-between;
-}
-.muted,
-.card-meta,
-.planned-set__detail {
+.muted {
     color: var(--nes-ink);
 }
 .card-title,
 .section-title {
     font-weight: normal;
 }
-.card,
-.exercise-block {
+.card {
     padding: 4px 0;
 }
 .paged-list {
@@ -123,15 +114,6 @@
 .editor-fields .inline-fields {
     align-items: end;
 }
-.editor-actions {
-    display: flex;
-    justify-content: end;
-    gap: 16px;
-    margin-top: 8px;
-}
-.app-menu .nes-popover__content {
-    overflow-y: auto;
-}
 .banner,
 .error-text,
 .error-list {
@@ -164,9 +146,6 @@
 .home-status {
     padding: 8px;
 }
-.menu-choice {
-    padding: 4px 0;
-}
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -189,46 +168,9 @@
     height: 100%;
     background: var(--nes-ink);
 }
-.exercise-block__header {
-    display: flex;
-    justify-content: space-between;
-}
-.exercise-block__target {
-    padding: 4px 0;
-}
-.set-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
-}
-.set-table th,
-.set-table td {
-    text-align: left;
-    font-weight: normal;
-    padding: 4px 0;
-}
-.set-table__set {
-    width: 16px;
-}
-.set-table__prev {
-    width: 58px;
-}
-.set-table__current {
-    width: 90px;
-}
-.set-table__check {
-    width: 32px;
-}
 .set-value {
     white-space: normal;
     text-align: left;
-}
-.set-pair {
-    display: flex;
-    gap: 8px;
-}
-.session-blocks {
-    overflow-y: auto;
 }
 .data-page {
     overflow-y: auto;
@@ -260,7 +202,6 @@
     flex: 1;
     min-height: 0;
 }
-
 .page-actions:has(.button-row) {
     flex-basis: 100%;
 }
@@ -268,20 +209,11 @@
     font-size: 16px;
     line-height: 16px;
 }
-.exercise-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    gap: 12px;
-    padding: 4px;
-}
-
 .paged-list__row .list-item__title {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
-
 .record-weight__row {
     display: flex;
     align-items: start;
@@ -296,7 +228,6 @@
     align-items: start;
     gap: 8px;
 }
-
 .paged-list__row .set-actions {
     flex-wrap: nowrap;
     gap: 8px;

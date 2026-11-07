@@ -186,11 +186,7 @@ function SessionPage(): JSX.Element {
                                     <Show
                                         when={current().completedAt === undefined}
                                         fallback={
-                                            <Button
-                                                class="btn btn--secondary"
-                                                type="button"
-                                                onPress={() => void reopen()}
-                                            >
+                                            <Button type="button" onPress={() => void reopen()}>
                                                 Reopen
                                             </Button>
                                         }

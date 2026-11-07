@@ -1,5 +1,5 @@
 import type { JSX } from 'solid-js';
-import { DateSpinner, MultiPicker, OptionPicker, Spinner, TextArea, TextInput } from './Controls/index.ts';
+import { DateSpinner, OptionPicker, Spinner, TextArea, TextInput } from './Controls/index.ts';
 import { fromDateLocalValue, toDateLocalValue } from '../utils/datetime.ts';
 
 /** Labeled native name entry using the shared frame. */
@@ -111,36 +111,5 @@ interface DateFieldProps {
     onChange: (value: number) => void;
 }
 
-/** Membership edits apply immediately and keep the shared multi-choice window open. */
-function CheckboxGroup(props: CheckboxGroupProps): JSX.Element {
-    return (
-        <MultiPicker
-            label={props.label}
-            values={props.values}
-            options={props.options}
-            onChange={(values) => {
-                const changed = props.options.find(
-                    (item) => values.includes(item.value) !== props.values.includes(item.value)
-                );
-                if (changed) {
-                    props.onToggle(changed.value);
-                }
-            }}
-            popoverMount={document.getElementById('root') ?? undefined}
-        />
-    );
-}
-interface CheckboxGroupProps {
-    label: string;
-    values: string[];
-    options: CheckboxItem[];
-    onToggle: (value: string) => void;
-}
-/** Available membership value. */
-interface CheckboxItem {
-    value: string;
-    label: string;
-}
-
-export { CheckboxGroup, CompactNumberField, DateField, NumberField, SelectField, TextAreaField, TextField };
-export type { CheckboxItem, SelectOption };
+export { CompactNumberField, DateField, NumberField, SelectField, TextAreaField, TextField };
+export type { SelectOption };

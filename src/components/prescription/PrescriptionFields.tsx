@@ -90,11 +90,10 @@ function PrescriptionFields(props: PrescriptionFieldsProps): JSX.Element {
 interface LoadConfigurationFieldsProps {
     exercise: ExerciseDefinition;
     value: LoadConfiguration;
-    lockSemantics?: boolean;
     onChange: (value: LoadConfiguration) => void;
 }
 
-/** Edit load kind (when unlocked), basis, weight, and unit. */
+/** Edit load kind, basis, weight, and unit. */
 function LoadConfigurationFields(props: LoadConfigurationFieldsProps): JSX.Element {
     const app = useAppData();
     const selectedOption = (): LoadOption | undefined =>
@@ -105,7 +104,6 @@ function LoadConfigurationFields(props: LoadConfigurationFieldsProps): JSX.Eleme
             <SelectField
                 label="Load"
                 value={props.value.kind}
-                disabled={props.lockSemantics}
                 options={props.exercise.loads.map((option) => ({ value: option.kind, label: option.kind }))}
                 onChange={(kind) => {
                     const option = props.exercise.loads.find((candidate) => candidate.kind === kind);
@@ -123,7 +121,6 @@ function LoadConfigurationFields(props: LoadConfigurationFieldsProps): JSX.Eleme
                             ? props.value.basis
                             : 'total'
                     }
-                    disabled={props.lockSemantics}
                     options={basesFor(selectedOption()).map((basis) => ({ value: basis, label: basis }))}
                     onChange={(basis) => {
                         if (props.value.kind !== 'external' && props.value.kind !== 'bodyweightExternal') {
@@ -206,4 +203,4 @@ function loadFromOption(option: LoadOption, previous: LoadConfiguration): LoadCo
     return { kind: option.kind, basis, weight: previousWeight };
 }
 
-export { LoadConfigurationFields, PrescriptionFields };
+export { PrescriptionFields };

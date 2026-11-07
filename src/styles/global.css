@@ -1,21 +1,6 @@
 @import "../styles/controls.css";
 :root {
     --screen-scale: 1;
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 16px;
-    --bg-primary: var(--nes-ground);
-    --bg-secondary: var(--nes-ground);
-    --bg-surface: var(--nes-ground);
-    --text-primary: var(--nes-ink);
-    --text-secondary: var(--nes-ink);
-    --text-heading: var(--nes-ink);
-    --text-muted: var(--nes-muted);
-    --border: var(--nes-muted);
-    --danger: var(--nes-error);
-    --accent: var(--nes-action);
-    --warning: var(--nes-ink);
-    --font-mono: var(--nes-font);
     color-scheme: dark;
 }
 *,
