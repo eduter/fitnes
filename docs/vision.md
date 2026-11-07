@@ -83,7 +83,8 @@ pixel cut off, and a 2-pixel black surround. The reusable
 [SteelPanel component](../src/components/SteelPanel/README.md) implements this
 border. The [selected bottom tabs](../src/components/BottomTabs/README.md)
 provide the six adopted 24×24 icons and 256×56 steel bar. These components are
-adopted building blocks; full-screen layout and broader typography remain open.
+adopted building blocks; full-screen layouts remain subject to review; shared PageTitle, DialogTitle and
+SectionHeading now own the typography hierarchy.
 
 Use the [final home artwork's indexed palette and emphasis](../art/home/construction.json)
 as the material-color reference for future icons and steel panels. Validate
@@ -128,7 +129,8 @@ corridor art does not implement the transition. See the
 and the [backlog](backlog.md) for next work.
 
 Owner feedback (2026-11-07): exercise editing opens directly in a popover over
-its library row; secondary actions belong in a nested menu. Buttons activate only
+its library row; Edit, Duplicate and Delete fit directly on each exercise row.
+Secondary workout and set actions belong in a More menu. Buttons activate only
 on their visible gold label or icon, with short verbs and passive black space.
 Use separators between library items, distinguish copper page headings from
 normal text and gold actions, and call the workout library Workouts. Remove the
@@ -143,3 +145,13 @@ stretch the material artwork to fit the panel.
 Preserve the compact preview's real workout data before clearing storage or
 replacing its deployment. Moving to another origin requires an explicit data
 transfer.
+
+Owner feedback (2026-11-07): page, dialog and section typography are shared,
+documented components. DialogActions centralizes copy and opposing-corner
+placement: Cancel left, Save/Create/Add right; End at right closes existing
+immediate edits. Restore full native DW3 field/window corners with one opaque
+black logical pixel outside the border, including corners. Editors leave room
+on both sides and between their border and fields; multi-choice fields have
+fixed width and reserved summary height. Workout editing uses Back navigation,
+bounded Add/Details editors and secondary More menus. Record weight places Date
+and Weight on one row with Cancel/Save below.

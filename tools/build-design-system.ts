@@ -8,7 +8,7 @@ async function main(): Promise<void> {
         configFile: false,
         root: resolve('src/design-system'),
         plugins: [solid()],
-        build: { outDir: resolve('work/design-system-preview'), emptyOutDir: true },
+        build: { outDir: resolve(process.argv[2] ?? 'work/design-system-preview'), emptyOutDir: true },
     });
 }
 

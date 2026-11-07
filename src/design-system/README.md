@@ -1,7 +1,10 @@
 # FitNES UI system — implementation contract
 
-[Live private review](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
+[Original foundation review](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
 · [PR #27](https://github.com/eduter/fitnes/pull/27)
+
+[Current PR #28 component review](https://fitnes-app-design-system.eduardo-terroso.chatgpt.site/design-system/)
+includes the Typography page and updated frames/actions.
 
 Read this before implementing screens. The components below are the current
 design vocabulary. Use the framed-field layout and anchored menus consistently;
@@ -114,7 +117,8 @@ screen-local raw buttons/inputs/selects/textareas/details outside approved imple
 
 `npm run dev` → `/src/design-system/index.html`.
 `node tools/build-design-system.ts` → `work/design-system-preview/` (no app DB,
-router or service worker). `npm run check` runs lint/types/format/tests;
+router or service worker). The app preview build also includes this isolated
+showcase at `/design-system/`, without exposing it in the product navigation. `npm run check` runs lint/types/format/tests;
 `npm run build` validates the application build.
 
 Capture native 256px/DPR 1 compositions after the font loads and run:
