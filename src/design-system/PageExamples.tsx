@@ -47,6 +47,8 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
     const count = () => Math.max(1, Math.ceil(items().length / pageSize()));
     const page = () => Math.min(requested(), count());
     const [editing, setEditing] = createSignal<number>();
+    // Keep the selected form mounted through the reverse closing animation
+    const [editorOpen, setEditorOpen] = createSignal(false);
     const selected = createMemo(() => items().find((item) => item.id === editing()));
     const [deleting, setDeleting] = createSignal<number>();
     const [notice, setNotice] = createSignal('Workout A');
@@ -82,6 +84,7 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                                                 onPress={(event) => {
                                                     action = event.currentTarget;
                                                     setEditing(item().id);
+                                                    setEditorOpen(true);
                                                 }}
                                             >
                                                 Edit
@@ -114,12 +117,8 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                 </PagedWindow>
             </div>
             <Popover
-                open={editing() !== undefined}
-                onOpenChange={(open) => {
-                    if (!open) {
-                        setEditing(undefined);
-                    }
-                }}
+                open={editorOpen()}
+                onOpenChange={setEditorOpen}
                 label="Edit exercise"
                 mount={props.mount}
                 anchor={() => action}
@@ -172,7 +171,7 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                                     onChange={(notes) => patch({ notes })}
                                 />
                             </div>
-                            <Button onPress={() => setEditing(undefined)}>End</Button>
+                            <Button onPress={() => setEditorOpen(false)}>End</Button>
                         </>
                     )}
                 </Show>
