@@ -1,6 +1,5 @@
-import { createContext, createSignal, onMount, useContext, type JSX } from 'solid-js';
+import { createContext, createSignal, type JSX, onMount, useContext } from 'solid-js';
 import { db } from '../db/database.ts';
-import { seedPreview } from '../preview/seedPreview.ts';
 import { waitForDb, withDbRead, withDbWrite } from '../db/dbLifecycle.ts';
 import {
     deleteBodyweightMeasurement,
@@ -20,14 +19,15 @@ import {
     putTemplate,
     seedExampleExercises,
 } from '../db/repository.ts';
-import type { WeightUnit } from '../domain/units.ts';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
-import { parseDataExport, serializeDataExport, type DataExport } from '../domain/dataExport.ts';
+import { type DataExport, parseDataExport, serializeDataExport } from '../domain/dataExport.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { generateWorkoutSessionId } from '../domain/generateIds.ts';
 import { createSessionFromTemplate, type WorkoutSession } from '../domain/session.ts';
+import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationResult } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import { seedPreview } from '../preview/seedPreview.ts';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -48,10 +48,7 @@ interface AppData {
     removeSession: (id: string) => Promise<boolean>;
     saveBodyweight: (input: unknown) => Promise<ValidationResult<BodyweightMeasurement>>;
     removeBodyweight: (id: string) => Promise<boolean>;
-    startSession: (
-        template: WorkoutTemplate,
-        bodyweight?: BodyweightMeasurement
-    ) => Promise<ValidationResult<WorkoutSession>>;
+    startSession: (template: WorkoutTemplate) => Promise<ValidationResult<WorkoutSession>>;
     latestBodyweight: (at: number) => Promise<BodyweightMeasurement | undefined>;
     exportData: () => Promise<string>;
     importData: (input: unknown) => Promise<ValidationResult<DataExport>>;
@@ -181,15 +178,14 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         return removeRecord(() => deleteBodyweightMeasurement(db, id), reloadBodyweight);
     }
 
-    async function startSession(
-        template: WorkoutTemplate,
-        bodyweight?: BodyweightMeasurement
-    ): Promise<ValidationResult<WorkoutSession>> {
+    async function startSession(template: WorkoutTemplate): Promise<ValidationResult<WorkoutSession>> {
+        const startedAt = Date.now();
+        const bodyweight = await latestBodyweight(startedAt);
         return saveSession(
             createSessionFromTemplate({
                 id: generateWorkoutSessionId(),
                 template,
-                startedAt: Date.now(),
+                startedAt,
                 bodyweight,
             })
         );
@@ -256,5 +252,5 @@ function useAppData(): AppData {
     return value;
 }
 
-export { AppDataProvider, useAppData };
 export type { AppData };
+export { AppDataProvider, useAppData };

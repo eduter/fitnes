@@ -24,7 +24,7 @@ function WorkoutPickerPage(): JSX.Element {
                         <p>
                             {template.exercises.length} exercises · {template.sequence.length} sets
                         </p>
-                        <Button onPress={() => navigate(`/sessions/start/${template.id}`)}>Choose</Button>
+                        <Button onPress={() => navigate(`/sessions/start/${template.id}`)}>Start</Button>
                     </article>
                 )}
             </PagedList>

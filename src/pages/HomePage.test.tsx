@@ -6,9 +6,9 @@ import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
 import { importDatabase } from '../db/repository.ts';
 import { previewData } from '../preview/seedPreview.ts';
-import { WorkoutPickerPage } from './WorkoutPickerPage.tsx';
-import { StartSessionPage } from './StartSessionPage.tsx';
 import { HomePage } from './HomePage.tsx';
+import { StartSessionPage } from './StartSessionPage.tsx';
+import { WorkoutPickerPage } from './WorkoutPickerPage.tsx';
 
 beforeEach(async () => {
     await importDatabase(db, previewData(Date.now()));
@@ -41,8 +41,7 @@ describe('home actions', () => {
         await waitFor(() => expect(button.disabled).toBe(false));
         fireEvent.click(button);
         const strength = await view.findByText('Strength A');
-        fireEvent.click(within(strength.closest('article') as HTMLElement).getByRole('button', { name: 'Choose' }));
-        fireEvent.click(await view.findByRole('button', { name: 'Start', exact: true }));
+        fireEvent.click(within(strength.closest('article') as HTMLElement).getByRole('button', { name: 'Start' }));
         await view.findByRole('heading', { name: 'Workout started' });
         const session = (await db.sessions.toArray()).find((candidate) => candidate.completedAt === undefined);
         expect(session?.snapshot.name).toBe('Strength A');
