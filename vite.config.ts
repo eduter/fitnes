@@ -49,6 +49,8 @@ const pwa = VitePWA({
         ],
     },
     workbox: {
+        // The isolated review page has its own HTML rather than the application's router shell.
+        navigateFallbackDenylist: [/^\/design-system(?:\/|$)/],
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
     },
 });
