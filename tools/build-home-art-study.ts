@@ -16,10 +16,7 @@ function main(): void {
     const hero = heroStudy(original, [15, 17, 33, 49]);
     const warmHero = heroStudy(original, [15, 33, 49, 32]);
     const source = logoSource();
-    const originalInks = [
-        ...new Set(JSON.parse(readFileSync('art/home/construction.json', 'utf8')).palettes.flat()),
-    ] as number[];
-    const baseline = quantizeLogo(source, [originalInks], false);
+    const baseline = filteredLogo(source);
     const palettes = [
         [15, 22, 39, 56],
         [15, 22, 56, 32],
@@ -35,11 +32,11 @@ function main(): void {
         logoDithered: save('logo-dithered', dithered.construction, dithered.image),
     };
     writeFileSync(`${OUT}/logo-source.png`, encodePng(source));
-    writeFileSync(`${OUT}/logo-nine-ink-baseline.png`, encodePng(baseline.image));
+    writeFileSync(`${OUT}/logo-current-filter.png`, encodePng(baseline));
     const metrics = {
         explanation:
-            'Aligned native pixels; Oklab distance lower is better, 8x8 luminance SSIM higher is better. Baseline is a new nine-ink approximation, not a recovered prior logo. Dithering is judged visually too.',
-        logoNineInkBaseline: perceptualScore(source, baseline.image),
+            'Aligned native pixels; Oklab distance lower is better, 8x8 luminance SSIM higher is better. Baseline reproduces the current App.tsx sRGB matrix/discrete filter. Dithering is judged visually too.',
+        logoCurrentFilter: perceptualScore(source, baseline),
         logoNearest: perceptualScore(source, nearest.image),
         logoDithered: perceptualScore(source, dithered.image),
         heroAgainstRetainedArtwork: perceptualScore(original, hero.image),
@@ -52,6 +49,32 @@ function main(): void {
     };
     writeFileSync(`${OUT}/report.json`, `${JSON.stringify(metrics, null, 2)}\n`);
     console.log(JSON.stringify(metrics, null, 2));
+}
+
+function filteredLogo(source: RgbImage): RgbImage {
+    const app = readFileSync('src/App.tsx', 'utf8');
+    const matrix = app
+        .match(/<feColorMatrix[\s\S]*?values="([^"]+)"/)?.[1]
+        .split(/\s+/)
+        .map(Number);
+    const tables = [...app.matchAll(/<feFunc[RGB] type="discrete" tableValues="([^"]+)"/g)].map((match) =>
+        match[1].split(' ').map(Number)
+    );
+    if (matrix?.length !== 20 || tables.length !== 3) {
+        throw new Error('The current logo filter changed; refresh the comparison baseline');
+    }
+    const image = { ...source, data: new Uint8Array(source.data.length) };
+    for (let p = 0; p < source.width * source.height; p++) {
+        for (let c = 0; c < 3; c++) {
+            const value = [0, 1, 2].reduce(
+                (sum, channel) => sum + (matrix[c * 5 + channel] * source.data[p * 3 + channel]) / 255,
+                matrix[c * 5 + 4]
+            );
+            const slot = Math.min(tables[c].length - 1, Math.max(0, Math.floor(value * tables[c].length)));
+            image.data[p * 3 + c] = Math.round(tables[c][slot] * 255);
+        }
+    }
+    return image;
 }
 
 function heroStudy(

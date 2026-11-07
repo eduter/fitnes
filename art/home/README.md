@@ -29,6 +29,11 @@ prove the composition fits.
 
 ## Color headroom
 
+The [richer artwork study](study/README.md) retains cool/warm towel candidates
+and direct/dithered warm logo comparisons, with perceptual measurements and
+independent emulator proofs. These are review candidates; the image above
+remains the adopted material reference.
+
 Nine is the current image's actual distinct-color count, not the NES maximum.
 Ordinary shared palettes allow up to 13 distinct background colors and 12 sprite
 colors (25 total), with local region/sprite restrictions. This construction

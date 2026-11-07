@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>FitNES · Artwork comparison</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #15100e; color: #e5c2a2; font: 16px/1.6 system-ui, sans-serif; }
+        main { max-width: 1120px; padding: 40px 24px 80px; margin: auto; }
+        h1, h2, h3 { line-height: 1.2; color: #ffd679; font-weight: 600; }
+        h1 { font-size: clamp(28px, 5vw, 46px); margin: 8px 0 16px; }
+        h2 { margin: 48px 0 12px; }
+        p { max-width: 740px; }
+        .eyebrow { color: #d8a082; text-transform: uppercase; letter-spacing: .15em; font-size: 12px; }
+        .intro { color: #b69c8a; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+        figure { margin: 0; padding: 16px; background: #211915; border: 1px solid #5e4538; overflow: auto; }
+        figure h3 { margin: 0 0 8px; font-size: 17px; }
+        figcaption { color: #b69c8a; font-size: 14px; margin-top: 12px; }
+        .image-wrap { width: 100%; overflow: auto; background: #000; line-height: 0; margin-top: 16px; }
+        img { display: block; image-rendering: pixelated; margin: auto; max-width: none; }
+        select { background: #17100e; color: #ffd679; border: 1px solid #7d5c4b; padding: 8px; font: inherit; max-width: 100%; }
+        label { display: block; margin: 16px 0 8px; }
+        .zoom { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 24px 0; }
+        .zoom label { margin: 0; }
+        details { margin-top: 32px; border-top: 1px solid #5e4538; padding-top: 20px; }
+        summary { cursor: pointer; color: #ffd679; }
+        table { border-collapse: collapse; width: 100%; max-width: 700px; font-size: 14px; margin-top: 16px; }
+        td, th { text-align: left; padding: 8px; border-bottom: 1px solid #5e4538; }
+        a { color: #ffd679; }
+        .note { border-left: 2px solid #7d5c4b; padding-left: 16px; color: #b69c8a; }
+        @media (max-width: 600px) { main { padding: 24px 12px 48px; } figure { padding: 12px; } }
+    </style>
+</head>
+<body>
+<main>
+    <div class="eyebrow">FitNES · Art study</div>
+    <h1>A little more fire.<br>A little more distinction.</h1>
+    <p class="intro">Two small experiments: let the towels read as fabric, and give the wordmark its warm red-to-yellow character back. The original artwork stays available for comparison.</p>
+    <div class="zoom"><label for="zoom">Pixel scale</label><select id="zoom"><option value="1">1× · native</option><option value="2">2×</option><option value="3">3×</option></select></div>
+
+    <h2>The gym illustration</h2>
+    <p>The scene keeps its existing shapes, lighting and warm metal. Only 243 pixels inside the two towels change. Choose cooler cloth or a softer warm linen.</p>
+    <div class="grid">
+        <figure><h3>Current artwork</h3><p>Nine colors</p><div class="image-wrap"><img src="gym-original.png" width="256" height="200" alt="Current gym illustration with golden towels"></div><figcaption>Yellow is shared by the lamp, hazard stripes and towel highlights.</figcaption></figure>
+        <figure><h3>More distinct cloth</h3><label for="hero">Towel palette</label><select id="hero"><option value="gym-linen.png">Cool linen</option><option value="gym-warm-linen.png">Warm linen</option></select><div class="image-wrap"><img id="hero-image" src="gym-linen.png" width="256" height="200" alt="Gym illustration with cooler towel highlights and blue gray folds"></div><figcaption>Twelve colors. Yellow remains on the warning stripes and lighting.</figcaption></figure>
+    </div>
+
+    <h2>The fiery wordmark</h2>
+    <p>The new palette follows the original colors directly. A subtle 4×4 ordered pattern can blend neighboring warm shades without putting holes in the lettering.</p>
+    <div class="grid">
+        <figure><h3>Original reference</h3><div class="image-wrap"><img src="logo-source.png" width="256" height="120" alt="Original red and yellow FitNES wordmark"></div><figcaption>The retained source, padded with black to align the comparisons.</figcaption></figure>
+        <figure><h3>Current app treatment</h3><div class="image-wrap"><img src="logo-current-filter.png" width="256" height="120" alt="Current FitNES logo reproduced with the app's discrete grayscale filter"></div><figcaption>The current filter first removes the source hue, then assigns four warm colors.</figcaption></figure>
+        <figure><h3>Warm palette</h3><label for="logo">Color treatment</label><select id="logo"><option value="logo-dithered.png">Subtle ordered dithering</option><option value="logo-nearest.png">Direct color matching</option></select><div class="image-wrap"><img id="logo-image" src="logo-dithered.png" width="256" height="120" alt="FitNES wordmark with restored warm colors and ordered dithering"></div><figcaption>Both versions share the same seven visible NES colors and keep the existing outlines.</figcaption></figure>
+    </div>
+
+    <details><summary>Similarity measurements and hardware checks</summary>
+        <p>Measured against the aligned original logo at native resolution. Lower Oklab distance means closer colors; higher SSIM means closer luminance structure. Fine dithering can improve the appearance of a gradient while reducing a pixel-level score.</p>
+        <table><thead><tr><th>Logo</th><th>Oklab ↓</th><th>SSIM ↑</th></tr></thead><tbody id="scores"></tbody></table>
+        <p>Each candidate has an explicit MMC5 construction and passes an independent FCEUmm emulator comparison with zero differing pixels. Both hero versions use 63 sprites, with at most eight on any scanline. Logo versions need no sprites. All use the same Composite Direct display model and whole-frame emphasis as the app artwork.</p>
+        <p class="note">These are separately proven candidate assets. Combining their different shared palettes with app controls in a visible screen still needs a composition proof. This review does not replace the app's adopted artwork or expand its UI tokens.</p>
+        <a href="report.json">Full comparison report</a>
+    </details>
+</main>
+<script>
+    const hero = document.querySelector('#hero');
+    const logo = document.querySelector('#logo');
+    hero.addEventListener('change', () => {
+        const image = document.querySelector('#hero-image');
+        image.src = hero.value;
+        image.alt = hero.value === 'gym-linen.png' ? 'Gym illustration with cooler towel highlights and blue gray folds' : 'Gym illustration with warm linen towels';
+    });
+    logo.addEventListener('change', () => {
+        const image = document.querySelector('#logo-image');
+        image.src = logo.value;
+        image.alt = logo.value === 'logo-dithered.png' ? 'FitNES wordmark with restored warm colors and ordered dithering' : 'FitNES wordmark with direct perceptual color matching';
+    });
+    document.querySelector('#zoom').addEventListener('change', (event) => {
+        const scale = Number(event.target.value);
+        for (const image of document.images) {
+            image.style.width = `${image.width / (Number(image.dataset.scale) || 1) * scale}px`;
+            image.style.height = `${image.height / (Number(image.dataset.scale) || 1) * scale}px`;
+            image.dataset.scale = String(scale);
+        }
+    });
+    fetch('report.json').then((response) => {
+        if (!response.ok) throw new Error('Comparison report unavailable');
+        return response.json();
+    }).then((report) => {
+        for (const [key, label] of [['logoCurrentFilter', 'Current filter'], ['logoNearest', 'Direct match'], ['logoDithered', 'Ordered dithering']]) {
+            const row = document.createElement('tr');
+            for (const value of [label, report[key].meanOklabDistance.toFixed(4), report[key].ssim.toFixed(4)]) {
+                const cell = document.createElement('td');
+                cell.textContent = value;
+                row.append(cell);
+            }
+            document.querySelector('#scores').append(row);
+        }
+    }).catch(() => { document.querySelector('#scores').textContent = 'Report could not be loaded.'; });
+</script>
+</body>
+</html>

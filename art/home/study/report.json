@@ -1,8 +1,8 @@
 {
-  "explanation": "Aligned native pixels; Oklab distance lower is better, 8x8 luminance SSIM higher is better. Baseline is a new nine-ink approximation, not a recovered prior logo. Dithering is judged visually too.",
-  "logoNineInkBaseline": {
-    "meanOklabDistance": 0.06685357769633465,
-    "ssim": 0.8829071630913764
+  "explanation": "Aligned native pixels; Oklab distance lower is better, 8x8 luminance SSIM higher is better. Baseline reproduces the current App.tsx sRGB matrix/discrete filter. Dithering is judged visually too.",
+  "logoCurrentFilter": {
+    "meanOklabDistance": 0.09517901658273369,
+    "ssim": 0.8771612253882163
   },
   "logoNearest": {
     "meanOklabDistance": 0.06576183013769887,
