@@ -8,8 +8,11 @@
 .nes-multi-picker legend {
     padding-inline: 4px;
 }
-.nes-multi-picker > .nes-button {
-    display: block;
+.nes-multi-picker > .nes-button[data-variant="plain"] {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    background: transparent;
     text-align: left;
     white-space: normal;
     overflow-wrap: anywhere;
