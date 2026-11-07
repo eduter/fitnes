@@ -1,5 +1,6 @@
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
+import { PageTitle } from './Typography.tsx';
 
 interface PageHeaderProps {
     title: string;
@@ -10,7 +11,7 @@ interface PageHeaderProps {
 function PageHeader(props: PageHeaderProps): JSX.Element {
     return (
         <div class="page-header">
-            <h1 class="page-title">{props.title}</h1>
+            <PageTitle>{props.title}</PageTitle>
             <Show when={props.actions}>
                 <div class="page-actions">{props.actions}</div>
             </Show>

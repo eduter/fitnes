@@ -1,5 +1,5 @@
 import { createEffect, createSignal, type JSX, on, untrack } from 'solid-js';
-import { Button } from '../Button/Button.tsx';
+import { DialogActions } from '../DialogActions.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 import './ConfirmDialog.css';
 
@@ -27,17 +27,14 @@ function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
             width={208}
         >
             <p class="nes-confirm-message">{message()}</p>
-            <div class="nes-confirm-actions">
-                <Button
-                    onPress={() => {
-                        props.onConfirm();
-                        props.onOpenChange(false);
-                    }}
-                >
-                    Yes
-                </Button>
-                <Button onPress={() => props.onOpenChange(false)}>No</Button>
-            </div>
+            <DialogActions
+                kind="confirm"
+                onConfirm={() => {
+                    props.onConfirm();
+                    props.onOpenChange(false);
+                }}
+                onCancel={() => props.onOpenChange(false)}
+            />
         </Popover>
     );
 }

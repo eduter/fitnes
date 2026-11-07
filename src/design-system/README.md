@@ -13,6 +13,8 @@ Import controls from `src/components/Controls/index.ts`.
 
 | Component | Use | Contract |
 | --- | --- | --- |
+| PageTitle / DialogTitle / SectionHeading | Page, editor, and field-group hierarchy | Copper passive text: 32px page title, 16px uppercase dialog title, 16px sentence-case section heading with vertical space. Typography.css is the single style owner. Use semantic h1/h2/h3; item titles remain normal 16px. |
+| DialogActions | Editor footer | Cancel (or No) at left, positive action at right. End alone at right for already-persisted edits. Central copy in dialogActionCopy; no per-screen synonyms. |
 | Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. Pointer input belongs only to visible text/icons; layout space stays passive. |
 | OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. There is no layout variant. |
 | MultiPicker | Multiple memberships | Framed summary (two names then +N, or None). Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
@@ -121,3 +123,17 @@ The checker reconstructs every unquantized pixel with the home background/sprite
 palettes and budgets. New compositions and states need new checks; source-color
 membership alone is not a screen proof. These checks are not independent
 emulator runs.
+
+## Typography and editor actions
+
+Use `PageTitle` through `PageHeader` for a tab/page, `DialogTitle` for an editor,
+and `SectionHeading` for a related field group. These are passive copper text;
+gold uppercase is reserved for actions. Edit their shared stylesheet to revise
+all three levels. The Typography showcase presents the hierarchy and footers.
+
+Use `DialogActions` with `kind="end"` for existing atomic edits: End closes,
+it does not save. New composites use `create`, new list items use `add`, and
+explicit drafts such as weight records use `save`; these include Cancel on the
+left. Destructive confirmations use `confirm` (No / Yes). All labels are owned
+by `dialogActionCopy`; a single change updates every footer using that kind.
+Choice menus and number pads keep their specialized layouts.

@@ -1,9 +1,9 @@
 import type { JSX } from 'solid-js';
-import { MultiPicker } from '../Controls/index.ts';
-import { TextAreaField, TextField } from '../fields.tsx';
-import { ValidationErrors } from '../ValidationErrors.tsx';
 import type { ExerciseDefinition, LoadOption, MeasurementOption } from '../../domain/exercise.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
+import { MultiPicker, SectionHeading } from '../Controls/index.ts';
+import { TextAreaField, TextField } from '../fields.tsx';
+import { ValidationErrors } from '../ValidationErrors.tsx';
 
 const measurements: { value: string; label: string; option: MeasurementOption }[] = [
     { value: 'repetitions/total', label: 'Reps', option: { measurement: 'repetitions', countBasis: 'total' } },
@@ -40,7 +40,7 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
     return (
         <div class="editor-fields">
             <TextField label="Name" value={props.value.name} required onChange={(name) => patch({ name })} />
-            <p>Tracking options</p>
+            <SectionHeading>Tracking options</SectionHeading>
             <MultiPicker
                 label="Measure"
                 values={props.value.measurements.map((item) => `${item.measurement}/${item.countBasis}`)}

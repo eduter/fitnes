@@ -1,11 +1,11 @@
 import { createEffect, createSignal, type JSX, on } from 'solid-js';
-import { DraftGuard } from '../../app/DraftGuard.tsx';
 import { useAppData } from '../../app/AppData.tsx';
+import { DraftGuard } from '../../app/DraftGuard.tsx';
 import type { ExerciseDefinition } from '../../domain/exercise.ts';
 import { generateExerciseId } from '../../domain/generateIds.ts';
 import { validateExercise } from '../../domain/validateExercise.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
-import { Button, ConfirmDialog, Popover } from '../Controls/index.ts';
+import { ConfirmDialog, DialogActions, DialogTitle, Popover } from '../Controls/index.ts';
 import { ExerciseForm } from './ExerciseForm.tsx';
 
 /** Keep the full exercise form over its library, with immediate existing edits and explicit creation. */
@@ -99,22 +99,14 @@ function ExerciseEditor(props: ExerciseEditorProps): JSX.Element {
                 mount={document.getElementById('root') ?? undefined}
             >
                 <div class="editor-fields">
-                    <h2 class="dialog-title">{props.creating ? 'Create exercise' : 'Edit exercise'}</h2>
+                    <DialogTitle>{props.creating ? 'Create exercise' : 'Edit exercise'}</DialogTitle>
                     <ExerciseForm value={draft()} errors={errors()} onChange={edit} />
-                    <div class="editor-actions">
-                        {props.creating ? (
-                            <>
-                                <Button disabled={busy()} onPress={() => void create()}>
-                                    Create
-                                </Button>
-                                <Button disabled={busy()} onPress={() => props.onOpenChange(false)}>
-                                    Cancel
-                                </Button>
-                            </>
-                        ) : (
-                            <Button onPress={() => void close()}>End</Button>
-                        )}
-                    </div>
+                    <DialogActions
+                        kind={props.creating ? 'create' : 'end'}
+                        disabled={busy()}
+                        onConfirm={() => void (props.creating ? create() : close())}
+                        onCancel={props.creating ? () => props.onOpenChange(false) : undefined}
+                    />
                 </div>
             </Popover>
             <ConfirmDialog
@@ -151,4 +143,4 @@ function blankExercise(): ExerciseDefinition {
     };
 }
 
-export { ExerciseEditor, blankExercise };
+export { blankExercise, ExerciseEditor };

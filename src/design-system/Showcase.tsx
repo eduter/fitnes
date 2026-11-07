@@ -1,7 +1,17 @@
 import { createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import homeArt from '../../art/home/gym.png';
-import { Button, OptionPicker, Popover, Spinner, TextInput } from '../components/Controls/index.ts';
+import {
+    Button,
+    DialogActions,
+    DialogTitle,
+    OptionPicker,
+    PageTitle,
+    Popover,
+    SectionHeading,
+    Spinner,
+    TextInput,
+} from '../components/Controls/index.ts';
 import { MembershipExample, WeightExample, WorkoutExample } from './PageExamples.tsx';
 import { homePalette } from './palette.ts';
 import './showcase.css';
@@ -18,6 +28,7 @@ function Showcase(): JSX.Element {
     let spacer: HTMLDivElement | undefined;
     let trigger: HTMLButtonElement | undefined;
     const pages = [
+        { value: 'type', label: 'Typography' },
         { value: 'workout', label: 'Workout' },
         { value: 'weight', label: 'Weight' },
         { value: 'members', label: 'Multiple' },
@@ -70,6 +81,16 @@ function Showcase(): JSX.Element {
                                     popoverMount={host()}
                                 />
                             </header>
+                            <Show when={page() === 'type'}>
+                                <section class="ds-section">
+                                    <PageTitle>Exercises</PageTitle>
+                                    <DialogTitle>Create exercise</DialogTitle>
+                                    <SectionHeading>Tracking options</SectionHeading>
+                                    <p>Body copy and item names</p>
+                                    <DialogActions kind="save" onCancel={() => {}} onConfirm={() => {}} />
+                                    <DialogActions kind="end" onConfirm={() => {}} />
+                                </section>
+                            </Show>
                             <Show when={page() === 'workout'}>
                                 <WorkoutExample mount={host()} />
                             </Show>

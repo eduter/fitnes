@@ -59,12 +59,6 @@
     gap: 8px;
     flex: none;
 }
-.page-title {
-    font-size: 32px;
-    line-height: 32px;
-    color: var(--nes-ink);
-    overflow-wrap: anywhere;
-}
 .page-actions,
 .button-row,
 .inline-fields {
@@ -282,13 +276,6 @@
 
 .page-actions:has(.button-row) {
     flex-basis: 100%;
-}
-.dialog-title {
-    color: var(--nes-ink);
-    font-size: 16px;
-    line-height: 16px;
-    text-transform: uppercase;
-    padding-bottom: 4px;
 }
 .list-item__title {
     font-size: 16px;
