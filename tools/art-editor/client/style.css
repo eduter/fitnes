@@ -1,0 +1,55 @@
+:root { font-family: system-ui, sans-serif; color: #dbe3ef; background: #10141c; color-scheme: dark; --zoom: 3; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 24px; border-bottom: 1px solid #303a4b; }
+h1 { font-size: 23px; margin: 3px 0 0; font-weight: 600; }
+.eyebrow { color: #93a3ba; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.file-actions, .tool-row, .replace-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+button { font: inherit; font-size: 13px; color: #dbe3ef; background: #202938; border: 1px solid #3a465c; border-radius: 5px; padding: 8px 12px; cursor: pointer; }
+button:hover:enabled { background: #303d50; }
+button:focus-visible { outline: 2px solid #a5d2ff; outline-offset: 3px; }
+button:disabled { opacity: .42; cursor: default; }
+button[aria-pressed="true"] { border-color: #9cc8ff; background: #273e5b; color: #fff; }
+#export { background: #22463c; border-color: #387b63; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 289px; min-height: calc(100vh - 90px); }
+main { min-width: 0; display: flex; flex-direction: column; }
+.toolbar, .palette { padding: 14px 20px; border-bottom: 1px solid #303a4b; }
+.replace-row { margin-top: 12px; }
+.chip { display: flex; align-items: center; gap: 8px; min-width: 138px; }
+.chip .dot { width: 22px; height: 22px; border: 1px solid #768298; display: inline-block; border-radius: 3px; }
+.chip small { display: block; font-size: 10px; text-align: left; color: #adbed5; }
+.chip .name { display: block; font-size: 12px; }
+.arrow { color: #8da3be; }
+.divider { height: 26px; width: 1px; margin: 0 6px; background: #3a465c; }
+#selection-label, #color-help { color: #9baec7; font-size: 12px; }
+#zoom-label { width: 30px; text-align: center; font-size: 13px; }
+.palette { display: flex; gap: 24px; align-items: start; flex-wrap: wrap; }
+h2 { margin: 0 0 8px; font-size: 11px; color: #9baec7; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+.swatches { display: flex; gap: 6px; flex-wrap: wrap; max-width: 340px; }
+.swatch { width: 29px; height: 29px; border-radius: 3px; border: 1px solid #778096; padding: 0; }
+.swatch:hover:enabled { box-shadow: 0 0 0 2px #879cb9; }
+.swatch[aria-pressed="true"] { outline: 2px solid #e5efff; outline-offset: 2px; }
+#color-help { margin: 0; max-width: 245px; line-height: 1.5; align-self: center; }
+.proof { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 12px 20px; border-bottom: 1px solid #303a4b; background: #29251b; }
+.proof strong { color: #ebce8e; font-size: 14px; }
+.proof p { color: #c6bfad; font-size: 12px; margin: 4px 0 0; }
+.proof[data-state="verified"] { background: #152c25; }
+.proof[data-state="verified"] strong { color: #8fe0b2; }
+.proof[data-state="unverified"] { background: #342124; }
+.proof[data-state="unverified"] strong { color: #ffb0ac; }
+.proof details { font-size: 12px; margin-top: 6px; max-width: 700px; }
+.proof details p { overflow-wrap: anywhere; }
+.viewport { overflow: auto; height: max(360px, calc(100vh - 382px)); background: #080b11; overscroll-behavior: contain; }
+.stage { padding: 24px; width: max-content; }
+.canvas-stack { position: relative; width: calc(256px * var(--zoom)); height: calc(200px * var(--zoom)); box-shadow: 0 0 0 1px #354156; }
+#art { display: block; width: 100%; height: 100%; image-rendering: pixelated; touch-action: none; cursor: crosshair; }
+#overlay { position: absolute; inset: 0; pointer-events: none; }
+footer { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; color: #8a9bb3; font-size: 11px; line-height: 1.6; padding: 10px 20px; }
+aside { padding: 16px; border-left: 1px solid #303a4b; background: #151b25; }
+figure { margin: 0 0 18px; width: 256px; }
+figcaption { font-size: 12px; color: #adbed5; margin-bottom: 7px; }
+aside img, aside canvas { width: 256px; height: 200px; display: block; background: #000; box-shadow: 0 0 0 1px #394252; }
+aside canvas, aside img[src$="current.png"] { image-rendering: pixelated; }
+.aside-note { color: #8a9bb3; font-size: 12px; line-height: 1.5; }
+.notice { padding: 10px 24px; background: #343023; color: #e7d39f; font-size: 13px; }
+@media (max-width: 960px) { .workspace { grid-template-columns: 1fr; } header { flex-wrap: wrap; } aside { display: flex; gap: 20px; overflow-x: auto; border-left: 0; border-top: 1px solid #303a4b; } figure { flex: none; } .aside-note { min-width: 200px; } .viewport { height: 55vh; } }

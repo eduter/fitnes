@@ -1,0 +1,9 @@
+{
+    "extends": "../../../tsconfig.app.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "../../../node_modules/.tmp/tsconfig.art-editor.tsbuildinfo",
+        "types": ["vite/client"]
+    },
+    "include": ["main.ts", "../model.ts", "../protocol.ts"],
+    "exclude": []
+}
