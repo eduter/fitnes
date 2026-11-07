@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from '@solidjs/router';
 import { onCleanup, onMount, Show, type JSX } from 'solid-js';
 import logoUrl from '../docs/fitnes-logo.png?url';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
+import { basePath, pathWithinBase } from './app/basePath.ts';
 import { BottomTabs, type TabId } from './components/BottomTabs/BottomTabs.tsx';
 import { SteelPanel } from './components/SteelPanel/SteelPanel.tsx';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
@@ -11,9 +12,10 @@ import './App.css';
 function App(props: AppProps): JSX.Element {
     const location = useLocation();
     const navigate = useNavigate();
-    const home = () => location.pathname === '/';
+    const routePath = () => pathWithinBase(location.pathname, basePath);
+    const home = () => routePath() === '/';
     const active = (): TabId => {
-        const path = location.pathname;
+        const path = routePath();
         if (path.startsWith('/templates')) {
             return 'templates';
         }
