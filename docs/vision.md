@@ -134,6 +134,10 @@ Use separators between library items, distinguish copper page headings from
 normal text and gold actions, and call the workout library Workouts. Remove the
 small FitNES header from all non-home pages.
 
+Steel-frame feedback (2026-11-07): straight edges must repeat the same native tile
+between fixed corners. Render 8×8 PNG edge tiles with repeat-x/repeat-y; do not
+stretch the material artwork to fit the panel.
+
 ## Preview data
 
 Preserve the compact preview's real workout data before clearing storage or

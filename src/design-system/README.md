@@ -34,6 +34,8 @@ Import controls from `src/components/Controls/index.ts`.
   Both copper and steel borders use native-size PNGs at runtime to avoid the
   Android SVG border-image painting bug fixed in #26. Keep the SVGs as editable
   sources; preserve the raster painting path when integrating the components.
+  SteelPanel uses fixed 8×8 corners and repeated 8×8 straight-edge tiles, with no
+  stretching of the frame artwork.
 - Action buttons size to their text and use a single verb where its meaning is
   clear. Only the visible label/icon receives pointer input; never turn black
   padding, a flex row or an item's background into an action target.
