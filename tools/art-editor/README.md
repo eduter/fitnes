@@ -41,6 +41,11 @@ FCEUmm core can be supplied with `--core /absolute/path/fceumm_libretro.so`.
 
 ## Tools
 
+- **Pencil:** click one pixel or drag a one-pixel-wide stroke. Gaps between
+  pointer samples are filled without smoothing. The complete stroke is one undo
+  action and is checked when released. Pick color samples a drawing color when
+  using the pencil; with a rectangle selection it samples the color to replace.
+
 - **Bucket fill:** choose the replacement color, then click a connected region.
   A whole fill is one undo action, regardless of how many pixels it touches.
 - **Replace within a selection:** drag a rectangle, click the **Replace this
@@ -83,7 +88,8 @@ scanline remain enforced. Pattern-bank capacity stays outside the visual contrac
 **Not verified** means the fitter did not find a valid construction, or the exact
 checker/emulator rejected the attempted construction. The search is bounded; it
 does not prove that no other NES arrangement could reproduce the edit. The
-affected area is outlined, with optional details. Try Undo, a smaller replacement
+affected area is outlined. A small square shows ✓ for verified, × for unverified,
+and … while checking; hover or focus it for details. Try Undo, a smaller replacement
 region, or another color. If the core is absent, the UI says **Emulator setup
 needed** and cannot turn green.
 
@@ -102,13 +108,28 @@ original reference. It auto-saves a draft under `work/art-editor/draft.json` and
 keeps a browser backup after each action. Work stays local; the server binds to
 127.0.0.1 and does not publish the image or connect to other services.
 
-**Download project** exports an editable JSON snapshot, including an unverified
-draft. **Open project** restores it as one undo action and rechecks the pixels.
+**Save artwork** (or Ctrl+S) writes the current green image to tracked candidate
+files under `art/home/edited/`: `gym.png`, `construction.json`, `project.json`,
+and `verification.json`. The save dialog provides copyable Git commands. Those
+commands create a feature branch if currently detached or on main/master, then
+commit only these four files, leaving unrelated staged changes out of the commit.
+Run the commands yourself in the Ubuntu checkout where the editor is running;
+the editor does not run Git or push changes automatically. Saving a candidate
+does not replace the app's adopted image or its palette tokens.
+
+Earlier saves are backed up under `work/art-editor/saved-backups/`. A directory
+swap keeps each saved image and construction together; failures restore the
+previous candidate. Existing additional files in the candidate folder are kept.
+If no auto-saved draft exists, the editor can resume the tracked `project.json`.
+
+The **File** menu contains the less frequent operations. **Download backup**
+(formerly Download project) exports an editable JSON snapshot, including an
+unverified draft. **Open backup** (formerly Open project) restores it as one undo action and rechecks the pixels.
 Undo history belongs to the open tab; the current draft and last verified image
 survive reopening. Preserve downloaded projects before deleting the ignored
 `work/` directory or removing the worktree.
 
-**Download verified bundle** is enabled only for the current green image. Its
+**Export verified files** (formerly Download verified bundle) is enabled only for the current green image. Its
 `.tar.gz` contains `image.png`, `construction.json`, a runnable `frame.nes`, the
 independent `capture.png`, and `report.json` with exact comparison counts and
 image/ROM/core hashes. Extract it with Windows archive support or `tar` in Ubuntu.

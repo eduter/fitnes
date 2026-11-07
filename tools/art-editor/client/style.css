@@ -52,4 +52,53 @@ aside img, aside canvas { width: 256px; height: 200px; display: block; backgroun
 aside canvas, aside img[src$="current.png"] { image-rendering: pixelated; }
 .aside-note { color: #8a9bb3; font-size: 12px; line-height: 1.5; }
 .notice { padding: 10px 24px; background: #343023; color: #e7d39f; font-size: 13px; }
-@media (max-width: 960px) { .workspace { grid-template-columns: 1fr; } header { flex-wrap: wrap; } aside { display: flex; gap: 20px; overflow-x: auto; border-left: 0; border-top: 1px solid #303a4b; } figure { flex: none; } .aside-note { min-width: 200px; } .viewport { height: 55vh; } }
+
+/* Keep the canvas prominent; file operations and proof details are available on demand. */
+[hidden] { display: none !important; }
+header { gap: 9px; padding: 5px 10px; height: 42px; justify-content: start; flex-wrap: nowrap; }
+h1 { font-size: 14px; margin: 0 6px 0 0; white-space: nowrap; }
+button, summary { font-size: 12px; padding: 5px 8px; border-radius: 3px; }
+#save-state { font-size: 11px; color: #98aac1; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#save { background: #22463c; border-color: #387b63; white-space: nowrap; }
+.file-menu { position: relative; }
+.file-menu summary { list-style: none; cursor: pointer; padding: 5px 8px; border: 1px solid #3a465c; background: #202938; }
+.file-panel { position: absolute; top: 32px; left: 0; width: 285px; padding: 7px; background: #1a2230; border: 1px solid #52617b; box-shadow: 0 8px 25px #0008; z-index: 10; }
+.file-panel button { display: block; width: 100%; text-align: left; padding: 8px; border: 0; }
+.file-panel small { display: block; color: #9baec7; margin-top: 3px; font-size: 10px; }
+.file-panel p { font-size: 11px; line-height: 1.5; padding: 0 8px; color: #adbed5; }
+.workspace { grid-template-columns: minmax(0, 1fr) 281px; height: calc(100dvh - 42px); min-height: 0; }
+main { min-height: 0; }
+.toolbar, .palette { padding: 5px 9px; flex: none; }
+.tool-row, .replace-row { gap: 5px; }
+.replace-row { margin-top: 5px; }
+.chip { min-width: 0; gap: 5px; }
+.chip .dot { width: 18px; height: 18px; }
+.chip small { display: none; }
+.chip .name { font-size: 11px; }
+.divider { height: 20px; margin: 0 4px; }
+.palette { gap: 14px; align-items: center; }
+.palette > div { display: flex; align-items: center; gap: 7px; }
+h2 { font-size: 10px; margin: 0; }
+.swatches { gap: 4px; }
+.swatch { width: 22px; height: 22px; }
+#color-help, #selection-label { font-size: 10px; }
+.proof, .proof[data-state="verified"], .proof[data-state="unverified"] { position: relative; display: block; padding: 0; border: 0; background: transparent; }
+#proof-toggle { width: 30px; height: 30px; padding: 0; font-size: 18px; color: #ebce8e; background: #342e20; }
+.proof[data-state="verified"] #proof-toggle { color: #8fe0b2; background: #15392b; border-color: #387b63; }
+.proof[data-state="unverified"] #proof-toggle { color: #ffb0ac; background: #492529; border-color: #ad5c60; }
+.proof-tooltip { display: none; position: absolute; right: 0; top: 33px; width: 330px; max-width: 85vw; padding: 12px; background: #1a2230; border: 1px solid #52617b; box-shadow: 0 8px 25px #0008; z-index: 12; font-size: 12px; line-height: 1.5; }
+.proof:hover .proof-tooltip, .proof:focus-within .proof-tooltip { display: block; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.viewport { flex: 1; min-height: 280px; height: auto; }
+.stage { padding: 12px; }
+footer { font-size: 10px; padding: 4px 10px; flex: none; }
+aside { padding: 10px 12px; overflow: auto; }
+figure { margin-bottom: 12px; }
+figcaption { font-size: 11px; margin-bottom: 4px; }
+.aside-note { display: none; }
+dialog { max-width: 650px; border: 1px solid #52617b; border-radius: 5px; padding: 20px; background: #1a2230; color: #dbe3ef; }
+dialog::backdrop { background: #0008; }
+dialog h2 { font-size: 18px; color: #dbe3ef; }
+dialog p { font-size: 13px; line-height: 1.6; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: #10141c; font-size: 11px; line-height: 1.7; }
+@media (max-width: 760px) { .workspace { grid-template-columns: 1fr; height: auto; } .viewport { height: 65vh; flex: none; } #save-state { display: none; } }

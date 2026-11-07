@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join, resolve, sep } from 'node:path';
 import { displayColors } from '../nes-hardware/check.ts';
@@ -7,6 +7,7 @@ import { decodePng } from '../nes-hardware/png.ts';
 import type { HardwareConstruction } from '../nes-hardware/rom.ts';
 import { imageCodes } from './compile.ts';
 import type { EditorConfig, VerificationResult } from './protocol.ts';
+import { saveArtwork } from './save.ts';
 import { createVerifier, type VerifiedArtifact } from './verification.ts';
 
 const NAMES = new Map([
@@ -62,6 +63,19 @@ function createEditorServer(root: string, corePath: string): Server {
             const backup = `draft-backup-${Date.now()}.json`;
             renameSync(draftPath, join(work, backup));
             recoveryMessage = `An older or unreadable draft was preserved as work/art-editor/${backup}. Starting from the app image.`;
+        }
+    } else if (existsSync(join(root, 'art/home/edited/project.json'))) {
+        const savedPath = join(root, 'art/home/edited/project.json');
+        try {
+            const saved = JSON.parse(readFileSync(savedPath, 'utf8'));
+            if (saved.baselineHash !== baselineHash || saved.emphasis !== seed.emphasis) {
+                throw new Error('Different source');
+            }
+            pixels = decodePixels(saved.pixels);
+            updatedAt = statSync(savedPath).mtimeMs;
+        } catch {
+            recoveryMessage =
+                'The saved artwork uses another source version. It remains in art/home/edited/project.json and can be opened with File → Open backup.';
         }
     }
     const verifier = createVerifier(root, corePath, seed);
@@ -161,6 +175,25 @@ function createEditorServer(root: string, corePath: string): Server {
             if (!response.destroyed) {
                 json(response, 200, result);
             }
+            return;
+        }
+        if (request.method === 'POST' && url.pathname === '/api/save') {
+            if (
+                request.headers['x-editor-token'] !== token ||
+                !request.headers['content-type']?.startsWith('application/json')
+            ) {
+                json(response, 403, { error: 'Reload the editor before saving' });
+                return;
+            }
+            const body = JSON.parse(await readBody(request));
+            if (!artifact || artifactRevision !== revision || body.revision !== revision) {
+                json(response, 409, {
+                    error: 'Wait until this edit is verified before saving artwork to the repository',
+                });
+                return;
+            }
+            const files = saveArtwork(root, artifact, baselineHash, seed.emphasis, pixels);
+            json(response, 200, { revision, files });
             return;
         }
         if (request.method === 'GET' && url.pathname === '/api/export') {

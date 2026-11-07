@@ -60,6 +60,42 @@ function replaceRegion(
     return result;
 }
 
+/** Draw a one-pixel-wide line without gaps between sampled pointer positions. */
+function paintLine(
+    pixels: Uint8Array,
+    width: number,
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+    color: number
+): Uint8Array {
+    const result = pixels.slice();
+    const dx = Math.abs(x1 - x0);
+    const dy = -Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let error = dx + dy;
+    while (true) {
+        if (x0 >= 0 && x0 < width && y0 >= 0 && y0 < pixels.length / width) {
+            result[y0 * width + x0] = color;
+        }
+        if (x0 === x1 && y0 === y1) {
+            break;
+        }
+        const twice = error * 2;
+        if (twice >= dy) {
+            error += dy;
+            x0 += sx;
+        }
+        if (twice <= dx) {
+            error += dx;
+            y0 += sy;
+        }
+    }
+    return result;
+}
+
 /** Whole-action immutable undo/redo history, bounded to 100 edits. */
 class EditHistory {
     private entries: { pixels: Uint8Array; label: string }[];
@@ -110,4 +146,4 @@ class EditHistory {
 }
 
 export type { Region };
-export { EditHistory, floodFill, replaceRegion };
+export { EditHistory, floodFill, paintLine, replaceRegion };

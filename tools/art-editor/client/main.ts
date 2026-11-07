@@ -1,4 +1,4 @@
-import { EditHistory, floodFill, type Region, replaceRegion } from '../model.ts';
+import { EditHistory, floodFill, paintLine, type Region, replaceRegion } from '../model.ts';
 import type { EditorConfig, VerificationResult } from '../protocol.ts';
 import './style.css';
 
@@ -24,8 +24,9 @@ async function main(): Promise<void> {
     }
     const history = new EditHistory(starting);
     let revision = config.revision + (recovered ? 1 : 0);
-    let tool: 'fill' | 'select' | 'pick' = 'fill';
-    let previousTool: 'fill' | 'select' = 'fill';
+    let tool: 'pencil' | 'fill' | 'select' | 'pick' = 'fill';
+    let previousTool: 'pencil' | 'fill' | 'select' = 'fill';
+    let stroke: { pixels: Uint8Array; last: { x: number; y: number }; color: number } | null = null;
     let from = 56;
     let to = 32;
     let active: 'from' | 'to' = 'to';
@@ -35,6 +36,7 @@ async function main(): Promise<void> {
     let regions: Region[] = [];
     let timer: ReturnType<typeof setTimeout>;
     let controller: AbortController | null = null;
+    let savedRevision = -1;
     const art = element<HTMLCanvasElement>('art');
     const overview = element<HTMLCanvasElement>('overview');
     const overlay = element<HTMLCanvasElement>('overlay');
@@ -54,6 +56,13 @@ async function main(): Promise<void> {
         );
     }
 
+    element('pencil').onclick = () => {
+        tool = 'pencil';
+        selection = null;
+        active = 'to';
+        renderControls();
+        renderOverlay();
+    };
     element('fill').onclick = () => {
         tool = 'fill';
         selection = null;
@@ -102,6 +111,29 @@ async function main(): Promise<void> {
     element('zoom-in').onclick = () => setZoom(zoom + 1);
     element('zoom-out').onclick = () => setZoom(zoom - 1);
     element('project').onclick = () => downloadProject();
+    const fileMenu = element<HTMLDetailsElement>('file-menu');
+    fileMenu.addEventListener('click', (event) => {
+        if (event.target instanceof Element && event.target.closest('button')) {
+            fileMenu.open = false;
+        }
+    });
+    document.addEventListener('pointerdown', (event) => {
+        if (event.target instanceof Node && !fileMenu.contains(event.target)) {
+            fileMenu.open = false;
+        }
+    });
+    element('save').onclick = () => {
+        void saveToRepository();
+    };
+    element('close-saved').onclick = () => element<HTMLDialogElement>('saved-dialog').close();
+    element('copy-commands').onclick = () => {
+        void navigator.clipboard
+            .writeText(element('commit-commands').textContent ?? '')
+            .then(() => {
+                element('copy-commands').textContent = 'Copied';
+            })
+            .catch(() => notify('Select and copy the commands in the save dialog.'));
+    };
     element('export').onclick = () => {
         window.location.assign(`/api/export?revision=${revision}`);
     };
@@ -143,7 +175,12 @@ async function main(): Promise<void> {
         const point = position(event);
         const source = history.pixels[point.y * 256 + point.x];
         if (tool === 'pick' || event.altKey) {
-            from = source;
+            const pickingFrom = selection !== null || (tool === 'pick' ? previousTool === 'select' : tool === 'select');
+            if (pickingFrom) {
+                from = source;
+            } else {
+                to = source;
+            }
             active = 'to';
             if (tool === 'pick') {
                 tool = previousTool;
@@ -158,6 +195,22 @@ async function main(): Promise<void> {
             renderControls();
             return;
         }
+        if (tool === 'pencil') {
+            art.setPointerCapture(event.pointerId);
+            revision++;
+            clearTimeout(timer);
+            controller?.abort();
+            element<HTMLButtonElement>('save').disabled = true;
+            element<HTMLButtonElement>('export').disabled = true;
+            setStatus('checking', 'Drawing…', 'Release the pencil to check this stroke.');
+            stroke = {
+                pixels: paintLine(history.pixels, 256, point.x, point.y, point.x, point.y, to),
+                last: point,
+                color: to,
+            };
+            render(stroke.pixels);
+            return;
+        }
         art.setPointerCapture(event.pointerId);
         anchor = point;
         selection = { left: point.x, top: point.y, width: 1, height: 1 };
@@ -165,6 +218,13 @@ async function main(): Promise<void> {
         renderOverlay();
     };
     art.onpointermove = (event) => {
+        if (stroke) {
+            const point = position(event);
+            stroke.pixels = paintLine(stroke.pixels, 256, stroke.last.x, stroke.last.y, point.x, point.y, stroke.color);
+            stroke.last = point;
+            render(stroke.pixels);
+            return;
+        }
         if (!anchor) {
             return;
         }
@@ -180,9 +240,15 @@ async function main(): Promise<void> {
     };
     art.onpointerup = () => {
         anchor = null;
+        finishStroke();
     };
     art.onpointercancel = () => {
         anchor = null;
+        finishStroke();
+    };
+    art.onlostpointercapture = () => {
+        anchor = null;
+        finishStroke();
     };
     art.addEventListener(
         'wheel',
@@ -199,6 +265,18 @@ async function main(): Promise<void> {
         { passive: false }
     );
     window.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 's') {
+            event.preventDefault();
+            if (!element<HTMLButtonElement>('save').disabled) {
+                void saveToRepository();
+            } else {
+                element('save-state').textContent = 'Draft saved; waiting for verification';
+            }
+            return;
+        }
+        if (element<HTMLDialogElement>('saved-dialog').open) {
+            return;
+        }
         if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
             return;
         }
@@ -213,6 +291,7 @@ async function main(): Promise<void> {
             event.preventDefault();
             redo();
         } else if (event.key === 'Escape') {
+            fileMenu.open = false;
             selection = null;
             renderControls();
             renderOverlay();
@@ -227,7 +306,26 @@ async function main(): Promise<void> {
         }
         changed();
     }
+    function finishStroke(): void {
+        if (!stroke) {
+            return;
+        }
+        const painted = stroke.pixels;
+        stroke = null;
+        if (history.commit(painted, 'Pencil stroke')) {
+            changed();
+        } else {
+            render();
+            schedule();
+        }
+    }
     function undo(): void {
+        if (stroke) {
+            stroke = null;
+            render();
+            schedule();
+            return;
+        }
         if (!history.canUndo) {
             return;
         }
@@ -235,6 +333,9 @@ async function main(): Promise<void> {
         changed();
     }
     function redo(): void {
+        if (stroke) {
+            return;
+        }
         if (!history.canRedo) {
             return;
         }
@@ -258,8 +359,7 @@ async function main(): Promise<void> {
                     updatedAt: Date.now(),
                 })
             );
-            element('save-state').textContent =
-                'Draft auto-saved on this computer. Original app assets stay untouched.';
+            element('save-state').textContent = 'Draft auto-saved locally';
         } catch {
             element('save-state').textContent =
                 'Browser backup is unavailable. Download your project before closing; the server also keeps a draft.';
@@ -269,6 +369,8 @@ async function main(): Promise<void> {
         clearTimeout(timer);
         controller?.abort();
         element<HTMLButtonElement>('export').disabled = true;
+        element<HTMLButtonElement>('save').disabled = true;
+        element('save').textContent = 'Save artwork';
         setStatus('checking', 'Checking…', 'Checking the current pixels and then the real NES emulator.');
         const snapshot = history.pixels;
         const requested = revision;
@@ -303,6 +405,8 @@ async function main(): Promise<void> {
                 saveBackup();
                 element<HTMLButtonElement>('restore').disabled = false;
                 element<HTMLButtonElement>('export').disabled = false;
+                element<HTMLButtonElement>('save').disabled = false;
+                element('save').textContent = savedRevision === revision ? 'Saved' : 'Save artwork';
                 setStatus(
                     'verified',
                     '✓ Verified',
@@ -332,9 +436,12 @@ async function main(): Promise<void> {
         element('proof-message').textContent = message;
         element('proof-detail').textContent = detail;
         element('proof-details').hidden = !detail;
+        const icon = state === 'verified' ? '✓' : state === 'unverified' ? '×' : '…';
+        element('proof-toggle').textContent = icon;
+        element('proof-toggle').setAttribute('aria-label', `${title}. ${message}`);
+        element('proof-announcement').textContent = `${title}. ${message}`;
     }
-    function render(): void {
-        const pixels = history.pixels;
+    function render(pixels = history.pixels): void {
         const data = new Uint8ClampedArray(256 * 200 * 4);
         for (let p = 0; p < pixels.length; p++) {
             data.set(config.colors[pixels[p]].rgb, p * 4);
@@ -348,15 +455,18 @@ async function main(): Promise<void> {
         renderOverlay();
     }
     function renderControls(): void {
-        for (const name of ['fill', 'select', 'pick']) {
+        for (const name of ['pencil', 'fill', 'select', 'pick']) {
             element(name).setAttribute('aria-pressed', String(tool === name));
         }
-        element<HTMLButtonElement>('undo').disabled = !history.canUndo;
+        element<HTMLButtonElement>('undo').disabled = !history.canUndo && !stroke;
         element('undo').title = `Undo ${history.undoLabel} · Ctrl+Z`;
         element<HTMLButtonElement>('redo').disabled = !history.canRedo;
         element<HTMLButtonElement>('restore').disabled = !lastVerified;
         element<HTMLButtonElement>('replace').disabled = !selection;
         element<HTMLButtonElement>('clear').disabled = !selection;
+        element('replace-controls').hidden = !selection && tool !== 'select' && tool !== 'pick';
+        element('undo').setAttribute('aria-label', 'Undo');
+        element('redo').setAttribute('aria-label', 'Redo');
         element('selection-label').textContent = selection
             ? `${selection.width}×${selection.height} pixels at ${selection.left}, ${selection.top}`
             : 'Select a rectangle to replace a color inside it.';
@@ -378,11 +488,13 @@ async function main(): Promise<void> {
             button.setAttribute('aria-pressed', String(active === slot));
         }
         element('color-help').textContent =
-            tool === 'pick'
-                ? 'Click a pixel to choose the color to replace. Your selection stays in place.'
-                : active === 'from'
-                  ? 'Choose the color to replace, or use Pick color on the image.'
-                  : 'Choose a replacement color, then fill or replace inside your selection.';
+            tool === 'pencil'
+                ? 'Draw one pixel or drag a stroke.'
+                : tool === 'pick'
+                  ? 'Pick a source color.'
+                  : tool === 'select'
+                    ? 'Drag a region, then replace a color.'
+                    : 'Choose a color and fill a region.';
     }
     function renderPalette(): void {
         const used = new Set(history.pixels);
@@ -507,6 +619,46 @@ async function main(): Promise<void> {
         link.download = 'fitnes-hero-project.json';
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+    async function saveToRepository(): Promise<void> {
+        if (savedRevision === revision) {
+            element<HTMLDialogElement>('saved-dialog').showModal();
+            return;
+        }
+        const requested = revision;
+        element<HTMLButtonElement>('save').disabled = true;
+        try {
+            const reply = await fetch('/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Editor-Token': config.token },
+                body: JSON.stringify({ revision: requested }),
+            });
+            const result = await reply.json();
+            if (!reply.ok) {
+                throw new Error(result.error ?? 'Could not save the artwork');
+            }
+            const files = (result.files as string[]).join(' ');
+            element('commit-commands').textContent = `art_branch=$(git branch --show-current)
+if [ -z "$art_branch" ] || [ "$art_branch" = main ] || [ "$art_branch" = master ]; then
+  git switch -c "art/home-edit-$(date +%Y%m%d-%H%M%S)"
+fi
+git add -- ${files}
+git commit --only -m "Edit home artwork" -- ${files}`;
+            savedRevision = requested;
+            if (revision === requested) {
+                element('save-state').textContent = 'Saved to art/home/edited/';
+                element('save').textContent = 'Saved';
+            } else {
+                notify('The checked image was saved. Your newer edits still need checking and saving.');
+            }
+            element<HTMLDialogElement>('saved-dialog').showModal();
+        } catch (error) {
+            notify(error instanceof Error ? error.message : String(error));
+        } finally {
+            if (revision === requested) {
+                element<HTMLButtonElement>('save').disabled = false;
+            }
+        }
     }
 }
 

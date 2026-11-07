@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { EditHistory, floodFill, replaceRegion } from './model.ts';
+import { EditHistory, floodFill, paintLine, replaceRegion } from './model.ts';
 
 it('flood fills only the connected region and keeps the input immutable', () => {
     const pixels = Uint8Array.from([1, 2, 1, 1, 2, 1]);
@@ -23,4 +23,16 @@ it('undoes a whole operation, supports redo and drops the redo branch after a ne
     history.commit(Uint8Array.from([4, 2]), 'Replace');
     expect(history.canRedo).toBe(false);
     expect(Array.from(history.undo())).toEqual([1, 2]);
+});
+
+it('draws exact pixels along a continuous pencil stroke and undoes the stroke as one action', () => {
+    const original = new Uint8Array(25);
+    let stroke = paintLine(original, 5, 0, 0, 4, 0, 32);
+    stroke = paintLine(stroke, 5, 4, 0, 4, 4, 32);
+    expect(Array.from(stroke).filter((code) => code === 32)).toHaveLength(9);
+    expect(original.every((code) => code === 0)).toBe(true);
+    const history = new EditHistory(original);
+    history.commit(stroke, 'Pencil stroke');
+    expect(history.undo()).toEqual(original);
+    expect(history.canUndo).toBe(false);
 });

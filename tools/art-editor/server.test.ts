@@ -61,6 +61,15 @@ it('does not turn an exact layout green or export it when the emulator is unavai
     ).json()) as VerificationResult;
     expect(result.status).toBe('emulator-unavailable');
     expect((await fetch(`${origin}/api/export?revision=${config.revision}`)).status).toBe(409);
+    expect(
+        (
+            await fetch(`${origin}/api/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Editor-Token': config.token },
+                body: JSON.stringify({ revision: config.revision }),
+            })
+        ).status
+    ).toBe(409);
 });
 
 it('rejects older revisions without overwriting the newer saved draft', async () => {
