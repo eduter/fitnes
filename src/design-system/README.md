@@ -3,10 +3,9 @@
 [Live private review](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
 · [PR #27](https://github.com/eduter/fitnes/pull/27)
 
-Read this before implementing screens. The components below are the single
-current design vocabulary. The alternative row/stacked field layouts and
-right-of-label menu placement have been removed from the implementation and
-API. Do not restore them or mix in another visual style without an owner change.
+Read this before implementing screens. The components below are the current
+design vocabulary. Use the framed-field layout and anchored menus consistently;
+changes to the visual direction require owner review.
 
 ## Available components and when to use them
 
@@ -28,7 +27,7 @@ Import controls from `src/components/Controls/index.ts`.
 
 ## Composition rules
 
-- Use the single A-style two-pixel cut-corner copper frame (`.nes-frame`) for
+- Use the two-pixel cut-corner copper frame (`.nes-frame`) for
   fields and plain windows. Gold identifies interactive values/actions; copper
   identifies passive text. No gold corner brackets, checkbox boxes, action
   chevrons, browser select/radio/switch presentation or expanding editor rows.
@@ -84,14 +83,13 @@ ad hoc to UI tokens. Keep the current palette until new artwork is approved.
 `PageExamples.tsx` uses temporary in-memory samples. Workout adapts its row
 count to height, shows all common edit fields in one form and puts Notes directly
 there. Weight demonstrates date/number entry. Multiple demonstrates summaries
-and membership toggling. Review is a framed navigation field; no B example is
-retained. These examples do not implement full home/session persistence.
+and membership toggling. Review is a framed navigation field. These examples
+do not implement full home/session persistence.
 
-See [the PR #26 source audit](pr26-audit.md) for integration gaps. The remaining
-work is application composition, complete home/session/catalog workflows,
-validation, real persistence/drafts and low-priority import/export—not permission
-to invent more component styles. Agent/native-control tests reject screen-local
-raw buttons/inputs/selects/textareas/details outside approved implementations.
+The [backlog](../../docs/backlog.md) tracks integration gaps: application
+composition, complete home/session/catalog workflows, validation, real
+persistence/drafts and low-priority import/export. The native-control tests reject
+screen-local raw buttons/inputs/selects/textareas/details outside approved implementations.
 
 ## Build and verification
 
@@ -108,9 +106,5 @@ node tools/prove-design-system.ts capture.png output-directory ui
 
 The checker reconstructs every unquantized pixel with the home background/sprite
 palettes and budgets. New compositions and states need new checks; source-color
-membership alone is not a screen proof. Historical capture counts describe
-specific earlier compositions. These checks are not independent emulator runs.
-
-Dedicated private Sites identity: `appgprj_6aee0a1d90d481918bf7a841adbcdd7c`.
-Preserve its owner-private audience and existing application previews. Its source
-repository tracks the GitHub source snapshot plus the isolated build in `dist/`.
+membership alone is not a screen proof. These checks are not independent
+emulator runs.

@@ -1,6 +1,6 @@
 # FitNES
 
-[Product vision](docs/vision.md) · [Backlog](docs/backlog.md) · [Repository inventory](docs/repo-status.md) · [Agent guidance](AGENTS.md)
+[Product vision](docs/vision.md) · [Backlog](docs/backlog.md) · [UI system](src/design-system/README.md) · [Repository inventory](docs/repo-status.md) · [Agent guidance](AGENTS.md)
 
 ## Development
 

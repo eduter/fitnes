@@ -9,22 +9,9 @@ Update the owning document when an owner-approved decision changes.
 ## Interface foundation
 
 Read the [UI system contract](src/design-system/README.md) before any UI work.
-It lists each exported component, when to use it and prohibited patterns.
-Use only the adopted framed-field style; alternative layout APIs are removed.
-Do not introduce native selects/radios/checkboxes/switches or new imitations.
-Missing patterns require a reviewed component, not a screen-local substitute.
-
-No inline expansion/accordions. No pagination inside a modal. Use available
-screen height before paginating page lists. Put notes directly in the editor.
-Do not focus text inputs on dialog open; let the user request text entry.
-Single-choice menus and numeric pads have no visible header. Numeric/multi
-editors end with End; multi checks sit immediately after the label and End is
-bottom-right. Confirmations say Yes/No and retain their subject through closing.
-Atomic edits remain immediate. Native text entry and DateSpinner's rare native
-calendar are approved input exceptions, not blanket web-widget permission.
-
-The nine-color token palette matches the current approved home artwork, not a
-hardware maximum. See the contract's palette explanation before future art work.
+It owns the component registry, composition rules, approved native-input
+exceptions and palette limits. Use its components instead of screen-local
+imitations; missing patterns require a reviewed component before integration.
 
 ## Tech and conventions
 

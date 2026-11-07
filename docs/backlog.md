@@ -1,27 +1,32 @@
 # Backlog
 
-## Design-system review first
+## Design-system foundation
 
-Owner direction (2026-11-06): pause broad UI integration to review the separate
-[design-system foundation](../src/design-system/README.md). Keep #26 open as
-workflow evidence and a source for useful reusable pieces.
+The [UI system contract](../src/design-system/README.md) defines the adopted
+components and composition rules. [PR #26](https://github.com/eduter/fitnes/pull/26)
+remains open for application integration and useful workflow evidence.
 
-- [ ] Review the complete home-image source palette, semantic roles, typography,
-  geometry and restricted component vocabulary in the phone showcase.
-- [ ] Approve/refine action text, editable values and popover choice menus,
-  including on/off choices; identify remaining patterns before screen use.
-- [x] Verify sampled closed-showcase compositions against NES attribute/palette/
-  sprite rules using the home construction; new screens and menu states still
-  require their own proofs.
-- [ ] After the foundation merges, revise #26 using the system while preserving
-  useful app behavior and existing data.
+- [x] Establish shared palette tokens, framed fields, layered windows,
+  date/multiline/membership entry, confirmations and page pagination.
+- [x] Verify sampled overview, editor and nested number-pad compositions against
+  NES attribute/palette/sprite rules using the home construction. New screens
+  and states still require their own proofs.
+- [ ] Revise #26 using the system while preserving useful app behavior and
+  existing data. Integrate the available components before adding patterns.
+- [ ] Build catalog selection with bounded page-level lists and child editors;
+  preserve the selected page/row when a child closes.
+- [ ] Complete home/session workflows, compact workout rows, previous-performance
+  columns and result summaries while preserving measurement/load meanings.
+- [ ] Define composite Create/Save/Cancel flows, including dismissal of unsaved
+  batches. Existing atomic edits remain immediate.
+- [ ] Add field-linked validation and compact empty/loading/error/status examples.
+- [ ] Review native Android refresh behavior on a real device. Page one permits
+  refresh; later pages use downward swipes for previous-page navigation.
 
-See the [PR #26 UI audit](../src/design-system/pr26-audit.md) before further
-integration. Integrate the existing bounded editor, date, multiline, membership, confirmation
-and compact-summary components before inventing new controls. Catalog selection,
-real persistence/draft semantics and validation remain application work;
-import/export is lower priority. Inline expansion and modal pagination are
-prohibited. The adopted vocabulary is documented in the UI system contract.
+Inline expansion and modal pagination are prohibited. Common edit fields and
+notes belong together in a bounded form. Import/export workflow polish remains
+lower priority; preserving real data is still a prerequisite to persistence or
+deployment changes.
 
 ## Integration order
 

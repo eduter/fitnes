@@ -9,7 +9,9 @@ Default focus is the dialog surface. Choice/number components may explicitly
 focus a safe control. Do not focus text inputs automatically on open. The stack
 makes only the top window interactive, and outside/Escape closes that window
 without activating content beneath it. Reverse closing preserves the content
-until animation completes. Inputs own their values; dismissal is not rollback.
+until animation completes. Keep the editor selection separate from its open
+flag so dismissing it does not clear the fields during that animation. Inputs
+own their values; dismissal is not rollback.
 
 Never put PagedWindow inside a dialog. Put common form fields together; place
 notes directly in the form rather than adding an unnecessary nested window.
