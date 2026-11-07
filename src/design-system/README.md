@@ -87,8 +87,9 @@ and membership toggling. Review is a framed navigation field. These examples
 do not implement full home/session persistence.
 
 The [backlog](../../docs/backlog.md) tracks integration gaps: application
-composition, complete home/session/catalog workflows, validation, real
-persistence/drafts and low-priority import/export. The native-control tests reject
+composition/device review, field-linked validation refinements and import/export
+polish. The application now integrates the shared components with real persistence
+and composite drafts; the showcase remains isolated from the application DB. The native-control tests reject
 screen-local raw buttons/inputs/selects/textareas/details outside approved implementations.
 
 ## Build and verification

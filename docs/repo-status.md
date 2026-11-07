@@ -15,8 +15,8 @@ Updated 2026-11-07. Use [the vision](vision.md) for product authority and
   Popover, ConfirmDialog and PagedWindow. The
   [private showcase](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
   demonstrates the adopted vocabulary with temporary in-memory examples;
-  application persistence/integration remains open. Use it for current design
-  review. The older
+  the application integrates those same components with IndexedDB in this
+  branch. Use the showcase for component review. The older
   [controls preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
   remains available as a historical mechanical fixture.
 - [Selected style reference](style-reference.png),
@@ -24,6 +24,22 @@ Updated 2026-11-07. Use [the vision](vision.md) for product authority and
   [original home composition reference](reference-home-screen-image.png).
 - Public PWA icons and component proof routes are build/runtime assets. Keep
   generated proof captures, reports, and ROMs under ignored `work/`.
+
+## Application integration in review
+
+[Private application preview](https://fitnes-app-design-system.eduardo-terroso.chatgpt.site) rebuilds the screens from
+current main while reusing PR #26's repository, model adapters and regression
+coverage. It includes home/start/resume, compact logging with previous results,
+completion/reopening, catalog/template edits, weight history and JSON transfer.
+Page-level catalogs and workout sets adapt their row count to available height;
+child editors preserve the underlying page. New composites remain drafts until
+Create/Save. Existing valid edits persist immediately, with shared confirmations
+for deletion and draft dismissal. The original PR #26 preview is preserved.
+
+The application preview seeds only an unused database. Normal builds never seed
+sample sessions/templates/readings. Schema upgrades retain legacy scaffold rows.
+No deployment or data at another origin is replaced automatically. The corridor
+transition remains deferred; this branch does not claim it is integrated.
 
 ## Retained design sources
 
