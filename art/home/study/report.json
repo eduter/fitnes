@@ -1,0 +1,66 @@
+{
+  "explanation": "Aligned native pixels; Oklab distance lower is better, 8x8 luminance SSIM higher is better. Baseline is a new nine-ink approximation, not a recovered prior logo. Dithering is judged visually too.",
+  "logoNineInkBaseline": {
+    "meanOklabDistance": 0.06685357769633465,
+    "ssim": 0.8829071630913764
+  },
+  "logoNearest": {
+    "meanOklabDistance": 0.06576183013769887,
+    "ssim": 0.935839501829299
+  },
+  "logoDithered": {
+    "meanOklabDistance": 0.0673270529721351,
+    "ssim": 0.9045401741642467
+  },
+  "heroAgainstRetainedArtwork": {
+    "meanOklabDistance": 0.0006066668183666605,
+    "ssim": 0.9998963978689993
+  },
+  "heroChangedPixels": 243,
+  "hardware": {
+    "hero": {
+      "status": "pass",
+      "profile": "mmc5-exattr",
+      "displayPalette": "composite-direct-fbx",
+      "emphasis": 1,
+      "attributeSize": 8,
+      "visibleColors": 12,
+      "sprites": 63,
+      "maxSpritesPerScanline": 8,
+      "problems": []
+    },
+    "warmHero": {
+      "status": "pass",
+      "profile": "mmc5-exattr",
+      "displayPalette": "composite-direct-fbx",
+      "emphasis": 1,
+      "attributeSize": 8,
+      "visibleColors": 12,
+      "sprites": 63,
+      "maxSpritesPerScanline": 8,
+      "problems": []
+    },
+    "logoNearest": {
+      "status": "pass",
+      "profile": "mmc5-exattr",
+      "displayPalette": "composite-direct-fbx",
+      "emphasis": 1,
+      "attributeSize": 8,
+      "visibleColors": 7,
+      "sprites": 0,
+      "maxSpritesPerScanline": 0,
+      "problems": []
+    },
+    "logoDithered": {
+      "status": "pass",
+      "profile": "mmc5-exattr",
+      "displayPalette": "composite-direct-fbx",
+      "emphasis": 1,
+      "attributeSize": 8,
+      "visibleColors": 7,
+      "sprites": 0,
+      "maxSpritesPerScanline": 0,
+      "problems": []
+    }
+  }
+}
