@@ -38,7 +38,7 @@ it('persists the Settings unit and uses it for new readings without relabelling 
     const choices = await view.findByRole('dialog');
     fireEvent.animationEnd(choices, { animationName: 'nes-popover-reveal' });
     fireEvent.click(within(choices).getByRole('button', { name: 'lb' }));
-    fireEvent.animationEnd(choices, { animationName: 'nes-popover-reveal' });
+    fireEvent.animationEnd(choices, { animationName: 'nes-popover-hide' });
     expect(localStorage.getItem('fitnes-mass-unit')).toBe('lb');
     expect(await db.bodyweightMeasurements.toArray()).toEqual(original);
 

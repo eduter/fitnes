@@ -59,7 +59,7 @@ describe('home actions', () => {
         fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Weight (kg)' }));
         fireEvent.submit(within(dialog).getByRole('button', { name: 'Save' }).closest('form') as HTMLFormElement);
         await view.findByText('Recorded 80.2 kg.');
-        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-hide' });
         expect(view.queryByRole('dialog')).toBeNull();
         const reading = await db.bodyweightMeasurements.orderBy('measuredAt').last();
         expect(reading?.value).toBe(80.2);
@@ -78,7 +78,7 @@ describe('home actions', () => {
         fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Weight (kg)' }));
         expect(within(dialog).getByRole('button', { name: 'Weight (kg): 080.2. Edit number' })).toBeTruthy();
         fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-hide' });
         expect(await db.bodyweightMeasurements.count()).toBe(8);
         expect(view.queryByRole('dialog')).toBeNull();
     });
@@ -92,7 +92,7 @@ describe('home actions', () => {
         fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
         fireEvent.keyDown(dialog, { key: 'Escape' });
         expect(dialog.getAttribute('data-phase')).toBe('closing');
-        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-hide' });
         expect(view.queryByRole('dialog')).toBeNull();
         expect(await db.bodyweightMeasurements.count()).toBe(8);
     });

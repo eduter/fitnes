@@ -18,14 +18,15 @@ Import controls from `src/components/Controls/index.ts`.
 | --- | --- | --- |
 | PageTitle / DialogTitle / SectionHeading | Page, editor, and field-group hierarchy | Copper passive text: 32px page title, 16px uppercase dialog title, 16px sentence-case section heading with vertical space. Typography.css is the single style owner. Use semantic h1/h2/h3; item titles remain normal 16px. |
 | DialogActions | Editor footer | Cancel (or No) at left, positive action at right. End alone at right for already-persisted edits. Central copy in dialogActionCopy; no per-screen synonyms. |
+| MoveButton | Reorder an item | Dedicated 16×16 shaft arrow and destination bar. Gold icon with an accessible Move … up/down verb. Disabled at list boundaries. Never reuse it for increments, pagination or navigation; those retain their existing glyphs. |
 | Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. Pointer input belongs only to visible text/icons; layout space stays passive. |
 | OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. There is no layout variant. |
-| MultiPicker | Multiple memberships | Full-width framed summary (two names then +N, or None), with two lines reserved so memberships never resize the field. Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
+| MultiPicker | Multiple memberships | Full-width framed summary (two names then +N, or None), with two lines reserved so memberships never resize the field. Values align at the top; the summary button has no opaque fill over the border. Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
 | Spinner / NumberPad | Quantities, reps, sets, load | Framed fixed-mask value and compact symmetric day-style arrows. Value opens a keyboard-free numeric pad containing digits/keys only, no visible header, and End. Back erases a digit; it is not window navigation. Changes are immediate; End only closes. |
 | DateSpinner | Recording bodyweight dates | Framed YYYY.MM.DD with adjacent-day arrows. Native calendar opens only when the date is pressed, as explicitly approved by the owner. Controlled value is a local YYYY-MM-DD date; day arithmetic avoids DST issues. |
 | TextInput | Names / single-line editable text | Native input inside the adopted frame/legend. Preserve mixed case, text selection, IME and phone keyboard. No corner-bracket alternative. |
 | TextArea | Notes / multiline entry | Put directly on the page or editor, with an appropriate `rows` bound. Native editing/keyboard on deliberate interaction. Do not add a Notes action that opens an extra nested dialog by default. A future truncated-copy/ellipsis editor requires a concrete need and owner review; it is not a second current component variant. |
-| Popover | Choice lists, bounded editors, child windows | Shared cut-corner frame, stepped reveal/reverse close, anchor clamping and modal stack. Only top window is interactive. Outside/Escape closes it and restores parent focus. Default focus is the dialog surface, never the first text input. Explicit safe-control initial focus is supported for choice/number selection. |
+| Popover | Choice lists, bounded editors, child windows | Fixed opaque frame inside a stepped overflow viewport, anchor clamping and modal stack. Only top window is interactive. Outside/Escape closes it and restores parent focus. Default focus is the dialog surface, never the first text input. Explicit safe-control initial focus is supported for choice/number selection. |
 | ConfirmDialog | Destructive confirmation | Message with Yes / No. Only Yes invokes the action. Outside/Escape cancels. Subject is snapshotted at opening and retained through closing. |
 | PagedWindow | Page-level lists that do not fit available height | Footer arrows close to fixed-width page numbers; up/down swipe for next/previous. One brief black redraw (skipped for reduced motion). Never inside a Popover or other dialog; this is checked at runtime. |
 | SteelPanel / BottomTabs | Adopted top-level art/navigation | Separate material assets under their existing component directories. Do not replace the plain field/window frame with SteelPanel everywhere. Full app compositions still need review/proof. |
@@ -149,3 +150,17 @@ Choice menus and number pads keep their specialized layouts.
 Editors default to 224 logical pixels, with eight pixels of internal padding and
 clamping margins on both sides of the app surface. Framed values use whole-pixel
 vertical insets; native single-line text is lifted two pixels above browser centering.
+
+## Motion and ordering
+
+Popover reveals and hides a fixed-size frame through an ordinary overflow
+viewport in whole 16-pixel steps. The copper border and scrolling content do not
+resize during animation. Do not animate clip-path on the framed/scrolling layer:
+the reported Chromium artifact showed page content blinking through covered
+windows. Stacked parent windows retain their frame and footer throughout child
+animations. Pagination belongs only to the underlying page.
+
+MoveButton's shaft arrow points toward a destination bar. It means reorder,
+whereas the small filled spinner triangles mean increment/decrement. Workout
+set rows place Edit, Duplicate, Delete and the two MoveButtons in one nonwrapping
+row with eight-pixel gaps. Keep the full accessible movement verbs on icon buttons.

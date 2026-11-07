@@ -7,7 +7,7 @@ import { placePopover } from './placement.ts';
 import '../../styles/controls.css';
 import './Popover.css';
 
-/** A controlled thin-bordered modal with PR 23's stepped reveal and reversed closing lifecycle. */
+/** A stepped modal viewport around a fixed, opaque frame; closing retains the complete content. */
 function Popover(props: PopoverProps): JSX.Element {
     const [local, rest] = splitProps(props, [
         'open',
@@ -28,12 +28,14 @@ function Popover(props: PopoverProps): JSX.Element {
     ]);
     const [phase, setPhase] = createSignal<PopoverPhase>('closed');
     const [height, setHeight] = createSignal(96);
+    const [closingHeight, setClosingHeight] = createSignal(96);
     let panel: HTMLDivElement | undefined;
+    let frame: HTMLDivElement | undefined;
     let layer: HTMLDivElement | undefined;
     let opener: HTMLElement | undefined;
     let disposed = false;
     const stepPixels = () => local.stepPixels ?? 16;
-    const steps = () => height() / stepPixels();
+    const steps = () => Math.max(1, (phase() === 'closing' ? closingHeight() : height()) / stepPixels());
     const duration = () => `${(steps() * (local.framesPerStep ?? 2) * 1000) / 60}ms`;
 
     function restoreBackground(): void {
@@ -92,17 +94,21 @@ function Popover(props: PopoverProps): JSX.Element {
                     if (disposed || phase() !== 'measuring') {
                         return;
                     }
-                    reveal(Math.max(16, panel?.offsetHeight || 16));
+                    positionPanel();
+                    reveal(Math.max(16, frame?.offsetHeight || 16));
                 });
             }
         } else if (!open && current !== 'closed' && current !== 'closing') {
+            // Reverse from the visible step if dismissal interrupts opening, without resizing the frame.
+            const visible = panel?.offsetHeight ?? height();
+            setClosingHeight(Math.ceil(visible / stepPixels()) * stepPixels());
             setPhase('closing');
         }
     });
 
     /** Convert viewport placement back into the scaled portal's own coordinates. */
     function positionPanel(): void {
-        if (!panel || !layer || phase() === 'closed') {
+        if (!panel || !frame || !layer || phase() === 'closed') {
             return;
         }
         const layerRect = layer.getBoundingClientRect();
@@ -132,7 +138,9 @@ function Popover(props: PopoverProps): JSX.Element {
         const availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
         panel.style.inlineSize = `${Math.min(local.width ?? 224, availableWidth)}px`;
         panel.style.maxBlockSize = `${availableHeight}px`;
-        const size = panel.getBoundingClientRect();
+        frame.style.maxBlockSize = `${availableHeight}px`;
+        // Placement must use the complete frame, never the animated viewport height.
+        const size = frame.getBoundingClientRect();
         const trigger = local.anchor?.() ?? opener;
         const anchor = trigger?.getBoundingClientRect();
         const fallback = {
@@ -174,10 +182,9 @@ function Popover(props: PopoverProps): JSX.Element {
     }
 
     function finishAnimation(event: AnimationEvent): void {
-        if (
-            event.target !== event.currentTarget ||
-            (event.animationName && event.animationName !== 'nes-popover-reveal')
-        ) {
+        // A queued completion from opening must not finish a newly started close, or vice versa.
+        const expected = phase() === 'closing' ? 'nes-popover-hide' : 'nes-popover-reveal';
+        if (event.target !== event.currentTarget || (event.animationName && event.animationName !== expected)) {
             return;
         }
         if (phase() === 'opening') {
@@ -249,7 +256,7 @@ function Popover(props: PopoverProps): JSX.Element {
                     <div
                         {...rest}
                         ref={panel}
-                        class={controlClasses('nes-popover nes-frame nes-control', local)}
+                        class={controlClasses('nes-popover nes-control', local)}
                         role="dialog"
                         aria-modal="true"
                         aria-label={local.label}
@@ -261,12 +268,19 @@ function Popover(props: PopoverProps): JSX.Element {
                             '--nes-popover-steps': String(steps()),
                             '--nes-popover-duration': duration(),
                             '--nes-popover-height': `${height()}px`,
+                            '--nes-popover-close-height': `${closingHeight()}px`,
                         }}
                         onAnimationEnd={finishAnimation}
                         onKeyDown={handleKeys}
                     >
-                        <div class="nes-popover__content" inert={phase() !== 'open'}>
-                            {local.children}
+                        <div
+                            ref={frame}
+                            class="nes-popover__frame nes-frame"
+                            style={{ 'block-size': phase() === 'measuring' ? 'auto' : `${height()}px` }}
+                        >
+                            <div class="nes-popover__content" inert={phase() !== 'open'}>
+                                {local.children}
+                            </div>
                         </div>
                     </div>
                 </div>

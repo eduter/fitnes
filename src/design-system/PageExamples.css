@@ -42,7 +42,7 @@
     white-space: nowrap;
 }
 
-.example-editor > .nes-popover__content > .nes-button {
+.example-editor .nes-popover__content > .nes-button {
     min-block-size: 24px;
 }
 

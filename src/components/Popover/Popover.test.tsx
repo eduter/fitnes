@@ -40,12 +40,12 @@ describe('Popover', () => {
         expect(panel.dataset.phase).toBe('opening');
         expect(panel.style.getPropertyValue('--nes-popover-steps')).toBe('6');
         expect(panel.style.getPropertyValue('--nes-popover-duration')).toBe('200ms');
-        fireEvent.animationEnd(panel, { animationName: 'nes-popover-reveal' });
+        finishAnimation(panel, 'nes-popover-reveal');
         expect(document.activeElement).toBe(panel);
         fireEvent.click(screen.getByRole('button', { name: 'Close' }));
         expect(panel.dataset.phase).toBe('closing');
         expect(screen.getByRole('dialog')).toBe(panel);
-        fireEvent.animationEnd(panel, { animationName: 'nes-popover-reveal' });
+        finishAnimation(panel, 'nes-popover-hide');
         expect(screen.queryByRole('dialog')).toBeNull();
         expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Open' }));
     });
@@ -55,13 +55,13 @@ describe('Popover', () => {
         const panel = screen.getByRole('dialog');
         fireEvent.animationEnd(screen.getByRole('heading'));
         expect(panel.dataset.phase).toBe('opening');
-        fireEvent.animationEnd(panel, { animationName: 'nes-popover-reveal' });
+        finishAnimation(panel, 'nes-popover-reveal');
         screen.getByRole('button', { name: 'Last' }).focus();
         fireEvent.keyDown(document.activeElement ?? panel, { key: 'Tab' });
         expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Close' }));
         fireEvent.keyDown(panel, { key: 'Escape' });
         expect(panel.dataset.phase).toBe('closing');
-        fireEvent.animationEnd(panel, { animationName: 'nes-popover-reveal' });
+        finishAnimation(panel, 'nes-popover-hide');
         expect(screen.queryByRole('dialog')).toBeNull();
     });
 
@@ -127,3 +127,37 @@ it('focuses the dialog rather than opening the text keyboard by default', async 
     fireEvent.animationEnd(dialog);
     expect(document.activeElement).toBe(dialog);
 });
+
+it('keeps the framed content separate from the animated clipping viewport', async () => {
+    example();
+    const dialog = screen.getByRole('dialog');
+    const frame = dialog.querySelector('.nes-popover__frame');
+    expect(frame).not.toBeNull();
+    expect(frame?.classList.contains('nes-frame')).toBe(true);
+    expect(dialog.classList.contains('nes-frame')).toBe(false);
+    fireEvent.animationEnd(dialog);
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+    expect(dialog.querySelector('.nes-popover__frame')).toBe(frame);
+    expect((frame as HTMLElement).style.blockSize).toBe('96px');
+});
+
+it('ignores a queued opening completion after a partially open window starts closing', () => {
+    example();
+    const dialog = screen.getByRole('dialog');
+    Object.defineProperty(dialog, 'offsetHeight', { value: 32 });
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    expect(dialog.dataset.phase).toBe('closing');
+    expect(dialog.style.getPropertyValue('--nes-popover-close-height')).toBe('32px');
+    expect((dialog.querySelector('.nes-popover__frame') as HTMLElement).style.blockSize).toBe('96px');
+    finishAnimation(dialog, 'nes-popover-reveal');
+    expect(screen.getByRole('dialog')).toBe(dialog);
+    finishAnimation(dialog, 'nes-popover-hide');
+    expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+function finishAnimation(target: Element, name: string): void {
+    // JSDOM's generic Event constructor silently drops the AnimationEvent-only animationName.
+    const event = new Event('animationend', { bubbles: true });
+    Object.defineProperty(event, 'animationName', { value: name });
+    fireEvent(target, event);
+}

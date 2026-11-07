@@ -130,7 +130,8 @@ and the [backlog](backlog.md) for next work.
 
 Owner feedback (2026-11-07): exercise editing opens directly in a popover over
 its library row; Edit, Duplicate and Delete fit directly on each exercise row.
-Secondary workout and set actions belong in a More menu. Buttons activate only
+Secondary workout actions belong in a More menu; set actions stay in one row
+with dedicated MoveButton icons for reordering. Buttons activate only
 on their visible gold label or icon, with short verbs and passive black space.
 Use separators between library items, distinguish copper page headings from
 normal text and gold actions, and call the workout library Workouts. Remove the
@@ -155,3 +156,11 @@ on both sides and between their border and fields; multi-choice fields have
 fixed width and reserved summary height. Workout editing uses Back navigation,
 bounded Add/Details editors and secondary More menus. Record weight places Date
 and Weight on one row with Cancel/Save below.
+
+Owner feedback (2026-11-07): Home's frequent action labels have a 16-logical-pixel
+gap for touch separation. Choosing a workout starts it immediately, attaching
+the latest recorded weight at or before the start instant; there is no weight
+choice/confirmation screen. This also applies to workouts without bodyweight
+sets. With no weight history, start without a snapshot. Multi-choice summaries
+align at the top of their fixed field. Popover motion uses a fixed frame behind
+a stepped overflow viewport to address reported Chromium painting artifacts.
