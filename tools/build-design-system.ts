@@ -6,9 +6,10 @@ import solid from 'vite-plugin-solid';
 async function main(): Promise<void> {
     await build({
         configFile: false,
+        base: './',
         root: resolve('src/design-system'),
         plugins: [solid()],
-        build: { outDir: resolve('work/design-system-preview'), emptyOutDir: true },
+        build: { outDir: resolve(process.argv[2] ?? 'work/design-system-preview'), emptyOutDir: true },
     });
 }
 

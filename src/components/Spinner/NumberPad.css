@@ -50,6 +50,8 @@
     gap: 4px 8px;
 }
 .nes-number-pad__keys .nes-button {
+    inline-size: 64px;
+    justify-content: center;
     block-size: 36px;
 }
 .nes-number-pad__announcement {

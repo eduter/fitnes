@@ -72,13 +72,19 @@ corners, rivets, industrial gym scenery, and warm logo/character accents. Adapt
 texture and shading to NES constraints while retaining depth, silhouettes, and
 contrast.
 
+Owner feedback (2026-11-07): preserve the warm orange/skin logo treatment from
+PR #26; do not substitute the gold-only treatment. Carry forward #26's fixed-raster
+border painting fix, including the same runtime path for the copper field/window
+frames, while retaining the editable SVG sources.
+
 Reserve elaborate metal framing for top-level panels. The approved frame uses
 4-pixel metal bars, riveted H-style corners with only the outermost corner
 pixel cut off, and a 2-pixel black surround. The reusable
 [SteelPanel component](../src/components/SteelPanel/README.md) implements this
 border. The [selected bottom tabs](../src/components/BottomTabs/README.md)
 provide the six adopted 24×24 icons and 256×56 steel bar. These components are
-adopted building blocks; full-screen layout and broader typography remain open.
+adopted building blocks; full-screen layouts remain subject to review; shared PageTitle, DialogTitle and
+SectionHeading now own the typography hierarchy.
 
 Use the [final home artwork's indexed palette and emphasis](../art/home/construction.json)
 as the material-color reference for future icons and steel panels. Validate
@@ -122,8 +128,39 @@ corridor art does not implement the transition. See the
 [reference notes and captures](references/README.md) for retained materials,
 and the [backlog](backlog.md) for next work.
 
+Owner feedback (2026-11-07): exercise editing opens directly in a popover over
+its library row; Edit, Duplicate and Delete fit directly on each exercise row.
+Secondary workout actions belong in a More menu; set actions stay in one row
+with dedicated MoveButton icons for reordering. Buttons activate only
+on their visible gold label or icon, with short verbs and passive black space.
+Use separators between library items, distinguish copper page headings from
+normal text and gold actions, and call the workout library Workouts. Remove the
+small FitNES header from all non-home pages.
+
+Steel-frame feedback (2026-11-07): straight edges must repeat the same native tile
+between fixed corners. Render 8×8 PNG edge tiles with repeat-x/repeat-y; do not
+stretch the material artwork to fit the panel.
+
 ## Preview data
 
 Preserve the compact preview's real workout data before clearing storage or
 replacing its deployment. Moving to another origin requires an explicit data
 transfer.
+
+Owner feedback (2026-11-07): page, dialog and section typography are shared,
+documented components. DialogActions centralizes copy and opposing-corner
+placement: Cancel left, Save/Create/Add right; End at right closes existing
+immediate edits. Restore full native DW3 field/window corners with one opaque
+black logical pixel outside the border, including corners. Editors leave room
+on both sides and between their border and fields; multi-choice fields have
+fixed width and reserved summary height. Workout editing uses Back navigation,
+bounded Add/Details editors and secondary More menus. Record weight places Date
+and Weight on one row with Cancel/Save below.
+
+Owner feedback (2026-11-07): Home's frequent action labels have a 16-logical-pixel
+gap for touch separation. Choosing a workout starts it immediately, attaching
+the latest recorded weight at or before the start instant; there is no weight
+choice/confirmation screen. This also applies to workouts without bodyweight
+sets. With no weight history, start without a snapshot. Multi-choice summaries
+align at the top of their fixed field. Popover motion uses a fixed frame behind
+a stepped overflow viewport to address reported Chromium painting artifacts.

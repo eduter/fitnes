@@ -142,6 +142,7 @@ function Spinner(props: SpinnerProps): JSX.Element {
                 open={open()}
                 onOpenChange={setOpen}
                 label={`Edit ${local.label}`}
+                width={240}
                 mount={local.popoverMount}
                 anchor={() => opener}
                 returnFocus={() => opener}

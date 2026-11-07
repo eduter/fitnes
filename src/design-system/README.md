@@ -1,7 +1,10 @@
 # FitNES UI system — implementation contract
 
-[Live private review](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
+[Original foundation review](https://fitnes-design-system.eduardo-terroso.chatgpt.site)
 · [PR #27](https://github.com/eduter/fitnes/pull/27)
+
+[Current PR #28 component review](https://fitnes-app-design-system.eduardo-terroso.chatgpt.site/design-system/)
+includes the Typography page and updated frames/actions.
 
 Read this before implementing screens. The components below are the current
 design vocabulary. Use the framed-field layout and anchored menus consistently;
@@ -13,24 +16,43 @@ Import controls from `src/components/Controls/index.ts`.
 
 | Component | Use | Contract |
 | --- | --- | --- |
-| Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. |
+| PageTitle / DialogTitle / SectionHeading | Page, editor, and field-group hierarchy | Copper passive text: 32px page title, 16px uppercase dialog title, 16px sentence-case section heading with vertical space. Typography.css is the single style owner. Use semantic h1/h2/h3; item titles remain normal 16px. |
+| DialogActions | Editor footer | Cancel (or No) at left, positive action at right. End alone at right for already-persisted edits. Central copy in dialogActionCopy; no per-screen synonyms. |
+| MoveButton | Reorder an item | Dedicated 16×16 shaft arrow and destination bar. Gold icon with an accessible Move … up/down verb. Disabled at list boundaries. Never reuse it for increments, pagination or navigation; those retain their existing glyphs. |
+| Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. Pointer input belongs only to visible text/icons; layout space stays passive. |
 | OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. There is no layout variant. |
-| MultiPicker | Multiple memberships | Framed summary (two names then +N, or None). Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
+| MultiPicker | Multiple memberships | Full-width framed summary (two names then +N, or None), with two lines reserved so memberships never resize the field. Values align at the top; the summary button has no opaque fill over the border. Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
 | Spinner / NumberPad | Quantities, reps, sets, load | Framed fixed-mask value and compact symmetric day-style arrows. Value opens a keyboard-free numeric pad containing digits/keys only, no visible header, and End. Back erases a digit; it is not window navigation. Changes are immediate; End only closes. |
 | DateSpinner | Recording bodyweight dates | Framed YYYY.MM.DD with adjacent-day arrows. Native calendar opens only when the date is pressed, as explicitly approved by the owner. Controlled value is a local YYYY-MM-DD date; day arithmetic avoids DST issues. |
 | TextInput | Names / single-line editable text | Native input inside the adopted frame/legend. Preserve mixed case, text selection, IME and phone keyboard. No corner-bracket alternative. |
 | TextArea | Notes / multiline entry | Put directly on the page or editor, with an appropriate `rows` bound. Native editing/keyboard on deliberate interaction. Do not add a Notes action that opens an extra nested dialog by default. A future truncated-copy/ellipsis editor requires a concrete need and owner review; it is not a second current component variant. |
-| Popover | Choice lists, bounded editors, child windows | Shared cut-corner frame, stepped reveal/reverse close, anchor clamping and modal stack. Only top window is interactive. Outside/Escape closes it and restores parent focus. Default focus is the dialog surface, never the first text input. Explicit safe-control initial focus is supported for choice/number selection. |
+| Popover | Choice lists, bounded editors, child windows | Fixed opaque frame inside a stepped overflow viewport, anchor clamping and modal stack. Only top window is interactive. Outside/Escape closes it and restores parent focus. Default focus is the dialog surface, never the first text input. Explicit safe-control initial focus is supported for choice/number selection. |
 | ConfirmDialog | Destructive confirmation | Message with Yes / No. Only Yes invokes the action. Outside/Escape cancels. Subject is snapshotted at opening and retained through closing. |
 | PagedWindow | Page-level lists that do not fit available height | Footer arrows close to fixed-width page numbers; up/down swipe for next/previous. One brief black redraw (skipped for reduced motion). Never inside a Popover or other dialog; this is checked at runtime. |
 | SteelPanel / BottomTabs | Adopted top-level art/navigation | Separate material assets under their existing component directories. Do not replace the plain field/window frame with SteelPanel everywhere. Full app compositions still need review/proof. |
 
 ## Composition rules
 
-- Use the two-pixel cut-corner copper frame (`.nes-frame`) for
+- Use the two-pixel rounded copper frame with an opaque one-pixel black surround (`.nes-frame`) for
   fields and plain windows. Gold identifies interactive values/actions; copper
   identifies passive text. No gold corner brackets, checkbox boxes, action
   chevrons, browser select/radio/switch presentation or expanding editor rows.
+  Both copper and steel borders use native-size PNGs at runtime to avoid the
+  Android SVG border-image painting bug fixed in #26. Keep the SVGs as editable
+  sources; preserve the raster painting path when integrating the components.
+  `tools/build-field-frame.ts` retains each complete four-pixel corner from
+  `frame-source.png` (the raster of `frame.svg`), then adds the black surround.
+  The border-image corners are five native pixels, never squeezed into a
+  three-pixel slice. Corner tiles stay opaque when covering content behind.
+  SteelPanel uses fixed 8×8 corners and repeated 8×8 straight-edge tiles, with no
+  stretching of the frame artwork.
+- Action buttons size to their text and use a single verb where its meaning is
+  clear. Only the visible label/icon receives pointer input; never turn black
+  padding, a flex row or an item's background into an action target.
+- Page titles use 32px copper type, item names and body copy use 16px type, and
+  actions use 16px gold uppercase type. Separate list rows with a thin steel rule.
+  The FitNES wordmark appears on Home only. The workout library is called
+  Workouts in the interface; storage still uses the existing template records.
 - A popup choice menu contains only options. Multi-choice adds End at the bottom
   right. Numeric pads have no visible header and close with End. Keep accessible
   names even when decorative headers are absent.
@@ -87,15 +109,17 @@ and membership toggling. Review is a framed navigation field. These examples
 do not implement full home/session persistence.
 
 The [backlog](../../docs/backlog.md) tracks integration gaps: application
-composition, complete home/session/catalog workflows, validation, real
-persistence/drafts and low-priority import/export. The native-control tests reject
+composition/device review, field-linked validation refinements and import/export
+polish. The application now integrates the shared components with real persistence
+and composite drafts; the showcase remains isolated from the application DB. The native-control tests reject
 screen-local raw buttons/inputs/selects/textareas/details outside approved implementations.
 
 ## Build and verification
 
 `npm run dev` → `/src/design-system/index.html`.
 `node tools/build-design-system.ts` → `work/design-system-preview/` (no app DB,
-router or service worker). `npm run check` runs lint/types/format/tests;
+router or service worker). The app preview build also includes this isolated
+showcase at `/design-system/`, without exposing it in the product navigation. `npm run check` runs lint/types/format/tests;
 `npm run build` validates the application build.
 
 Capture native 256px/DPR 1 compositions after the font loads and run:
@@ -108,3 +132,35 @@ The checker reconstructs every unquantized pixel with the home background/sprite
 palettes and budgets. New compositions and states need new checks; source-color
 membership alone is not a screen proof. These checks are not independent
 emulator runs.
+
+## Typography and editor actions
+
+Use `PageTitle` through `PageHeader` for a tab/page, `DialogTitle` for an editor,
+and `SectionHeading` for a related field group. These are passive copper text;
+gold uppercase is reserved for actions. Edit their shared stylesheet to revise
+all three levels. The Typography showcase presents the hierarchy and footers.
+
+Use `DialogActions` with `kind="end"` for existing atomic edits: End closes,
+it does not save. New composites use `create`, new list items use `add`, and
+explicit drafts such as weight records use `save`; these include Cancel on the
+left. Destructive confirmations use `confirm` (No / Yes). All labels are owned
+by `dialogActionCopy`; a single change updates every footer using that kind.
+Choice menus and number pads keep their specialized layouts.
+
+Editors default to 224 logical pixels, with eight pixels of internal padding and
+clamping margins on both sides of the app surface. Framed values use whole-pixel
+vertical insets; native single-line text is lifted two pixels above browser centering.
+
+## Motion and ordering
+
+Popover reveals and hides a fixed-size frame through an ordinary overflow
+viewport in whole 16-pixel steps. The copper border and scrolling content do not
+resize during animation. Do not animate clip-path on the framed/scrolling layer:
+the reported Chromium artifact showed page content blinking through covered
+windows. Stacked parent windows retain their frame and footer throughout child
+animations. Pagination belongs only to the underlying page.
+
+MoveButton's shaft arrow points toward a destination bar. It means reorder,
+whereas the small filled spinner triangles mean increment/decrement. Workout
+set rows place Edit, Duplicate, Delete and the two MoveButtons in one nonwrapping
+row with eight-pixel gaps. Keep the full accessible movement verbs on icon buttons.

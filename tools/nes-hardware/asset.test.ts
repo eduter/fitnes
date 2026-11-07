@@ -19,3 +19,16 @@ it('keeps the steel panel inks in the home artwork metal palette with the same e
     expect(panelInks).toHaveLength(4);
     expect(new Set(panelInks)).toEqual(new Set(metalInks));
 });
+
+it('keeps the fixed-size steel border in the approved material palette', () => {
+    const construction = JSON.parse(readFileSync(new URL('../../art/home/construction.json', import.meta.url), 'utf8'));
+    const image = decodePng(readFileSync(new URL('../../src/components/SteelPanel/steel-panel.png', import.meta.url)));
+    const colors = displayColors(construction.emphasis);
+    const expected = construction.palettes[1].map((code: number) => colors[code].join(','));
+    const actual = new Set<string>();
+    for (let offset = 0; offset < image.data.length; offset += 3) {
+        actual.add(Array.from(image.data.subarray(offset, offset + 3)).join(','));
+    }
+    expect([image.width, image.height]).toEqual([18, 18]);
+    expect(actual).toEqual(new Set(expected));
+});

@@ -9,7 +9,7 @@ function OptionPicker(props: OptionPickerProps): JSX.Element {
     const [width, setWidth] = createSignal(64);
     let sizer: HTMLSpanElement | undefined;
     onMount(() => {
-        const measure = () => setWidth((sizer?.offsetWidth ?? 54) + 10);
+        const measure = () => setWidth((sizer?.offsetWidth ?? 54) + 22);
         measure();
         void document.fonts?.ready.then(measure);
     });

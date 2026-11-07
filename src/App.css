@@ -1,38 +1,234 @@
 .app {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-height: 100dvh;
+    height: calc(100dvh / var(--screen-scale));
 }
-
 .app-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
+    flex: none;
+    padding: 8px;
+    text-align: center;
+    color: var(--nes-ink);
+}
+.app-title {
+    line-height: 16px;
+}
+.app--home .app-header {
+    padding: 7px 0;
+}
+.fitnes-logo {
+    filter: url("#logo-palette");
+    display: block;
+    width: 244px;
+    height: 114px;
+    margin: auto;
+}
+.palette-definitions {
+    position: absolute;
+}
+.app-main {
     display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+.page-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.app-tabs {
+    flex: none;
+    height: 56px;
+}
+.page {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 8px;
+    padding: 4px;
+}
+.page-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    padding: var(--space-md) var(--space-lg);
-    border-bottom: 1px solid var(--border);
-    background: var(--bg-primary);
+    justify-content: space-between;
+    gap: 8px;
+    flex: none;
+}
+.page-actions,
+.button-row,
+.inline-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+}
+.stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+.muted {
+    color: var(--nes-ink);
+}
+.card-title,
+.section-title {
+    font-weight: normal;
+}
+.card {
+    padding: 4px 0;
+}
+.paged-list {
+    flex: 1;
+    min-height: 96px;
+}
+.paged-list > .nes-paged-window {
+    height: 100%;
+}
+.paged-list__row {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--nes-muted);
+}
+.paged-list__row p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.paged-list__row .button-row {
+    gap: 12px;
+}
+.editor-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.editor-fields .inline-fields {
+    align-items: end;
+}
+.banner,
+.error-text,
+.error-list {
+    color: var(--nes-error);
+}
+.banner {
+    padding: 4px;
+}
+.error-list {
+    padding-left: 12px;
+    margin: 0;
+}
+.error-list li {
+    margin-bottom: 4px;
+}
+.home-page {
+    flex: 1;
+}
+.home-art {
+    display: block;
+    width: 256px;
+    height: 200px;
+}
+.home-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 8px;
+}
+.home-status {
+    padding: 8px;
+}
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    clip-path: inset(50%);
+    overflow: hidden;
+    white-space: nowrap;
+}
+.session-progress {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.session-progress__track {
+    flex: 1;
+    height: 4px;
+    background: var(--nes-muted);
+}
+.session-progress__bar {
+    height: 100%;
+    background: var(--nes-ink);
+}
+.set-value {
+    white-space: normal;
+    text-align: left;
+}
+.data-page {
+    overflow-y: auto;
+}
+.template-form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-height: 0;
+}
+.set-comparison {
+    display: grid;
+    grid-template-columns: 80px 90px 36px;
+    gap: 2px;
+    align-items: center;
+}
+.set-comparison > span {
+    overflow-wrap: anywhere;
+}
+.set-comparison .nes-button {
+    min-block-size: 24px;
+    padding: 0;
+}
+.page-panel > .steel-panel__frame {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+.page-actions:has(.button-row) {
+    flex-basis: 100%;
+}
+.list-item__title {
+    font-size: 16px;
+    line-height: 16px;
+}
+.paged-list__row .list-item__title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.record-weight__row {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+}
+.record-weight__row > fieldset {
     flex-shrink: 0;
 }
-
-.app-title {
-    margin: 0;
-    font-size: 20px;
-    color: var(--text-heading);
+.action-menu {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 8px;
 }
-
-.app-main {
-    flex: 1 1 auto;
-}
-
-.placeholder {
-    text-align: center;
-    padding: var(--space-xl) var(--space-lg);
-}
-
-.placeholder-text {
-    color: var(--text-muted);
-    margin: 0;
+.paged-list__row .set-actions {
+    flex-wrap: nowrap;
+    gap: 8px;
 }

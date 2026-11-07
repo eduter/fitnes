@@ -74,3 +74,16 @@ describe('Button', () => {
         expect(button.classList.contains('idle')).toBe(false);
     });
 });
+
+it('leaves button layout space passive while the visible label still activates', () => {
+    const action = vi.fn();
+    render(() => <Button onPress={action}>Edit</Button>);
+    const button = screen.getByRole('button', { name: 'Edit' });
+    const emptyPress = new MouseEvent('pointerdown', { bubbles: true, cancelable: true, button: 0 });
+    Object.defineProperty(emptyPress, 'isPrimary', { value: true });
+    fireEvent(button, emptyPress);
+    expect(action).not.toHaveBeenCalled();
+    expect(emptyPress.defaultPrevented).toBe(false);
+    press(button);
+    expect(action).toHaveBeenCalledTimes(1);
+});

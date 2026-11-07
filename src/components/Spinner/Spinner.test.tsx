@@ -140,7 +140,7 @@ describe('Spinner', () => {
         expect(dialog.querySelector('input')).toBeNull();
         press(screen.getByRole('button', { name: 'End' }));
         expect(dialog.dataset.phase).toBe('closing');
-        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-hide' });
         expect(screen.queryByRole('dialog')).toBeNull();
         expect(document.activeElement).toBe(opener);
     });

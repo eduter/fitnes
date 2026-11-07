@@ -18,8 +18,8 @@ const pwa = VitePWA({
         name: 'FitNES',
         short_name: 'FitNES',
         description: 'Personal offline-first workout tracker',
-        theme_color: '#181818',
-        background_color: '#181818',
+        theme_color: '#000000',
+        background_color: '#000000',
         display: 'standalone',
         scope: '/',
         start_url: '/',
@@ -49,7 +49,9 @@ const pwa = VitePWA({
         ],
     },
     workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // The isolated review page has its own HTML rather than the application's router shell.
+        navigateFallbackDenylist: [/^\/design-system(?:\/|$)/],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}'],
     },
 });
 
@@ -68,6 +70,7 @@ export default defineConfig(({ mode }) => ({
         : {}),
     test: {
         environment: 'node',
+        maxWorkers: 2,
         setupFiles: ['src/test/setup.ts'],
     },
 }));

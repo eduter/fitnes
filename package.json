@@ -21,7 +21,8 @@
     "art:corridor": "node tools/build-corridor-art.ts",
     "nes:rom": "node tools/nes-hardware/rom-cli.ts",
     "nes:emulate": "node tools/nes-hardware/emulate.ts",
-    "nes:emulator:setup": "node tools/nes-hardware/setup-emulator.ts"
+    "nes:emulator:setup": "node tools/nes-hardware/setup-emulator.ts",
+    "build:preview": "tsc -b && vite build --mode preview && node tools/build-design-system.ts dist/design-system"
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",

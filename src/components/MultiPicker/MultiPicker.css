@@ -2,18 +2,21 @@
     margin: 0;
     padding: 0 4px;
     min-inline-size: 0;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
 }
 .nes-multi-picker legend {
     padding-inline: 4px;
 }
-.nes-multi-picker > .nes-button {
-    display: block;
+.nes-multi-picker > .nes-button[data-variant="plain"] {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    background: transparent;
     text-align: left;
     white-space: normal;
     overflow-wrap: anywhere;
-    min-block-size: 24px;
+    min-block-size: 32px;
     max-width: 100%;
 }
 .nes-multi-picker__options {
@@ -30,7 +33,7 @@
     grid-template-columns: max-content 8px;
     align-items: center;
     gap: 4px;
-    width: 100%;
+    width: max-content;
 }
 .nes-multi-picker__mark {
     width: 8px;

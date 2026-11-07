@@ -3,6 +3,7 @@
     inset: 0;
     z-index: 100;
     display: block;
+    isolation: isolate;
 }
 
 .nes-popover__backdrop {
@@ -20,30 +21,47 @@
 .nes-popover {
     position: absolute;
     box-sizing: border-box;
-    inline-size: min(240px, calc(100% - 16px));
-    min-block-size: 16px;
-    padding: 4px;
-    background: var(--nes-ground);
+    inline-size: min(224px, calc(100% - 16px));
+    min-block-size: 0;
     outline: none;
-    clip-path: inset(0);
+    /* Clip a fixed frame with ordinary layout; animated clip-path can leak cached page pixels on Chromium. */
+    overflow: hidden;
+    contain: paint;
+}
+.nes-popover__frame {
+    box-sizing: border-box;
+    inline-size: 100%;
+    padding: 8px;
+    background: var(--nes-ground);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 .nes-popover[data-phase="measuring"] {
     visibility: hidden;
 }
-.nes-popover[data-phase="opening"],
-.nes-popover[data-phase="closing"] {
+.nes-popover[data-phase="opening"] {
     animation: nes-popover-reveal var(--nes-popover-motion-duration, var(--nes-popover-duration))
         steps(var(--nes-popover-steps), end) both;
 }
 .nes-popover[data-phase="closing"] {
-    animation-direction: reverse;
+    animation: nes-popover-hide var(--nes-popover-motion-duration, var(--nes-popover-duration))
+        steps(var(--nes-popover-steps), end) both;
 }
 @keyframes nes-popover-reveal {
     from {
-        clip-path: inset(0 0 var(--nes-popover-height) 0);
+        block-size: 0;
     }
     to {
-        clip-path: inset(0);
+        block-size: var(--nes-popover-height);
+    }
+}
+@keyframes nes-popover-hide {
+    from {
+        block-size: var(--nes-popover-close-height);
+    }
+    to {
+        block-size: 0;
     }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -53,6 +71,8 @@
 }
 
 .nes-popover__content {
+    flex: 1;
+    min-block-size: 0;
     max-block-size: 100%;
     overflow-y: auto;
 }

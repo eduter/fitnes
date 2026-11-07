@@ -1,7 +1,3 @@
 .nes-confirm-message {
     margin: 0 0 8px;
 }
-.nes-confirm-actions {
-    display: flex;
-    justify-content: space-between;
-}

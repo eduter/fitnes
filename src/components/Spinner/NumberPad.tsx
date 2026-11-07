@@ -1,5 +1,6 @@
 import { createMemo, createSignal, For, type JSX, Show } from 'solid-js';
 import { Button } from '../Button/Button.tsx';
+import { dialogActionCopy } from '../DialogActions.tsx';
 import { formatMaskedNumber, type NumberMask, replaceNumberDigit } from './numberMask.ts';
 import './NumberPad.css';
 
@@ -83,7 +84,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
                 <Button variant="plain" aria-label="Digit 0" onPress={() => choose(0)}>
                     0
                 </Button>
-                <Button onPress={props.onEnd}>End</Button>
+                <Button onPress={props.onEnd}>{dialogActionCopy.end}</Button>
             </div>
             <output class="nes-number-pad__announcement" aria-live="polite">
                 {props.label}: {formatMaskedNumber(props.value, props.mask)}

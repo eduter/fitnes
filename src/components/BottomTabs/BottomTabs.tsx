@@ -4,7 +4,7 @@ import './BottomTabs.css';
 
 const tabItems = [
     { id: 'home', label: 'Home', icon: new URL('./icons/home.png', import.meta.url).href },
-    { id: 'templates', label: 'Templates', icon: new URL('./icons/templates.png', import.meta.url).href },
+    { id: 'templates', label: 'Workouts', icon: new URL('./icons/templates.png', import.meta.url).href },
     { id: 'exercises', label: 'Exercises', icon: new URL('./icons/exercises.png', import.meta.url).href },
     { id: 'weight', label: 'Weight', icon: new URL('./icons/weight.png', import.meta.url).href },
     { id: 'history', label: 'History', icon: new URL('./icons/history.png', import.meta.url).href },

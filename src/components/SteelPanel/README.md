@@ -16,9 +16,15 @@ Ordinary div attributes and refs pass through; reactive `class` and `classList`
 inputs are merged while preserving the required frame class. Importing the component
 also imports its CSS; it does not depend on the app's stylesheet.
 
-CSS nine-slices the editable **18×18 SVG**: 8px corners stay fixed while the
-straight edges stretch. The SVG is the canonical material source; no generator
-or build step is needed. Its four inks match background palette 1 of the
+CSS draws four fixed **8×8 corner tiles** over four **8×8 edge tiles**, repeated
+horizontally or vertically at native size. Straight segments use the same tile
+throughout; no border artwork is stretched or rescaled to fit a panel. Opaque
+corner tiles cover the edge joins. PNG backgrounds also preserve the Android
+SVG painting workaround.
+
+`node tools/build-steel-panel-tiles.ts` reproduces the tiles from the retained
+18×18 raster. The editable SVG remains the canonical material source, and that
+raster is its exact native-size rendering on black. Its four inks match background palette 1 of the
 [final home artwork](../../../art/home/construction.json), using the documented
 Composite Direct display model with red emphasis (`emphasis: 1`):
 
@@ -57,3 +63,13 @@ node work/nes-checker/tools/nes/cli.ts \
 
 The border uses one four-color background palette and no sprites. Check results
 and preview links belong in the PR; generated screenshots/reports are not source.
+
+For a native (DPR 1), cropped panel screenshot, verify every surround, corner and
+straight-edge pixel against the source artwork with:
+
+```sh
+node tools/verify-steel-panel-capture.ts panel-capture.png
+```
+
+The verifier ignores content inside the frame, so the same check applies to
+empty, content-sized, short and tall panels.

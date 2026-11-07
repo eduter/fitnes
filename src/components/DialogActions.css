@@ -1,0 +1,11 @@
+.nes-dialog-actions {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 8px;
+    width: 100%;
+}
+.nes-dialog-actions > :last-child {
+    margin-inline-start: auto;
+}

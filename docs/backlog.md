@@ -4,22 +4,25 @@
 
 The [UI system contract](../src/design-system/README.md) defines the adopted
 components and composition rules. [PR #26](https://github.com/eduter/fitnes/pull/26)
-remains open for application integration and useful workflow evidence.
+is retained as workflow evidence; its screen implementation is superseded by
+the application integration in this branch.
 
 - [x] Establish shared palette tokens, framed fields, layered windows,
   date/multiline/membership entry, confirmations and page pagination.
 - [x] Verify sampled overview, editor and nested number-pad compositions against
   NES attribute/palette/sprite rules using the home construction. New screens
   and states still require their own proofs.
-- [ ] Revise #26 using the system while preserving useful app behavior and
-  existing data. Integrate the available components before adding patterns.
-- [ ] Build catalog selection with bounded page-level lists and child editors;
+- [x] Rebuild the application using the merged system, reusing useful #26 model
+  and repository behavior. Preserve earlier preview deployments and device data.
+- [x] Build catalog selection with bounded page-level lists and child editors;
   preserve the selected page/row when a child closes.
-- [ ] Complete home/session workflows, compact workout rows, previous-performance
+- [x] Complete home/session workflows, compact workout rows, previous-performance
   columns and result summaries while preserving measurement/load meanings.
-- [ ] Define composite Create/Save/Cancel flows, including dismissal of unsaved
+- [x] Define composite Create/Save/Cancel flows, including dismissal of unsaved
   batches. Existing atomic edits remain immediate.
-- [ ] Add field-linked validation and compact empty/loading/error/status examples.
+- [x] Add compact empty/loading/error/status feedback and validation paths.
+- [ ] Refine field-linked validation and review all imported numeric extremes.
+- [ ] Dogfood the new application on the owner's Android phone; collect UI feedback.
 - [ ] Review native Android refresh behavior on a real device. Page one permits
   refresh; later pages use downward swipes for previous-page navigation.
 
@@ -37,11 +40,11 @@ preview's behavioral role.
 
 - [ ] Preserve preview data and review import/export behavior before changing
   persistence or replacing the current deployment.
-- [ ] Build the application UI around the compact preview's dogfooded workflows
+- [x] Build the application UI around the compact preview's dogfooded workflows
   and the adopted home art, SteelPanel, BottomTabs, and reusable controls.
 - [ ] Review persistence and import/export for validation, atomic replacement,
   and preservation of real data.
-- [ ] Implement compact logging, previous-performance display, and navigation
+- [x] Implement compact logging, previous-performance display, and navigation
   using the preview's behavior as the reference.
 - [ ] Locate and preserve the menu capture's source as a navigation design
   reference; its sequence of a few choices followed by subsequent menus is an
