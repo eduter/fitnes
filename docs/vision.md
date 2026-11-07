@@ -72,6 +72,11 @@ corners, rivets, industrial gym scenery, and warm logo/character accents. Adapt
 texture and shading to NES constraints while retaining depth, silhouettes, and
 contrast.
 
+Owner feedback (2026-11-07): preserve the warm orange/skin logo treatment from
+PR #26; do not substitute the gold-only treatment. Carry forward #26's fixed-raster
+border painting fix, including the same runtime path for the copper field/window
+frames, while retaining the editable SVG sources.
+
 Reserve elaborate metal framing for top-level panels. The approved frame uses
 4-pixel metal bars, riveted H-style corners with only the outermost corner
 pixel cut off, and a 2-pixel black surround. The reusable

@@ -16,6 +16,7 @@
     padding: 7px 0;
 }
 .fitnes-logo {
+    filter: url("#logo-palette");
     display: block;
     width: 244px;
     height: 114px;

@@ -41,7 +41,8 @@ validates before an atomic replacement of the four domain collections. Legacy
 version-1 scaffold workout rows are retained in their store, without automatic
 conversion into the current domain format.
 
-`node tools/build-ui-logo.ts` reproduces the indexed logo from the standalone
-source using the home's first background palette. This avoids browser filter
-rounding and keeps the logo within the same hardware construction as the art.
-Generated Chromium captures and construction reports belong in ignored `work/`.
+The home logo uses the standalone source and the warm orange/skin filter from
+PR #26, restored after owner feedback. Both steel and copper frames use native-size
+PNG assets at runtime to retain the Android border-image painting fix. Editable
+SVG sources remain alongside them. Generated Chromium captures and construction
+reports belong in ignored `work/`.
