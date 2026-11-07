@@ -296,3 +296,8 @@
     align-items: start;
     gap: 8px;
 }
+
+.paged-list__row .set-actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+}

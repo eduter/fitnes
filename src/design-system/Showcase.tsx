@@ -5,6 +5,7 @@ import {
     Button,
     DialogActions,
     DialogTitle,
+    MoveButton,
     OptionPicker,
     PageTitle,
     Popover,
@@ -89,6 +90,11 @@ function Showcase(): JSX.Element {
                                     <p>Body copy and item names</p>
                                     <DialogActions kind="save" onCancel={() => {}} onConfirm={() => {}} />
                                     <DialogActions kind="end" onConfirm={() => {}} />
+                                    <SectionHeading>Move a set</SectionHeading>
+                                    <div class="ds-fields">
+                                        <MoveButton label="Move set up" direction="up" onPress={() => {}} />
+                                        <MoveButton label="Move set down" direction="down" onPress={() => {}} />
+                                    </div>
                                 </section>
                             </Show>
                             <Show when={page() === 'workout'}>

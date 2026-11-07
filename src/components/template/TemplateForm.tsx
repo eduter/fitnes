@@ -12,6 +12,7 @@ import {
     ConfirmDialog,
     DialogActions,
     DialogTitle,
+    MoveButton,
     OptionPicker,
     Popover,
     SectionHeading,
@@ -40,11 +41,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
     const [metadataOpen, setMetadataOpen] = createSignal(false);
     const [deleting, setDeleting] = createSignal<number>();
     const [moreOpen, setMoreOpen] = createSignal(false);
-    const [setMenuOpen, setSetMenuOpen] = createSignal(false);
-    const [menuEntry, setMenuEntry] = createSignal<string>();
-    const menuIndex = () => props.value.sequence.findIndex((entry) => entry.id === menuEntry());
     let moreTrigger: HTMLElement | undefined;
-    let setMenuTrigger: HTMLElement | undefined;
     let trigger: HTMLElement | undefined;
     const selectedSet = () => props.value.sets.find((set) => set.id === editing());
     const selected = () => {
@@ -210,7 +207,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                     return item ? prescriptionSummary(item.prescription, app.massUnit()) : '';
                                 })()}
                             </p>
-                            <div class="button-row">
+                            <div class="button-row set-actions">
                                 <Button
                                     onPress={(event) => {
                                         trigger = event.currentTarget;
@@ -220,15 +217,27 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                 >
                                     Edit
                                 </Button>
+                                <Button onPress={() => duplicateOccurrence(index())}>Duplicate</Button>
                                 <Button
                                     onPress={(event) => {
-                                        setMenuTrigger = event.currentTarget;
-                                        setMenuEntry(id);
-                                        setSetMenuOpen(true);
+                                        trigger = event.currentTarget;
+                                        setDeleting(index());
                                     }}
                                 >
-                                    More
+                                    Delete
                                 </Button>
+                                <MoveButton
+                                    label={`Move set ${index() + 1} up`}
+                                    direction="up"
+                                    disabled={index() === 0}
+                                    onPress={() => moveOccurrence(index(), -1)}
+                                />
+                                <MoveButton
+                                    label={`Move set ${index() + 1} down`}
+                                    direction="down"
+                                    disabled={index() === props.value.sequence.length - 1}
+                                    onPress={() => moveOccurrence(index(), 1)}
+                                />
                             </div>
                         </article>
                     );
@@ -326,52 +335,6 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     <DialogActions kind="end" onConfirm={() => setMoreOpen(false)} />
                 </div>
             </Popover>
-            <Popover
-                open={setMenuOpen()}
-                onOpenChange={setSetMenuOpen}
-                label="Set actions"
-                anchor={() => setMenuTrigger}
-                returnFocus={() => setMenuTrigger}
-                mount={document.getElementById('root') ?? undefined}
-                width={144}
-            >
-                <div class="action-menu">
-                    <Button
-                        onPress={() => {
-                            duplicateOccurrence(menuIndex());
-                            setSetMenuOpen(false);
-                        }}
-                    >
-                        Duplicate
-                    </Button>
-                    <Button
-                        onPress={() => {
-                            setDeleting(menuIndex());
-                        }}
-                    >
-                        Delete
-                    </Button>
-                    <Button
-                        disabled={menuIndex() <= 0}
-                        onPress={() => {
-                            moveOccurrence(menuIndex(), -1);
-                            setSetMenuOpen(false);
-                        }}
-                    >
-                        Up
-                    </Button>
-                    <Button
-                        disabled={menuIndex() >= props.value.sequence.length - 1}
-                        onPress={() => {
-                            moveOccurrence(menuIndex(), 1);
-                            setSetMenuOpen(false);
-                        }}
-                    >
-                        Down
-                    </Button>
-                    <DialogActions kind="end" onConfirm={() => setSetMenuOpen(false)} />
-                </div>
-            </Popover>
             <ConfirmDialog
                 open={deleting() !== undefined}
                 onOpenChange={(open) => {
@@ -384,7 +347,6 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     const index = deleting();
                     if (index !== undefined) {
                         removeOccurrence(index);
-                        setSetMenuOpen(false);
                     }
                 }}
                 trigger={() => trigger}

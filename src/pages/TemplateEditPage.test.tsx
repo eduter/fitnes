@@ -63,3 +63,56 @@ it('adds the chosen exercise and prescription only on Add', async () => {
         });
     });
 });
+
+it('moves a set directly with dedicated arrows and keeps all its actions on the row', async () => {
+    renderWorkout();
+    await screen.findByRole('heading', { name: 'Strength A' });
+    const before = await db.templates.get('preview-strength');
+    const row = within(screen.getByRole('article', { name: 'Set 1', exact: true }));
+    expect(row.queryByRole('button', { name: 'More', exact: true })).toBeNull();
+    expect(row.getByRole('button', { name: 'Move set 1 up' })).toHaveProperty('disabled', true);
+    fireEvent.click(row.getByRole('button', { name: 'Move set 1 down' }));
+    await waitFor(async () =>
+        expect((await db.templates.get('preview-strength'))?.sequence[1].id).toBe(before?.sequence[0].id)
+    );
+    fireEvent.click(
+        within(screen.getByRole('article', { name: 'Set 2', exact: true })).getByRole('button', {
+            name: 'Move set 2 up',
+        })
+    );
+    await waitFor(async () => expect((await db.templates.get('preview-strength'))?.sequence).toEqual(before?.sequence));
+});
+
+it('duplicates and deletes directly from the set row while retaining confirmation', async () => {
+    renderWorkout();
+    await screen.findByRole('heading', { name: 'Strength A' });
+    const count = (await db.templates.get('preview-strength'))?.sequence.length ?? 0;
+    fireEvent.click(
+        within(screen.getByRole('article', { name: 'Set 1', exact: true })).getByRole('button', {
+            name: 'Duplicate',
+            exact: true,
+        })
+    );
+    await waitFor(async () => expect((await db.templates.get('preview-strength'))?.sequence).toHaveLength(count + 1));
+    fireEvent.click(
+        within(screen.getByRole('article', { name: 'Set 2', exact: true })).getByRole('button', {
+            name: 'Delete',
+            exact: true,
+        })
+    );
+    const confirm = await screen.findByRole('dialog', { name: 'Delete set 2?' });
+    fireEvent.animationEnd(confirm);
+    fireEvent.click(within(confirm).getByRole('button', { name: 'No', exact: true }));
+    fireEvent.animationEnd(confirm);
+    expect((await db.templates.get('preview-strength'))?.sequence).toHaveLength(count + 1);
+    fireEvent.click(
+        within(screen.getByRole('article', { name: 'Set 2', exact: true })).getByRole('button', {
+            name: 'Delete',
+            exact: true,
+        })
+    );
+    const next = await screen.findByRole('dialog', { name: 'Delete set 2?' });
+    fireEvent.animationEnd(next);
+    fireEvent.click(within(next).getByRole('button', { name: 'Yes', exact: true }));
+    await waitFor(async () => expect((await db.templates.get('preview-strength'))?.sequence).toHaveLength(count));
+});

@@ -5,6 +5,8 @@ export { ConfirmDialog } from '../ConfirmDialog/ConfirmDialog.tsx';
 export type { DateSpinnerProps } from '../DateSpinner/DateSpinner.tsx';
 export { DateSpinner } from '../DateSpinner/DateSpinner.tsx';
 export { DialogActions, dialogActionCopy } from '../DialogActions.tsx';
+export type { MoveButtonProps } from '../MoveButton.tsx';
+export { MoveButton } from '../MoveButton.tsx';
 export type { MultiPickerProps } from '../MultiPicker/MultiPicker.tsx';
 export { MultiPicker } from '../MultiPicker/MultiPicker.tsx';
 export type { OptionPickerProps, PickerOption } from '../OptionPicker/OptionPicker.tsx';
