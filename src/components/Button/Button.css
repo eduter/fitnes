@@ -1,4 +1,5 @@
 .nes-button {
+    -webkit-tap-highlight-color: transparent;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
