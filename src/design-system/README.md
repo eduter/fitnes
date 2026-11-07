@@ -31,6 +31,9 @@ Import controls from `src/components/Controls/index.ts`.
   fields and plain windows. Gold identifies interactive values/actions; copper
   identifies passive text. No gold corner brackets, checkbox boxes, action
   chevrons, browser select/radio/switch presentation or expanding editor rows.
+  Both copper and steel borders use native-size PNGs at runtime to avoid the
+  Android SVG border-image painting bug fixed in #26. Keep the SVGs as editable
+  sources; preserve the raster painting path when integrating the components.
 - A popup choice menu contains only options. Multi-choice adds End at the bottom
   right. Numeric pads have no visible header and close with End. Keep accessible
   names even when decorative headers are absent.

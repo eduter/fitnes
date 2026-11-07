@@ -1,6 +1,8 @@
 .nes-frame {
     border: 2px solid transparent;
-    border-image: url("./frame.svg") 3 / 3px / 0 stretch;
+    /* Use the same raster painting path as SteelPanel to avoid Android SVG border corruption */
+    border-image: url("./frame.png") 3 / 3px / 0 stretch;
+    image-rendering: pixelated;
     background-color: var(--nes-ground);
     border-radius: 0;
 }
