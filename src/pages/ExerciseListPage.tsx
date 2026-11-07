@@ -1,7 +1,7 @@
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
-import { ExerciseEditor, blankExercise } from '../components/exercise/ExerciseEditor.tsx';
+import { Button, ConfirmDialog } from '../components/Controls/index.ts';
+import { blankExercise, ExerciseEditor } from '../components/exercise/ExerciseEditor.tsx';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { duplicateExercise } from '../domain/duplicateExercise.ts';
@@ -23,12 +23,10 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
     const [creating, setCreating] = createSignal(false);
     const [editorOpen, setEditorOpen] = createSignal(false);
     const [selected, setSelected] = createSignal<ExerciseDefinition>();
-    const [menuOpen, setMenuOpen] = createSignal(false);
     const [deleting, setDeleting] = createSignal(false);
     const [busy, setBusy] = createSignal(false);
     const [status, setStatus] = createSignal('');
     let editorTrigger: HTMLElement | undefined;
-    let menuTrigger: HTMLElement | undefined;
     let handledRoute: string | undefined;
 
     function edit(value: ExerciseDefinition, trigger?: HTMLElement): void {
@@ -63,8 +61,7 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
         }
     });
 
-    async function duplicate(): Promise<void> {
-        const source = selected();
+    async function duplicate(source: ExerciseDefinition, trigger: HTMLElement): Promise<void> {
         if (!source || busy()) {
             return;
         }
@@ -75,8 +72,8 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
             setStatus(result.errors.map((error) => error.message).join('. '));
             return;
         }
-        setMenuOpen(false);
-        edit(result.value, menuTrigger);
+        setReveal(result.value.id);
+        edit(result.value, trigger);
     }
     async function remove(): Promise<void> {
         const source = selected();
@@ -84,7 +81,6 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
             return;
         }
         if (await app.removeExercise(source.id)) {
-            setMenuOpen(false);
             setStatus(`Deleted ${source.name}.`);
         }
     }
@@ -119,14 +115,20 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
                                         Edit
                                     </Button>
                                     <Button
-                                        aria-label={`More for ${item().name}`}
-                                        onPress={(event) => {
-                                            menuTrigger = event.currentTarget;
+                                        aria-label={`Duplicate ${item().name}`}
+                                        disabled={busy()}
+                                        onPress={(event) => void duplicate(item(), event.currentTarget)}
+                                    >
+                                        Duplicate
+                                    </Button>
+                                    <Button
+                                        aria-label={`Delete ${item().name}`}
+                                        onPress={() => {
                                             setSelected(item());
-                                            setMenuOpen(true);
+                                            setDeleting(true);
                                         }}
                                     >
-                                        More
+                                        Delete
                                     </Button>
                                 </div>
                             </article>
@@ -145,24 +147,6 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
                     setStatus(`Created ${value.name}.`);
                 }}
             />
-            <Popover
-                open={menuOpen()}
-                onOpenChange={setMenuOpen}
-                label={`Actions for ${selected()?.name ?? 'exercise'}`}
-                anchor={() => menuTrigger}
-                returnFocus={() => menuTrigger}
-                width={128}
-                mount={document.getElementById('root') ?? undefined}
-            >
-                <div class="exercise-actions">
-                    <Button disabled={busy()} onPress={() => void duplicate()}>
-                        Duplicate
-                    </Button>
-                    <Button disabled={busy()} onPress={() => setDeleting(true)}>
-                        Delete
-                    </Button>
-                </div>
-            </Popover>
             <ConfirmDialog
                 open={deleting()}
                 onOpenChange={setDeleting}

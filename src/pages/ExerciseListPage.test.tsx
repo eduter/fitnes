@@ -59,28 +59,21 @@ it('creates in the popover and leaves cancelled drafts out of storage', async ()
     );
 });
 
-it('keeps delete behind More and a Yes/No confirmation', async () => {
+it('offers direct deletion with a Yes/No confirmation', async () => {
     renderLibrary();
-    fireEvent.click(await screen.findByRole('button', { name: 'More for Air squat' }));
-    const menu = await screen.findByRole('dialog', { name: 'Actions for Air squat' });
-    fireEvent.animationEnd(menu);
-    fireEvent.click(within(menu).getByRole('button', { name: 'Delete', exact: true }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete Air squat' }));
     const confirm = await screen.findByRole('dialog', { name: 'Delete Air squat?' });
     fireEvent.animationEnd(confirm);
     fireEvent.click(within(confirm).getByRole('button', { name: 'No', exact: true }));
     fireEvent.animationEnd(confirm);
     expect(await db.exercises.get('ex-air-squat')).toBeTruthy();
-    expect(screen.getByRole('dialog', { name: 'Actions for Air squat' })).toBe(menu);
+    expect(screen.queryByRole('dialog')).toBeNull();
 });
 
 it('duplicates into an editor without changing the source exercise', async () => {
     renderLibrary();
-    fireEvent.click(await screen.findByRole('button', { name: 'More for Air squat' }));
-    const menu = await screen.findByRole('dialog', { name: 'Actions for Air squat' });
-    fireEvent.animationEnd(menu);
-    fireEvent.click(within(menu).getByRole('button', { name: 'Duplicate', exact: true }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Duplicate Air squat' }));
     const editor = await screen.findByRole('dialog', { name: 'Edit exercise' });
-    fireEvent.animationEnd(menu);
     fireEvent.animationEnd(editor);
     const name = within(editor).getByRole('textbox', { name: 'Name' });
     expect(name).toHaveProperty('value', 'Air squat (copy)');
