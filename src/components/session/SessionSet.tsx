@@ -1,11 +1,13 @@
 import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
 import { massValue } from '../../domain/convertWeight.ts';
-import type { WeightUnit } from '../../domain/units.ts';
 import type { SequenceOccurrence } from '../../domain/lookups.ts';
 import type { ActualResult } from '../../domain/session.ts';
+import type { WeightUnit } from '../../domain/units.ts';
 import { Button, Popover } from '../Controls/index.ts';
+import { DialogActions } from '../DialogActions.tsx';
 import { CompactNumberField } from '../fields.tsx';
+import { DialogTitle } from '../Typography.tsx';
 import { prescriptionSummary } from '../template/prescriptionSummary.ts';
 import {
     formatSetReference,
@@ -68,7 +70,7 @@ function SessionSet(props: SessionSetProps): JSX.Element {
                 mount={document.getElementById('root') ?? undefined}
             >
                 <div class="editor-fields">
-                    <p>{prefix()}</p>
+                    <DialogTitle>{prefix()}</DialogTitle>
                     <Show when={shape()?.load === 'weight'} fallback={<p>{bodyweightMarker(props.draft)}</p>}>
                         <CompactNumberField
                             label={`External ${app.massUnit()}${props.draft?.load.kind === 'external' || props.draft?.load.kind === 'bodyweightExternal' ? (props.draft.load.basis === 'perSide' ? '/side' : '') : ''}`}
@@ -110,7 +112,7 @@ function SessionSet(props: SessionSetProps): JSX.Element {
                             />
                         </div>
                     </Show>
-                    <Button onPress={() => setOpen(false)}>End</Button>
+                    <DialogActions kind="end" onConfirm={() => setOpen(false)} />
                 </div>
             </Popover>
         </article>

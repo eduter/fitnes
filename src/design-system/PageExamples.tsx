@@ -11,6 +11,7 @@ import {
     TextInput,
 } from '../components/Controls/index.ts';
 import { todayDate } from '../components/DateSpinner/date.ts';
+import { DialogActions } from '../components/DialogActions.tsx';
 import './PageExamples.css';
 
 /** A small workout overview demonstrating summaries, actions and layered editors without persistence. */
@@ -171,7 +172,7 @@ function WorkoutExample(props: ExampleProps): JSX.Element {
                                     onChange={(notes) => patch({ notes })}
                                 />
                             </div>
-                            <Button onPress={() => setEditorOpen(false)}>End</Button>
+                            <DialogActions kind="end" onConfirm={() => setEditorOpen(false)} />
                         </>
                     )}
                 </Show>

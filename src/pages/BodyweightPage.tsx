@@ -1,10 +1,12 @@
-import { createSignal, Show, type JSX } from 'solid-js';
+import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
-import { DateField, NumberField } from '../components/fields.tsx';
+import { DialogActions } from '../components/DialogActions.tsx';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
+import { DateField, NumberField } from '../components/fields.tsx';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { DialogTitle } from '../components/Typography.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
 import { formatMass, massValue } from '../domain/convertWeight.ts';
@@ -114,6 +116,7 @@ function BodyweightPage(): JSX.Element {
                 <Show when={editing()}>
                     {(reading) => (
                         <div class="editor-fields">
+                            <DialogTitle>Edit weight</DialogTitle>
                             <NumberField
                                 label={`Weight (${app.massUnit()})`}
                                 min={0.1}
@@ -128,7 +131,7 @@ function BodyweightPage(): JSX.Element {
                                 onChange={(measuredAt) => void edit({ ...reading(), measuredAt })}
                             />
                             <ValidationErrors errors={errors()} />
-                            <Button onPress={() => setEditorOpen(false)}>End</Button>
+                            <DialogActions kind="end" onConfirm={() => setEditorOpen(false)} />
                         </div>
                     )}
                 </Show>

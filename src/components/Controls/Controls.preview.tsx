@@ -1,6 +1,7 @@
 import { createSignal, type JSX, onCleanup, onMount, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { Button } from '../Button/Button.tsx';
+import { DialogActions } from '../DialogActions.tsx';
 import { Popover } from '../Popover/Popover.tsx';
 import { Spinner } from '../Spinner/Spinner.tsx';
 import { SteelPanel } from '../SteelPanel/SteelPanel.tsx';
@@ -115,7 +116,7 @@ function Preview(): JSX.Element {
                                         returnFocus={() => opener}
                                     >
                                         <p class="nes-demo__about">Thin border. Stepped reveal.</p>
-                                        <Button onPress={() => setAbout(false)}>End</Button>
+                                        <DialogActions kind="end" onConfirm={() => setAbout(false)} />
                                     </Popover>
                                 </>
                             )}
