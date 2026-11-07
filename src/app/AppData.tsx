@@ -211,10 +211,15 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
             return parsed;
         }
 
-        return storeRecord(async () => {
+        const result = await storeRecord(async () => {
             await importDatabase(db, parsed.value);
             return parsed;
         }, reloadAll);
+        if (result.ok) {
+            setLoadState('ready');
+            setLoadError(null);
+        }
+        return result;
     }
 
     const value: AppData = {
