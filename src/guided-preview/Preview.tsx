@@ -396,8 +396,7 @@ function Preview(): JSX.Element {
                             }
                         >
                             <p>
-                                Step {index() + 1} of {steps().length} ·{' '}
-                                {current()?.kind === 'rest' ? 'Rest' : 'Current set'}
+                                Step {index() + 1} of {steps().length}
                             </p>
                             <Show when={current()?.kind === 'set'}>
                                 <p>
@@ -412,23 +411,23 @@ function Preview(): JSX.Element {
                                 </p>
                             </Show>
                             <div class="guided-focus">
-                                <p role="status">
-                                    {!started()
-                                        ? 'Ready when you are'
-                                        : done()
-                                          ? current()?.kind === 'rest'
-                                              ? 'Rest complete'
-                                              : 'Set complete'
-                                          : !running()
-                                            ? 'Paused'
-                                            : position().phase === 'prep'
-                                              ? 'Get into position'
-                                              : current()?.kind === 'rest'
-                                                ? 'Rest · time remaining'
-                                                : exercise()?.timed
-                                                  ? 'Time remaining'
-                                                  : 'Reps completed'}
-                                </p>
+                                <Show when={started()}>
+                                    <p role="status">
+                                        {done()
+                                            ? current()?.kind === 'rest'
+                                                ? 'Rest complete'
+                                                : 'Set complete'
+                                            : !running()
+                                              ? 'Paused'
+                                              : position().phase === 'prep'
+                                                ? 'Get into position'
+                                                : current()?.kind === 'rest'
+                                                  ? 'Rest · time remaining'
+                                                  : exercise()?.timed
+                                                    ? 'Time remaining'
+                                                    : 'Reps completed'}
+                                    </p>
+                                </Show>
                                 <div
                                     class="guided-counter"
                                     role="timer"

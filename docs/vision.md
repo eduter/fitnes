@@ -37,7 +37,8 @@ not this sequencing flexibility.
 
 Owner feedback (2026-11-08): make the current exercise name the prominent
 tracking-screen heading. Omit the generic Workout heading and workout name
-during training; they are not useful in the middle of a set.
+during training; they are not useful in the middle of a set. Remove the redundant
+Current set label and the Ready when you are message.
 
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
