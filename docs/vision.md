@@ -23,9 +23,11 @@ on during the guided set so the owner can glance at it.
 For repetition-based sets, support a configurable duration per repetition and
 count repetitions at that pace so the owner can follow along without keeping
 count mentally. This requires a model change to represent the repetition pace.
-The preparation duration, pace configuration scope, pause/interruption behavior,
-and result defaults still need to be decided; this direction does not choose
-them.
+Preparation duration and time per repetition are configurable defaults on
+the exercise, with overrides in the workout. Preparation time varies because
+some exercises take longer to get into position. Extend the data model for
+these settings; timed versus repetition-based measurement is already supported.
+Pause/interruption behavior and result defaults still need to be decided.
 
 The corridor is a between-set interstitial after finishing a set and before
 the next one. It is optional for the first version; the guided current-set

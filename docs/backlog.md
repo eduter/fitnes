@@ -77,8 +77,10 @@ tracking layout.
   timed sets; keep the screen on during the guided set.
 - [ ] Extend the model with configurable duration per repetition and guide
   repetition-based sets with a rep counter running at that pace.
-- [ ] Resolve preparation duration, pace configuration scope, pause/interruption
-  behavior and result defaults before implementing those details.
+- [ ] Add exercise defaults for preparation duration and time per repetition,
+  with workout-level overrides for both settings.
+- [ ] Resolve pause/interruption behavior and result defaults before implementing
+  those details.
 - [ ] Add the corridor as a later between-set interstitial; it is not required
   for the first guided tracking version.
 
