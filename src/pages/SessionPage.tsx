@@ -5,7 +5,7 @@ import { DraftGuard } from '../app/DraftGuard.tsx';
 import { Button, ConfirmDialog } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { GuidedSession } from '../components/session/GuidedSession.tsx';
+import { GuidedSession, updateGuidedDraft } from '../components/session/GuidedSession.tsx';
 import { previousPerformance } from '../components/session/previousPerformance.ts';
 import { SessionSet } from '../components/session/SessionSet.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
@@ -353,6 +353,11 @@ function SessionPage(): JSX.Element {
                                                         )}
                                                         readOnly={readOnly() || busy()}
                                                         onDraftChange={(draft) => {
+                                                            updateGuidedDraft(
+                                                                current().id,
+                                                                draft,
+                                                                effectiveDrafts()[id]
+                                                            );
                                                             setDrafts({ ...drafts(), [id]: draft });
                                                             if (
                                                                 current().results.some(
@@ -410,7 +415,12 @@ function SessionPage(): JSX.Element {
                                             session()?.results.some((result) => result.sequenceEntryId === id) ?? false
                                         );
                                     }}
-                                    onReview={() => setReviewing(true)}
+                                    onReview={(draft) => {
+                                        if (draft) {
+                                            setDrafts({ ...drafts(), [id]: draft });
+                                        }
+                                        setReviewing(true);
+                                    }}
                                     onComplete={(element) => {
                                         trigger = element;
                                         if (loggedCount() < plannedCount()) {

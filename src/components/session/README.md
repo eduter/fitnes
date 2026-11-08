@@ -37,7 +37,10 @@ Start runs preparation then timed work or paced repetitions. Rep counts advance
 after each full configured interval. All phases use fixed slots. Pause freezes
 elapsed time; Resume continues. Wall-clock anchors survive throttling/refresh.
 Transient timers, side selection, manual edits and unlogged performance are
-cached per session step in local storage; failed saves retain them. Validated
+cached per session step in local storage; failed saves retain them.
+Review receives the current guided draft, and edits there update the cached
+draft without resetting its timer or selected side. Manual count corrections
+are tracked independently for each side and survive refresh. Validated
 results and rest completion use IndexedDB. Full database replacement clears
 old transient caches. Clearing a recorded result also clears its cached timer draft. Wake lock is requested when available and reacquired
 when the page becomes visible, with a manual-screen fallback message.

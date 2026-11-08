@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { cleanup, fireEvent, render, screen, waitFor } from '@solidjs/testing-library';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@solidjs/testing-library';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { findOccurrence } from '../../domain/lookups.ts';
 import { draftResultFromPrescription } from '../../domain/recordSession.ts';
@@ -7,7 +7,10 @@ import { rowTemplate } from '../../test/domainFixtures.ts';
 import { GuidedSession } from './GuidedSession.tsx';
 
 beforeEach(() => localStorage.clear());
-afterEach(cleanup);
+afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+});
 
 function setup(perSide = false, saves = true, reps = 8) {
     const plan = rowTemplate();
@@ -63,4 +66,33 @@ it('keeps large imported performance loggable beyond the keypad capacity', async
     const { onLog, draft } = setup(false, true, 100000);
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await waitFor(() => expect(onLog).toHaveBeenCalledWith(draft));
+});
+
+it('preserves a right-side correction made before switching sides and refreshing', async () => {
+    const { draft } = setup(true);
+    fireEvent.click(screen.getByRole('button', { name: 'More', exact: true }));
+    const menu = await screen.findByRole('dialog', { name: 'Workout actions' });
+    fireEvent.animationEnd(menu);
+    fireEvent.click(within(menu).getByRole('button', { name: 'Result', exact: true }));
+    const editor = await screen.findByRole('dialog', { name: 'Edit result' });
+    fireEvent.animationEnd(menu);
+    fireEvent.animationEnd(editor);
+    fireEvent.click(within(editor).getByRole('button', { name: 'Decrease Actual right' }));
+    fireEvent.click(within(editor).getByRole('button', { name: 'End', exact: true }));
+    fireEvent.animationEnd(editor);
+    fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+    cleanup();
+
+    const { onLog } = setup(true);
+    let now = Date.now();
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    now += 8000;
+    fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await waitFor(() =>
+        expect(onLog).toHaveBeenCalledWith({
+            ...draft,
+            measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 8, right: 7 } },
+        })
+    );
 });

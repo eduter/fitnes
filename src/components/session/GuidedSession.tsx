@@ -23,7 +23,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const [now, setNow] = createSignal(Date.now());
     const [side, setSide] = createSignal<'left' | 'right'>(restored?.side ?? 'left');
     const [draft, setDraft] = createSignal<ActualResult | undefined>(restored?.draft ?? props.draft);
-    const [manual, setManual] = createSignal(restored?.manual ?? false);
+    const [manualSides, setManualSides] = createSignal<ManualSides>(restored?.manualSides ?? {});
     const [more, setMore] = createSignal(false);
     const [resultOpen, setResultOpen] = createSignal(false);
     const [busy, setBusy] = createSignal(false);
@@ -62,7 +62,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     };
 
     function setValue(value: number): void {
-        setManual(true);
+        setManualSides({ ...manualSides(), [side()]: true });
         const current = draft();
         if (!current) {
             return;
@@ -138,7 +138,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             return;
         }
         stopForEditor();
-        if (!rest() && started() && !done() && !manual()) {
+        if (!rest() && started() && !done() && !manualSides()[side()]) {
             setValue(skipped ? 0 : timed() ? Math.floor(Math.max(0, elapsed() / 1000 - prep())) : position().reps);
         }
         if (skipped && draft()) {
@@ -147,7 +147,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         }
         if (!skipped && perSide() && side() === 'left') {
             setSide('right');
-            setManual(false);
             reset();
             return;
         }
@@ -169,7 +168,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
 
     createEffect(() => {
         const state: SavedRun = {
-            manual: manual(),
+            manualSides: manualSides(),
             started: started(),
             elapsed: accumulated(),
             anchor: anchor(),
@@ -347,7 +346,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                     <Button
                         onPress={() => {
                             setMore(false);
-                            props.onReview();
+                            props.onReview(draft());
                         }}
                     >
                         Review
@@ -401,7 +400,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                                             value={totalCountValue(value().measurement) ?? 0}
                                             integer={!timed()}
                                             onChange={(count) => {
-                                                setManual(true);
+                                                setManualSides({ ...manualSides(), [side()]: true });
                                                 setDraft(withTotalCount(value(), count));
                                             }}
                                         />
@@ -422,9 +421,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                                                 }
                                                 integer={!timed()}
                                                 onChange={(count) => {
-                                                    if (s === side()) {
-                                                        setManual(true);
-                                                    }
+                                                    setManualSides({ ...manualSides(), [s]: true });
                                                     setDraft(withSideCount(value(), s, count));
                                                 }}
                                             />
@@ -479,18 +476,19 @@ interface GuidedSessionProps {
     nextName?: string;
     unit: WeightUnit;
     onLog: (draft: ActualResult | undefined) => Promise<boolean>;
-    onReview: () => void;
+    onReview: (draft: ActualResult | undefined) => void;
     onComplete: (trigger?: HTMLElement) => void;
     onDelete: (trigger?: HTMLElement) => void;
 }
 interface SavedRun {
     started: boolean;
-    manual?: boolean;
+    manualSides?: ManualSides;
     elapsed: number;
     anchor?: number;
     side: 'left' | 'right';
     draft?: ActualResult;
 }
+type ManualSides = Partial<Record<'left' | 'right', boolean>>;
 
 /** Ignore corrupt/stale local timer state; real performance remains validated in IndexedDB. */
 function restoreRun(key: string, planned: ActualResult | undefined): SavedRun | undefined {
@@ -506,6 +504,19 @@ function restoreRun(key: string, planned: ActualResult | undefined): SavedRun | 
         ) {
             return undefined;
         }
+        const manualSides = raw.manualSides;
+        if (
+            manualSides !== undefined &&
+            (manualSides === null ||
+                typeof manualSides !== 'object' ||
+                Object.entries(manualSides).some(
+                    ([side, manual]) => !['left', 'right'].includes(side) || typeof manual !== 'boolean'
+                ))
+        ) {
+            return undefined;
+        }
+        // Older caches tracked only the current side's correction.
+        raw.manualSides = manualSides ?? (raw.manual === true ? { [raw.side]: true } : {});
         if (planned) {
             const result = actualResult(raw.draft);
             if (
@@ -522,6 +533,31 @@ function restoreRun(key: string, planned: ActualResult | undefined): SavedRun | 
         return raw as SavedRun;
     } catch {
         return undefined;
+    }
+}
+
+/** Update a paused guided draft from Review without discarding its timer or side. */
+function updateGuidedDraft(sessionId: string, draft: ActualResult, previous: ActualResult | undefined): void {
+    const key = `fitnes-guided:${sessionId}:${draft.sequenceEntryId}`;
+    const saved = restoreRun(key, draft);
+    const before = saved?.draft ?? previous;
+    const manualSides = { ...saved?.manualSides };
+    for (const side of ['left', 'right'] as const) {
+        const old = before?.measurement;
+        const next = draft.measurement;
+        const oldCount = old?.countBasis === 'perSide' ? old.sides[side] : old && totalCountValue(old);
+        const nextCount = next.countBasis === 'perSide' ? next.sides[side] : totalCountValue(next);
+        if (oldCount !== nextCount) {
+            manualSides[side] = true;
+        }
+    }
+    try {
+        localStorage.setItem(
+            key,
+            JSON.stringify({ started: false, elapsed: 0, side: 'left', ...saved, manualSides, draft })
+        );
+    } catch {
+        /* Review's in-memory draft remains available when local storage is disabled */
     }
 }
 /** Keep large imported results loggable even beyond the shared five-digit keypad capacity. */
@@ -563,4 +599,4 @@ function clock(seconds: number): string {
     return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-export { GuidedSession };
+export { GuidedSession, updateGuidedDraft };
