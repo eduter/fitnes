@@ -81,6 +81,10 @@ tracking layout.
   with workout-level overrides for both settings.
 - [ ] Resolve pause/interruption behavior and result defaults before implementing
   those details.
+- [ ] Preserve arbitrary individual-set order in editing and tracking, including
+  circuits and supersets; do not regroup execution by exercise.
+- [ ] Design configurable rest between sets to reflect sequence and workload;
+  resolve its model placement and configuration separately from preparation time.
 - [ ] Add the corridor as a later between-set interstitial; it is not required
   for the first guided tracking version.
 

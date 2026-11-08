@@ -29,6 +29,18 @@ some exercises take longer to get into position. Extend the data model for
 these settings; timed versus repetition-based measurement is already supported.
 Pause/interruption behavior and result defaults still need to be decided.
 
+Owner clarification (2026-11-08): preserve the workout as an arbitrarily
+ordered sequence of individual sets. Circuits, supersets and any interleaving
+must be possible; do not regroup sets by exercise or change their execution
+order in the tracking UI. Focusing on the current set changes presentation,
+not this sequencing flexibility.
+
+Support flexible rest time between sets. The required rest depends on the
+surrounding sequence and workload, including the exercise coming next; one
+fixed rest duration per exercise is insufficient. Where rest belongs in the
+model and how it is configured remain open decisions. Do not conflate rest
+between sets with the preparation countdown before starting a set.
+
 The corridor is a between-set interstitial after finishing a set and before
 the next one. It is optional for the first version; the guided current-set
 experience takes priority. Later, use top-down character movement between
