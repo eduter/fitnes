@@ -98,6 +98,13 @@ from PR #30. Keep only the original reference and current app image for each
 asset; older app versions belong in Git history, drafts and backups in ignored
 `work/`. Editor Save artwork explicitly replaces the current asset after proof.
 
+Owner decision (2026-11-08): the installed PWA icon uses the exact 90×90 crop
+of the current home artwork at (83, 65), with the rack near the top and sneakers
+near the bottom. Preserve its pixels and palette with nearest-neighbor scaling;
+ship opaque square artwork and let Android apply its launcher mask. The wordmark
+continues to identify the app on Home. `npm run generate:icons` regenerates the
+launcher assets and favicons from the hero via `tools/build-pwa-icons.ts`.
+
 Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 as a navigation design reference: show a few choices, then expose further
 options through subsequent menus, keeping workout interaction quick. It is an
