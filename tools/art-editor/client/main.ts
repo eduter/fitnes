@@ -12,7 +12,9 @@ import type { EditorConfig, VerificationResult } from '../protocol.ts';
 import './style.css';
 
 async function main(): Promise<void> {
-    const response = await fetch('/api/config');
+    const chosen = new URL(location.href).searchParams.get('asset') ?? 'home';
+    const api = (path: string) => `${path}?asset=${encodeURIComponent(chosen)}`;
+    const response = await fetch(api('/api/config'));
     if (!response.ok) {
         throw new Error('Could not open the local editor');
     }
@@ -36,7 +38,10 @@ async function main(): Promise<void> {
     let tool: 'pencil' | 'fill' | 'select' | 'pick' = 'fill';
     let previousTool: 'pencil' | 'fill' | 'select' = 'fill';
     let stroke: { pixels: Uint8Array; last: { x: number; y: number }; color: number } | null = null;
-    let from = 56;
+    let from =
+        config.assetId === 'home'
+            ? 56
+            : (config.colors.find((color) => color.group === 'current' && color.code !== 15)?.code ?? 15);
     let to = 32;
     let active: 'from' | 'to' = 'to';
     let selection: Region | null = null;
@@ -45,6 +50,7 @@ async function main(): Promise<void> {
     let floating: { patch: PixelPatch; left: number; top: number } | null = null;
     let pasteDrag: { x: number; y: number } | null = null;
     let zoom = 3;
+    const zoomMax = Math.min(64, Math.floor(4096 / config.width), Math.floor(3200 / config.height));
     let regions: Region[] = [];
     let timer: ReturnType<typeof setTimeout>;
     let controller: AbortController | null = null;
@@ -114,7 +120,7 @@ async function main(): Promise<void> {
     element('cancel-paste').onclick = cancelPaste;
     element('replace').onclick = () => {
         if (selection) {
-            commit(replaceRegion(history.pixels, 256, selection, from, to), 'Replace in selection');
+            commit(replaceRegion(history.pixels, config.width, selection, from, to), 'Replace in selection');
         }
     };
     element('undo').onclick = undo;
@@ -151,7 +157,7 @@ async function main(): Promise<void> {
             .catch(() => notify('Select and copy the commands in the save dialog.'));
     };
     element('export').onclick = () => {
-        window.location.assign(`/api/export?revision=${revision}`);
+        window.location.assign(`${api('/api/export')}&revision=${revision}`);
     };
     element('open').onclick = () => element<HTMLInputElement>('file').click();
     element<HTMLInputElement>('file').onchange = async (event) => {
@@ -167,11 +173,11 @@ async function main(): Promise<void> {
             const project = JSON.parse(await file.text());
             if (
                 project.format !== 'fitnes-art-editor-v1' ||
-                project.width !== 256 ||
-                project.height !== 200 ||
+                project.width !== config.width ||
+                project.height !== config.height ||
                 project.emphasis !== config.emphasis
             ) {
-                throw new Error('Choose a FitNES artwork editor project for the 256×200 hero');
+                throw new Error(`Choose a project for this ${config.width}×${config.height} asset`);
             }
             commit(decode(project.pixels), 'Open project');
             if (project.baselineHash !== config.baselineHash) {
@@ -200,7 +206,7 @@ async function main(): Promise<void> {
             movePaste(point.x - pasteDrag.x, point.y - pasteDrag.y);
             return;
         }
-        const source = history.pixels[point.y * 256 + point.x];
+        const source = history.pixels[point.y * config.width + point.x];
         if (tool === 'pick' || event.altKey) {
             const pickingFrom = selection !== null || (tool === 'pick' ? previousTool === 'select' : tool === 'select');
             if (pickingFrom) {
@@ -218,7 +224,7 @@ async function main(): Promise<void> {
         }
         if (tool === 'fill') {
             from = source;
-            commit(floodFill(history.pixels, 256, point.x, point.y, to), 'Bucket fill');
+            commit(floodFill(history.pixels, config.width, point.x, point.y, to), 'Bucket fill');
             renderControls();
             return;
         }
@@ -231,7 +237,7 @@ async function main(): Promise<void> {
             element<HTMLButtonElement>('export').disabled = true;
             setStatus('checking', 'Drawing…', 'Release the pencil to check this stroke.');
             stroke = {
-                pixels: paintLine(history.pixels, 256, point.x, point.y, point.x, point.y, to),
+                pixels: paintLine(history.pixels, config.width, point.x, point.y, point.x, point.y, to),
                 last: point,
                 color: to,
             };
@@ -252,7 +258,15 @@ async function main(): Promise<void> {
         }
         if (stroke) {
             const point = position(event);
-            stroke.pixels = paintLine(stroke.pixels, 256, stroke.last.x, stroke.last.y, point.x, point.y, stroke.color);
+            stroke.pixels = paintLine(
+                stroke.pixels,
+                config.width,
+                stroke.last.x,
+                stroke.last.y,
+                point.x,
+                point.y,
+                stroke.color
+            );
             stroke.last = point;
             render(stroke.pixels);
             return;
@@ -388,9 +402,53 @@ async function main(): Promise<void> {
             renderOverlay();
         }
     });
+    const picker = element<HTMLSelectElement>('artwork');
+    for (const asset of config.assets) {
+        const option = document.createElement('option');
+        option.value = asset.id;
+        option.textContent = asset.label;
+        picker.append(option);
+    }
+    picker.value = config.assetId;
+    picker.onchange = () => {
+        saveBackup();
+        location.assign(`/?asset=${encodeURIComponent(picker.value)}`);
+    };
+    for (const canvas of [art, overview]) {
+        canvas.width = config.width;
+        canvas.height = config.height;
+    }
+    document.documentElement.style.setProperty('--art-width', String(config.width));
+    document.documentElement.style.setProperty('--art-height', String(config.height));
+    const previewScale = Math.max(1, Math.floor(Math.min(256 / config.width, 200 / config.height)));
+    for (const preview of document.querySelectorAll<HTMLElement>('aside img, aside canvas')) {
+        preview.style.width = `${config.width * previewScale}px`;
+        preview.style.height = `${config.height * previewScale}px`;
+        preview.style.margin = 'auto';
+    }
+    element<HTMLImageElement>('concept-preview').style.imageRendering =
+        config.assetId === 'home' || config.assetId === 'logo' ? 'auto' : 'pixelated';
+    element<HTMLImageElement>('concept-preview').src = api('/assets/concept.png');
+    element<HTMLImageElement>('current-preview').src = api('/assets/current.png');
+    element('saved-directory').textContent = config.saveDirectory;
+    element('save').title = `Save verified artwork to ${config.saveDirectory} for committing`;
+    if (config.assetId !== 'home') {
+        element('reference-caption').textContent = 'Reference image';
+        element('current-caption').textContent = 'Repository image';
+    }
     render();
+    setZoom(
+        Math.max(config.width, config.height) <= 64
+            ? Math.floor(
+                  Math.min((viewport.clientWidth - 24) / config.width, (viewport.clientHeight - 24) / config.height)
+              )
+            : 3
+    );
     schedule();
 
+    function decode(value: unknown): Uint8Array {
+        return parsePixels(value, config.width * config.height);
+    }
     function commit(pixels: Uint8Array, label: string): void {
         if (!history.commit(pixels, label)) {
             return;
@@ -451,7 +509,7 @@ async function main(): Promise<void> {
         if (floating) {
             clipboard = { ...floating.patch, pixels: floating.patch.pixels.slice() };
         } else if (selection) {
-            clipboard = copyRegion(history.pixels, 256, selection);
+            clipboard = copyRegion(history.pixels, config.width, selection);
         }
         renderControls();
     }
@@ -462,8 +520,8 @@ async function main(): Promise<void> {
         if (floating) {
             placePaste();
         }
-        const left = Math.min(256 - clipboard.width, (selection?.left ?? 0) + (selection?.width ?? 0));
-        const top = Math.min(200 - clipboard.height, selection?.top ?? 0);
+        const left = Math.min(config.width - clipboard.width, (selection?.left ?? 0) + (selection?.width ?? 0));
+        const top = Math.min(config.height - clipboard.height, selection?.top ?? 0);
         floating = { patch: { ...clipboard, pixels: clipboard.pixels.slice() }, left, top };
         regions = [];
         tool = 'select';
@@ -485,8 +543,8 @@ async function main(): Promise<void> {
         if (!floating) {
             return;
         }
-        floating.left = Math.max(0, Math.min(256 - floating.patch.width, left));
-        floating.top = Math.max(0, Math.min(200 - floating.patch.height, top));
+        floating.left = Math.max(0, Math.min(config.width - floating.patch.width, left));
+        floating.top = Math.max(0, Math.min(config.height - floating.patch.height, top));
         render();
     }
     function placePaste(): void {
@@ -497,7 +555,7 @@ async function main(): Promise<void> {
         floating = null;
         pasteDrag = null;
         selection = { left: placed.left, top: placed.top, width: placed.patch.width, height: placed.patch.height };
-        const pixels = pasteRegion(history.pixels, 256, placed.patch, placed.left, placed.top);
+        const pixels = pasteRegion(history.pixels, config.width, placed.patch, placed.left, placed.top);
         if (history.commit(pixels, 'Paste selection')) {
             changed();
         } else {
@@ -546,7 +604,7 @@ async function main(): Promise<void> {
     async function verify(snapshot: Uint8Array, requested: number): Promise<void> {
         controller = new AbortController();
         try {
-            const reply = await fetch('/api/verify', {
+            const reply = await fetch(api('/api/verify'), {
                 method: 'POST',
                 signal: controller.signal,
                 headers: { 'Content-Type': 'application/json', 'X-Editor-Token': config.token },
@@ -608,15 +666,15 @@ async function main(): Promise<void> {
     }
     function render(
         pixels = floating
-            ? pasteRegion(history.pixels, 256, floating.patch, floating.left, floating.top)
+            ? pasteRegion(history.pixels, config.width, floating.patch, floating.left, floating.top)
             : history.pixels
     ): void {
-        const data = new Uint8ClampedArray(256 * 200 * 4);
+        const data = new Uint8ClampedArray(config.width * config.height * 4);
         for (let p = 0; p < pixels.length; p++) {
             data.set(config.colors[pixels[p]].rgb, p * 4);
             data[p * 4 + 3] = 255;
         }
-        const image = new ImageData(data, 256, 200);
+        const image = new ImageData(data, config.width, config.height);
         context?.putImageData(image, 0, 0);
         mini?.putImageData(image, 0, 0);
         renderControls();
@@ -628,6 +686,7 @@ async function main(): Promise<void> {
             element(name).setAttribute('aria-pressed', String(tool === name));
             element<HTMLButtonElement>(name).disabled = !!floating;
         }
+        element<HTMLSelectElement>('artwork').disabled = !!floating || !!stroke;
         art.style.cursor = floating ? (pasteDrag ? 'grabbing' : 'grab') : 'crosshair';
         element<HTMLButtonElement>('copy').disabled = (!selection && !floating) || !!stroke;
         element<HTMLButtonElement>('paste').disabled = !clipboard || !!stroke;
@@ -669,6 +728,12 @@ async function main(): Promise<void> {
             button.append(dot, label);
             button.setAttribute('aria-pressed', String(active === slot));
         }
+        element('select').title = floating
+            ? 'Position the pasted pixels. Drag and release, or use arrows and Enter. Esc cancels.'
+            : 'Drag a rectangle to copy it or replace a color inside it.';
+        element('place-paste').title = floating
+            ? `Place copy at ${floating.left}, ${floating.top} (Enter)`
+            : 'Place copy (Enter)';
         element('color-help').textContent = floating
             ? 'Drag the copy into place, then release.'
             : tool === 'pencil'
@@ -709,11 +774,11 @@ async function main(): Promise<void> {
         element('other-group').hidden = element('other-colors').childElementCount === 0;
     }
     function renderOverlay(): void {
-        if (overlay.width !== 256 * zoom) {
-            overlay.width = 256 * zoom;
+        if (overlay.width !== config.width * zoom) {
+            overlay.width = config.width * zoom;
         }
-        if (overlay.height !== 200 * zoom) {
-            overlay.height = 200 * zoom;
+        if (overlay.height !== config.height * zoom) {
+            overlay.height = config.height * zoom;
         }
         if (!marks) {
             return;
@@ -723,13 +788,13 @@ async function main(): Promise<void> {
             marks.strokeStyle = 'rgba(170,190,220,.18)';
             marks.lineWidth = 1;
             marks.beginPath();
-            for (let x = 0; x <= 256; x++) {
+            for (let x = 0; x <= config.width; x++) {
                 marks.moveTo(x * zoom + 0.5, 0);
-                marks.lineTo(x * zoom + 0.5, 200 * zoom);
+                marks.lineTo(x * zoom + 0.5, config.height * zoom);
             }
-            for (let y = 0; y <= 200; y++) {
+            for (let y = 0; y <= config.height; y++) {
                 marks.moveTo(0, y * zoom + 0.5);
-                marks.lineTo(256 * zoom, y * zoom + 0.5);
+                marks.lineTo(config.width * zoom, y * zoom + 0.5);
             }
             marks.stroke();
         }
@@ -775,7 +840,7 @@ async function main(): Promise<void> {
         }
     }
     function setZoom(next: number, x = viewport.scrollLeft / zoom, y = viewport.scrollTop / zoom): void {
-        const value = Math.min(16, Math.max(1, next));
+        const value = Math.min(zoomMax, Math.max(1, next));
         const old = zoom;
         zoom = value;
         document.documentElement.style.setProperty('--zoom', String(zoom));
@@ -783,7 +848,7 @@ async function main(): Promise<void> {
         viewport.scrollLeft += x * (zoom - old);
         viewport.scrollTop += y * (zoom - old);
         element<HTMLButtonElement>('zoom-out').disabled = zoom === 1;
-        element<HTMLButtonElement>('zoom-in').disabled = zoom === 16;
+        element<HTMLButtonElement>('zoom-in').disabled = zoom === zoomMax;
         renderOverlay();
     }
     function position(event: PointerEvent): { x: number; y: number } {
@@ -799,8 +864,8 @@ async function main(): Promise<void> {
                 JSON.stringify(
                     {
                         format: 'fitnes-art-editor-v1',
-                        width: 256,
-                        height: 200,
+                        width: config.width,
+                        height: config.height,
                         emphasis: config.emphasis,
                         baselineHash: config.baselineHash,
                         pixels: encode(history.pixels),
@@ -814,7 +879,7 @@ async function main(): Promise<void> {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = 'fitnes-hero-project.json';
+        link.download = `fitnes-${config.assetId.replace(/[^a-zA-Z0-9_-]/g, '-')}-project.json`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
     }
@@ -826,7 +891,7 @@ async function main(): Promise<void> {
         const requested = revision;
         element<HTMLButtonElement>('save').disabled = true;
         try {
-            const reply = await fetch('/api/save', {
+            const reply = await fetch(api('/api/save'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-Editor-Token': config.token },
                 body: JSON.stringify({ revision: requested }),
@@ -835,16 +900,16 @@ async function main(): Promise<void> {
             if (!reply.ok) {
                 throw new Error(result.error ?? 'Could not save the artwork');
             }
-            const files = (result.files as string[]).join(' ');
+            const files = (result.files as string[]).map((file) => `'${file.replaceAll("'", "'\"'\"'")}'`).join(' ');
             element('commit-commands').textContent = `art_branch=$(git branch --show-current)
 if [ -z "$art_branch" ] || [ "$art_branch" = main ] || [ "$art_branch" = master ]; then
-  git switch -c "art/home-edit-$(date +%Y%m%d-%H%M%S)"
+  git switch -c "art/edit-$(date +%Y%m%d-%H%M%S)"
 fi
 git add -- ${files}
-git commit --only -m "Edit home artwork" -- ${files}`;
+git commit --only -m "Edit artwork" -- ${files}`;
             savedRevision = requested;
             if (revision === requested) {
-                element('save-state').textContent = 'Saved to art/home/edited/';
+                element('save-state').textContent = `Saved to ${config.saveDirectory}/`;
                 element('save').textContent = 'Saved';
             } else {
                 notify('The checked image was saved. Your newer edits still need checking and saving.');
@@ -867,13 +932,13 @@ function element<T extends HTMLElement = HTMLElement>(id: string): T {
     }
     return node as T;
 }
-function decode(value: unknown): Uint8Array {
-    if (typeof value !== 'string' || value.length > 69000) {
+function parsePixels(value: unknown, count: number): Uint8Array {
+    if (typeof value !== 'string' || value.length > Math.ceil((count * 4) / 3) + 4) {
         throw new Error('Invalid editor pixel data');
     }
     const pixels = Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
-    if (pixels.length !== 51200 || pixels.some((v) => v > 63)) {
-        throw new Error('Expected a 256×200 image using NES color codes');
+    if (pixels.length !== count || pixels.some((v) => v > 63)) {
+        throw new Error(`Expected ${count} native pixels using NES color codes`);
     }
     return pixels;
 }

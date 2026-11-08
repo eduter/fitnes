@@ -3,9 +3,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, statSync, writeFileSyn
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join, resolve, sep } from 'node:path';
 import { displayColors } from '../nes-hardware/check.ts';
-import { decodePng } from '../nes-hardware/png.ts';
-import type { HardwareConstruction } from '../nes-hardware/rom.ts';
-import { imageCodes } from './compile.ts';
+import { type ArtworkAsset, listArtwork } from './assets.ts';
 import type { EditorConfig, VerificationResult } from './protocol.ts';
 import { saveArtwork } from './save.ts';
 import { createVerifier, type VerifiedArtifact } from './verification.ts';
@@ -32,14 +30,45 @@ const NAMES = new Map([
 ]);
 const CANDIDATES = [32, 54, 12, 60, 61, 23, 8, 22, 49];
 
-/** Create a loopback-only editor server with versioned drafts and serialized emulator checks. */
+/** Create a loopback-only editor with isolated state and proof queues for each repository asset. */
 function createEditorServer(root: string, corePath: string): Server {
-    const seed = JSON.parse(readFileSync(join(root, 'art/home/construction.json'), 'utf8')) as HardwareConstruction;
-    const currentFile = readFileSync(join(root, 'art/home/gym.png'));
+    const assets = listArtwork(root);
+    const handlers = new Map<string, ReturnType<typeof createAssetHandler>>();
+    return createServer((request, response) => {
+        void (async () => {
+            const id = new URL(request.url ?? '/', 'http://localhost').searchParams.get('asset') ?? 'home';
+            const asset = assets.find((entry) => entry.id === id);
+            if (!asset) {
+                json(response, 404, { error: 'Unknown artwork asset' });
+                return;
+            }
+            let handler = handlers.get(id);
+            if (!handler) {
+                handler = createAssetHandler(root, corePath, asset, assets);
+                handlers.set(id, handler);
+            }
+            await handler(request, response);
+        })().catch((error) => {
+            if (!response.headersSent && !response.destroyed) {
+                json(response, 400, { error: error instanceof Error ? error.message : String(error) });
+            }
+        });
+    });
+}
+
+function createAssetHandler(
+    root: string,
+    corePath: string,
+    asset: ArtworkAsset,
+    assets: ArtworkAsset[]
+): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
+    const seed = asset.seed;
+    const currentFile = Buffer.from(asset.image);
     const baselineHash = createHash('sha256').update(currentFile).update(JSON.stringify(seed)).digest('hex');
-    const original = imageCodes(decodePng(currentFile), seed);
+    const original = asset.pixels;
+    const count = asset.width * asset.height;
     const token = randomBytes(24).toString('hex');
-    const work = join(root, 'work/art-editor');
+    const work = join(root, asset.workDirectory);
     const draftPath = join(work, 'draft.json');
     mkdirSync(work, { recursive: true });
     let pixels: Uint8Array = original.slice();
@@ -53,43 +82,42 @@ function createEditorServer(root: string, corePath: string): Server {
             if (draft.baselineHash !== baselineHash) {
                 throw new Error('The source artwork changed');
             }
-            pixels = decodePixels(draft.pixels);
+            pixels = decodePixels(draft.pixels, count);
             if (draft.lastVerified) {
-                lastVerified = decodePixels(draft.lastVerified);
+                lastVerified = decodePixels(draft.lastVerified, count);
             }
             updatedAt = typeof draft.updatedAt === 'number' ? draft.updatedAt : 0;
         } catch {
             // Preserve a corrupt or older-source draft instead of overwriting the user's work
             const backup = `draft-backup-${Date.now()}.json`;
             renameSync(draftPath, join(work, backup));
-            recoveryMessage = `An older or unreadable draft was preserved as work/art-editor/${backup}. Starting from the app image.`;
+            recoveryMessage = `An older or unreadable draft was preserved as ${asset.workDirectory}/${backup}. Starting from the app image.`;
         }
-    } else if (existsSync(join(root, 'art/home/edited/project.json'))) {
-        const savedPath = join(root, 'art/home/edited/project.json');
+    } else if (existsSync(join(root, asset.saveDirectory, 'project.json'))) {
+        const savedPath = join(root, asset.saveDirectory, 'project.json');
         try {
             const saved = JSON.parse(readFileSync(savedPath, 'utf8'));
             if (saved.baselineHash !== baselineHash || saved.emphasis !== seed.emphasis) {
                 throw new Error('Different source');
             }
-            pixels = decodePixels(saved.pixels);
+            pixels = decodePixels(saved.pixels, count);
             updatedAt = statSync(savedPath).mtimeMs;
         } catch {
-            recoveryMessage =
-                'The saved artwork uses another source version. It remains in art/home/edited/project.json and can be opened with File → Open backup.';
+            recoveryMessage = `Saved artwork from another source remains in ${asset.saveDirectory}/project.json; use File → Open backup.`;
         }
     }
-    const verifier = createVerifier(root, corePath, seed);
+    const verifier = createVerifier(
+        root,
+        corePath,
+        seed,
+        { width: asset.width, height: asset.height },
+        asset.workDirectory
+    );
     let queue = Promise.resolve();
     let artifact: VerifiedArtifact | null = null;
     let artifactRevision = -1;
 
-    return createServer((request, response) => {
-        void handle(request, response).catch((error) => {
-            if (!response.headersSent && !response.destroyed) {
-                json(response, 400, { error: error instanceof Error ? error.message : String(error) });
-            }
-        });
-    });
+    return handle;
 
     async function handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
         const host = request.headers.host ?? '';
@@ -106,6 +134,12 @@ function createEditorServer(root: string, corePath: string): Server {
             const currentCodes = new Set(original);
             const config: EditorConfig = {
                 token,
+                assetId: asset.id,
+                assetLabel: asset.label,
+                width: asset.width,
+                height: asset.height,
+                saveDirectory: asset.saveDirectory,
+                assets: assets.map(({ id, label }) => ({ id, label })),
                 baselineHash,
                 emphasis: seed.emphasis,
                 revision,
@@ -134,7 +168,7 @@ function createEditorServer(root: string, corePath: string): Server {
                 return;
             }
             const body = JSON.parse(await readBody(request));
-            const edit = decodePixels(body.pixels);
+            const edit = decodePixels(body.pixels, count);
             if (!Number.isSafeInteger(body.revision) || body.revision < 0) {
                 throw new Error('Invalid edit revision');
             }
@@ -192,7 +226,7 @@ function createEditorServer(root: string, corePath: string): Server {
                 });
                 return;
             }
-            const files = saveArtwork(root, artifact, baselineHash, seed.emphasis, pixels);
+            const files = saveArtwork(root, artifact, baselineHash, seed.emphasis, pixels, asset);
             json(response, 200, { revision, files });
             return;
         }
@@ -220,7 +254,7 @@ function createEditorServer(root: string, corePath: string): Server {
             return;
         }
         if (url.pathname === '/assets/concept.png') {
-            send(response, readFileSync(join(root, 'docs/reference-home-screen-image.png')), '.png');
+            send(response, readFileSync(join(root, asset.reference)), '.png');
             return;
         }
         const base = resolve(root, 'work/art-editor-ui');
@@ -249,13 +283,13 @@ function createEditorServer(root: string, corePath: string): Server {
 }
 
 /** Validate canonical base64 and the exact native six-bit pixel buffer. */
-function decodePixels(value: unknown): Uint8Array {
-    if (typeof value !== 'string' || value.length > 69000) {
+function decodePixels(value: unknown, count = 51200): Uint8Array {
+    if (typeof value !== 'string' || value.length > Math.ceil((count * 4) / 3) + 4) {
         throw new Error('Expected native editor pixels');
     }
     const bytes = Buffer.from(value, 'base64');
-    if (bytes.length !== 51200 || bytes.toString('base64') !== value || bytes.some((v) => v > 63)) {
-        throw new Error('Pixels must contain exactly 51,200 six-bit NES colors');
+    if (bytes.length !== count || bytes.toString('base64') !== value || bytes.some((v) => v > 63)) {
+        throw new Error(`Pixels must contain exactly ${count.toLocaleString('en-US')} six-bit NES colors`);
     }
     return new Uint8Array(bytes);
 }

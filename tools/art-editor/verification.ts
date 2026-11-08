@@ -5,6 +5,7 @@ import { join } from 'node:path';
 import { promisify } from 'node:util';
 import { encodePng } from '../nes-hardware/png.ts';
 import type { HardwareConstruction } from '../nes-hardware/rom.ts';
+import { assetPng, framePixels } from './assets.ts';
 import { compilePixels, rgbImage } from './compile.ts';
 import type { VerificationResult } from './protocol.ts';
 
@@ -21,7 +22,9 @@ interface VerifiedArtifact {
 function createVerifier(
     root: string,
     corePath: string,
-    seed: HardwareConstruction
+    seed: HardwareConstruction,
+    size = { width: seed.width, height: seed.height },
+    workDirectory = 'work/art-editor'
 ): {
     verify: (
         pixels: Uint8Array,
@@ -29,7 +32,7 @@ function createVerifier(
     ) => Promise<{ result: VerificationResult; artifact?: VerifiedArtifact }>;
 } {
     const cache = new Map<string, VerifiedArtifact>();
-    const directory = join(root, 'work/art-editor/checks');
+    const directory = join(root, workDirectory, 'checks');
     mkdirSync(directory, { recursive: true });
 
     async function verify(
@@ -37,7 +40,8 @@ function createVerifier(
         revision: number
     ): Promise<{ result: VerificationResult; artifact?: VerifiedArtifact }> {
         const started = performance.now();
-        const image = encodePng(rgbImage(pixels, seed.emphasis));
+        const image = encodePng(rgbImage(framePixels(pixels, size.width, size.height, seed.height), seed.emphasis));
+        const nativeImage = assetPng(pixels, size.width, size.height, seed.emphasis);
         const imageHash = createHash('sha256').update(image).digest('hex');
         const result: VerificationResult = {
             revision,
@@ -47,7 +51,7 @@ function createVerifier(
             elapsedMs: 0,
             imageHash,
         };
-        const proof = compilePixels(pixels, seed);
+        const proof = compilePixels(framePixels(pixels, size.width, size.height, seed.height), seed);
         if (!proof.ok) {
             return {
                 result: {
@@ -89,6 +93,7 @@ function createVerifier(
         }
         const job = mkdtempSync(join(directory, 'check-'));
         writeFileSync(join(job, 'image.png'), image);
+        writeFileSync(join(job, 'asset.png'), nativeImage);
         writeFileSync(join(job, 'construction.json'), JSON.stringify(proof.construction));
         try {
             await run(
@@ -112,6 +117,12 @@ function createVerifier(
             ) {
                 throw new Error('The emulator did not reproduce these exact image and core bytes');
             }
+            Object.assign(report, {
+                assetSha256: createHash('sha256').update(nativeImage).digest('hex'),
+                assetWidth: size.width,
+                assetHeight: size.height,
+            });
+            writeFileSync(join(job, 'report.json'), `${JSON.stringify(report, null, 2)}\n`);
             const archive = join(job, 'verified-art.tar.gz');
             await run('tar', [
                 '-czf',
@@ -119,6 +130,7 @@ function createVerifier(
                 '-C',
                 job,
                 'image.png',
+                'asset.png',
                 'construction.json',
                 'frame.nes',
                 'capture.png',

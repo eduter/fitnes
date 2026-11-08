@@ -15,6 +15,12 @@ beforeAll(async () => {
     for (const file of ['gym.png', 'construction.json']) {
         cpSync(`art/home/${file}`, join(root, 'art/home', file));
     }
+    mkdirSync(join(root, 'art/logo'), { recursive: true });
+    for (const file of ['logo.png', 'construction.json', 'reference.png']) {
+        cpSync(`art/logo/${file}`, join(root, 'art/logo', file));
+    }
+    mkdirSync(join(root, 'src/styles'), { recursive: true });
+    cpSync('src/styles/frame.png', join(root, 'src/styles/frame.png'));
     server = createEditorServer(root, join(root, 'missing-core.so'));
     await new Promise<void>((done) => server.listen(0, '127.0.0.1', done));
     const address = server.address();
@@ -96,4 +102,24 @@ it('rejects older revisions without overwriting the newer saved draft', async ()
 it('rejects malformed and out-of-palette pixel buffers', () => {
     expect(() => decodePixels('AAAA')).toThrow('51,200');
     expect(() => decodePixels(Buffer.alloc(51200, 64).toString('base64'))).toThrow('six-bit');
+});
+
+it('isolates logo and border dimensions, tokens, revisions and drafts from the home image', async () => {
+    const home = (await (await fetch(`${origin}/api/config`)).json()) as EditorConfig;
+    const logo = (await (await fetch(`${origin}/api/config?asset=logo`)).json()) as EditorConfig;
+    const border = (await (await fetch(`${origin}/api/config?asset=src%2Fstyles%2Fframe.png`)).json()) as EditorConfig;
+    expect([logo.width, logo.height]).toEqual([256, 120]);
+    expect([border.width, border.height]).toEqual([12, 12]);
+    expect(logo.token).not.toBe(home.token);
+    const changed = Buffer.from(logo.pixels, 'base64');
+    changed[0] = 32;
+    await fetch(`${origin}/api/verify?asset=logo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Editor-Token': logo.token },
+        body: JSON.stringify({ revision: logo.revision + 1, pixels: changed.toString('base64') }),
+    });
+    const after = (await (await fetch(`${origin}/api/config`)).json()) as EditorConfig;
+    expect(after.pixels).toBe(home.pixels);
+    expect(after.revision).toBe(home.revision);
+    expect((await fetch(`${origin}/api/config?asset=..%2F..%2Fetc%2Fpasswd`)).status).toBe(404);
 });

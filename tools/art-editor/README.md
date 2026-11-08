@@ -1,8 +1,33 @@
 # Local NES artwork editor
 
-A small Paint-style tool for the Home hero, running inside Ubuntu on WSL with
-the interface in a normal Windows Chromium browser. It starts from the artwork
-currently used in the app, not one of the generated reference-fit candidates.
+Choose artwork from the header: Home, the preferred logo, field/steel borders,
+steel border tiles or tab icons. Switching assets preserves each draft and last verified image independently; the clipboard/undo stack
+belongs to the current open asset. Existing Home drafts and `art/home/edited/`
+remain compatible. The owner's pushed hand-edited Home candidate is retained.
+
+The catalog discovers native **opaque 8-bit RGB/RGBA PNGs** under `art/`, `src/`
+and `public/` that fit 256×240 and exactly use the retained NES display colors.
+Generated candidate folders are excluded. High-resolution references, SVGs,
+transparent/antialiased PNGs and arbitrary RGB colors are not silently converted
+into editable assets. The reference view stays read-only.
+
+Small assets open enlarged (up to 64×); the three side previews use matching
+integer scales. Editing keeps the PNG's original dimensions. For verification,
+a small asset sits at the top left of an explicitly black, 256-wide padded frame.
+The real emulator proves that frame; this is not a proof over arbitrary app
+backgrounds or combined screen palettes. Border candidate saves include the
+native PNG and a separate `proof-frame.png`; exported bundles include native
+`asset.png` plus the frame `image.png`. The project records the native dimensions.
+
+Home saves keep their existing location. Logo candidates go to `art/logo/edited/`;
+other asset candidates go to `art/edited/<source-path-without-extension>/`.
+Every save supplies Git commands for just that asset's files. Source assets are
+never replaced automatically. Toolbar icons have hover instructions; selecting
+a tool keeps a single fixed-height control row without moving the canvas.
+
+A small Paint-style tool for native repository artwork, running inside Ubuntu on WSL with
+the interface in a normal Windows Chromium browser. It starts from the selected repository image; the logo profile uses the preferred
+direct-color candidate while retaining the original logo as its reference.
 There is no desktop emulator window or WSLg requirement.
 
 ## Install in Ubuntu / WSL
@@ -70,7 +95,7 @@ FCEUmm core can be supplied with `--core /absolute/path/fceumm_libretro.so`.
   16×. Use Shift+wheel or scrollbars to pan. A pixel grid appears at 8× and above.
   Esc clears a rectangle.
 
-The palette includes all nine current app colors and the additional inks
+The palette includes the selected asset’s current colors and the additional inks
 considered in the artwork studies: off-white, peach, deep teal, soft cream,
 light copper, ochre, olive shadow, ember and pale linen. Each swatch uses an actual
 PPU code under the current artwork's Composite Direct interpretation/emphasis.
@@ -78,7 +103,7 @@ The palette is not an invitation to ignore local color restrictions: the checker
 still verifies the complete construction.
 
 The sidebar stacks **Original concept**, **Current image in the app**, and
-**Your edit** at the same 256×200 display size. Your edit updates immediately;
+**Your edit** at matching display sizes for the selected asset. Your edit updates immediately;
 zooming the editing canvas does not change these overview sizes.
 
 ## What the check means
@@ -87,7 +112,7 @@ After an edit, the green state clears immediately. The browser waits 140 ms to
 combine rapid actions, then sends the exact indexed pixels to the local server.
 The server fits a construction, reconstructs every RGB pixel with the existing
 hardware verifier, and runs the pinned FCEUmm core for 180 frames. Green is shown
-only after the emulator reproduces all 51,200 pixels exactly. No smoothing,
+only after the emulator reproduces every pixel of the proof frame exactly. No smoothing,
 quantization, color substitution or silent repair is allowed.
 
 The fitter reuses the known artwork's background/sprite geometry, moves redundant
@@ -120,10 +145,10 @@ keeps a browser backup after each action. Work stays local; the server binds to
 127.0.0.1 and does not publish the image or connect to other services.
 
 **Save artwork** (or Ctrl+S) writes the current green image to tracked candidate
-files under `art/home/edited/`: `gym.png`, `construction.json`, `project.json`,
+files (Home uses `art/home/edited/`): `gym.png`, `construction.json`, `project.json`,
 and `verification.json`. The save dialog provides copyable Git commands. Those
 commands create a feature branch if currently detached or on main/master, then
-commit only these four files, leaving unrelated staged changes out of the commit.
+commit only the listed asset files, leaving unrelated staged changes out of the commit.
 Run the commands yourself in the Ubuntu checkout where the editor is running;
 the editor does not run Git or push changes automatically. Saving a candidate
 does not replace the app's adopted image or its palette tokens.

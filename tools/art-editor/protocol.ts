@@ -2,6 +2,12 @@ import type { Region } from './model.ts';
 
 /** Browser configuration for the local-only editor. */
 interface EditorConfig {
+    assetId: string;
+    assetLabel: string;
+    width: number;
+    height: number;
+    saveDirectory: string;
+    assets: { id: string; label: string }[];
     token: string;
     baselineHash: string;
     emphasis: number;

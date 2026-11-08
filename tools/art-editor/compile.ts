@@ -11,8 +11,15 @@ type CompileResult =
 /** Fit exact recolored pixels to the retained layout, adding overlays when budgets permit. Never quantize. */
 function compilePixels(pixels: Uint8Array, seed: HardwareConstruction): CompileResult {
     const { width, height, emphasis } = seed;
-    if (width !== 256 || height !== 200 || pixels.length !== width * height || pixels.some((v) => v > 63)) {
-        throw new Error('Expected 51,200 six-bit NES color codes');
+    if (
+        width !== 256 ||
+        height < 8 ||
+        height > 240 ||
+        height % 8 !== 0 ||
+        pixels.length !== width * height ||
+        pixels.some((v) => v > 63)
+    ) {
+        throw new Error('Expected a 256-wide native proof frame of six-bit NES color codes');
     }
     const image = rgbImage(pixels, emphasis);
     const unchanged = checkConstruction(seed, image);
@@ -50,7 +57,7 @@ function compilePixels(pixels: Uint8Array, seed: HardwareConstruction): CompileR
             owners[p] = -1;
         }
     }
-    const tiles = Array.from({ length: 800 }, (_, t) =>
+    const tiles = Array.from({ length: (32 * height) / 8 }, (_, t) =>
         Array.from(
             { length: 64 },
             (_, i) => (Math.floor(t / 32) * 8 + Math.floor(i / 8)) * width + (t % 32) * 8 + (i % 8)
