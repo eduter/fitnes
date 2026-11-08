@@ -854,8 +854,8 @@ async function main(): Promise<void> {
     function position(event: PointerEvent): { x: number; y: number } {
         const bounds = art.getBoundingClientRect();
         return {
-            x: Math.max(0, Math.min(255, Math.floor((event.clientX - bounds.left) / zoom))),
-            y: Math.max(0, Math.min(199, Math.floor((event.clientY - bounds.top) / zoom))),
+            x: Math.max(0, Math.min(config.width - 1, Math.floor((event.clientX - bounds.left) / zoom))),
+            y: Math.max(0, Math.min(config.height - 1, Math.floor((event.clientY - bounds.top) / zoom))),
         };
     }
     function downloadProject(): void {
