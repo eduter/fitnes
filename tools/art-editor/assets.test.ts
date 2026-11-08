@@ -19,6 +19,10 @@ it.each(assets.map((asset) => [asset.id, asset] as const))('proves exact native 
     expect(encoded).toEqual(source);
 });
 
+it('excludes generated launcher assets from native artwork editing', () => {
+    expect(assets.some((asset) => asset.id.startsWith('public/'))).toBe(false);
+});
+
 it('keeps one current image per asset with isolated drafts', () => {
     const home = assets.find((asset) => asset.id === 'home');
     expect(home?.workDirectory).toBe('work/art-editor');

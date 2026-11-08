@@ -36,7 +36,8 @@ function listArtwork(root: string): ArtworkAsset[] {
     if (existsSync(join(root, 'art/logo/logo.png'))) {
         assets.push(load('logo', 'Logo', 'art/logo/logo.png', 'art/logo/construction.json', 'docs/fitnes-logo.png'));
     }
-    for (const directory of ['src', 'art', 'public']) {
+    // Launcher PNGs in public are generated at device sizes, not editable native NES artwork
+    for (const directory of ['src', 'art']) {
         if (!existsSync(join(root, directory))) {
             continue;
         }

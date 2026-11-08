@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "generate:icons": "pwa-assets-generator -r public -p minimal -o favicon.svg",
+    "generate:icons": "node tools/build-pwa-icons.ts",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "typecheck": "tsc -b --noEmit",
