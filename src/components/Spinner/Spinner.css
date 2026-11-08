@@ -11,6 +11,7 @@
 }
 .nes-spinner__controls {
     display: flex;
+    justify-content: flex-end;
     align-items: center;
     gap: 4px;
     height: 24px;
@@ -21,6 +22,9 @@
 .nes-spinner__value {
     width: 100%;
     min-block-size: 24px;
+}
+.nes-spinner__value[data-variant="plain"] {
+    justify-content: flex-end;
 }
 .nes-spinner__arrows {
     display: grid;
