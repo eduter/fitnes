@@ -12,7 +12,6 @@ interface CreateWorkoutTemplateInput {
     catalog: readonly ExerciseDefinition[];
     sets: PlannedSet[];
     sequence: SequenceEntry[];
-    timingOverrides?: WorkoutTemplate['timingOverrides'];
     existingSnapshots?: readonly ExerciseDefinition[];
 }
 
@@ -23,7 +22,7 @@ interface CreateWorkoutTemplateInput {
  * a saved plan unless {@link refreshTemplateExercises} is called.
  */
 function createWorkoutTemplate(input: CreateWorkoutTemplateInput): ValidationResult<WorkoutTemplate> {
-    const { id, name, description, catalog, sets, sequence, timingOverrides, existingSnapshots = [] } = input;
+    const { id, name, description, catalog, sets, sequence, existingSnapshots = [] } = input;
 
     const template: WorkoutTemplate = {
         id,
@@ -33,10 +32,6 @@ function createWorkoutTemplate(input: CreateWorkoutTemplateInput): ValidationRes
         sets: structuredClone(sets),
         sequence: structuredClone(sequence),
     };
-
-    if (timingOverrides !== undefined) {
-        template.timingOverrides = structuredClone(timingOverrides);
-    }
 
     if (description !== undefined && description !== '') {
         template.description = description;
@@ -60,7 +55,6 @@ function refreshTemplateExercises(
         catalog,
         sets: template.sets,
         sequence: template.sequence,
-        timingOverrides: template.timingOverrides,
     });
 }
 

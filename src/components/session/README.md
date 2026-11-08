@@ -7,12 +7,21 @@ there is no sample-data seeding in the normal build. The historical standalone
 prototype is not the app review URL.
 
 Exercise `timing` stores optional `prepSeconds` and `secondsPerRep` defaults.
-Workout `timingOverrides` independently overrides each field by exercise ID.
-The workout editor's More → Timing edits these values; session More → Timing
-changes only its snapshot and is available before starting. Old plans use
-initial editable defaults of five seconds prep and three seconds per rep.
-Embedded definitions keep the existing snapshot policy; workout Refresh takes
-new catalog defaults. No existing data is rewritten automatically.
+Individual planned sets store sparse `timing` overrides. Add/Edit set forms
+always show effective exercise defaults; opening a form does not write them.
+Only a differing field is stored. Returning to a default deletes its override;
+an entirely inherited set has no `timing` property. There are no Timing menus.
+Missing exercise settings use initial defaults of five seconds prep and three
+seconds per rep. Only repetition-based sets show the pace field. Starting or
+reopening work copies current exercise defaults without changing prescribed
+measurement/load meanings.
+
+Active sessions retain execution configuration to run consistently. Completed
+history removes all preparation/pace settings, including copied exercise
+defaults, while keeping actual reps, timed performance, load and bodyweight.
+Database version 3 converts previous shared workout overrides into independent
+set properties and removes timing from existing completed snapshots. Only valid
+rows are normalized; unparseable rows remain recoverable by the raw exporter.
 
 An execution-sequence entry has exactly one of `plannedSetId` or `restSeconds`.
 Rest is an explicit movable step, separate from preparation. This compatible
@@ -20,8 +29,8 @@ extension preserves existing set definitions and references; collapsing those
 two arrays into self-contained steps remains separate work. Session results
 still address set occurrences by sequence ID. `completedRestIds` records rest
 completion without inventing exercise measurements. These fields round-trip
-through JSON import/export and session snapshots. New exports use version 2;
-version-1 exports still import, while older app builds reject the newer format
+through JSON import/export and session snapshots. New exports use version 3;
+version-1 and version-2 exports still import, while older app builds reject the newer format
 instead of silently losing timing or rests.
 
 Start runs preparation then timed work or paced repetitions. Rep counts advance

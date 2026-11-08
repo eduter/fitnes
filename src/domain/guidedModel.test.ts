@@ -14,15 +14,15 @@ describe('persistent guided workouts', () => {
         const plan = rowTemplate();
         expect(validateWorkoutTemplate(plan).ok).toBe(true);
         plan.exercises[0].timing = { prepSeconds: 12, secondsPerRep: 4 };
-        plan.timingOverrides = { [plan.exercises[0].id]: { prepSeconds: 0 } };
-        expect(effectiveTiming(plan.exercises[0].timing, plan.timingOverrides[plan.exercises[0].id])).toEqual({
+        plan.sets[0].timing = { prepSeconds: 0 };
+        expect(effectiveTiming(plan.exercises[0].timing, plan.sets[0].timing)).toEqual({
             prepSeconds: 0,
             secondsPerRep: 4,
         });
         const built = createWorkoutTemplate({ ...plan, catalog: plan.exercises });
-        expect(built.ok && built.value.timingOverrides).toEqual(plan.timingOverrides);
+        expect(built.ok && built.value.sets[0].timing).toEqual(plan.sets[0].timing);
         const refreshed = refreshTemplateExercises(plan, plan.exercises);
-        expect(refreshed.ok && refreshed.value.timingOverrides).toEqual(plan.timingOverrides);
+        expect(refreshed.ok && refreshed.value.sets[0].timing).toEqual(plan.sets[0].timing);
     });
     it('preserves interleaved rests in duplicates and independent session snapshots', () => {
         const plan = rowTemplate();
@@ -49,7 +49,7 @@ describe('persistent guided workouts', () => {
     it('round-trips timing, explicit rest and recorded rest completion through the new export version', () => {
         const plan = rowTemplate();
         plan.exercises[0].timing = { prepSeconds: 9, secondsPerRep: 2 };
-        plan.timingOverrides = { [plan.exercises[0].id]: { prepSeconds: 0 } };
+        plan.sets[0].timing = { prepSeconds: 0 };
         plan.sequence.push({ id: 'rest-export', restSeconds: 30 } as (typeof plan.sequence)[number]);
         const session = createSessionFromTemplate({ id: 'export-session' as never, template: plan, startedAt: 1 });
         session.completedRestIds = [plan.sequence[2].id];
@@ -62,7 +62,7 @@ describe('persistent guided workouts', () => {
                 bodyweightMeasurements: [],
             })
         );
-        expect(parsed.ok && parsed.value.templates[0].timingOverrides).toEqual(plan.timingOverrides);
+        expect(parsed.ok && parsed.value.templates[0].sets[0].timing).toEqual(plan.sets[0].timing);
         expect(parsed.ok && parsed.value.sessions[0].completedRestIds).toEqual(session.completedRestIds);
         expect(parsed.ok && parsed.value.sessions[0].snapshot.sequence[2].restSeconds).toBe(30);
     });

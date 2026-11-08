@@ -5,9 +5,10 @@ import type { ActualMeasurement, SetPrescription } from './prescription.ts';
 import { type ActualResult, type WorkoutSession, workoutSession } from './session.ts';
 import { collectTemplateIssues } from './validateWorkoutTemplate.ts';
 import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
+import { normalizeWorkoutTiming, withoutExecutionTiming } from './workoutTiming.ts';
 
 /**
- * Validate an untrusted value as a completed workout session. Beyond the
+ * Validate a live or completed workout session. Completed history discards execution timing. Beyond the
  * schema, this checks that the plan snapshot is internally sound, that every
  * result targets a real sequence occurrence exactly once, and that each result
  * matches the exercise's measurement and load capabilities.
@@ -29,7 +30,16 @@ function validateWorkoutSession(input: unknown): ValidationResult<WorkoutSession
         return { ok: false, errors: issues.issues };
     }
 
-    return { ok: true, value: parsed };
+    return {
+        ok: true,
+        value: {
+            ...parsed,
+            snapshot:
+                parsed.completedAt === undefined
+                    ? normalizeWorkoutTiming(parsed.snapshot)
+                    : withoutExecutionTiming(parsed.snapshot),
+        },
+    };
 }
 
 /** Report trace metadata that contradicts the session's preserved snapshot. */

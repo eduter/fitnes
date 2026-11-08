@@ -24,12 +24,19 @@ For repetition-based sets, support a configurable duration per repetition and
 count repetitions at that pace so the owner can follow along without keeping
 count mentally. Exercise timing and workout overrides are now persisted in the
 guided integration.
-Preparation duration and time per repetition are configurable defaults on
-the exercise, with overrides in the workout. Preparation time varies because
-some exercises take longer to get into position. Existing plans without timing
-use initial editable defaults of five seconds preparation and three seconds per
-rep. Exercise defaults are embedded in workout snapshots; workout Refresh picks
-up later catalog changes. Session timing edits affect only that session.
+Preparation duration and time per repetition are configurable defaults on the
+exercise. Owner clarification: overrides belong to individual sets, in the Add
+and Edit set forms. Show effective defaults directly in the UI; opening a form
+does not copy them into set data. Persist only fields changed to values that
+differ from the exercise default; returning to a default removes its override.
+There is no Timing menu in workout or session dropdowns.
+
+Preparation and pace are execution settings. An active session may keep them
+to run consistently, but completion removes them from its historical snapshot,
+including copied exercise defaults. History retains actual reps, duration,
+load, bodyweight and performance metadata. Neither prep nor pace is kept as
+historical performance. Older completed records are cleaned without changing
+their results. Current exercise defaults are used when starting/reopening work.
 Pause, early logging, skip and rest transitions have functional initial behavior
 for review, documented with the [session components](../src/components/session/README.md).
 

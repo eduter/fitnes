@@ -15,7 +15,7 @@ import type { WorkoutTemplate } from './workoutTemplate.ts';
  * rather than guessed at, because a partial read of a future format would
  * silently drop whatever this build does not know about.
  */
-const EXPORT_SCHEMA_VERSION = 2;
+const EXPORT_SCHEMA_VERSION = 3;
 
 /** Everything the app stores, in one JSON document. */
 interface DataExport {

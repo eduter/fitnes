@@ -1,6 +1,6 @@
 import { type } from 'arktype';
 
-/** Optional timing fields shared by catalog defaults and workout-specific overrides. */
+/** Optional timing fields shared by catalog defaults and per-set overrides. */
 const trackingTiming = type({
     'prepSeconds?': 'number.integer >= 0 & number <= 999',
     'secondsPerRep?': 'number >= 0.1 & number <= 99.9',
@@ -15,5 +15,20 @@ function effectiveTiming(defaults?: TrackingTiming, overrides?: TrackingTiming):
     };
 }
 
+/** Keep only values that differ from the exercise defaults; an untouched/default set has no timing property. */
+function normalizeSetTiming(
+    defaults: TrackingTiming | undefined,
+    values: TrackingTiming | undefined
+): TrackingTiming | undefined {
+    const inherited = effectiveTiming(defaults);
+    const next: TrackingTiming = {};
+    for (const field of ['prepSeconds', 'secondsPerRep'] as const) {
+        if (values?.[field] !== undefined && values[field] !== inherited[field]) {
+            next[field] = values[field];
+        }
+    }
+    return Object.keys(next).length ? next : undefined;
+}
+
 export type { TrackingTiming };
-export { effectiveTiming, trackingTiming };
+export { effectiveTiming, normalizeSetTiming, trackingTiming };

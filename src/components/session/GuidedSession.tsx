@@ -4,13 +4,12 @@ import { massValue } from '../../domain/convertWeight.ts';
 import { elapsedAt, guidedPosition } from '../../domain/guidedProgress.ts';
 import type { SequenceOccurrence } from '../../domain/lookups.ts';
 import { type ActualResult, actualResult } from '../../domain/session.ts';
-import { effectiveTiming, type TrackingTiming } from '../../domain/trackingTiming.ts';
+import { effectiveTiming } from '../../domain/trackingTiming.ts';
 import type { WeightUnit } from '../../domain/units.ts';
 import type { SequenceEntry } from '../../domain/workoutTemplate.ts';
 import { Button, DialogActions, DialogTitle, PageTitle, Popover, Spinner } from '../Controls/index.ts';
 import { prescriptionSummary } from '../template/prescriptionSummary.ts';
 import { formatSetReference, totalCountValue, withSideCount, withTotalCount, withWeight } from './resultEditing.ts';
-import { TimingFields } from './TimingFields.tsx';
 import './GuidedSession.css';
 
 /** Guide a real session step while its owning page validates and persists every completed result. */
@@ -26,7 +25,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const [draft, setDraft] = createSignal<ActualResult | undefined>(restored?.draft ?? props.draft);
     const [manual, setManual] = createSignal(restored?.manual ?? false);
     const [more, setMore] = createSignal(false);
-    const [timingOpen, setTimingOpen] = createSignal(false);
     const [resultOpen, setResultOpen] = createSignal(false);
     const [busy, setBusy] = createSignal(false);
     const [message, setMessage] = createSignal('');
@@ -42,7 +40,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         const m = measurement();
         return props.entry.restSeconds ?? (m?.measurement === 'duration' ? m.seconds : (m?.reps ?? 1));
     };
-    const timing = () => effectiveTiming(props.occurrence?.exercise.timing, props.timing);
+    const timing = () => effectiveTiming(props.occurrence?.exercise.timing, props.occurrence?.set.timing);
     const prep = () => (rest() ? 0 : timing().prepSeconds);
     const counterSize = () => {
         const length = timed() ? clock(Math.ceil(target())).length : String(target()).length * 2 + 1;
@@ -363,15 +361,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         >
                             Result
                         </Button>
-                        <Button
-                            disabled={started()}
-                            onPress={() => {
-                                setMore(false);
-                                setTimingOpen(true);
-                            }}
-                        >
-                            Timing
-                        </Button>
                     </Show>
                     <Button
                         onPress={() => {
@@ -390,24 +379,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         Delete
                     </Button>
                     <DialogActions kind="end" onConfirm={() => setMore(false)} />
-                </div>
-            </Popover>
-            <Popover
-                open={timingOpen()}
-                onOpenChange={setTimingOpen}
-                label="Session timing"
-                returnFocus={() => trigger}
-                mount={document.getElementById('root') ?? undefined}
-            >
-                <div class="editor-fields">
-                    <DialogTitle>Session timing</DialogTitle>
-                    <TimingFields
-                        inherit
-                        defaults={props.occurrence?.exercise.timing}
-                        value={props.timing}
-                        onChange={(timing) => void props.onTiming(timing)}
-                    />
-                    <DialogActions kind="end" onConfirm={() => setTimingOpen(false)} />
                 </div>
             </Popover>
             <Popover
@@ -503,13 +474,11 @@ interface GuidedSessionProps {
     occurrence?: SequenceOccurrence;
     draft?: ActualResult;
     previous?: ActualResult;
-    timing?: TrackingTiming;
     index: number;
     count: number;
     nextName?: string;
     unit: WeightUnit;
     onLog: (draft: ActualResult | undefined) => Promise<boolean>;
-    onTiming: (timing: TrackingTiming) => Promise<void>;
     onReview: () => void;
     onComplete: (trigger?: HTMLElement) => void;
     onDelete: (trigger?: HTMLElement) => void;

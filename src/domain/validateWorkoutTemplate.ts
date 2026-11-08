@@ -3,6 +3,7 @@ import { prescriptionProblems } from './capability.ts';
 import type { ExerciseDefinition } from './exercise.ts';
 import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
 import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
+import { normalizeWorkoutTiming } from './workoutTiming.ts';
 
 /**
  * Validate an untrusted value as a workout template, including the
@@ -24,7 +25,7 @@ function validateWorkoutTemplate(input: unknown): ValidationResult<WorkoutTempla
         return { ok: false, errors: issues.issues };
     }
 
-    return { ok: true, value: parsed };
+    return { ok: true, value: normalizeWorkoutTiming(parsed) };
 }
 
 /**

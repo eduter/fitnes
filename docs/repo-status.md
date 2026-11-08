@@ -56,15 +56,19 @@ Guided tracking is integrated into the actual session page. Opening/resuming a
 workout selects its first unfinished step. Start runs preparation followed by
 timed work or paced reps; Log persists a real result before advancing. The
 workout editor adds, edits, duplicates and reorders explicit rest steps alongside
-sets. Exercise editors persist timing defaults; workout More → Timing persists
-independent overrides. Session More → Timing changes only the session snapshot.
+sets. Exercise editors persist timing defaults; Add/Edit set forms show those
+defaults and persist only per-set differences. Timing menu options are removed.
 Per-side measurements guide each side independently and retain distinct results.
 Previous results, load bases, units and bodyweight snapshots remain intact.
 
 All tracker phases reserve fixed layout slots, including result editing and
 wake-lock feedback. Paused/running timer state and unlogged results recover
 from local storage after refresh; final results and rest completion are stored
-in IndexedDB and included in JSON export. Review/history keeps the list view.
+in IndexedDB and included in JSON export. Completion removes preparation/pace
+from the history snapshot while preserving actual performance. Database version
+3 converts the earlier shared overrides into set properties and cleans timing
+from existing completed records. Export version 3 still reads older exports.
+Review/history keeps the list view.
 See [integrated behavior](../src/components/session/README.md).
 
 The earlier [standalone prototype](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)

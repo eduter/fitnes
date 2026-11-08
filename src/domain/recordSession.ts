@@ -77,7 +77,7 @@ function clearResult(session: WorkoutSession, sequenceEntryId: SequenceEntryId):
     return validateWorkoutSession(next);
 }
 
-/** Mark a session as finished at `completedAt`. */
+/** Finish a session at `completedAt`; validation removes execution timing from its history snapshot. */
 function completeSession(session: WorkoutSession, completedAt: number): ValidationResult<WorkoutSession> {
     const next = structuredClone(session);
     next.completedAt = completedAt;

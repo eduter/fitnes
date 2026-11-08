@@ -13,6 +13,7 @@ const plannedSet = type({
     id: plannedSetId,
     exerciseId,
     prescription: setPrescription,
+    'timing?': trackingTiming,
 }).onDeepUndeclaredKey('reject');
 type PlannedSet = typeof plannedSet.infer;
 
@@ -48,6 +49,7 @@ const workoutTemplate = type({
     'description?': 'string',
     schemaVersion: '1',
     exercises: exerciseDefinition.array(),
+    // Read compatibility only; validation converts this older field to sparse set timing.
     'timingOverrides?': type({ '[string]': trackingTiming }),
     sets: plannedSet.array(),
     sequence: sequenceEntry.array(),

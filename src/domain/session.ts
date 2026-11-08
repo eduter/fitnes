@@ -33,7 +33,8 @@ type ActualResult = typeof actualResult.infer;
  * A historical record of a workout performed. It holds an independent snapshot
  * of the plan and the performance recorded against sequence occurrences, so
  * the same exercise appearing more than once stays distinguishable. The
- * snapshot is a full template copy, not a reference to a mutable template.
+ * snapshot is an independent plan copy. Execution timing is removed when the
+ * session is completed; actual performance remains unchanged.
  */
 const workoutSession = type({
     id: workoutSessionId,

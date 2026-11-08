@@ -75,8 +75,11 @@ the historical standalone prototype.
   successful Log advances to the next unfinished step.
 - [x] Add Start, preparation countdowns, remaining time, paced repetitions,
   pause/resume and screen wake lock with fixed element positions.
-- [x] Persist exercise preparation/rep-duration defaults and independent workout
-  overrides; permit session-only timing edits before starting a set.
+- [x] Persist exercise preparation/rep-duration defaults and sparse per-set
+  overrides in Add/Edit set forms. Display inherited defaults without storing
+  them; returning to the default removes the override. Remove Timing menus.
+- [x] Remove prep/pace from completed history, including legacy snapshots, while
+  retaining actual performance and live-session execution configuration.
 - [x] Add explicit rest steps to the ordered execution sequence and workout
   editing, duplication and movement. Preserve circuits and supersets.
 - [x] Preserve previous results, count/load meanings and independent per-side

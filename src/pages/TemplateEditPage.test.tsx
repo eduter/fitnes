@@ -116,3 +116,54 @@ it('duplicates and deletes directly from the set row while retaining confirmatio
     fireEvent.click(within(next).getByRole('button', { name: 'Yes', exact: true }));
     await waitFor(async () => expect((await db.templates.get('preview-strength'))?.sequence).toHaveLength(count));
 });
+
+it('edits sparse timing on each set with exercise defaults prefilled and no Timing menu', async () => {
+    const plan = await db.templates.get('preview-strength');
+    if (!plan) {
+        throw Error('missing fixture');
+    }
+    const exercise = plan.exercises[0];
+    exercise.timing = { prepSeconds: 7, secondsPerRep: 2 };
+    await db.templates.put(plan);
+    await db.exercises.update(exercise.id, { timing: exercise.timing });
+    renderWorkout();
+    const row = await screen.findByRole('article', { name: 'Set 1', exact: true });
+    fireEvent.click(within(row).getByRole('button', { name: 'Edit', exact: true }));
+    const dialog = await screen.findByRole('dialog', { name: 'Edit planned set' });
+    fireEvent.animationEnd(dialog);
+    expect(within(dialog).getByRole('button', { name: 'Prep seconds: 007. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Seconds per rep: 02.0. Edit number' })).toBeTruthy();
+    expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Prep seconds' }));
+    await waitFor(async () => expect((await db.templates.get(plan.id))?.sets[0].timing).toEqual({ prepSeconds: 8 }));
+    expect((await db.templates.get(plan.id))?.sets[1].timing).toBeUndefined();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Decrease Prep seconds' }));
+    await waitFor(async () => expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined());
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Seconds per rep' }));
+    await waitFor(async () =>
+        expect((await db.templates.get(plan.id))?.sets[0].timing).toEqual({ secondsPerRep: 2.1 })
+    );
+    fireEvent.click(within(dialog).getByRole('button', { name: 'End', exact: true }));
+    fireEvent.animationEnd(dialog);
+    fireEvent.click(screen.getByRole('button', { name: 'More', exact: true }));
+    const menu = await screen.findByRole('dialog', { name: 'Workout actions' });
+    fireEvent.animationEnd(menu);
+    expect(within(menu).queryByRole('button', { name: 'Timing', exact: true })).toBeNull();
+});
+
+it('shows current exercise defaults rather than stale timing embedded in the workout', async () => {
+    const plan = await db.templates.get('preview-strength');
+    if (!plan) {
+        throw Error('missing fixture');
+    }
+    plan.exercises[0].timing = { prepSeconds: 7, secondsPerRep: 2 };
+    await db.templates.put(plan);
+    renderWorkout();
+    const row = await screen.findByRole('article', { name: 'Set 1', exact: true });
+    fireEvent.click(within(row).getByRole('button', { name: 'Edit', exact: true }));
+    const dialog = await screen.findByRole('dialog', { name: 'Edit planned set' });
+    fireEvent.animationEnd(dialog);
+    expect(within(dialog).getByRole('button', { name: 'Prep seconds: 005. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Seconds per rep: 03.0. Edit number' })).toBeTruthy();
+    expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined();
+});

@@ -33,7 +33,6 @@ function setup(perSide = false, saves = true, reps = 8) {
             unit="kg"
             onLog={onLog}
             onReview={() => {}}
-            onTiming={async () => {}}
             onComplete={() => {}}
             onDelete={() => {}}
         />

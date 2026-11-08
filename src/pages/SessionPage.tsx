@@ -24,6 +24,7 @@ import type { ActualResult, WorkoutSession } from '../domain/session.ts';
 import { validateWorkoutSession } from '../domain/validateWorkoutSession.ts';
 import type { ValidationIssue, ValidationResult } from '../domain/validation.ts';
 import type { SequenceEntry } from '../domain/workoutTemplate.ts';
+import { withExecutionTiming } from '../domain/workoutTiming.ts';
 import { formatDateTime } from '../utils/datetime.ts';
 
 /** Log results against a session snapshot, or review a completed session. */
@@ -146,11 +147,36 @@ function SessionPage(): JSX.Element {
                 Math.max(Date.now(), current.startedAt, ...current.results.map((result) => result.completedAt))
             )
         );
+        if (session()?.completedAt !== undefined) {
+            try {
+                const prefix = `fitnes-guided:${session()?.id}:`;
+                for (const key of Object.keys(localStorage)) {
+                    if (key.startsWith(prefix)) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            } catch {
+                /* Completed history remains in IndexedDB even when timer cache cleanup is unavailable */
+            }
+        }
         setBusy(false);
     }
 
     function reopen(): Promise<void> {
-        return change(reopenSession);
+        return change((current) => {
+            const reopened = reopenSession(current);
+            if (!reopened.ok) {
+                return reopened;
+            }
+            return validateWorkoutSession({
+                ...reopened.value,
+                snapshot: withExecutionTiming(
+                    current.snapshot,
+                    app.templates().find((plan) => plan.id === current.templateId),
+                    app.exercises()
+                ),
+            });
+        });
     }
 
     async function remove(): Promise<void> {
@@ -353,12 +379,6 @@ function SessionPage(): JSX.Element {
                                     occurrence={findOccurrence(current().snapshot, id)}
                                     draft={effectiveDrafts()[id]}
                                     previous={previous()[id]}
-                                    timing={(() => {
-                                        const occurrence = findOccurrence(current().snapshot, id);
-                                        return occurrence
-                                            ? current().snapshot.timingOverrides?.[occurrence.exercise.id]
-                                            : undefined;
-                                    })()}
                                     index={current().snapshot.sequence.findIndex((entry) => entry.id === id)}
                                     count={plannedCount()}
                                     unit={app.massUnit()}
@@ -388,24 +408,6 @@ function SessionPage(): JSX.Element {
                                         );
                                         return (
                                             session()?.results.some((result) => result.sequenceEntryId === id) ?? false
-                                        );
-                                    }}
-                                    onTiming={async (timing) => {
-                                        const occurrence = findOccurrence(current().snapshot, id);
-                                        if (!occurrence) {
-                                            return;
-                                        }
-                                        await change((value) =>
-                                            validateWorkoutSession({
-                                                ...value,
-                                                snapshot: {
-                                                    ...value.snapshot,
-                                                    timingOverrides: {
-                                                        ...value.snapshot.timingOverrides,
-                                                        [occurrence.exercise.id]: timing,
-                                                    },
-                                                },
-                                            })
                                         );
                                     }}
                                     onReview={() => setReviewing(true)}

@@ -27,6 +27,7 @@ import { createSessionFromTemplate, type WorkoutSession } from '../domain/sessio
 import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationResult } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import { withExecutionTiming } from '../domain/workoutTiming.ts';
 import { seedPreview } from '../preview/seedPreview.ts';
 
 type LoadState = 'loading' | 'ready' | 'error';
@@ -184,7 +185,7 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         return saveSession(
             createSessionFromTemplate({
                 id: generateWorkoutSessionId(),
-                template,
+                template: withExecutionTiming(template, template, exercises()),
                 startedAt,
                 bodyweight,
             })
