@@ -65,6 +65,23 @@ preview's behavioral role.
   character alternatives available; timing and detailed interaction remain open.
 - [ ] Plan deployment and data transfer before replacing the preview.
 
+## Guided workout tracking
+
+Owner-approved direction (2026-11-08), detailed in the [vision](vision.md).
+The compact list remains workflow evidence; it is not the intended final
+tracking layout.
+
+- [ ] Focus tracking on the current set, with a clear Log action that records
+  the result and advances to the next set.
+- [ ] Add Start, a short preparation countdown, and visible remaining time for
+  timed sets; keep the screen on during the guided set.
+- [ ] Extend the model with configurable duration per repetition and guide
+  repetition-based sets with a rep counter running at that pace.
+- [ ] Resolve preparation duration, pace configuration scope, pause/interruption
+  behavior and result defaults before implementing those details.
+- [ ] Add the corridor as a later between-set interstitial; it is not required
+  for the first guided tracking version.
+
 ## Model policies to resolve
 
 These product decisions remain open; documentation cleanup does not choose a

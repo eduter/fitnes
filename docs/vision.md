@@ -11,7 +11,26 @@ actual performance, actions, and session progress must be readable on a phone.
 The existing model is a good starting point. Preserve its measurement and load
 meanings when designing the interface; raise concrete gaps separately.
 
-Use top-down character movement between sets to communicate workout progress.
+Owner clarification (2026-11-08): the tracking screen focuses on the current
+set rather than a list of sets. Show what to do now and provide a clear Log
+action that records the result and advances to the next set.
+
+Guide the set while the owner exercises. A timed set has a Start action,
+a short preparation countdown to allow getting into position or arranging
+equipment, then a visible remaining-time countdown. The screen should stay
+on during the guided set so the owner can glance at it.
+
+For repetition-based sets, support a configurable duration per repetition and
+count repetitions at that pace so the owner can follow along without keeping
+count mentally. This requires a model change to represent the repetition pace.
+The preparation duration, pace configuration scope, pause/interruption behavior,
+and result defaults still need to be decided; this direction does not choose
+them.
+
+The corridor is a between-set interstitial after finishing a set and before
+the next one. It is optional for the first version; the guided current-set
+experience takes priority. Later, use top-down character movement between
+sets to communicate workout progress.
 
 ## NES visual contract
 
