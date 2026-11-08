@@ -39,8 +39,8 @@ checkout in the Ubuntu filesystem for faster dependency installation/builds.
 To keep an existing development checkout untouched, run these from it:
 
 ```sh
-git fetch origin
-git worktree add --detach ../fitnes-art-editor origin/feat/local-art-editor
+git fetch origin main
+git worktree add --detach ../fitnes-art-editor origin/main
 cd ../fitnes-art-editor
 ```
 
@@ -92,8 +92,8 @@ FCEUmm core can be supplied with `--core /absolute/path/fceumm_libretro.so`.
   actions are retained in the open tab. **Return to last verified** restores the
   last image that passed both checks, including after reopening the editor.
 - **Zoom:** + / − or the wheel over the canvas, in whole-number steps from 1× to
-  16×. Use Shift+wheel or scrollbars to pan. A pixel grid appears at 8× and above.
-  Esc clears a rectangle.
+  16× for Home, and up to 64× for small assets. Use Shift+wheel or scrollbars to
+  pan. A pixel grid appears at 8× and above. Esc clears a rectangle.
 
 The palette includes the selected asset’s current colors and the additional inks
 considered in the artwork studies: off-white, peach, deep teal, soft cream,
@@ -134,8 +134,8 @@ browser bind a result to its edit revision so an old success cannot approve a
 newer image. Exact repeated images can reuse a real emulator proof cached for
 the same image hash and core hash; this makes undo to a checked image fast.
 
-These proofs cover the edited hero asset. They do not prove an entire app screen
-that combines the hero with other assets or controls.
+These proofs cover the selected asset's padded frame. They do not prove an
+entire app screen that combines artwork with other assets or controls.
 
 ## Work and exports
 

@@ -9,6 +9,10 @@ npm install
 npm run dev
 ```
 
+For native artwork changes, use the [local NES artwork editor](tools/art-editor/README.md)
+(`npm run art:editor`). It keeps per-asset drafts and saves verified candidates
+without replacing the app's adopted assets.
+
 ## Build
 
 ```bash
