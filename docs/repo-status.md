@@ -45,6 +45,20 @@ sample sessions/templates/readings. Schema upgrades retain legacy scaffold rows.
 No deployment or data at another origin is replaced automatically. The corridor
 transition remains deferred; this branch does not claim it is integrated.
 
+## Full PR #33 application review
+
+[Complete PR #33 application](https://fitnes-pr33-app.eduardo-terroso.chatgpt.site)
+is built with the normal production build from this PR's source. It includes
+all app screens and normal IndexedDB persistence, without seeded sample data.
+It uses a separate origin, so it starts empty and never replaces data in earlier
+previews. The owner can transfer an exported JSON through the app's Data page.
+
+This is the actual merge-result review: the shared spinner alignment fix is
+integrated, but guided current-set tracking remains the standalone prototype
+below. The real session page and persistent workout schema have not yet been
+replaced. Review the complete app when deciding whether to merge; use the
+prototype only to discuss the proposed guided interaction.
+
 ## Guided workout preview
 
 [Private guided workout preview](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
