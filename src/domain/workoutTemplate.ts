@@ -2,6 +2,7 @@ import { type } from 'arktype';
 import { exerciseDefinition } from './exercise.ts';
 import { exerciseId, plannedSetId, sequenceEntryId, workoutTemplateId } from './ids.ts';
 import { setPrescription } from './prescription.ts';
+import { trackingTiming } from './trackingTiming.ts';
 
 /**
  * A single prescribed set. It references an exercise by ID and carries its own
@@ -16,7 +17,7 @@ const plannedSet = type({
 type PlannedSet = typeof plannedSet.infer;
 
 /**
- * One occurrence of a planned set in the execution order. Entries are separate
+ * One ordered step: either a planned-set reference or an explicit rest duration. Entries are separate
  * from sets so a workout can interleave sets from different exercises in any
  * order. A given `plannedSetId` may appear at most once in a sequence: the
  * sequence lists what to do, and repetitions of work are modelled as distinct
@@ -25,8 +26,15 @@ type PlannedSet = typeof plannedSet.infer;
  */
 const sequenceEntry = type({
     id: sequenceEntryId,
-    plannedSetId,
-}).onUndeclaredKey('reject');
+    'plannedSetId?': plannedSetId,
+    'restSeconds?': 'number.integer > 0 & number <= 9999',
+})
+    .onUndeclaredKey('reject')
+    .narrow(
+        (entry, ctx) =>
+            (entry.plannedSetId !== undefined) !== (entry.restSeconds !== undefined) ||
+            ctx.mustBe('exactly one set reference or rest duration')
+    );
 type SequenceEntry = typeof sequenceEntry.infer;
 
 /**
@@ -40,10 +48,11 @@ const workoutTemplate = type({
     'description?': 'string',
     schemaVersion: '1',
     exercises: exerciseDefinition.array(),
+    'timingOverrides?': type({ '[string]': trackingTiming }),
     sets: plannedSet.array(),
     sequence: sequenceEntry.array(),
 }).onDeepUndeclaredKey('reject');
 type WorkoutTemplate = typeof workoutTemplate.infer;
 
-export { plannedSet, sequenceEntry, workoutTemplate };
 export type { PlannedSet, SequenceEntry, WorkoutTemplate };
+export { plannedSet, sequenceEntry, workoutTemplate };

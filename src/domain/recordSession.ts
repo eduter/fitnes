@@ -1,8 +1,8 @@
-import type { ActualResult, WorkoutSession } from './session.ts';
-import type { ActualMeasurement, SetPrescription } from './prescription.ts';
 import type { SequenceEntryId } from './ids.ts';
-import type { ValidationResult } from './validation.ts';
+import type { ActualMeasurement, SetPrescription } from './prescription.ts';
+import type { ActualResult, WorkoutSession } from './session.ts';
 import { validateWorkoutSession } from './validateWorkoutSession.ts';
+import type { ValidationResult } from './validation.ts';
 
 /**
  * Copy a planned set's prescription into an actual result. Numeric values start
@@ -59,9 +59,20 @@ function recordResult(session: WorkoutSession, result: ActualResult): Validation
     return validateWorkoutSession(next);
 }
 
+/** Persist completion of an explicit rest without inventing an exercise performance. */
+function recordRest(session: WorkoutSession, entryId: SequenceEntryId): ValidationResult<WorkoutSession> {
+    return validateWorkoutSession({
+        ...session,
+        completedRestIds: [...new Set([...(session.completedRestIds ?? []), entryId])],
+    });
+}
+
 /** Remove the result for one sequence occurrence. */
 function clearResult(session: WorkoutSession, sequenceEntryId: SequenceEntryId): ValidationResult<WorkoutSession> {
     const next = structuredClone(session);
+    if (next.completedRestIds) {
+        next.completedRestIds = next.completedRestIds.filter((id) => id !== sequenceEntryId);
+    }
     next.results = next.results.filter((result) => result.sequenceEntryId !== sequenceEntryId);
     return validateWorkoutSession(next);
 }
@@ -80,4 +91,4 @@ function reopenSession(session: WorkoutSession): ValidationResult<WorkoutSession
     return validateWorkoutSession(next);
 }
 
-export { clearResult, completeSession, draftResultFromPrescription, recordResult, reopenSession };
+export { clearResult, completeSession, draftResultFromPrescription, recordRest, recordResult, reopenSession };

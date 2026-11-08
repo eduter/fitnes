@@ -1,8 +1,8 @@
 import type { ExerciseDefinition } from './exercise.ts';
-import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 import type { WorkoutTemplateId } from './ids.ts';
-import type { ValidationResult } from './validation.ts';
 import { validateWorkoutTemplate } from './validateWorkoutTemplate.ts';
+import type { ValidationResult } from './validation.ts';
+import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 
 /** Inputs for building a template from catalog definitions and planned work. */
 interface CreateWorkoutTemplateInput {
@@ -12,6 +12,7 @@ interface CreateWorkoutTemplateInput {
     catalog: readonly ExerciseDefinition[];
     sets: PlannedSet[];
     sequence: SequenceEntry[];
+    timingOverrides?: WorkoutTemplate['timingOverrides'];
     existingSnapshots?: readonly ExerciseDefinition[];
 }
 
@@ -22,7 +23,7 @@ interface CreateWorkoutTemplateInput {
  * a saved plan unless {@link refreshTemplateExercises} is called.
  */
 function createWorkoutTemplate(input: CreateWorkoutTemplateInput): ValidationResult<WorkoutTemplate> {
-    const { id, name, description, catalog, sets, sequence, existingSnapshots = [] } = input;
+    const { id, name, description, catalog, sets, sequence, timingOverrides, existingSnapshots = [] } = input;
 
     const template: WorkoutTemplate = {
         id,
@@ -32,6 +33,10 @@ function createWorkoutTemplate(input: CreateWorkoutTemplateInput): ValidationRes
         sets: structuredClone(sets),
         sequence: structuredClone(sequence),
     };
+
+    if (timingOverrides !== undefined) {
+        template.timingOverrides = structuredClone(timingOverrides);
+    }
 
     if (description !== undefined && description !== '') {
         template.description = description;
@@ -55,6 +60,7 @@ function refreshTemplateExercises(
         catalog,
         sets: template.sets,
         sequence: template.sequence,
+        timingOverrides: template.timingOverrides,
     });
 }
 
@@ -94,5 +100,5 @@ function snapshotReferencedExercises(
     return exercises;
 }
 
-export { createWorkoutTemplate, refreshTemplateExercises };
 export type { CreateWorkoutTemplateInput };
+export { createWorkoutTemplate, refreshTemplateExercises };

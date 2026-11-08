@@ -2,9 +2,9 @@ import { type } from 'arktype';
 import { loadProblems, measurementProblems, type PrescriptionProblem } from './capability.ts';
 import type { ExerciseDefinition } from './exercise.ts';
 import type { ActualMeasurement, SetPrescription } from './prescription.ts';
-import { workoutSession, type ActualResult, type WorkoutSession } from './session.ts';
-import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
+import { type ActualResult, type WorkoutSession, workoutSession } from './session.ts';
 import { collectTemplateIssues } from './validateWorkoutTemplate.ts';
+import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
 
 /**
  * Validate an untrusted value as a completed workout session. Beyond the
@@ -64,6 +64,13 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
         snapshot.exercises.map((exercise) => [exercise.id, exercise])
     );
 
+    const completedRests = new Set<string>();
+    for (const [index, id] of (session.completedRestIds ?? []).entries()) {
+        if (completedRests.has(id) || entriesById.get(id)?.restSeconds === undefined) {
+            issues.add(['completedRestIds', index], 'rest must reference a distinct rest step');
+        }
+        completedRests.add(id);
+    }
     const seenOccurrences = new Set<string>();
 
     for (const [index, result] of session.results.entries()) {
@@ -85,6 +92,10 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
         }
         seenOccurrences.add(result.sequenceEntryId);
 
+        if (entry.plannedSetId === undefined) {
+            issues.add(['results', index, 'sequenceEntryId'], 'rest steps cannot have exercise results');
+            continue;
+        }
         const set = setsById.get(entry.plannedSetId);
         if (!set) {
             continue;

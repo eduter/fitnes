@@ -1,5 +1,6 @@
 import { type } from 'arktype';
 import { exerciseId } from './ids.ts';
+import { trackingTiming } from './trackingTiming.ts';
 
 /**
  * How a measurement is counted. `total` counts once for the set; `perSide`
@@ -79,21 +80,13 @@ const exerciseDefinition = type({
     id: exerciseId,
     name: 'string > 0',
     'description?': 'string',
+    'timing?': trackingTiming,
     measurements: measurementOptions,
     executionModes,
     loads: loadOptions,
 }).onDeepUndeclaredKey('reject');
 type ExerciseDefinition = typeof exerciseDefinition.infer;
 
-export {
-    exerciseDefinition,
-    executionMode,
-    loadBasis,
-    loadOption,
-    measurementCountBasis,
-    measurementOption,
-    measurementType,
-};
 export type {
     ExecutionMode,
     ExerciseDefinition,
@@ -102,4 +95,13 @@ export type {
     MeasurementCountBasis,
     MeasurementOption,
     MeasurementType,
+};
+export {
+    executionMode,
+    exerciseDefinition,
+    loadBasis,
+    loadOption,
+    measurementCountBasis,
+    measurementOption,
+    measurementType,
 };

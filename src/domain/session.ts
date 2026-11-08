@@ -1,9 +1,9 @@
 import { type } from 'arktype';
 import type { BodyweightMeasurement } from './bodyweight.ts';
-import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
-import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
 import { bodyweightMeasurementId, sequenceEntryId, workoutSessionId, workoutTemplateId } from './ids.ts';
 import { actualMeasurement, type LoadConfiguration, loadConfiguration } from './prescription.ts';
+import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
+import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
 
 /**
  * A bodyweight snapshot taken when a session begins. The value and unit are
@@ -43,6 +43,7 @@ const workoutSession = type({
     snapshot: workoutTemplate,
     'bodyweight?': bodyweightSnapshot,
     results: actualResult.array(),
+    'completedRestIds?': sequenceEntryId.array(),
 }).onDeepUndeclaredKey('reject');
 type WorkoutSession = typeof workoutSession.infer;
 
@@ -116,5 +117,5 @@ function totalLoad(load: LoadConfiguration, bodyweight: Weight | undefined): Wei
     return { value: bodyweight.value + load.weight.value, unit: bodyweight.unit };
 }
 
-export { actualResult, bodyweightSnapshot, createSessionFromTemplate, totalLoad, workoutSession };
 export type { ActualResult, BodyweightSnapshot, StartSessionInput, WorkoutSession };
+export { actualResult, bodyweightSnapshot, createSessionFromTemplate, totalLoad, workoutSession };

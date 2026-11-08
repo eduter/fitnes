@@ -2,11 +2,11 @@ import { type } from 'arktype';
 import type { BodyweightMeasurement } from './bodyweight.ts';
 import type { ExerciseDefinition } from './exercise.ts';
 import type { WorkoutSession } from './session.ts';
-import { formatPath, type ValidationIssue, type ValidationResult } from './validation.ts';
 import { validateBodyweightMeasurement } from './validateBodyweightMeasurement.ts';
 import { validateExercise } from './validateExercise.ts';
 import { validateWorkoutSession } from './validateWorkoutSession.ts';
 import { validateWorkoutTemplate } from './validateWorkoutTemplate.ts';
+import { formatPath, type ValidationIssue, type ValidationResult } from './validation.ts';
 import type { WorkoutTemplate } from './workoutTemplate.ts';
 
 /**
@@ -15,7 +15,7 @@ import type { WorkoutTemplate } from './workoutTemplate.ts';
  * rather than guessed at, because a partial read of a future format would
  * silently drop whatever this build does not know about.
  */
-const EXPORT_SCHEMA_VERSION = 1;
+const EXPORT_SCHEMA_VERSION = 2;
 
 /** Everything the app stores, in one JSON document. */
 interface DataExport {
@@ -147,5 +147,5 @@ function tryParseJson(text: string): { ok: true; value: unknown } | { ok: false;
     }
 }
 
-export { collectionNames, countRecords, EXPORT_SCHEMA_VERSION, parseDataExport, serializeDataExport };
 export type { CollectionName, DataExport };
+export { collectionNames, countRecords, EXPORT_SCHEMA_VERSION, parseDataExport, serializeDataExport };
