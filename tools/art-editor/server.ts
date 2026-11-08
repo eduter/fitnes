@@ -63,8 +63,7 @@ function createAssetHandler(
     assets: ArtworkAsset[]
 ): (request: IncomingMessage, response: ServerResponse) => Promise<void> {
     const seed = asset.seed;
-    const currentFile = Buffer.from(asset.image);
-    const baselineHash = createHash('sha256').update(currentFile).update(JSON.stringify(seed)).digest('hex');
+    const baselineHash = createHash('sha256').update(asset.image).update(JSON.stringify(seed)).digest('hex');
     const original = asset.pixels;
     const count = asset.width * asset.height;
     const token = randomBytes(24).toString('hex');
@@ -93,8 +92,8 @@ function createAssetHandler(
             renameSync(draftPath, join(work, backup));
             recoveryMessage = `An older or unreadable draft was preserved as ${asset.workDirectory}/${backup}. Starting from the app image.`;
         }
-    } else if (existsSync(join(root, asset.saveDirectory, 'project.json'))) {
-        const savedPath = join(root, asset.saveDirectory, 'project.json');
+    } else if (existsSync(join(work, 'saved/project.json'))) {
+        const savedPath = join(work, 'saved/project.json');
         try {
             const saved = JSON.parse(readFileSync(savedPath, 'utf8'));
             if (saved.baselineHash !== baselineHash || saved.emphasis !== seed.emphasis) {
@@ -103,7 +102,7 @@ function createAssetHandler(
             pixels = decodePixels(saved.pixels, count);
             updatedAt = statSync(savedPath).mtimeMs;
         } catch {
-            recoveryMessage = `Saved artwork from another source remains in ${asset.saveDirectory}/project.json; use File → Open backup.`;
+            recoveryMessage = `Saved artwork from another source remains in ${asset.workDirectory}/saved/project.json; use File → Open backup.`;
         }
     }
     const verifier = createVerifier(
@@ -250,7 +249,7 @@ function createAssetHandler(
             return;
         }
         if (url.pathname === '/assets/current.png') {
-            send(response, currentFile, '.png');
+            send(response, readFileSync(join(root, asset.saveDirectory, asset.imageName)), '.png');
             return;
         }
         if (url.pathname === '/assets/concept.png') {

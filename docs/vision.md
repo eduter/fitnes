@@ -50,10 +50,10 @@ directly in the editor. Choice/numeric windows have no visible header; numeric
 and multi-choice editors finish with End. Multi checks sit immediately after
 the label; End is bottom-right. Use available screen height for page content.
 
-The full nine-color palette is copied from the final 256×200 home artwork.
-Nine is not a hardware maximum: a future richer artwork pass may reconsider
-palette/tile allocation under the visual contract, subject to owner approval.
-Current palette tokens stay unchanged until that work is adopted.
+The source palette follows the current 256×200 home artwork, including the
+off-white ink added in the owner-edited PR #30 image. Existing semantic UI inks
+retain their meanings. The number of artwork colors is not a hardware maximum;
+future palette changes still require an exact construction and owner approval.
 
 ## Design direction
 
@@ -89,9 +89,14 @@ SectionHeading now own the typography hierarchy.
 Use the [final home artwork's indexed palette and emphasis](../art/home/construction.json)
 as the material-color reference for future icons and steel panels. Validate
 their combined screen's shared palettes and budgets before adopting a
-composition. Use the [standalone FitNES logo](fitnes-logo.png) as the logo
-source and [the original home reference](reference-home-screen-image.png) as
-composition provenance.
+composition. Use the [current FitNES logo](../art/logo/logo.png) in the app;
+the [original logo](fitnes-logo.png) and [original home reference](reference-home-screen-image.png)
+remain read-only visual references.
+
+Owner clarification (2026-11-08): adopt the edited hero and direct-color logo
+from PR #30. Keep only the original reference and current app image for each
+asset; older app versions belong in Git history, drafts and backups in ignored
+`work/`. Editor Save artwork explicitly replaces the current asset after proof.
 
 Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 as a navigation design reference: show a few choices, then expose further

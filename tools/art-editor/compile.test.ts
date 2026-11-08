@@ -50,7 +50,7 @@ it('never calls an edited image valid when a construction cannot reproduce its e
     }
 });
 
-it('can use shared off-white on both towels and the sneakers in one exact image', () => {
+it('allows another off-white accent alongside the edited towels and sneakers', () => {
     let edited: Uint8Array = pixels.slice();
     for (const region of [
         { left: 37, top: 88, width: 8, height: 17 },
@@ -58,9 +58,7 @@ it('can use shared off-white on both towels and the sneakers in one exact image'
         { left: 107, top: 141, width: 12, height: 11 },
         { left: 135, top: 141, width: 13, height: 11 },
     ]) {
-        for (const source of [16, 56]) {
-            edited = replaceRegion(edited, 256, region, source, 32);
-        }
+        edited = replaceRegion(edited, 256, region, 16, 32);
     }
     const result = compilePixels(edited, seed);
     expect(result.ok).toBe(true);
@@ -79,4 +77,23 @@ it('highlights changed regions rather than untouched character and sign sprites'
     if (!result.ok) {
         expect(result.regions.every((region) => region.top >= 160)).toBe(true);
     }
+});
+
+it('rejects extra overlays when the current artwork would exceed its sprite budget', () => {
+    const before = pixels.slice();
+    let edited: Uint8Array = pixels.slice();
+    for (const region of [
+        { left: 37, top: 88, width: 8, height: 17 },
+        { left: 33, top: 167, width: 13, height: 18 },
+        { left: 107, top: 141, width: 12, height: 11 },
+        { left: 135, top: 141, width: 13, height: 11 },
+    ]) {
+        edited = replaceRegion(edited, 256, region, 56, 32);
+    }
+    const result = compilePixels(edited, seed);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+        expect(result.detail).toContain('at most 64 sprites');
+    }
+    expect(pixels).toEqual(before);
 });

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { basename, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { displayColors } from '../nes-hardware/check.ts';
 import { decodePng, encodePng, type RgbImage } from '../nes-hardware/png.ts';
 import type { HardwareConstruction } from '../nes-hardware/rom.ts';
@@ -18,6 +18,7 @@ interface ArtworkAsset {
     reference: string;
     saveDirectory: string;
     imageName: string;
+    constructionName: string;
     workDirectory: string;
 }
 
@@ -33,15 +34,7 @@ function listArtwork(root: string): ArtworkAsset[] {
     );
     assets.push(home);
     if (existsSync(join(root, 'art/logo/logo.png'))) {
-        assets.push(
-            load(
-                'logo',
-                'Logo · preferred colors',
-                'art/logo/logo.png',
-                'art/logo/construction.json',
-                'art/logo/reference.png'
-            )
-        );
+        assets.push(load('logo', 'Logo', 'art/logo/logo.png', 'art/logo/construction.json', 'docs/fitnes-logo.png'));
     }
     for (const directory of ['src', 'art', 'public']) {
         if (!existsSync(join(root, directory))) {
@@ -104,10 +97,12 @@ function listArtwork(root: string): ArtworkAsset[] {
             }
             return code;
         });
-        let seed = construction
-            ? (JSON.parse(readFileSync(join(root, construction), 'utf8')) as HardwareConstruction)
+        const sourceConstruction = construction ?? `${path.slice(0, -4)}.construction.json`;
+        const hasConstruction = existsSync(join(root, sourceConstruction));
+        let seed = hasConstruction
+            ? (JSON.parse(readFileSync(join(root, sourceConstruction), 'utf8')) as HardwareConstruction)
             : makeSeed(image, pixels);
-        if (!construction) {
+        if (!hasConstruction) {
             const exact = compilePixels(framePixels(pixels, image.width, image.height, seed.height), seed);
             if (exact.ok) {
                 seed = exact.construction;
@@ -122,13 +117,9 @@ function listArtwork(root: string): ArtworkAsset[] {
             image: bytes,
             pixels,
             reference,
-            saveDirectory:
-                id === 'home'
-                    ? 'art/home/edited'
-                    : id === 'logo'
-                      ? 'art/logo/edited'
-                      : `art/edited/${path.slice(0, -4)}`,
+            saveDirectory: dirname(path),
             imageName: basename(path),
+            constructionName: basename(sourceConstruction),
             workDirectory:
                 id === 'home'
                     ? 'work/art-editor'

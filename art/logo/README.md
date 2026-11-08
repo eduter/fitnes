@@ -1,12 +1,14 @@
-# Editable logo
+# App logo
 
-`logo.png` is the preferred direct-color-matching candidate retained from the
-artwork comparison, unchanged from `bb3a1b0`. `construction.json` reconstructs its
-exact pixels under MMC5 attributes, Composite Direct and emphasis 1. It uses
-seven visible colors and no sprites. `reference.png` retains the original logo's
-colors, centered in the same 256×120 comparison frame (6px horizontal / 3px
-vertical black padding around the unchanged 244×114 source).
+[`logo.png`](logo.png) is the current app wordmark, using the direct-color version
+from PR #30. It renders at its native 256×120 size without a recoloring filter.
+[`construction.json`](construction.json) reproduces its exact pixels with MMC5
+attributes, Composite Direct and emphasis 1: seven visible colors, no sprites.
 
-Open **Logo · preferred colors** in the local artwork editor's asset picker.
-Drafts are independent of Home; Save artwork writes candidates under
-`art/logo/edited/`. This does not adopt the candidate into the app header.
+The richer [original reference](../../docs/fitnes-logo.png) is retained unchanged.
+There is no separate padded reference or tracked candidate image. Older app
+versions remain in Git history.
+
+Choose **Logo** in the [local artwork editor](../../tools/art-editor/README.md).
+Save artwork replaces the current PNG and construction; drafts, verification
+reports and recovery backups remain under ignored `work/`.

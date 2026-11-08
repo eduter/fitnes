@@ -909,11 +909,12 @@ git add -- ${files}
 git commit --only -m "Edit artwork" -- ${files}`;
             savedRevision = requested;
             if (revision === requested) {
-                element('save-state').textContent = `Saved to ${config.saveDirectory}/`;
+                element('save-state').textContent = `Saved current artwork to ${config.saveDirectory}/`;
                 element('save').textContent = 'Saved';
             } else {
                 notify('The checked image was saved. Your newer edits still need checking and saving.');
             }
+            element<HTMLImageElement>('current-preview').src = `${api('/assets/current.png')}&saved=${requested}`;
             element<HTMLDialogElement>('saved-dialog').showModal();
         } catch (error) {
             notify(error instanceof Error ? error.message : String(error));
