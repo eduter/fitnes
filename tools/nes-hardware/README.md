@@ -1,5 +1,9 @@
 # Explicit NES hardware proof
 
+For manual recoloring with near-real-time exact checks and a real emulator,
+see the [local artwork editor](../art-editor/README.md). It runs in Ubuntu/WSL
+and opens in a Windows browser.
+
 ```sh
 npm run nes:proof -- art/home/construction.json art/home/gym.png
 ```

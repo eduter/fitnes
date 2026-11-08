@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "profile": "mmc5-exattr",
+  "displayPalette": "composite-direct-fbx",
+  "emphasis": 1,
+  "attributeSize": 8,
+  "visibleColors": 10,
+  "sprites": 63,
+  "maxSpritesPerScanline": 8,
+  "problems": [],
+  "frames": 180,
+  "differingPixels": 0,
+  "comparedPixels": 51200,
+  "fastCheckMs": 11.102546000000004,
+  "emulatorMs": 94.85977299999999,
+  "coreSha256": "3f350aad3cf20257c5667c8485b7e3fcc22ab047893e5d763de15520f293b7f0",
+  "romSha256": "548a3570c211ec215c315c68161ddd64338a486e07236234485739d045a76644",
+  "imageSha256": "0401a9e94f9837c0a77e96430c046c53e6a66f6908ebe0def67e70c831010c77"
+}

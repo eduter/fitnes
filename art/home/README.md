@@ -6,6 +6,13 @@
   final pixel and generate a runnable NES demonstration ROM.
 - [Private review](https://fitnes-home-art-review.eduardo-terroso.chatgpt.site).
 
+The owner's hand-edited revision is retained under [edited/](edited/):
+[image](edited/gym.png), [construction](edited/construction.json),
+[editable project](edited/project.json), and [verification](edited/verification.json).
+It contains ten visible colors and 63 sprites, with at most eight per scanline.
+The local [artwork editor](../../tools/art-editor/README.md) resumes this candidate
+when no local Home draft exists. It is separate from the adopted image above.
+
 The final image preserves the reference's full composition, with separate brick
 and concrete colors, warm skin, matching yellow hazards and lamp light. The sign
 has bold native lettering, a beveled metal border and shaded corner rivets.

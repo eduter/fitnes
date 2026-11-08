@@ -19,6 +19,7 @@
     "fix": "npm run lint:fix && npm run format",
     "nes:proof": "node tools/nes-hardware/cli.ts",
     "art:corridor": "node tools/build-corridor-art.ts",
+    "art:editor": "node tools/art-editor/start.ts",
     "nes:rom": "node tools/nes-hardware/rom-cli.ts",
     "nes:emulate": "node tools/nes-hardware/emulate.ts",
     "nes:emulator:setup": "node tools/nes-hardware/setup-emulator.ts",
