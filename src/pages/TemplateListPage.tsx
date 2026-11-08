@@ -17,7 +17,7 @@ function TemplateListPage(): JSX.Element {
                     <article>
                         <h2 class="list-item__title">{item.name}</h2>
                         <p class="muted">
-                            {item.sequence.length} sets · {item.exercises.length} exercises
+                            {item.sequence.length} steps · {item.exercises.length} exercises
                         </p>
                         <div class="button-row">
                             <Button onPress={() => navigate(`/templates/${item.id}`)}>Edit</Button>

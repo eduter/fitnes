@@ -16,10 +16,12 @@ import {
     OptionPicker,
     Popover,
     SectionHeading,
+    Spinner,
 } from '../Controls/index.ts';
 import { TextAreaField, TextField } from '../fields.tsx';
 import { PagedList } from '../PagedList.tsx';
 import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
+import { TimingFields } from '../session/TimingFields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
 import { prescriptionSummary } from './prescriptionSummary.ts';
 
@@ -41,6 +43,9 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
     const [metadataOpen, setMetadataOpen] = createSignal(false);
     const [deleting, setDeleting] = createSignal<number>();
     const [moreOpen, setMoreOpen] = createSignal(false);
+    const [timingOpen, setTimingOpen] = createSignal(false);
+    const [timingExercise, setTimingExercise] = createSignal('');
+    const [restEditing, setRestEditing] = createSignal<string>();
     let moreTrigger: HTMLElement | undefined;
     let trigger: HTMLElement | undefined;
     const selectedSet = () => props.value.sets.find((set) => set.id === editing());
@@ -59,6 +64,11 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
             sets: overrides.sets ?? props.value.sets,
             sequence: overrides.sequence ?? props.value.sequence,
             existingSnapshots,
+            timingOverrides: Object.fromEntries(
+                Object.entries(overrides.timingOverrides ?? props.value.timingOverrides ?? {}).filter(([id]) =>
+                    (overrides.sets ?? props.value.sets).some((set) => set.exerciseId === id)
+                )
+            ),
         });
 
         if (result.ok) {
@@ -137,6 +147,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
 
     function duplicateOccurrence(sequenceIndex: number): void {
         const entry = props.value.sequence[sequenceIndex];
+        if (entry?.restSeconds !== undefined) {
+            const sequence = [...props.value.sequence];
+            sequence.splice(sequenceIndex + 1, 0, { id: generateSequenceEntryId(), restSeconds: entry.restSeconds });
+            rebuild({ sequence });
+            return;
+        }
         const set = props.value.sets.find((candidate) => candidate.id === entry?.plannedSetId);
         if (!entry || !set) {
             return;
@@ -174,6 +190,15 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 </Button>
                 <AddSetControl catalog={props.catalog} onAdd={addSet} />
                 <Button
+                    onPress={() =>
+                        rebuild({
+                            sequence: [...props.value.sequence, { id: generateSequenceEntryId(), restSeconds: 60 }],
+                        })
+                    }
+                >
+                    Add rest
+                </Button>
+                <Button
                     onPress={(event) => {
                         moreTrigger = event.currentTarget;
                         setMoreOpen(true);
@@ -183,7 +208,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 </Button>
             </div>
             <ValidationErrors errors={props.errors} />
-            <SectionHeading>Sets</SectionHeading>
+            <SectionHeading>Sequence</SectionHeading>
             <PagedList
                 label={`Sets in ${props.value.id}`}
                 items={props.value.sequence.map((entry) => entry.id)}
@@ -197,9 +222,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     const exercise = () =>
                         props.value.exercises.find((candidate) => candidate.id === set()?.exerciseId);
                     return (
-                        <article aria-label={`Set ${index() + 1}`}>
+                        <article aria-label={`${entry()?.restSeconds !== undefined ? 'Rest' : 'Set'} ${index() + 1}`}>
                             <p>
-                                {index() + 1}. {exercise()?.name ?? 'Unknown exercise'}
+                                {index() + 1}.{' '}
+                                {entry()?.restSeconds !== undefined
+                                    ? `Rest ${entry()?.restSeconds}s`
+                                    : (exercise()?.name ?? 'Unknown exercise')}
                             </p>
                             <p class="muted">
                                 {(() => {
@@ -211,8 +239,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                 <Button
                                     onPress={(event) => {
                                         trigger = event.currentTarget;
-                                        setEditing(entry()?.plannedSetId);
-                                        setEditorOpen(true);
+                                        if (entry()?.restSeconds !== undefined) {
+                                            setRestEditing(entry()?.id);
+                                        } else {
+                                            setEditing(entry()?.plannedSetId);
+                                            setEditorOpen(true);
+                                        }
                                     }}
                                 >
                                     Edit
@@ -227,13 +259,13 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                     Delete
                                 </Button>
                                 <MoveButton
-                                    label={`Move set ${index() + 1} up`}
+                                    label={`Move ${entry()?.restSeconds !== undefined ? 'rest' : 'set'} ${index() + 1} up`}
                                     direction="up"
                                     disabled={index() === 0}
                                     onPress={() => moveOccurrence(index(), -1)}
                                 />
                                 <MoveButton
-                                    label={`Move set ${index() + 1} down`}
+                                    label={`Move ${entry()?.restSeconds !== undefined ? 'rest' : 'set'} ${index() + 1} down`}
                                     direction="down"
                                     disabled={index() === props.value.sequence.length - 1}
                                     onPress={() => moveOccurrence(index(), 1)}
@@ -243,6 +275,68 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     );
                 }}
             </PagedList>
+            <Popover
+                open={restEditing() !== undefined}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setRestEditing(undefined);
+                    }
+                }}
+                label="Edit rest"
+                anchor={() => trigger}
+                returnFocus={() => trigger}
+                mount={document.getElementById('root') ?? undefined}
+            >
+                <div class="editor-fields">
+                    <DialogTitle>Rest</DialogTitle>
+                    <Spinner
+                        label="Rest seconds"
+                        value={props.value.sequence.find((entry) => entry.id === restEditing())?.restSeconds ?? 60}
+                        min={1}
+                        max={9999}
+                        integerDigits={4}
+                        onChange={(restSeconds) =>
+                            rebuild({
+                                sequence: props.value.sequence.map((entry) =>
+                                    entry.id === restEditing() ? { ...entry, restSeconds } : entry
+                                ),
+                            })
+                        }
+                        popoverMount={document.getElementById('root') ?? undefined}
+                    />
+                    <DialogActions kind="end" onConfirm={() => setRestEditing(undefined)} />
+                </div>
+            </Popover>
+            <Popover
+                open={timingOpen()}
+                onOpenChange={setTimingOpen}
+                label="Workout timing"
+                returnFocus={() => moreTrigger}
+                mount={document.getElementById('root') ?? undefined}
+            >
+                <div class="editor-fields">
+                    <DialogTitle>Workout timing</DialogTitle>
+                    <OptionPicker
+                        label="Exercise"
+                        value={timingExercise()}
+                        options={props.value.exercises.map((exercise) => ({
+                            value: exercise.id,
+                            label: exercise.name,
+                        }))}
+                        onChange={setTimingExercise}
+                        popoverMount={document.getElementById('root') ?? undefined}
+                    />
+                    <TimingFields
+                        inherit
+                        defaults={props.value.exercises.find((exercise) => exercise.id === timingExercise())?.timing}
+                        value={props.value.timingOverrides?.[timingExercise()]}
+                        onChange={(timing) =>
+                            rebuild({ timingOverrides: { ...props.value.timingOverrides, [timingExercise()]: timing } })
+                        }
+                    />
+                    <DialogActions kind="end" onConfirm={() => setTimingOpen(false)} />
+                </div>
+            </Popover>
             <Popover
                 open={metadataOpen()}
                 onOpenChange={setMetadataOpen}
@@ -303,6 +397,16 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 width={144}
             >
                 <div class="action-menu">
+                    <Button
+                        disabled={props.value.exercises.length === 0}
+                        onPress={() => {
+                            setMoreOpen(false);
+                            setTimingExercise(props.value.exercises[0]?.id ?? '');
+                            setTimingOpen(true);
+                        }}
+                    >
+                        Timing
+                    </Button>
                     <Show when={props.onDuplicate}>
                         <Button
                             disabled={props.duplicating}
@@ -342,7 +446,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                         setDeleting(undefined);
                     }
                 }}
-                message={`Delete set ${(deleting() ?? 0) + 1}?`}
+                message={`Delete ${props.value.sequence[deleting() ?? 0]?.restSeconds !== undefined ? 'rest' : 'set'} ${(deleting() ?? 0) + 1}?`}
                 onConfirm={() => {
                     const index = deleting();
                     if (index !== undefined) {

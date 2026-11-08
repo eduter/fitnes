@@ -22,7 +22,7 @@ function WorkoutPickerPage(): JSX.Element {
                     <article>
                         <p>{template.name}</p>
                         <p>
-                            {template.exercises.length} exercises · {template.sequence.length} sets
+                            {template.exercises.length} exercises · {template.sequence.length} steps
                         </p>
                         <Button onPress={() => navigate(`/sessions/start/${template.id}`)}>Start</Button>
                     </article>
