@@ -35,6 +35,10 @@ must be possible; do not regroup sets by exercise or change their execution
 order in the tracking UI. Focusing on the current set changes presentation,
 not this sequencing flexibility.
 
+Owner feedback (2026-11-08): make the current exercise name the prominent
+tracking-screen heading. Omit the generic Workout heading and workout name
+during training; they are not useful in the middle of a set.
+
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
 fixed rest duration per exercise is insufficient. The proposed model is one

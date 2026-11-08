@@ -26,6 +26,11 @@
 }
 .guided-header {
     min-height: 40px;
+    align-items: flex-start;
+}
+.guided-header > .nes-page-title {
+    flex: 1;
+    min-width: 0;
 }
 .guided-focus {
     display: flex;

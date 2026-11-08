@@ -249,7 +249,9 @@ function Preview(): JSX.Element {
             <SteelPanel class="guided-panel">
                 <main class="guided-page">
                     <header class="guided-header">
-                        <PageTitle>{view() === 'plan' ? 'Sequence' : 'Workout'}</PageTitle>
+                        <PageTitle>
+                            {view() === 'plan' ? 'Sequence' : finished() ? 'Complete' : label(current())}
+                        </PageTitle>
                         <Button
                             onPress={() => {
                                 if (running()) {
@@ -397,7 +399,6 @@ function Preview(): JSX.Element {
                                 Step {index() + 1} of {steps().length} ·{' '}
                                 {current()?.kind === 'rest' ? 'Rest' : 'Current set'}
                             </p>
-                            <SectionHeading>{label(current())}</SectionHeading>
                             <Show when={current()?.kind === 'set'}>
                                 <p>
                                     {(current() as Extract<GuidedStep, { kind: 'set' }>).target}{' '}
