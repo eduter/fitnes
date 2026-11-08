@@ -1,8 +1,9 @@
 import { type } from 'arktype';
 import { prescriptionProblems } from './capability.ts';
 import type { ExerciseDefinition } from './exercise.ts';
-import { workoutTemplate, type WorkoutTemplate } from './workoutTemplate.ts';
 import { formatPath, IssueCollector, type ValidationResult } from './validation.ts';
+import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
+import { normalizeWorkoutTiming } from './workoutTiming.ts';
 
 /**
  * Validate an untrusted value as a workout template, including the
@@ -24,7 +25,7 @@ function validateWorkoutTemplate(input: unknown): ValidationResult<WorkoutTempla
         return { ok: false, errors: issues.issues };
     }
 
-    return { ok: true, value: parsed };
+    return { ok: true, value: normalizeWorkoutTiming(parsed) };
 }
 
 /**
@@ -39,6 +40,11 @@ function collectTemplateIssues(template: WorkoutTemplate, issues: IssueCollector
     );
     const setIds = new Set<string>(template.sets.map((set) => set.id));
 
+    for (const exerciseId of Object.keys(template.timingOverrides ?? {})) {
+        if (!exercisesById.has(exerciseId)) {
+            issues.add([...prefix, 'timingOverrides', exerciseId], 'unknown exercise timing override');
+        }
+    }
     checkUniqueIds(issues, template, prefix);
     checkExerciseReferences(issues, template, exercisesById, prefix);
     checkPrescriptionCapabilities(issues, template, exercisesById, prefix);
@@ -100,6 +106,9 @@ function checkSequenceReferences(
     const occurrences = new Map<string, number>();
 
     for (const [index, entry] of template.sequence.entries()) {
+        if (entry.plannedSetId === undefined) {
+            continue;
+        }
         if (!setIds.has(entry.plannedSetId)) {
             issues.add(
                 [...prefix, 'sequence', index, 'plannedSetId'],

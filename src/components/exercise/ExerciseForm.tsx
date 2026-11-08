@@ -3,6 +3,7 @@ import type { ExerciseDefinition, LoadOption, MeasurementOption } from '../../do
 import type { ValidationIssue } from '../../domain/validation.ts';
 import { MultiPicker, SectionHeading } from '../Controls/index.ts';
 import { TextAreaField, TextField } from '../fields.tsx';
+import { TimingFields } from '../session/TimingFields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
 
 const measurements: { value: string; label: string; option: MeasurementOption }[] = [
@@ -75,6 +76,8 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
                 onChange={(values) => patch({ loads: loadOptions(values) })}
                 popoverMount={document.getElementById('root') ?? undefined}
             />
+            <SectionHeading>Timing defaults</SectionHeading>
+            <TimingFields value={props.value.timing} onChange={(timing) => patch({ timing })} />
             <TextAreaField
                 label="Description"
                 value={props.value.description ?? ''}

@@ -5,8 +5,10 @@ import { defaultPrescription } from '../../domain/defaultPrescription.ts';
 import type { ExerciseDefinition } from '../../domain/exercise.ts';
 import { generatePlannedSetId, generateSequenceEntryId } from '../../domain/generateIds.ts';
 import type { SetPrescription } from '../../domain/prescription.ts';
+import type { TrackingTiming } from '../../domain/trackingTiming.ts';
 import type { ValidationIssue } from '../../domain/validation.ts';
 import type { PlannedSet, WorkoutTemplate } from '../../domain/workoutTemplate.ts';
+import { withExecutionTiming } from '../../domain/workoutTiming.ts';
 import {
     Button,
     ConfirmDialog,
@@ -16,10 +18,12 @@ import {
     OptionPicker,
     Popover,
     SectionHeading,
+    Spinner,
 } from '../Controls/index.ts';
 import { TextAreaField, TextField } from '../fields.tsx';
 import { PagedList } from '../PagedList.tsx';
 import { PrescriptionFields } from '../prescription/PrescriptionFields.tsx';
+import { TimingFields } from '../session/TimingFields.tsx';
 import { ValidationErrors } from '../ValidationErrors.tsx';
 import { prescriptionSummary } from './prescriptionSummary.ts';
 
@@ -41,6 +45,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
     const [metadataOpen, setMetadataOpen] = createSignal(false);
     const [deleting, setDeleting] = createSignal<number>();
     const [moreOpen, setMoreOpen] = createSignal(false);
+    const [restEditing, setRestEditing] = createSignal<string>();
     let moreTrigger: HTMLElement | undefined;
     let trigger: HTMLElement | undefined;
     const selectedSet = () => props.value.sets.find((set) => set.id === editing());
@@ -58,7 +63,11 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
             catalog: props.catalog,
             sets: overrides.sets ?? props.value.sets,
             sequence: overrides.sequence ?? props.value.sequence,
-            existingSnapshots,
+            existingSnapshots: withExecutionTiming(
+                { ...props.value, exercises: [...existingSnapshots] },
+                undefined,
+                props.catalog
+            ).exercises,
         });
 
         if (result.ok) {
@@ -82,7 +91,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
         });
     }
 
-    function addSet(exerciseId: string, prescription: SetPrescription): void {
+    function addSet(exerciseId: string, prescription: SetPrescription, timing?: TrackingTiming): void {
         const exercise =
             props.catalog.find((candidate) => candidate.id === exerciseId) ??
             props.value.exercises.find((candidate) => candidate.id === exerciseId);
@@ -94,7 +103,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
         rebuild({
             sets: [
                 ...props.value.sets,
-                { id: plannedSetId, exerciseId: exercise.id, prescription: structuredClone(prescription) },
+                {
+                    id: plannedSetId,
+                    exerciseId: exercise.id,
+                    prescription: structuredClone(prescription),
+                    ...(timing && Object.keys(timing).length ? { timing } : {}),
+                },
             ],
             sequence: [...props.value.sequence, { id: generateSequenceEntryId(), plannedSetId }],
         });
@@ -137,6 +151,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
 
     function duplicateOccurrence(sequenceIndex: number): void {
         const entry = props.value.sequence[sequenceIndex];
+        if (entry?.restSeconds !== undefined) {
+            const sequence = [...props.value.sequence];
+            sequence.splice(sequenceIndex + 1, 0, { id: generateSequenceEntryId(), restSeconds: entry.restSeconds });
+            rebuild({ sequence });
+            return;
+        }
         const set = props.value.sets.find((candidate) => candidate.id === entry?.plannedSetId);
         if (!entry || !set) {
             return;
@@ -174,6 +194,15 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 </Button>
                 <AddSetControl catalog={props.catalog} onAdd={addSet} />
                 <Button
+                    onPress={() =>
+                        rebuild({
+                            sequence: [...props.value.sequence, { id: generateSequenceEntryId(), restSeconds: 60 }],
+                        })
+                    }
+                >
+                    Add rest
+                </Button>
+                <Button
                     onPress={(event) => {
                         moreTrigger = event.currentTarget;
                         setMoreOpen(true);
@@ -183,7 +212,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                 </Button>
             </div>
             <ValidationErrors errors={props.errors} />
-            <SectionHeading>Sets</SectionHeading>
+            <SectionHeading>Sequence</SectionHeading>
             <PagedList
                 label={`Sets in ${props.value.id}`}
                 items={props.value.sequence.map((entry) => entry.id)}
@@ -197,9 +226,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     const exercise = () =>
                         props.value.exercises.find((candidate) => candidate.id === set()?.exerciseId);
                     return (
-                        <article aria-label={`Set ${index() + 1}`}>
+                        <article aria-label={`${entry()?.restSeconds !== undefined ? 'Rest' : 'Set'} ${index() + 1}`}>
                             <p>
-                                {index() + 1}. {exercise()?.name ?? 'Unknown exercise'}
+                                {index() + 1}.{' '}
+                                {entry()?.restSeconds !== undefined
+                                    ? `Rest ${entry()?.restSeconds}s`
+                                    : (exercise()?.name ?? 'Unknown exercise')}
                             </p>
                             <p class="muted">
                                 {(() => {
@@ -211,8 +243,12 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                 <Button
                                     onPress={(event) => {
                                         trigger = event.currentTarget;
-                                        setEditing(entry()?.plannedSetId);
-                                        setEditorOpen(true);
+                                        if (entry()?.restSeconds !== undefined) {
+                                            setRestEditing(entry()?.id);
+                                        } else {
+                                            setEditing(entry()?.plannedSetId);
+                                            setEditorOpen(true);
+                                        }
                                     }}
                                 >
                                     Edit
@@ -227,13 +263,13 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                     Delete
                                 </Button>
                                 <MoveButton
-                                    label={`Move set ${index() + 1} up`}
+                                    label={`Move ${entry()?.restSeconds !== undefined ? 'rest' : 'set'} ${index() + 1} up`}
                                     direction="up"
                                     disabled={index() === 0}
                                     onPress={() => moveOccurrence(index(), -1)}
                                 />
                                 <MoveButton
-                                    label={`Move set ${index() + 1} down`}
+                                    label={`Move ${entry()?.restSeconds !== undefined ? 'rest' : 'set'} ${index() + 1} down`}
                                     direction="down"
                                     disabled={index() === props.value.sequence.length - 1}
                                     onPress={() => moveOccurrence(index(), 1)}
@@ -243,6 +279,38 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                     );
                 }}
             </PagedList>
+            <Popover
+                open={restEditing() !== undefined}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setRestEditing(undefined);
+                    }
+                }}
+                label="Edit rest"
+                anchor={() => trigger}
+                returnFocus={() => trigger}
+                mount={document.getElementById('root') ?? undefined}
+            >
+                <div class="editor-fields">
+                    <DialogTitle>Rest</DialogTitle>
+                    <Spinner
+                        label="Rest seconds"
+                        value={props.value.sequence.find((entry) => entry.id === restEditing())?.restSeconds ?? 60}
+                        min={1}
+                        max={9999}
+                        integerDigits={4}
+                        onChange={(restSeconds) =>
+                            rebuild({
+                                sequence: props.value.sequence.map((entry) =>
+                                    entry.id === restEditing() ? { ...entry, restSeconds } : entry
+                                ),
+                            })
+                        }
+                        popoverMount={document.getElementById('root') ?? undefined}
+                    />
+                    <DialogActions kind="end" onConfirm={() => setRestEditing(undefined)} />
+                </div>
+            </Popover>
             <Popover
                 open={metadataOpen()}
                 onOpenChange={setMetadataOpen}
@@ -285,6 +353,29 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                                             { ...selection().set, prescription }
                                         )
                                     }
+                                />
+                                <TimingFields
+                                    sparse
+                                    defaults={
+                                        (
+                                            props.catalog.find((exercise) => exercise.id === selection().exercise.id) ??
+                                            selection().exercise
+                                        ).timing
+                                    }
+                                    value={selection().set.timing}
+                                    paced={selection().set.prescription.measurement.measurement === 'repetitions'}
+                                    onChange={(timing) => {
+                                        const next = { ...selection().set };
+                                        if (Object.keys(timing).length) {
+                                            next.timing = timing;
+                                        } else {
+                                            delete next.timing;
+                                        }
+                                        setAt(
+                                            props.value.sets.findIndex((item) => item.id === editing()),
+                                            next
+                                        );
+                                    }}
                                 />
                                 <ValidationErrors errors={props.errors} />
                                 <DialogActions kind="end" onConfirm={() => setEditorOpen(false)} />
@@ -342,7 +433,7 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
                         setDeleting(undefined);
                     }
                 }}
-                message={`Delete set ${(deleting() ?? 0) + 1}?`}
+                message={`Delete ${props.value.sequence[deleting() ?? 0]?.restSeconds !== undefined ? 'rest' : 'set'} ${(deleting() ?? 0) + 1}?`}
                 onConfirm={() => {
                     const index = deleting();
                     if (index !== undefined) {
@@ -358,13 +449,14 @@ function TemplateForm(props: TemplateFormProps): JSX.Element {
 
 interface AddSetControlProps {
     catalog: ExerciseDefinition[];
-    onAdd: (exerciseId: string, prescription: SetPrescription) => void;
+    onAdd: (exerciseId: string, prescription: SetPrescription, timing?: TrackingTiming) => void;
 }
 
 function AddSetControl(props: AddSetControlProps): JSX.Element {
     const [picking, setPicking] = createSignal(false);
     const [exerciseId, setExerciseId] = createSignal('');
     const [prescription, setPrescription] = createSignal<SetPrescription>();
+    const [timing, setTiming] = createSignal<TrackingTiming>({});
     let trigger: HTMLElement | undefined;
     const exercise = () => props.catalog.find((item) => item.id === exerciseId());
     function choose(id: string): void {
@@ -373,6 +465,7 @@ function AddSetControl(props: AddSetControlProps): JSX.Element {
             return;
         }
         setExerciseId(id);
+        setTiming({});
         setPrescription(defaultPrescription(item));
     }
     return (
@@ -414,6 +507,17 @@ function AddSetControl(props: AddSetControlProps): JSX.Element {
                             )}
                         </Show>
                     </Show>
+                    <Show when={exercise()}>
+                        {(item) => (
+                            <TimingFields
+                                sparse
+                                defaults={item().timing}
+                                value={timing()}
+                                paced={prescription()?.measurement.measurement === 'repetitions'}
+                                onChange={setTiming}
+                            />
+                        )}
+                    </Show>
                     <DialogActions
                         kind="add"
                         confirmDisabled={!exercise() || !prescription()}
@@ -423,7 +527,7 @@ function AddSetControl(props: AddSetControlProps): JSX.Element {
                             if (!value || !exercise()) {
                                 return;
                             }
-                            props.onAdd(exerciseId(), value);
+                            props.onAdd(exerciseId(), value, timing());
                             setPicking(false);
                         }}
                     />

@@ -1,8 +1,8 @@
 import type { ExerciseDefinition } from './exercise.ts';
-import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 import type { LoadConfiguration } from './prescription.ts';
 import type { WorkoutSession } from './session.ts';
 import type { Weight } from './units.ts';
+import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 
 /** The plan data needed to interpret one sequence occurrence. */
 interface SequenceOccurrence {
@@ -14,7 +14,7 @@ interface SequenceOccurrence {
 /** Resolve a sequence entry to its planned set and embedded exercise definition. */
 function findOccurrence(template: WorkoutTemplate, sequenceEntryId: string): SequenceOccurrence | undefined {
     const entry = template.sequence.find((candidate) => candidate.id === sequenceEntryId);
-    if (!entry) {
+    if (!entry || entry.plannedSetId === undefined) {
         return undefined;
     }
 
@@ -79,5 +79,5 @@ function groupSequenceEntries(template: WorkoutTemplate): SequenceOccurrence[][]
     return blocks;
 }
 
-export { findOccurrence, groupSequenceEntries, loadUsesBodyweight, sessionBodyweightWeight, templateUsesBodyweight };
 export type { SequenceOccurrence };
+export { findOccurrence, groupSequenceEntries, loadUsesBodyweight, sessionBodyweightWeight, templateUsesBodyweight };

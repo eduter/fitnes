@@ -1,8 +1,8 @@
 import type { ExerciseDefinition } from './exercise.ts';
-import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 import type { WorkoutTemplateId } from './ids.ts';
-import type { ValidationResult } from './validation.ts';
 import { validateWorkoutTemplate } from './validateWorkoutTemplate.ts';
+import type { ValidationResult } from './validation.ts';
+import type { PlannedSet, SequenceEntry, WorkoutTemplate } from './workoutTemplate.ts';
 
 /** Inputs for building a template from catalog definitions and planned work. */
 interface CreateWorkoutTemplateInput {
@@ -94,5 +94,5 @@ function snapshotReferencedExercises(
     return exercises;
 }
 
-export { createWorkoutTemplate, refreshTemplateExercises };
 export type { CreateWorkoutTemplateInput };
+export { createWorkoutTemplate, refreshTemplateExercises };

@@ -11,7 +11,70 @@ actual performance, actions, and session progress must be readable on a phone.
 The existing model is a good starting point. Preserve its measurement and load
 meanings when designing the interface; raise concrete gaps separately.
 
-Use top-down character movement between sets to communicate workout progress.
+Owner clarification (2026-11-08): the tracking screen focuses on the current
+set rather than a list of sets. Show what to do now and provide a clear Log
+action that records the result and advances to the next set.
+
+Guide the set while the owner exercises. A timed set has a Start action,
+a short preparation countdown to allow getting into position or arranging
+equipment, then a visible remaining-time countdown. The screen should stay
+on during the guided set so the owner can glance at it.
+
+For repetition-based sets, support a configurable duration per repetition and
+count repetitions at that pace so the owner can follow along without keeping
+count mentally. Exercise timing and workout overrides are now persisted in the
+guided integration.
+Preparation duration and time per repetition are configurable defaults on the
+exercise. Owner clarification: overrides belong to individual sets, in the Add
+and Edit set forms. Show effective defaults directly in the UI; opening a form
+does not copy them into set data. Persist only fields changed to values that
+differ from the exercise default; returning to a default removes its override.
+There is no Timing menu in workout or session dropdowns.
+
+Preparation and pace are execution settings. An active session may keep them
+to run consistently, but completion removes them from its historical snapshot,
+including copied exercise defaults. History retains actual reps, duration,
+load, bodyweight and performance metadata. Neither prep nor pace is kept as
+historical performance. Older completed records are cleaned without changing
+their results. Current exercise defaults are used when starting/reopening work.
+Pause, early logging, skip and rest transitions have functional initial behavior
+for review, documented with the [session components](../src/components/session/README.md).
+
+Owner clarification (2026-11-08): preserve the workout as an arbitrarily
+ordered sequence of individual sets. Circuits, supersets and any interleaving
+must be possible; do not regroup sets by exercise or change their execution
+order in the tracking UI. Focusing on the current set changes presentation,
+not this sequencing flexibility.
+
+Owner feedback (2026-11-08): make the current exercise name the prominent
+tracking-screen heading. Omit the generic Workout heading and workout name
+during training; they are not useful in the middle of a set. Remove the redundant
+Current set label and the Ready when you are message.
+
+Owner feedback: all tracking elements retain fixed vertical positions throughout
+a set, including ready, preparation, active, paused and completed states. Reserve
+space for conditional status, pacing, actions, result editing and wake-lock
+feedback rather than recentering content as controls appear. Spinner contents
+align to the right when a longer label determines the field width.
+
+Support flexible rest time between sets. The required rest depends on the
+surrounding sequence and workload, including the exercise coming next; one
+fixed rest duration per exercise is insufficient. The proposed model is one
+ordered array whose steps can be either individual sets or explicit rest
+durations, replacing the separate set/sequence structure. Owner clarification:
+the tracker must be integrated and reviewed in the actual full application.
+The integration now supports explicit rest entries in the existing ordered
+sequence and preserves old set references for compatibility. Collapsing those
+internal set/reference arrays is still follow-up work. The owner is the sole user and
+accepts manually converting an exported JSON backup for that future change;
+an automatic migration system is not required. Detailed rest interaction
+remains subject to preview review. Do not conflate rest
+between sets with the preparation countdown before starting a set.
+
+The corridor is a between-set interstitial after finishing a set and before
+the next one. It is optional for the first version; the guided current-set
+experience takes priority. Later, use top-down character movement between
+sets to communicate workout progress.
 
 ## NES visual contract
 

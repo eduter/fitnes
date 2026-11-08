@@ -27,6 +27,7 @@ import { createSessionFromTemplate, type WorkoutSession } from '../domain/sessio
 import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationResult } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import { withExecutionTiming } from '../domain/workoutTiming.ts';
 import { seedPreview } from '../preview/seedPreview.ts';
 
 type LoadState = 'loading' | 'ready' | 'error';
@@ -184,7 +185,7 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         return saveSession(
             createSessionFromTemplate({
                 id: generateWorkoutSessionId(),
-                template,
+                template: withExecutionTiming(template, template, exercises()),
                 startedAt,
                 bodyweight,
             })
@@ -216,6 +217,16 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
             return parsed;
         }, reloadAll);
         if (result.ok) {
+            // Timer drafts belong to the replaced database, even when imported sessions reuse IDs.
+            try {
+                for (const key of Object.keys(localStorage)) {
+                    if (key.startsWith('fitnes-guided:')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            } catch {
+                /* IndexedDB remains authoritative when local storage is disabled */
+            }
             setLoadState('ready');
             setLoadError(null);
         }

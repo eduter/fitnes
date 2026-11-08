@@ -23,6 +23,9 @@ function duplicateWorkoutTemplate(template: WorkoutTemplate): WorkoutTemplate {
     });
 
     copy.sequence = copy.sequence.map((entry) => {
+        if (entry.plannedSetId === undefined) {
+            return { id: generateSequenceEntryId(), restSeconds: entry.restSeconds };
+        }
         const plannedSetId = setIds.get(entry.plannedSetId);
         if (!plannedSetId) {
             throw new Error(`cannot duplicate template '${template.id}': set '${entry.plannedSetId}' is missing`);

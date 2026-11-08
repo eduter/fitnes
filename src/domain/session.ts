@@ -1,9 +1,9 @@
 import { type } from 'arktype';
 import type { BodyweightMeasurement } from './bodyweight.ts';
-import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
-import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
 import { bodyweightMeasurementId, sequenceEntryId, workoutSessionId, workoutTemplateId } from './ids.ts';
 import { actualMeasurement, type LoadConfiguration, loadConfiguration } from './prescription.ts';
+import { epochMillis, positiveFinite, type Weight, weightUnit } from './units.ts';
+import { type WorkoutTemplate, workoutTemplate } from './workoutTemplate.ts';
 
 /**
  * A bodyweight snapshot taken when a session begins. The value and unit are
@@ -33,7 +33,8 @@ type ActualResult = typeof actualResult.infer;
  * A historical record of a workout performed. It holds an independent snapshot
  * of the plan and the performance recorded against sequence occurrences, so
  * the same exercise appearing more than once stays distinguishable. The
- * snapshot is a full template copy, not a reference to a mutable template.
+ * snapshot is an independent plan copy. Execution timing is removed when the
+ * session is completed; actual performance remains unchanged.
  */
 const workoutSession = type({
     id: workoutSessionId,
@@ -43,6 +44,7 @@ const workoutSession = type({
     snapshot: workoutTemplate,
     'bodyweight?': bodyweightSnapshot,
     results: actualResult.array(),
+    'completedRestIds?': sequenceEntryId.array(),
 }).onDeepUndeclaredKey('reject');
 type WorkoutSession = typeof workoutSession.infer;
 
@@ -116,5 +118,5 @@ function totalLoad(load: LoadConfiguration, bodyweight: Weight | undefined): Wei
     return { value: bodyweight.value + load.weight.value, unit: bodyweight.unit };
 }
 
-export { actualResult, bodyweightSnapshot, createSessionFromTemplate, totalLoad, workoutSession };
 export type { ActualResult, BodyweightSnapshot, StartSessionInput, WorkoutSession };
+export { actualResult, bodyweightSnapshot, createSessionFromTemplate, totalLoad, workoutSession };

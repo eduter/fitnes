@@ -65,6 +65,34 @@ preview's behavioral role.
   character alternatives available; timing and detailed interaction remain open.
 - [ ] Plan deployment and data transfer before replacing the preview.
 
+## Guided workout tracking
+
+Owner-approved direction is detailed in the [vision](vision.md). Review the
+[actual complete app](https://fitnes-pr33-app.eduardo-terroso.chatgpt.site), not
+the historical standalone prototype.
+
+- [x] Integrate current-step tracking with real session snapshots and persistence;
+  successful Log advances to the next unfinished step.
+- [x] Add Start, preparation countdowns, remaining time, paced repetitions,
+  pause/resume and screen wake lock with fixed element positions.
+- [x] Persist exercise preparation/rep-duration defaults and sparse per-set
+  overrides in Add/Edit set forms. Display inherited defaults without storing
+  them; returning to the default removes the override. Remove Timing menus.
+- [x] Remove prep/pace from completed history, including legacy snapshots, while
+  retaining actual performance and live-session execution configuration.
+- [x] Add explicit rest steps to the ordered execution sequence and workout
+  editing, duplication and movement. Preserve circuits and supersets.
+- [x] Preserve previous results, count/load meanings and independent per-side
+  performance; recover unlogged timer/result drafts after refresh.
+- [x] Publish the full application from the PR source with no preview seeding.
+- [ ] Review/refine pause, early logging, skip, rest auto-start and Next behavior
+  on the owner's Android phone. These are functional initial choices for review.
+- [ ] Simplify the internal set/reference storage into the proposed single array
+  of set/rest objects. The working integration extends the existing sequence
+  compatibly; old exports still import. Manual JSON conversion is acceptable
+  when that later representation changes; no automatic migration is required.
+- [ ] Add the corridor later; it is not required for the first guided version.
+
 ## Model policies to resolve
 
 These product decisions remain open; documentation cleanup does not choose a

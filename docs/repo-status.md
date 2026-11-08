@@ -45,6 +45,37 @@ sample sessions/templates/readings. Schema upgrades retain legacy scaffold rows.
 No deployment or data at another origin is replaced automatically. The corridor
 transition remains deferred; this branch does not claim it is integrated.
 
+## Full PR #33 application review
+
+[Complete PR #33 application](https://fitnes-pr33-app.eduardo-terroso.chatgpt.site)
+builds the actual app with normal IndexedDB persistence and no seeded sample
+data. The separate origin starts empty; transfer an exported JSON through
+Settings → Data when desired. Earlier deployments and their data are preserved.
+
+Guided tracking is integrated into the actual session page. Opening/resuming a
+workout selects its first unfinished step. Start runs preparation followed by
+timed work or paced reps; Log persists a real result before advancing. The
+workout editor adds, edits, duplicates and reorders explicit rest steps alongside
+sets. Exercise editors persist timing defaults; Add/Edit set forms show those
+defaults and persist only per-set differences. Timing menu options are removed.
+Per-side measurements guide each side independently and retain distinct results.
+Previous results, load bases, units and bodyweight snapshots remain intact.
+
+All tracker phases reserve fixed layout slots, including result editing and
+wake-lock feedback. Paused/running timer state and unlogged results recover
+from local storage after refresh; final results and rest completion are stored
+in IndexedDB and included in JSON export. Completion removes preparation/pace
+from the history snapshot while preserving actual performance. Database version
+3 converts the earlier shared overrides into set properties and cleans timing
+from existing completed records. Export version 3 still reads older exports.
+Review/history keeps the list view.
+See [integrated behavior](../src/components/session/README.md).
+
+The earlier [standalone prototype](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
+is superseded for app review and remains hosted as a historical artifact. Its
+screen source has been replaced by the integrated session components. The full
+app URL above is the merge-result preview; Android owner review remains open.
+
 ## Retained design sources
 
 The [corridor art package](design/corridor-interstitial/README.md) is available

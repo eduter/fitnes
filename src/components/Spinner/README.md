@@ -15,3 +15,6 @@ is used. The internal NumberPad is shared by all Spinner instances.
 
 The pad has no visible title/header and closes with End. Its accessible name
 and live readout retain the field label. It never opens the virtual keyboard.
+
+The value and step arrows align to the right inside the field, including when
+a long legend determines its width. Fixed-mask digits are right aligned.

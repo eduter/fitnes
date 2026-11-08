@@ -157,8 +157,13 @@ Popover reveals and hides a fixed-size frame through an ordinary overflow
 viewport in whole 16-pixel steps. The copper border and scrolling content do not
 resize during animation. Do not animate clip-path on the framed/scrolling layer:
 the reported Chromium artifact showed page content blinking through covered
-windows. Stacked parent windows retain their frame and footer throughout child
-animations. Pagination belongs only to the underlying page.
+windows. Resolve tall windows to one fitting whole-step height before opening;
+the frame and viewport use that same target without competing CSS max-height
+constraints. Window borders use native PNG corners and repeated edge strips;
+long stretched border-image edges corrupt their paint under Chromium zoom.
+Scroll only the inner form, without repositioning its frame on its
+own scroll events. Viewport/ancestor changes still reposition nested windows.
+Stacked parent windows retain their frame and footer throughout child animations. Pagination belongs only to the underlying page.
 
 MoveButton's shaft arrow points toward a destination bar. It means reorder,
 whereas the small filled spinner triangles mean increment/decrement. Workout
