@@ -84,9 +84,16 @@ tracking layout.
 - [ ] Preserve arbitrary individual-set order in editing and tracking, including
   circuits and supersets; do not regroup execution by exercise.
 - [ ] Design configurable rest between sets to reflect sequence and workload;
-  resolve its model placement and configuration separately from preparation time.
+  review the proposed ordered set/rest array separately from preparation time.
 - [ ] Add the corridor as a later between-set interstitial; it is not required
   for the first guided tracking version.
+
+- [x] Build an isolated current-set preview with sample data, configurable exercise
+  defaults/workout overrides, and an editable ordered set/rest sequence. See
+  [preview behavior and provisional decisions](../src/guided-preview/README.md).
+- [ ] Review the guided preview on the owner's phone before integrating it or
+  replacing the persistent set/sequence model. Manual exported-JSON conversion
+  is acceptable to the owner; no automatic migration system is required.
 
 ## Model policies to resolve
 

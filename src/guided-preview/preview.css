@@ -1,0 +1,110 @@
+.guided-preview {
+    position: relative;
+    min-height: calc(100dvh / var(--screen-scale));
+}
+.guided-panel {
+    min-height: calc(100dvh / var(--screen-scale));
+}
+.guided-panel > .steel-panel__frame {
+    min-height: calc(100dvh / var(--screen-scale) - 20px);
+    display: flex;
+}
+.guided-page {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding: 4px;
+}
+.guided-header,
+.guided-actions,
+.guided-fields {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+.guided-header {
+    min-height: 40px;
+}
+.guided-focus {
+    display: flex;
+    flex: 1;
+    min-height: 184px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    text-align: center;
+    padding-block: 16px;
+}
+.guided-counter {
+    font-size: 48px;
+    line-height: 48px;
+    min-height: 48px;
+    font-variant-numeric: tabular-nums;
+}
+.guided-focus > .nes-button {
+    align-self: center;
+}
+.guided-meter {
+    display: flex;
+    gap: 4px;
+    height: 8px;
+}
+.guided-meter span {
+    display: block;
+    width: 8px;
+    background: var(--nes-muted);
+}
+.guided-meter .filled {
+    background: var(--nes-ink);
+}
+.guided-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.guided-bottom > .guided-actions {
+    justify-content: flex-start;
+    gap: 24px;
+}
+.guided-caption {
+    border-top: 1px solid var(--nes-muted);
+    padding-top: 8px;
+    margin-top: 8px;
+}
+.guided-wake:empty {
+    display: none;
+}
+.guided-editor,
+.guided-finish {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.guided-editor .nes-section-heading {
+    margin-block: 0;
+}
+.guided-fields {
+    justify-content: flex-start;
+    align-items: end;
+    flex-wrap: wrap;
+}
+.guided-plan-list {
+    flex: 1;
+    min-height: 96px;
+}
+.guided-plan-list > .nes-paged-window {
+    height: 100%;
+}
+.guided-step-row {
+    padding-block: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-bottom: 1px solid var(--nes-muted);
+}
+.guided-step-row .guided-actions {
+    justify-content: flex-start;
+}

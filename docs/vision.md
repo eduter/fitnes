@@ -37,8 +37,13 @@ not this sequencing flexibility.
 
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
-fixed rest duration per exercise is insufficient. Where rest belongs in the
-model and how it is configured remain open decisions. Do not conflate rest
+fixed rest duration per exercise is insufficient. The proposed model is one
+ordered array whose steps can be either individual sets or explicit rest
+durations, replacing the separate set/sequence structure. Review this in an
+isolated preview before changing persistence. The owner is the sole user and
+accepts manually converting an exported JSON backup for that future change;
+an automatic migration system is not required. Detailed rest interaction
+remains subject to preview review. Do not conflate rest
 between sets with the preparation countdown before starting a set.
 
 The corridor is a between-set interstitial after finishing a set and before
