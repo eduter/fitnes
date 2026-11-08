@@ -16,7 +16,7 @@ beforeAll(async () => {
         cpSync(`art/home/${file}`, join(root, 'art/home', file));
     }
     mkdirSync(join(root, 'art/logo'), { recursive: true });
-    for (const file of ['logo.png', 'construction.json', 'reference.png']) {
+    for (const file of ['logo.png', 'construction.json']) {
         cpSync(`art/logo/${file}`, join(root, 'art/logo', file));
     }
     mkdirSync(join(root, 'src/styles'), { recursive: true });

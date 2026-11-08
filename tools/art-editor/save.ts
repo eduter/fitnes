@@ -7,7 +7,7 @@ import { assetPng, framePixels } from './assets.ts';
 import { rgbImage } from './compile.ts';
 import type { VerifiedArtifact } from './verification.ts';
 
-/** Save a verified candidate to tracked files, preserving adopted artwork and previous saves. */
+/** Replace current artwork with verified pixels, keeping recovery files under ignored work/. */
 function saveArtwork(
     root: string,
     artifact: VerifiedArtifact,
@@ -17,8 +17,9 @@ function saveArtwork(
     destination = {
         width: 256,
         height: pixels.length / 256,
-        saveDirectory: 'art/home/edited',
+        saveDirectory: 'art/home',
         imageName: 'gym.png',
+        constructionName: 'construction.json',
         workDirectory: 'work/art-editor',
     }
 ): string[] {
@@ -40,26 +41,32 @@ function saveArtwork(
         throw new Error('The verified files changed. Recheck the image before saving.');
     }
     const target = join(root, destination.saveDirectory);
-    const parent = dirname(target);
-    mkdirSync(parent, { recursive: true });
-    const staged = mkdtempSync(join(parent, '.edited-save-'));
-    const backups = join(root, destination.workDirectory, 'saved-backups');
-    let backup: string | null = null;
+    const work = join(root, destination.workDirectory);
+    mkdirSync(target, { recursive: true });
+    const staged = mkdtempSync(join(target, '.art-save-'));
+    const backups = join(work, 'saved-backups');
+    mkdirSync(backups, { recursive: true });
+    const backup = mkdtempSync(join(backups, 'save-'));
+    const files = [destination.imageName, destination.constructionName];
+    const replaced: string[] = [];
     try {
-        if (existsSync(target)) {
-            cpSync(target, staged, { recursive: true });
+        // Back up only this asset; neighboring tiles and references belong to other files
+        for (const file of files) {
+            if (existsSync(join(target, file))) {
+                cpSync(join(target, file), join(backup, file));
+            }
         }
         writeFileSync(
             join(staged, destination.imageName),
             assetPng(pixels, destination.width, destination.height, emphasis)
         );
-        if (destination.width !== 256 || destination.height !== seed.height) {
-            writeFileSync(join(staged, 'proof-frame.png'), image);
-        }
-        writeFileSync(join(staged, 'construction.json'), construction);
-        writeFileSync(join(staged, 'verification.json'), report);
+        writeFileSync(join(staged, destination.constructionName), construction);
+
+        const saved = join(work, 'saved');
+        mkdirSync(saved, { recursive: true });
+        writeFileSync(join(saved, 'verification.json'), report);
         writeFileSync(
-            join(staged, 'project.json'),
+            join(saved, 'project.json'),
             `${JSON.stringify(
                 {
                     format: 'fitnes-art-editor-v1',
@@ -73,24 +80,23 @@ function saveArtwork(
                 2
             )}\n`
         );
-        if (existsSync(target)) {
-            mkdirSync(backups, { recursive: true });
-            backup = join(mkdtempSync(join(backups, 'save-')), 'edited');
-            renameSync(target, backup);
+        for (const file of files) {
+            renameSync(join(staged, file), join(target, file));
+            replaced.push(file);
         }
-        renameSync(staged, target);
     } catch (error) {
-        // A failed directory swap must leave the previous candidate usable
-        if (backup && !existsSync(target)) {
-            renameSync(backup, target);
+        // A failed multi-file save must restore the previous matching image and construction
+        for (const file of replaced) {
+            const previous = join(backup, file);
+            if (existsSync(previous)) {
+                cpSync(previous, join(target, file));
+            } else {
+                rmSync(join(target, file), { force: true });
+            }
         }
         throw error;
     } finally {
         rmSync(staged, { recursive: true, force: true });
-    }
-    const files = [destination.imageName, 'construction.json', 'project.json', 'verification.json'];
-    if (destination.width !== 256 || destination.height !== seed.height) {
-        files.push('proof-frame.png');
     }
     return files.map((file) => `${destination.saveDirectory}/${file}`);
 }

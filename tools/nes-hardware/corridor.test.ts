@@ -32,7 +32,12 @@ it.each(VERSIONS)('keeps the %s sample within the home palettes and NES sprite b
     const image = decodePng(readAsset(version, 'sample.png'));
     expect(construction.palettes).toEqual(home.palettes);
     expect(construction.emphasis).toEqual(home.emphasis);
-    expect(construction.spritePalettes).toEqual(home.spritePalettes?.slice(0, 2));
+    // Corridor sprites retain their own allocation as the adopted hero evolves
+    expect(construction.spritePalettes?.[0]).toEqual(home.spritePalettes?.[0]);
+    const homeCodes = new Set([...home.palettes.flat(), ...(home.spritePalettes ?? []).flat()]);
+    for (const code of construction.spritePalettes?.flat() ?? []) {
+        expect(homeCodes.has(code)).toBe(true);
+    }
     expect(checkConstruction(construction, image)).toMatchObject({
         status: 'pass',
         profile: 'mmc5-exattr',

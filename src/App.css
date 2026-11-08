@@ -16,14 +16,10 @@
     padding: 7px 0;
 }
 .fitnes-logo {
-    filter: url("#logo-palette");
     display: block;
-    width: 244px;
-    height: 114px;
+    width: 256px;
+    height: 120px;
     margin: auto;
-}
-.palette-definitions {
-    position: absolute;
 }
 .app-main {
     display: flex;

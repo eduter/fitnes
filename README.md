@@ -10,8 +10,8 @@ npm run dev
 ```
 
 For native artwork changes, use the [local NES artwork editor](tools/art-editor/README.md)
-(`npm run art:editor`). It keeps per-asset drafts and saves verified candidates
-without replacing the app's adopted assets.
+(`npm run art:editor`). Drafts and backups stay local; Save artwork replaces the
+selected current image and construction after verification.
 
 ## Build
 
@@ -45,8 +45,9 @@ validates before an atomic replacement of the four domain collections. Legacy
 version-1 scaffold workout rows are retained in their store, without automatic
 conversion into the current domain format.
 
-The home logo uses the standalone source and the warm orange/skin filter from
-PR #26, restored after owner feedback. Both steel and copper frames use native-size
+Home uses the owner-edited `art/home/gym.png` and the direct-color
+`art/logo/logo.png` from PR #30. Original references remain under `docs/`;
+there are no tracked alternate app-image versions or runtime logo filters. Both steel and copper frames use native-size
 PNG assets at runtime to retain the Android border-image painting fix. Editable
 SVG sources remain alongside them. Generated Chromium captures and construction
 reports belong in ignored `work/`.

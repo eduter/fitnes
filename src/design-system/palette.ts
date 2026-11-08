@@ -8,6 +8,7 @@ const homePalette = [
     { name: 'Coral', token: 'coral', code: 38, hex: '#ff754e' },
     { name: 'Charcoal', token: 'charcoal', code: 45, hex: '#5e4538' },
     { name: 'Orange', token: 'orange', code: 39, hex: '#ff8b20' },
+    { name: 'Off-white', token: 'off-white', code: 32, hex: '#ffe9bd' },
     { name: 'Skin', token: 'skin', code: 55, hex: '#ffcc83' },
 ] as const;
 

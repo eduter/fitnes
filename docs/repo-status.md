@@ -1,12 +1,16 @@
 # Repository inventory
 
-Updated 2026-11-07. Use [the vision](vision.md) for product authority and
+Updated 2026-11-08. Use [the vision](vision.md) for product authority and
 [the backlog](backlog.md) for open work.
 
 ## Adopted in main
 
-- [Final home artwork](../art/home/gym.png) and its
-  [construction/proof inputs](../art/home/construction.json).
+- [Current home artwork](../art/home/gym.png) and its
+  [construction](../art/home/construction.json), using the owner-edited PR #30 image.
+- [Current logo](../art/logo/logo.png) and [construction](../art/logo/construction.json),
+  rendered directly. Original references remain under `docs/`; no alternate app images are retained.
+- [Local artwork editor](../tools/art-editor/README.md); Save artwork replaces the
+  current selected asset, with drafts and backups under ignored `work/`.
 - [SteelPanel](../src/components/SteelPanel/README.md), the reusable steel frame.
 - [BottomTabs](../src/components/BottomTabs/README.md), the selected six icons
   and steel tab bar.
@@ -20,7 +24,7 @@ Updated 2026-11-07. Use [the vision](vision.md) for product authority and
   [controls preview](https://fitnes-numeric-preview.eduardo-terroso.chatgpt.site/)
   remains available as a historical mechanical fixture.
 - [Selected style reference](style-reference.png),
-  [standalone logo](fitnes-logo.png), and
+  [original logo reference](fitnes-logo.png), and
   [original home composition reference](reference-home-screen-image.png).
 - Public PWA icons and component proof routes are build/runtime assets. Keep
   generated proof captures, reports, and ROMs under ignored `work/`.

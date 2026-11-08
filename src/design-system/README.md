@@ -78,13 +78,13 @@ Import controls from `src/components/Controls/index.ts`.
 - Native keyboard and rare native date picking are approved exceptions for
   input convenience. They do not authorize other web-widget substitutions.
 
-## Palette: nine is the artwork choice, not the NES maximum
+## Palette: artwork colors are not the NES maximum
 
-The approved `art/home/gym.png` is 256×200 and really contains exactly **nine**
-RGB colors. Tokens cover all nine; `tokens.test.ts` compares CSS/inventory with
-actual image pixels and its indexed PPU construction. The original high-res
-reference has many more colors. Current semantic inks use the existing approved
-source colors; no artwork changes are made in this PR.
+The current `art/home/gym.png` is the owner-edited PR #30 image: 256×200 pixels
+and ten exact RGB colors, including off-white. Tokens cover all source colors;
+`tokens.test.ts` compares the inventory and CSS with the indexed construction
+and image. Existing semantic inks retain their meanings. The richer original
+reference is preserved separately; only the current app image is retained.
 
 Ordinary NES palette organization can expose up to 13 distinct background
 colors (four groups of three plus a shared backdrop) and 12 sprite colors,
@@ -92,13 +92,13 @@ colors (four groups of three plus a shared backdrop) and 12 sprite colors,
 still restricted to its own small palette; available slots do not permit
 arbitrary colors anywhere. The home uses MMC5 extended 8×8 background attributes,
 red emphasis 1 and the Composite Direct RGB interpretation. It has four
-background palettes, three sprite palettes, 57 sprites and already reaches the
+background palettes, two sprite palettes, 63 sprites and already reaches the
 eight-sprites-per-scanline limit. Duplicate material colors across palettes
 reduce the number of distinct colors actually used.
 
 A richer future artwork pass is possible, with palette/tile reassignment and
 composition proof. Do not treat nine as a permanent hardware cap, or add colors
-ad hoc to UI tokens. Keep the current palette until new artwork is approved.
+ad hoc to UI tokens. Future artwork changes still require owner approval and exact proof.
 
 ## Source and integration scope
 

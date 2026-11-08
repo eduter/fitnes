@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { checkConstruction } from '../nes-hardware/check.ts';
 import { decodePng } from '../nes-hardware/png.ts';
@@ -19,10 +19,10 @@ it.each(assets.map((asset) => [asset.id, asset] as const))('proves exact native 
     expect(encoded).toEqual(source);
 });
 
-it('keeps the original home draft identity and the preferred logo pixels', () => {
+it('keeps one current image per asset with isolated drafts', () => {
     const home = assets.find((asset) => asset.id === 'home');
     expect(home?.workDirectory).toBe('work/art-editor');
-    expect(home?.saveDirectory).toBe('art/home/edited');
+    expect(home?.saveDirectory).toBe('art/home');
     const seed = JSON.parse(readFileSync('art/home/construction.json', 'utf8'));
     expect(
         createHash('sha256')
@@ -33,15 +33,14 @@ it('keeps the original home draft identity and the preferred logo pixels', () =>
     expect(assets.find((asset) => asset.id === 'logo')?.height).toBe(120);
 });
 
-it('keeps the hand-edited Home candidate, editable project and proof consistent', () => {
-    const image = readFileSync('art/home/edited/gym.png');
-    const project = JSON.parse(readFileSync('art/home/edited/project.json', 'utf8'));
-    const construction = JSON.parse(readFileSync('art/home/edited/construction.json', 'utf8'));
-    const proof = JSON.parse(readFileSync('art/home/edited/verification.json', 'utf8'));
-    const pixels = Buffer.from(project.pixels, 'base64');
-    expect(decodePng(assetPng(pixels, project.width, project.height, project.emphasis))).toEqual(decodePng(image));
+it('uses the edited hero as the canonical artwork without retaining candidate images', () => {
+    const image = readFileSync('art/home/gym.png');
+    const construction = JSON.parse(readFileSync('art/home/construction.json', 'utf8'));
     expect(checkConstruction(construction, decodePng(image)).status).toBe('pass');
-    expect(proof.status).toBe('pass');
-    expect(proof.differingPixels).toBe(0);
-    expect(proof.imageSha256).toBe(createHash('sha256').update(image).digest('hex'));
+    expect(createHash('sha256').update(image).digest('hex')).toBe(
+        '0401a9e94f9837c0a77e96430c046c53e6a66f6908ebe0def67e70c831010c77'
+    );
+    expect(existsSync('art/home/edited')).toBe(false);
+    expect(existsSync('art/logo/reference.png')).toBe(false);
+    expect(assets.find((asset) => asset.id === 'logo')?.reference).toBe('docs/fitnes-logo.png');
 });

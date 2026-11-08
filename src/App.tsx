@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from '@solidjs/router';
-import { onCleanup, onMount, Show, type JSX } from 'solid-js';
-import logoUrl from '../docs/fitnes-logo.png?url';
+import { type JSX, onCleanup, onMount, Show } from 'solid-js';
+import logoUrl from '../art/logo/logo.png?url';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
 import { basePath, pathWithinBase } from './app/basePath.ts';
 import { BottomTabs, type TabId } from './components/BottomTabs/BottomTabs.tsx';
@@ -50,26 +50,11 @@ function App(props: AppProps): JSX.Element {
 
     return (
         <AppDataProvider>
-            <svg class="palette-definitions" width="0" height="0" aria-hidden="true">
-                <defs>
-                    <filter id="logo-palette" color-interpolation-filters="sRGB">
-                        <feColorMatrix
-                            type="matrix"
-                            values="0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0.2126 0.7152 0.0722 0 0 0 0 0 1 0"
-                        />
-                        <feComponentTransfer>
-                            <feFuncR type="discrete" tableValues="0 1 1 1" />
-                            <feFuncG type="discrete" tableValues="0 0.460784 0.547059 0.801961" />
-                            <feFuncB type="discrete" tableValues="0 0.307843 0.127451 0.515686" />
-                        </feComponentTransfer>
-                    </filter>
-                </defs>
-            </svg>
             <div class="app" classList={{ 'app--home': home() }}>
                 <Show when={home()}>
                     <header class="app-header">
                         <div class="app-title">
-                            <img src={logoUrl} class="fitnes-logo" alt="FitNES" width="244" height="114" />
+                            <img src={logoUrl} class="fitnes-logo" alt="FitNES" width="256" height="120" />
                         </div>
                     </header>
                 </Show>
