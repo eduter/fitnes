@@ -45,6 +45,17 @@ sample sessions/templates/readings. Schema upgrades retain legacy scaffold rows.
 No deployment or data at another origin is replaced automatically. The corridor
 transition remains deferred; this branch does not claim it is integrated.
 
+## Guided workout preview
+
+[Private guided workout preview](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
+is an isolated sample-data prototype of the current-set direction. It supports
+preparation countdowns, timed sets, paced repetitions, pause/resume, Log to
+advance, explicit rest steps, and exercise timing defaults with workout
+overrides. Plan edits an ordered set/rest array without changing the persistent
+application model or stored data. See [behavior and provisional choices](../src/guided-preview/README.md).
+The owner has not yet reviewed this preview on Android; it is not a dogfooded
+behavioral reference. The corridor remains deferred.
+
 ## Retained design sources
 
 The [corridor art package](design/corridor-interstitial/README.md) is available

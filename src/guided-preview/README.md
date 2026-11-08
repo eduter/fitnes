@@ -1,5 +1,7 @@
 # Guided workout preview
 
+[Private phone preview](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
+
 Isolated prototype of the owner-approved current-set direction. It imports the
 adopted controls and SteelPanel, but no application database, router or service
 worker. It uses sample data in memory and resets on reload. Existing workout
