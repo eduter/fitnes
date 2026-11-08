@@ -87,11 +87,14 @@ function main(): void {
                     }
                 }
                 if (choice.missing.length) {
+                    // NES sprites start at row one; shift a transparent top row without changing visible pixels.
+                    const shiftTop = y === 0 && sprite.subarray(0, 8).every((slot) => slot === 0);
+                    const pattern = shiftTop ? new Uint8Array([...sprite.subarray(8), ...new Uint8Array(8)]) : sprite;
                     construction.sprites?.push({
                         x,
-                        y,
+                        y: shiftTop ? 1 : y,
                         palette: choice.spritePalette,
-                        pixels: Buffer.from(sprite).toString('base64'),
+                        pixels: Buffer.from(pattern).toString('base64'),
                     });
                 }
             }
