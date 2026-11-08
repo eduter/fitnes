@@ -398,36 +398,40 @@ function Preview(): JSX.Element {
                             <p>
                                 Step {index() + 1} of {steps().length}
                             </p>
-                            <Show when={current()?.kind === 'set'}>
-                                <p>
-                                    {(current() as Extract<GuidedStep, { kind: 'set' }>).target}{' '}
-                                    {exercise()?.timed ? 'seconds' : 'reps'}
-                                    {(current() as Extract<GuidedStep, { kind: 'set' }>).load > 0
-                                        ? ` · ${(current() as Extract<GuidedStep, { kind: 'set' }>).load} kg`
-                                        : ''}
-                                </p>
-                                <p>
-                                    {timing().prep}s prep{exercise()?.timed ? '' : ` · ${timing().pace}s per rep`}
-                                </p>
-                            </Show>
-                            <div class="guided-focus">
-                                <Show when={started()}>
-                                    <p role="status">
-                                        {done()
-                                            ? current()?.kind === 'rest'
-                                                ? 'Rest complete'
-                                                : 'Set complete'
-                                            : !running()
-                                              ? 'Paused'
-                                              : position().phase === 'prep'
-                                                ? 'Get into position'
-                                                : current()?.kind === 'rest'
-                                                  ? 'Rest · time remaining'
-                                                  : exercise()?.timed
-                                                    ? 'Time remaining'
-                                                    : 'Reps completed'}
+                            <div class="guided-prescription">
+                                <Show when={current()?.kind === 'set'}>
+                                    <p>
+                                        {(current() as Extract<GuidedStep, { kind: 'set' }>).target}{' '}
+                                        {exercise()?.timed ? 'seconds' : 'reps'}
+                                        {(current() as Extract<GuidedStep, { kind: 'set' }>).load > 0
+                                            ? ` · ${(current() as Extract<GuidedStep, { kind: 'set' }>).load} kg`
+                                            : ''}
+                                    </p>
+                                    <p>
+                                        {timing().prep}s prep{exercise()?.timed ? '' : ` · ${timing().pace}s per rep`}
                                     </p>
                                 </Show>
+                            </div>
+                            <div class="guided-focus">
+                                <div class="guided-status">
+                                    <Show when={started()}>
+                                        <p role="status">
+                                            {done()
+                                                ? current()?.kind === 'rest'
+                                                    ? 'Rest complete'
+                                                    : 'Set complete'
+                                                : !running()
+                                                  ? 'Paused'
+                                                  : position().phase === 'prep'
+                                                    ? 'Get into position'
+                                                    : current()?.kind === 'rest'
+                                                      ? 'Rest · time remaining'
+                                                      : exercise()?.timed
+                                                        ? 'Time remaining'
+                                                        : 'Reps completed'}
+                                        </p>
+                                    </Show>
+                                </div>
                                 <div
                                     class="guided-counter"
                                     role="timer"
@@ -449,31 +453,34 @@ function Preview(): JSX.Element {
                                             ? clock(position().remaining)
                                             : `${position().reps}/${(current() as Extract<GuidedStep, { kind: 'set' }>).target}`}
                                 </div>
-                                <Show
-                                    when={
-                                        started() &&
-                                        current()?.kind === 'set' &&
-                                        !exercise()?.timed &&
-                                        position().phase !== 'prep' &&
-                                        !done()
-                                    }
-                                >
-                                    <p>
-                                        Next rep in{' '}
-                                        {Math.max(
-                                            1,
-                                            Math.ceil(
-                                                timing().pace -
-                                                    (Math.max(
-                                                        0,
-                                                        elapsedAt(accumulated(), anchor(), now()) / 1000 - timing().prep
-                                                    ) %
-                                                        timing().pace)
-                                            )
-                                        )}
-                                        s
-                                    </p>
-                                </Show>
+                                <div class="guided-cue">
+                                    <Show
+                                        when={
+                                            started() &&
+                                            current()?.kind === 'set' &&
+                                            !exercise()?.timed &&
+                                            position().phase !== 'prep' &&
+                                            !done()
+                                        }
+                                    >
+                                        <p>
+                                            Next rep in{' '}
+                                            {Math.max(
+                                                1,
+                                                Math.ceil(
+                                                    timing().pace -
+                                                        (Math.max(
+                                                            0,
+                                                            elapsedAt(accumulated(), anchor(), now()) / 1000 -
+                                                                timing().prep
+                                                        ) %
+                                                            timing().pace)
+                                                )
+                                            )}
+                                            s
+                                        </p>
+                                    </Show>
+                                </div>
                                 <div class="guided-meter" aria-hidden="true">
                                     <For each={Array.from({ length: 16 })}>
                                         {(_, i) => (
@@ -485,49 +492,55 @@ function Preview(): JSX.Element {
                                         )}
                                     </For>
                                 </div>
-                                <Show
-                                    when={!started()}
-                                    fallback={
-                                        <Show when={!done()}>
-                                            <Button onPress={() => (running() ? pause() : start())}>
-                                                {running() ? 'Pause' : 'Resume'}
-                                            </Button>
-                                        </Show>
-                                    }
-                                >
-                                    <Button onPress={start}>Start</Button>
-                                </Show>
-                                <Show when={done() && current()?.kind === 'set'}>
-                                    <Spinner
-                                        label={exercise()?.timed ? 'Actual seconds' : 'Actual reps'}
-                                        value={actual()}
-                                        onChange={setActual}
-                                        max={999}
-                                        integerDigits={3}
-                                        popoverMount={mount()}
-                                    />
-                                </Show>
-                                <Show when={started() && current()?.kind === 'set'}>
-                                    <Button
-                                        class="guided-primary"
-                                        onPress={() => {
-                                            const elapsed = elapsedAt(accumulated(), anchor(), Date.now());
-                                            const value = done()
-                                                ? actual()
-                                                : exercise()?.timed
-                                                  ? Math.floor(Math.max(0, elapsed / 1000 - timing().prep))
-                                                  : position().reps;
-                                            advance(false, value);
-                                        }}
+                                <div class="guided-control-slot">
+                                    <Show
+                                        when={!started()}
+                                        fallback={
+                                            <Show when={!done()}>
+                                                <Button onPress={() => (running() ? pause() : start())}>
+                                                    {running() ? 'Pause' : 'Resume'}
+                                                </Button>
+                                            </Show>
+                                        }
                                     >
-                                        Log
-                                    </Button>
-                                </Show>
-                                <Show when={done() && current()?.kind === 'rest'}>
-                                    <Button class="guided-primary" onPress={() => advance()}>
-                                        Next
-                                    </Button>
-                                </Show>
+                                        <Button onPress={start}>Start</Button>
+                                    </Show>
+                                </div>
+                                <div class="guided-result-slot">
+                                    <Show when={done() && current()?.kind === 'set'}>
+                                        <Spinner
+                                            label={exercise()?.timed ? 'Actual seconds' : 'Actual reps'}
+                                            value={actual()}
+                                            onChange={setActual}
+                                            max={999}
+                                            integerDigits={3}
+                                            popoverMount={mount()}
+                                        />
+                                    </Show>
+                                </div>
+                                <div class="guided-log-slot">
+                                    <Show when={started() && current()?.kind === 'set'}>
+                                        <Button
+                                            class="guided-primary"
+                                            onPress={() => {
+                                                const elapsed = elapsedAt(accumulated(), anchor(), Date.now());
+                                                const value = done()
+                                                    ? actual()
+                                                    : exercise()?.timed
+                                                      ? Math.floor(Math.max(0, elapsed / 1000 - timing().prep))
+                                                      : position().reps;
+                                                advance(false, value);
+                                            }}
+                                        >
+                                            Log
+                                        </Button>
+                                    </Show>
+                                    <Show when={done() && current()?.kind === 'rest'}>
+                                        <Button class="guided-primary" onPress={() => advance()}>
+                                            Next
+                                        </Button>
+                                    </Show>
+                                </div>
                             </div>
                             <div class="guided-bottom">
                                 <p>Next: {label(next())}</p>

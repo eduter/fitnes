@@ -32,16 +32,36 @@
     flex: 1;
     min-width: 0;
 }
+.guided-prescription {
+    display: grid;
+    grid-template-rows: 16px 16px;
+    gap: 8px;
+    height: 40px;
+}
 .guided-focus {
-    display: flex;
+    display: grid;
     flex: 1;
-    min-height: 184px;
-    flex-direction: column;
+    min-height: 208px;
+    grid-template-rows: 16px 48px 16px 8px 16px 48px 16px;
+    align-content: center;
+    justify-items: center;
+    gap: 4px;
+    text-align: center;
+    padding-block: 8px;
+}
+.guided-status,
+.guided-cue,
+.guided-control-slot,
+.guided-result-slot,
+.guided-log-slot {
+    display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    text-align: center;
-    padding-block: 16px;
+    width: 100%;
+    min-height: 0;
+}
+.guided-focus .nes-button {
+    align-self: center;
 }
 .guided-counter {
     font-size: 48px;
@@ -68,7 +88,7 @@
 .guided-bottom {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
 }
 .guided-bottom > .guided-actions {
     justify-content: flex-start;
@@ -79,8 +99,8 @@
     padding-top: 8px;
     margin-top: 8px;
 }
-.guided-wake:empty {
-    display: none;
+.guided-wake {
+    height: 32px;
 }
 .guided-editor,
 .guided-finish {

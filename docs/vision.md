@@ -40,6 +40,12 @@ tracking-screen heading. Omit the generic Workout heading and workout name
 during training; they are not useful in the middle of a set. Remove the redundant
 Current set label and the Ready when you are message.
 
+Owner feedback: all tracking elements retain fixed vertical positions throughout
+a set, including ready, preparation, active, paused and completed states. Reserve
+space for conditional status, pacing, actions, result editing and wake-lock
+feedback rather than recentering content as controls appear. Spinner contents
+align to the right when a longer label determines the field width.
+
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
 fixed rest duration per exercise is insufficient. The proposed model is one
