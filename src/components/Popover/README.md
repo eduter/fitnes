@@ -17,3 +17,16 @@ Never put PagedWindow inside a dialog. Put common form fields together; place
 notes directly in the form rather than adding an unnecessary nested window.
 Single-choice menus and number pads have no visible header. Accessible `label`
 is still required. End closes an editor; confirmations use Yes/No.
+
+Tall editors resolve their full frame to the available viewport height in whole
+animation steps before opening. The painted frame and clipping viewport share
+that same resolved target; do not cap a larger border using CSS max-height.
+Only the inner content scrolls. Its scroll events do not reposition the frame;
+viewport changes and ancestor scrolling still update placement, including child
+windows anchored inside a scrolling parent.
+
+The window uses opaque five-pixel native corner PNGs and repeated two-pixel
+edge strips cut from the shared frame artwork. This avoids Chromium's loss of
+long stretched border-image edges under CSS zoom. Generate them together with
+the field frame using `node tools/build-field-frame.ts`; do not stretch the
+window edge strips. Fieldset legends retain their existing frame painting.

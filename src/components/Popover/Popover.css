@@ -28,11 +28,38 @@
     overflow: hidden;
     contain: paint;
 }
-.nes-popover__frame {
+.nes-popover__frame.nes-frame {
     box-sizing: border-box;
     inline-size: 100%;
     padding: 8px;
-    background: var(--nes-ground);
+    background-color: var(--nes-ground);
+    /* Repeat native edge strips instead of stretching a tall border-image under CSS zoom. */
+    border-image: none;
+    background-image:
+        url("./tiles/top-left.png"), url("./tiles/top-right.png"), url("./tiles/bottom-left.png"),
+        url("./tiles/bottom-right.png"), url("./tiles/top.png"), url("./tiles/bottom.png"), url("./tiles/left.png"),
+        url("./tiles/right.png");
+    background-position:
+        left top,
+        right top,
+        left bottom,
+        right bottom,
+        left top,
+        left bottom,
+        left top,
+        right top;
+    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size:
+        5px 5px,
+        5px 5px,
+        5px 5px,
+        5px 5px,
+        2px 5px,
+        2px 5px,
+        5px 2px,
+        5px 2px;
+    background-origin: border-box;
+    background-clip: border-box;
     display: flex;
     flex-direction: column;
     overflow: hidden;

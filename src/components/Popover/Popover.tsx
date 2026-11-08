@@ -34,8 +34,10 @@ function Popover(props: PopoverProps): JSX.Element {
     let layer: HTMLDivElement | undefined;
     let opener: HTMLElement | undefined;
     let disposed = false;
+    let requestedHeight = 96;
+    let availableHeight = Number.POSITIVE_INFINITY;
     const stepPixels = () => local.stepPixels ?? 16;
-    const steps = () => Math.max(1, (phase() === 'closing' ? closingHeight() : height()) / stepPixels());
+    const steps = () => Math.max(1, Math.ceil((phase() === 'closing' ? closingHeight() : height()) / stepPixels()));
     const duration = () => `${(steps() * (local.framesPerStep ?? 2) * 1000) / 60}ms`;
 
     function restoreBackground(): void {
@@ -54,7 +56,8 @@ function Popover(props: PopoverProps): JSX.Element {
         if (!Number.isInteger(stepPixels()) || stepPixels() < 1 || !Number.isFinite(measured) || measured <= 0) {
             throw new Error('Popover requires a positive height and positive integer stepPixels');
         }
-        setHeight(Math.ceil(measured / stepPixels()) * stepPixels());
+        requestedHeight = measured;
+        fitHeight();
         setPhase('opening');
         queueMicrotask(() => {
             if (disposed || phase() === 'closed') {
@@ -106,9 +109,20 @@ function Popover(props: PopoverProps): JSX.Element {
         }
     });
 
+    /** Resolve one whole-step frame height, rather than clipping a larger painted border with CSS max-height. */
+    function fitHeight(): void {
+        const rounded = Math.ceil(requestedHeight / stepPixels()) * stepPixels();
+        const limit = Math.floor(availableHeight / stepPixels()) * stepPixels();
+        setHeight(Math.min(rounded, limit > 0 ? limit : availableHeight));
+    }
+
     /** Convert viewport placement back into the scaled portal's own coordinates. */
-    function positionPanel(): void {
+    function positionPanel(event?: Event): void {
         if (!panel || !frame || !layer || phase() === 'closed') {
+            return;
+        }
+        // Scrolling this form does not move its anchor; only an outer scroll can change placement.
+        if (event?.type === 'scroll' && event.target instanceof Node && panel.contains(event.target)) {
             return;
         }
         const layerRect = layer.getBoundingClientRect();
@@ -135,10 +149,11 @@ function Popover(props: PopoverProps): JSX.Element {
             bottom: viewportTop + viewportHeight - margin,
         };
         const availableWidth = Math.max(16, (bounds.right - bounds.left) / scale);
-        const availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
+        availableHeight = Math.max(16, Math.floor((bounds.bottom - bounds.top) / scale));
         panel.style.inlineSize = `${Math.min(local.width ?? 224, availableWidth)}px`;
-        panel.style.maxBlockSize = `${availableHeight}px`;
-        frame.style.maxBlockSize = `${availableHeight}px`;
+        if (phase() !== 'measuring') {
+            fitHeight();
+        }
         // Placement must use the complete frame, never the animated viewport height.
         const size = frame.getBoundingClientRect();
         const trigger = local.anchor?.() ?? opener;

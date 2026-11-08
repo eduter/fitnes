@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Popover } from './Popover.tsx';
 
 afterEach(cleanup);
@@ -161,3 +161,55 @@ function finishAnimation(target: Element, name: string): void {
     Object.defineProperty(event, 'animationName', { value: name });
     fireEvent(target, event);
 }
+
+it('resolves tall windows to one fitting height before animating their fixed border', async () => {
+    const original = Object.getOwnPropertyDescriptor(window, 'innerHeight');
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 173 });
+    try {
+        render(() => (
+            <Popover open onOpenChange={() => {}} label="Tall editor" height={512}>
+                <p>Long form</p>
+            </Popover>
+        ));
+        await Promise.resolve();
+        const dialog = screen.getByRole('dialog', { name: 'Tall editor' });
+        const frame = dialog.querySelector<HTMLElement>('.nes-popover__frame');
+        expect(dialog.style.blockSize).toBe('144px');
+        expect(frame?.style.blockSize).toBe('144px');
+        expect(dialog.style.maxBlockSize).toBe('');
+        expect(frame?.style.maxBlockSize).toBe('');
+        expect(dialog.style.getPropertyValue('--nes-popover-steps')).toBe('9');
+        finishAnimation(dialog, 'nes-popover-reveal');
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: 205 });
+        fireEvent.resize(window);
+        expect(frame?.style.blockSize).toBe('176px');
+        expect(dialog.style.blockSize).toBe('176px');
+    } finally {
+        if (original) {
+            Object.defineProperty(window, 'innerHeight', original);
+        } else {
+            Reflect.deleteProperty(window, 'innerHeight');
+        }
+    }
+});
+
+it('scrolls its own form without repositioning or repainting the fixed frame', async () => {
+    example();
+    await Promise.resolve();
+    const dialog = screen.getByRole('dialog');
+    finishAnimation(dialog, 'nes-popover-reveal');
+    const frame = dialog.querySelector<HTMLElement>('.nes-popover__frame');
+    const content = dialog.querySelector<HTMLElement>('.nes-popover__content');
+    if (!frame || !content) {
+        throw new Error('Popover frame/content missing');
+    }
+    const measure = vi.spyOn(frame, 'getBoundingClientRect');
+    try {
+        fireEvent.scroll(content);
+        expect(measure).not.toHaveBeenCalled();
+        fireEvent.resize(window);
+        expect(measure).toHaveBeenCalled();
+    } finally {
+        measure.mockRestore();
+    }
+});
