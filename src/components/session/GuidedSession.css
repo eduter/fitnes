@@ -1,0 +1,91 @@
+.live-guided {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    gap: 8px;
+}
+.live-guided__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 64px;
+}
+.live-guided__header > .nes-page-title {
+    flex: 1;
+    min-width: 0;
+}
+.live-guided__prescription {
+    height: 64px;
+    display: grid;
+    grid-template-rows: 16px 16px 16px;
+    gap: 8px;
+}
+.live-guided__prescription p {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.live-guided__focus {
+    display: grid;
+    flex: 1;
+    min-height: 208px;
+    grid-template-rows: 16px 48px 16px 8px 16px 48px 16px;
+    gap: 4px;
+    align-content: center;
+    justify-items: center;
+    padding-block: 8px;
+}
+.live-guided__status,
+.live-guided__cue,
+.live-guided__control,
+.live-guided__result,
+.live-guided__log {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 0;
+}
+.live-guided__status p {
+    white-space: nowrap;
+}
+.live-guided__focus .nes-button {
+    align-self: center;
+}
+.live-guided__counter {
+    font-size: 48px;
+    line-height: 48px;
+    min-height: 48px;
+    font-variant-numeric: tabular-nums;
+}
+.live-guided__meter {
+    display: flex;
+    gap: 4px;
+    height: 8px;
+}
+.live-guided__meter span {
+    display: block;
+    width: 8px;
+    background: var(--nes-muted);
+}
+.live-guided__meter .filled {
+    background: var(--nes-ink);
+}
+.live-guided__bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.live-guided__bottom > p:first-child {
+    height: 32px;
+    overflow: hidden;
+}
+.live-guided__bottom .button-row {
+    height: 16px;
+}
+.live-guided__feedback {
+    height: 32px;
+    overflow: hidden;
+}

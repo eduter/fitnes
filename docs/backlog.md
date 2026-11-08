@@ -67,33 +67,28 @@ preview's behavioral role.
 
 ## Guided workout tracking
 
-Owner-approved direction (2026-11-08), detailed in the [vision](vision.md).
-The compact list remains workflow evidence; it is not the intended final
-tracking layout.
+Owner-approved direction is detailed in the [vision](vision.md). Review the
+[actual complete app](https://fitnes-pr33-app.eduardo-terroso.chatgpt.site), not
+the historical standalone prototype.
 
-- [ ] Focus tracking on the current set, with a clear Log action that records
-  the result and advances to the next set.
-- [ ] Add Start, a short preparation countdown, and visible remaining time for
-  timed sets; keep the screen on during the guided set.
-- [ ] Extend the model with configurable duration per repetition and guide
-  repetition-based sets with a rep counter running at that pace.
-- [ ] Add exercise defaults for preparation duration and time per repetition,
-  with workout-level overrides for both settings.
-- [ ] Resolve pause/interruption behavior and result defaults before implementing
-  those details.
-- [ ] Preserve arbitrary individual-set order in editing and tracking, including
-  circuits and supersets; do not regroup execution by exercise.
-- [ ] Design configurable rest between sets to reflect sequence and workload;
-  review the proposed ordered set/rest array separately from preparation time.
-- [ ] Add the corridor as a later between-set interstitial; it is not required
-  for the first guided tracking version.
-
-- [x] Build an isolated current-set preview with sample data, configurable exercise
-  defaults/workout overrides, and an editable ordered set/rest sequence. See
-  [preview behavior and provisional decisions](../src/guided-preview/README.md).
-- [ ] Review the guided preview on the owner's phone before integrating it or
-  replacing the persistent set/sequence model. Manual exported-JSON conversion
-  is acceptable to the owner; no automatic migration system is required.
+- [x] Integrate current-step tracking with real session snapshots and persistence;
+  successful Log advances to the next unfinished step.
+- [x] Add Start, preparation countdowns, remaining time, paced repetitions,
+  pause/resume and screen wake lock with fixed element positions.
+- [x] Persist exercise preparation/rep-duration defaults and independent workout
+  overrides; permit session-only timing edits before starting a set.
+- [x] Add explicit rest steps to the ordered execution sequence and workout
+  editing, duplication and movement. Preserve circuits and supersets.
+- [x] Preserve previous results, count/load meanings and independent per-side
+  performance; recover unlogged timer/result drafts after refresh.
+- [x] Publish the full application from the PR source with no preview seeding.
+- [ ] Review/refine pause, early logging, skip, rest auto-start and Next behavior
+  on the owner's Android phone. These are functional initial choices for review.
+- [ ] Simplify the internal set/reference storage into the proposed single array
+  of set/rest objects. The working integration extends the existing sequence
+  compatibly; old exports still import. Manual JSON conversion is acceptable
+  when that later representation changes; no automatic migration is required.
+- [ ] Add the corridor later; it is not required for the first guided version.
 
 ## Model policies to resolve
 

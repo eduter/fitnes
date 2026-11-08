@@ -5,8 +5,8 @@ import { afterEach, beforeEach, expect, it } from 'vitest';
 import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
 import { importDatabase } from '../db/repository.ts';
-import { createSessionFromTemplate } from '../domain/session.ts';
 import { workoutSessionId } from '../domain/ids.ts';
+import { createSessionFromTemplate } from '../domain/session.ts';
 import { previewData } from '../preview/seedPreview.ts';
 import { SessionPage } from './SessionPage.tsx';
 
@@ -30,8 +30,28 @@ function renderSession() {
     ));
 }
 
-it('serializes rapid set logs and preserves both results', async () => {
+async function reviewSession(): Promise<void> {
     renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: 'More', exact: true }));
+    const menu = await screen.findByRole('dialog', { name: 'Workout actions' });
+    fireEvent.animationEnd(menu);
+    fireEvent.click(within(menu).getByRole('button', { name: 'Review', exact: true }));
+}
+
+it('shows only the current set and advances after a real result is persisted', async () => {
+    renderSession();
+    expect(await screen.findByRole('heading', { name: 'Bent-over row', level: 1 })).toBeTruthy();
+    expect(screen.queryByText(/Ready when you are/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Log Bent-over row set 2' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await waitFor(async () => expect((await db.sessions.get(sessionId))?.results).toHaveLength(1));
+    await waitFor(() => expect(screen.getByText(/^Step 2 of /)).toBeTruthy());
+    const saved = await db.sessions.get(sessionId);
+    expect(saved?.results[0].sequenceEntryId).toBe(saved?.snapshot.sequence[0].id);
+});
+
+it('serializes rapid set logs and preserves both results', async () => {
+    await reviewSession();
     const first = await screen.findByRole('button', { name: 'Log Bent-over row set 1' });
     const second = screen.getByRole('button', { name: 'Log Bent-over row set 2' });
     fireEvent.click(first);
@@ -40,7 +60,7 @@ it('serializes rapid set logs and preserves both results', async () => {
 });
 
 it('keeps a recorded set editor open across immediate persisted edits', async () => {
-    renderSession();
+    await reviewSession();
     fireEvent.click(await screen.findByRole('button', { name: 'Log Bent-over row set 1' }));
     await screen.findByRole('button', { name: 'Clear Bent-over row set 1' });
     fireEvent.click(screen.getByRole('button', { name: 'Edit Bent-over row set 1' }));

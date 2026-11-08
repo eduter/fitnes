@@ -216,6 +216,16 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
             return parsed;
         }, reloadAll);
         if (result.ok) {
+            // Timer drafts belong to the replaced database, even when imported sessions reuse IDs.
+            try {
+                for (const key of Object.keys(localStorage)) {
+                    if (key.startsWith('fitnes-guided:')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+            } catch {
+                /* IndexedDB remains authoritative when local storage is disabled */
+            }
             setLoadState('ready');
             setLoadError(null);
         }

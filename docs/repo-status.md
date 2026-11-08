@@ -48,27 +48,29 @@ transition remains deferred; this branch does not claim it is integrated.
 ## Full PR #33 application review
 
 [Complete PR #33 application](https://fitnes-pr33-app.eduardo-terroso.chatgpt.site)
-is built with the normal production build from this PR's source. It includes
-all app screens and normal IndexedDB persistence, without seeded sample data.
-It uses a separate origin, so it starts empty and never replaces data in earlier
-previews. The owner can transfer an exported JSON through the app's Data page.
+builds the actual app with normal IndexedDB persistence and no seeded sample
+data. The separate origin starts empty; transfer an exported JSON through
+Settings → Data when desired. Earlier deployments and their data are preserved.
 
-This is the actual merge-result review: the shared spinner alignment fix is
-integrated, but guided current-set tracking remains the standalone prototype
-below. The real session page and persistent workout schema have not yet been
-replaced. Review the complete app when deciding whether to merge; use the
-prototype only to discuss the proposed guided interaction.
+Guided tracking is integrated into the actual session page. Opening/resuming a
+workout selects its first unfinished step. Start runs preparation followed by
+timed work or paced reps; Log persists a real result before advancing. The
+workout editor adds, edits, duplicates and reorders explicit rest steps alongside
+sets. Exercise editors persist timing defaults; workout More → Timing persists
+independent overrides. Session More → Timing changes only the session snapshot.
+Per-side measurements guide each side independently and retain distinct results.
+Previous results, load bases, units and bodyweight snapshots remain intact.
 
-## Guided workout preview
+All tracker phases reserve fixed layout slots, including result editing and
+wake-lock feedback. Paused/running timer state and unlogged results recover
+from local storage after refresh; final results and rest completion are stored
+in IndexedDB and included in JSON export. Review/history keeps the list view.
+See [integrated behavior](../src/components/session/README.md).
 
-[Private guided workout preview](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
-is an isolated sample-data prototype of the current-set direction. It supports
-preparation countdowns, timed sets, paced repetitions, pause/resume, Log to
-advance, explicit rest steps, and exercise timing defaults with workout
-overrides. Plan edits an ordered set/rest array without changing the persistent
-application model or stored data. See [behavior and provisional choices](../src/guided-preview/README.md).
-The owner has not yet reviewed this preview on Android; it is not a dogfooded
-behavioral reference. The corridor remains deferred.
+The earlier [standalone prototype](https://fitnes-guided-workout.eduardo-terroso.chatgpt.site)
+is superseded for app review and remains hosted as a historical artifact. Its
+screen source has been replaced by the integrated session components. The full
+app URL above is the merge-result preview; Android owner review remains open.
 
 ## Retained design sources
 

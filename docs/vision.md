@@ -22,12 +22,16 @@ on during the guided set so the owner can glance at it.
 
 For repetition-based sets, support a configurable duration per repetition and
 count repetitions at that pace so the owner can follow along without keeping
-count mentally. This requires a model change to represent the repetition pace.
+count mentally. Exercise timing and workout overrides are now persisted in the
+guided integration.
 Preparation duration and time per repetition are configurable defaults on
 the exercise, with overrides in the workout. Preparation time varies because
-some exercises take longer to get into position. Extend the data model for
-these settings; timed versus repetition-based measurement is already supported.
-Pause/interruption behavior and result defaults still need to be decided.
+some exercises take longer to get into position. Existing plans without timing
+use initial editable defaults of five seconds preparation and three seconds per
+rep. Exercise defaults are embedded in workout snapshots; workout Refresh picks
+up later catalog changes. Session timing edits affect only that session.
+Pause, early logging, skip and rest transitions have functional initial behavior
+for review, documented with the [session components](../src/components/session/README.md).
 
 Owner clarification (2026-11-08): preserve the workout as an arbitrarily
 ordered sequence of individual sets. Circuits, supersets and any interleaving
@@ -50,8 +54,11 @@ Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
 fixed rest duration per exercise is insufficient. The proposed model is one
 ordered array whose steps can be either individual sets or explicit rest
-durations, replacing the separate set/sequence structure. Review this in an
-isolated preview before changing persistence. The owner is the sole user and
+durations, replacing the separate set/sequence structure. Owner clarification:
+the tracker must be integrated and reviewed in the actual full application.
+The integration now supports explicit rest entries in the existing ordered
+sequence and preserves old set references for compatibility. Collapsing those
+internal set/reference arrays is still follow-up work. The owner is the sole user and
 accepts manually converting an exported JSON backup for that future change;
 an automatic migration system is not required. Detailed rest interaction
 remains subject to preview review. Do not conflate rest
