@@ -60,7 +60,8 @@ align to the right when a longer label determines the field width.
 Owner feedback (2026-11-09): one-side-at-a-time sets guide Left then Right,
 including sets with a single recorded rep count. Each side gets its own
 preparation and counter before advancing to the next sequence entry. Show the
-side before starting; side order is fixed for now.
+side before starting; side order is fixed for now. Keep the Log/Next side action
+to the right of the actual-performance spinner, aligned with its numeric controls.
 
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one

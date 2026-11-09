@@ -304,20 +304,26 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         </Button>
                     </Show>
                 </div>
-                <div class="live-guided__result">
-                    <Show when={done() && !rest()}>
-                        <ResultNumberField
-                            label={perSide() ? `Actual ${side()}` : timed() ? 'Actual seconds' : 'Actual reps'}
-                            value={resultValue()}
-                            integer={!timed()}
-                            disabled={busy()}
-                            onChange={setValue}
-                        />
-                    </Show>
-                </div>
                 <div class="live-guided__log">
+                    <div class="live-guided__result">
+                        <Show when={done() && !rest()}>
+                            <ResultNumberField
+                                label={perSide() ? `Actual ${side()}` : timed() ? 'Actual seconds' : 'Actual reps'}
+                                value={resultValue()}
+                                integer={!timed()}
+                                disabled={busy()}
+                                onChange={setValue}
+                            />
+                        </Show>
+                    </div>
                     <Button disabled={busy()} onPress={() => void log()}>
-                        {busy() ? 'Saving' : rest() ? 'Next' : separateSides() && side() === 'left' ? 'Next side' : 'Log'}
+                        {busy()
+                            ? 'Saving'
+                            : rest()
+                              ? 'Next'
+                              : separateSides() && side() === 'left'
+                                ? 'Next side'
+                                : 'Log'}
                     </Button>
                 </div>
             </div>
