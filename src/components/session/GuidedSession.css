@@ -31,7 +31,7 @@
     display: grid;
     flex: 1;
     min-height: 208px;
-    grid-template-rows: 16px 48px 16px 8px 16px 48px 16px;
+    grid-template-rows: 16px 48px 16px 16px 48px;
     gap: 4px;
     align-content: center;
     justify-items: center;
@@ -40,13 +40,28 @@
 .live-guided__status,
 .live-guided__cue,
 .live-guided__control,
-.live-guided__result,
 .live-guided__log {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     min-height: 0;
+}
+.live-guided__log {
+    gap: 16px;
+}
+.live-guided__result {
+    display: flex;
+    width: 128px;
+    min-width: 0;
+    align-self: stretch;
+    align-items: flex-start;
+    padding-top: 4px;
+}
+.live-guided__log > .nes-button {
+    width: 72px;
+    /* Match the numeric controls below the spinner legend */
+    transform: translateY(8px);
 }
 .live-guided__status p {
     white-space: nowrap;
@@ -62,6 +77,8 @@
 }
 .live-guided__meter {
     display: flex;
+    align-self: center;
+    flex-shrink: 0;
     gap: 4px;
     height: 8px;
 }

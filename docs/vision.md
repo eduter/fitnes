@@ -57,6 +57,17 @@ space for conditional status, pacing, actions, result editing and wake-lock
 feedback rather than recentering content as controls appear. Spinner contents
 align to the right when a longer label determines the field width.
 
+Owner feedback (2026-11-09): one-side-at-a-time sets guide Left then Right,
+including sets with a single recorded rep count. Each side gets its own
+preparation and counter before advancing to the next sequence entry. Show the
+side before starting; side order is fixed for now. Keep the Log/Next side action
+to the right of the actual-performance spinner, aligned with its numeric controls.
+
+Owner feedback (2026-11-09): show the segmented progress bar immediately below
+Step X of Y, reflecting the current step's position in the whole workout.
+The large rep/time counter covers progress within the current set; omit its
+redundant bar. Switching sides stays on the same workout step.
+
 Support flexible rest time between sets. The required rest depends on the
 surrounding sequence and workload, including the exercise coming next; one
 fixed rest duration per exercise is insufficient. The proposed model is one

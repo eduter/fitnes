@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, it } from 'vitest';
 import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
 import { importDatabase } from '../db/repository.ts';
+import { wristCurl } from '../domain/examples.ts';
 import { workoutSessionId } from '../domain/ids.ts';
 import { draftResultFromPrescription } from '../domain/recordSession.ts';
 import { createSessionFromTemplate } from '../domain/session.ts';
@@ -111,4 +112,31 @@ it('keeps a recorded set editor open across immediate persisted edits', async ()
     fireEvent.click(within(dialog).getByRole('button', { name: 'End', exact: true }));
     expect(dialog.dataset.phase).toBe('closing');
     expect(dialog.textContent).toContain('Bent-over row');
+});
+
+it('finishes both sides of unilateral wrist curls before persisting and advancing', async () => {
+    const session = await db.sessions.get(sessionId);
+    if (!session) {
+        throw new Error('missing test session');
+    }
+    const first = session.snapshot.sets[0];
+    session.snapshot.exercises.push(structuredClone(wristCurl));
+    first.exerciseId = wristCurl.id;
+    first.prescription.executionMode = 'unilateral';
+    first.prescription.load = { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } };
+    await db.sessions.put(session);
+
+    renderSession();
+    expect(await screen.findByRole('heading', { name: 'Wrist curl' })).toBeTruthy();
+    expect(screen.getByText('Left')).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
+    fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+    expect(screen.getByText('Right')).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
+    expect((await db.sessions.get(sessionId))?.results).toHaveLength(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await waitFor(async () => expect((await db.sessions.get(sessionId))?.results).toHaveLength(1));
+    expect(await screen.findByRole('heading', { name: 'Bent-over row' })).toBeTruthy();
+    expect(screen.getByText(/^Step 2 of /)).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('2');
 });

@@ -36,6 +36,8 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const measurement = () => props.occurrence?.set.prescription.measurement;
     const timed = () => rest() || measurement()?.measurement === 'duration';
     const perSide = () => measurement()?.countBasis === 'perSide';
+    const separateSides = () => props.occurrence?.set.prescription.executionMode === 'unilateral' || perSide();
+    const sideLabel = () => (side() === 'left' ? 'Left' : 'Right');
     const target = () => {
         const m = measurement();
         return props.entry.restSeconds ?? (m?.measurement === 'duration' ? m.seconds : (m?.reps ?? 1));
@@ -145,7 +147,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             const value = draft() as ActualResult;
             setDraft(perSide() ? withSideCount(withSideCount(value, 'left', 0), 'right', 0) : withTotalCount(value, 0));
         }
-        if (!skipped && perSide() && side() === 'left') {
+        if (!skipped && separateSides() && side() === 'left') {
             setSide('right');
             reset();
             return;
@@ -231,6 +233,19 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             <p>
                 Step {props.index + 1} of {props.count}
             </p>
+            <div
+                class="live-guided__meter"
+                role="progressbar"
+                aria-label="Workout progress"
+                aria-valuemin={0}
+                aria-valuemax={props.count}
+                aria-valuenow={props.index + 1}
+                aria-valuetext={`Step ${props.index + 1} of ${props.count}`}
+            >
+                <For each={Array.from({ length: 16 })}>
+                    {(_, i) => <span classList={{ filled: i() < (16 * (props.index + 1)) / props.count }} />}
+                </For>
+            </div>
             <div class="live-guided__prescription">
                 <p>
                     {rest()
@@ -244,20 +259,22 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             </div>
             <div class="live-guided__focus">
                 <div class="live-guided__status">
-                    <Show when={started()}>
+                    <Show when={started() || separateSides()}>
                         <p role="status">
-                            {done()
-                                ? rest()
-                                    ? 'Rest complete'
-                                    : 'Set complete'
-                                : !running()
-                                  ? 'Paused'
-                                  : position().phase === 'prep'
-                                    ? 'Get into position'
-                                    : rest() || timed()
-                                      ? 'Time remaining'
-                                      : 'Reps completed'}
-                            {perSide() ? ` · ${side()}` : ''}
+                            {!started()
+                                ? sideLabel()
+                                : done()
+                                  ? rest()
+                                      ? 'Rest complete'
+                                      : 'Set complete'
+                                  : !running()
+                                    ? 'Paused'
+                                    : position().phase === 'prep'
+                                      ? 'Get into position'
+                                      : rest() || timed()
+                                        ? 'Time remaining'
+                                        : 'Reps completed'}
+                            {started() && separateSides() ? ` · ${sideLabel()}` : ''}
                         </p>
                     </Show>
                 </div>
@@ -288,11 +305,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         </p>
                     </Show>
                 </div>
-                <div class="live-guided__meter" aria-hidden="true">
-                    <For each={Array.from({ length: 16 })}>
-                        {(_, i) => <span classList={{ filled: started() && position().fraction >= (i() + 1) / 16 }} />}
-                    </For>
-                </div>
                 <div class="live-guided__control">
                     <Show when={!done()}>
                         <Button disabled={busy()} onPress={() => (running() ? pause() : start())}>
@@ -300,20 +312,26 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         </Button>
                     </Show>
                 </div>
-                <div class="live-guided__result">
-                    <Show when={done() && !rest()}>
-                        <ResultNumberField
-                            label={perSide() ? `Actual ${side()}` : timed() ? 'Actual seconds' : 'Actual reps'}
-                            value={resultValue()}
-                            integer={!timed()}
-                            disabled={busy()}
-                            onChange={setValue}
-                        />
-                    </Show>
-                </div>
                 <div class="live-guided__log">
+                    <div class="live-guided__result">
+                        <Show when={done() && !rest()}>
+                            <ResultNumberField
+                                label={perSide() ? `Actual ${side()}` : timed() ? 'Actual seconds' : 'Actual reps'}
+                                value={resultValue()}
+                                integer={!timed()}
+                                disabled={busy()}
+                                onChange={setValue}
+                            />
+                        </Show>
+                    </div>
                     <Button disabled={busy()} onPress={() => void log()}>
-                        {busy() ? 'Saving' : rest() ? 'Next' : perSide() && side() === 'left' ? 'Next side' : 'Log'}
+                        {busy()
+                            ? 'Saving'
+                            : rest()
+                              ? 'Next'
+                              : separateSides() && side() === 'left'
+                                ? 'Next side'
+                                : 'Log'}
                     </Button>
                 </div>
             </div>
