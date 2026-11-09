@@ -49,8 +49,11 @@ Initial behavior for Android review: Log without starting records the displayed
 planned/edited result. Early Log records completed reps or elapsed work seconds
 unless the count was manually corrected. Completed timers wait for Log; actual
 performance can be adjusted in place or with More → Result, including external
-load and independent side values. Per-side measurements guide left then right;
-Next side keeps the left result and prepares the right. Skip records zero work
+load and independent side values. Unilateral execution and per-side measurements
+both guide Left then Right, with the side visible before Start;
+Next side keeps the draft and prepares the right with a fresh timer. Measurement
+storage keeps its existing meaning: per-side results retain independent values;
+total-counted results retain one shared count, finalized when logging Right. Skip records zero work
 for a set, or completes a rest early. A rest auto-starts on entering its step;
 Next completes it, including early. Logging advances only after successful
 persistence. After the last step, Complete finishes the session. More → Review

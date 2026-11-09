@@ -12,7 +12,7 @@ afterEach(() => {
     vi.restoreAllMocks();
 });
 
-function setup(perSide = false, saves = true, reps = 8) {
+function setup(perSide = false, saves = true, reps = 8, unilateral = false) {
     const plan = rowTemplate();
     if (perSide) {
         plan.sets[0].prescription.measurement = { measurement: 'repetitions', countBasis: 'perSide', reps: 8 };
@@ -22,6 +22,9 @@ function setup(perSide = false, saves = true, reps = 8) {
         countBasis: perSide ? 'perSide' : 'total',
         reps,
     };
+    if (unilateral) {
+        plan.sets[0].prescription.executionMode = 'unilateral';
+    }
     const entry = plan.sequence[0];
     const draft = draftResultFromPrescription(entry.id, plan.sets[0].prescription, 1);
     const onLog = vi.fn(async () => saves);
@@ -94,5 +97,57 @@ it('preserves a right-side correction made before switching sides and refreshing
             ...draft,
             measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 8, right: 7 } },
         })
+    );
+});
+
+it('guides unilateral total-counted sets left then right before advancing', async () => {
+    const { onLog, draft } = setup(false, true, 8, true);
+    expect(screen.getByText('Left')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+    expect(onLog).not.toHaveBeenCalled();
+    expect(screen.getByText('Right')).toBeTruthy();
+    expect(screen.getByRole('timer').textContent).toBe('0/8');
+    cleanup();
+
+    const resumed = setup(false, true, 8, true);
+    expect(screen.getByText('Right')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await waitFor(() => expect(resumed.onLog).toHaveBeenCalledWith(draft));
+});
+
+it('restarts the preparation and rep counter for the right side', async () => {
+    const { onLog } = setup(false, true, 2, true);
+    let now = Date.now();
+    vi.spyOn(Date, 'now').mockImplementation(() => now);
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    now += 11000;
+    await screen.findByText('Set complete · Left');
+    fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+    expect(onLog).not.toHaveBeenCalled();
+    expect(screen.getByRole('timer').textContent).toBe('0/2');
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    expect(screen.getByText('Get into position · Right')).toBeTruthy();
+    now += 8000;
+    await screen.findByText('Reps completed · Right');
+    expect(screen.getByRole('timer').textContent).toBe('1/2');
+    fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await waitFor(() =>
+        expect(onLog).toHaveBeenCalledWith(
+            expect.objectContaining({
+                measurement: { measurement: 'repetitions', countBasis: 'total', reps: 1 },
+            })
+        )
+    );
+});
+
+it('skips a unilateral set without requiring a second side', async () => {
+    const { onLog } = setup(false, true, 8, true);
+    fireEvent.click(screen.getByRole('button', { name: 'Skip', exact: true }));
+    await waitFor(() =>
+        expect(onLog).toHaveBeenCalledWith(
+            expect.objectContaining({
+                measurement: { measurement: 'repetitions', countBasis: 'total', reps: 0 },
+            })
+        )
     );
 });
