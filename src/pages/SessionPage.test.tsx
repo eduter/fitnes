@@ -129,11 +129,14 @@ it('finishes both sides of unilateral wrist curls before persisting and advancin
     renderSession();
     expect(await screen.findByRole('heading', { name: 'Wrist curl' })).toBeTruthy();
     expect(screen.getByText('Left')).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
     expect(screen.getByText('Right')).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
     expect((await db.sessions.get(sessionId))?.results).toHaveLength(0);
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await waitFor(async () => expect((await db.sessions.get(sessionId))?.results).toHaveLength(1));
     expect(await screen.findByRole('heading', { name: 'Bent-over row' })).toBeTruthy();
     expect(screen.getByText(/^Step 2 of /)).toBeTruthy();
+    expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('2');
 });

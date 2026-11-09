@@ -233,6 +233,19 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             <p>
                 Step {props.index + 1} of {props.count}
             </p>
+            <div
+                class="live-guided__meter"
+                role="progressbar"
+                aria-label="Workout progress"
+                aria-valuemin={0}
+                aria-valuemax={props.count}
+                aria-valuenow={props.index + 1}
+                aria-valuetext={`Step ${props.index + 1} of ${props.count}`}
+            >
+                <For each={Array.from({ length: 16 })}>
+                    {(_, i) => <span classList={{ filled: i() < (16 * (props.index + 1)) / props.count }} />}
+                </For>
+            </div>
             <div class="live-guided__prescription">
                 <p>
                     {rest()
@@ -291,11 +304,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                             s
                         </p>
                     </Show>
-                </div>
-                <div class="live-guided__meter" aria-hidden="true">
-                    <For each={Array.from({ length: 16 })}>
-                        {(_, i) => <span classList={{ filled: started() && position().fraction >= (i() + 1) / 16 }} />}
-                    </For>
                 </div>
                 <div class="live-guided__control">
                     <Show when={!done()}>
