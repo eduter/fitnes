@@ -9,7 +9,6 @@ import {
     setPrescription,
     setSequence,
     useOnlyExercise,
-    wristCurl,
 } from '../test/domainFixtures.ts';
 import { validateWorkoutTemplate } from './validateWorkoutTemplate.ts';
 
@@ -25,7 +24,7 @@ function pathsOf(input: unknown): string[] {
 const rowPrescription = (reps: number, kg: number): unknown => ({
     measurement: { measurement: 'repetitions', countBasis: 'total', reps },
     executionMode: 'bilateral',
-    load: { kind: 'external', basis: 'total', weight: { value: kg, unit: 'kg' } },
+    load: { kind: 'external', weight: { value: kg, unit: 'kg' } },
 });
 
 describe('validateWorkoutTemplate', () => {
@@ -38,7 +37,7 @@ describe('validateWorkoutTemplate', () => {
         setPrescription(template, 'set-1', {
             measurement: { measurement: 'duration', countBasis: 'total', seconds: 30 },
             executionMode: 'bilateral',
-            load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 40, unit: 'kg' } },
         });
 
         expect(pathsOf(template)).toContain('sets[0].prescription.measurement');
@@ -87,12 +86,11 @@ describe('validateWorkoutTemplate', () => {
         expect(pathsOf(template)).toContain('sets[0].prescription.load');
     });
 
-    it('rejects a load basis the exercise does not allow', () => {
+    it('rejects an obsolete per-side load basis', () => {
         const template = rowTemplate();
-        useOnlyExercise(template, wristCurl);
-        setLoad(template, 'set-1', { kind: 'external', basis: 'total', weight: { value: 20, unit: 'kg' } });
+        setLoad(template, 'set-1', { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } });
 
-        expect(pathsOf(template)).toContain('sets[0].prescription.load');
+        expect(pathsOf(template).some((path) => path.startsWith('sets[0].prescription.load'))).toBe(true);
     });
 
     it('accepts a weighted pull-up as bodyweight plus external load', () => {
@@ -101,7 +99,7 @@ describe('validateWorkoutTemplate', () => {
         const prescription = {
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
             executionMode: 'bilateral',
-            load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 10, unit: 'kg' } },
+            load: { kind: 'bodyweightExternal', weight: { value: 10, unit: 'kg' } },
         };
         setPrescription(template, 'set-1', prescription);
         setPrescription(template, 'set-2', prescription);
@@ -115,7 +113,7 @@ describe('validateWorkoutTemplate', () => {
         setPrescription(template, 'set-1', {
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
             executionMode: 'bilateral',
-            load: { kind: 'external', basis: 'total', weight: { value: 10, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 10, unit: 'kg' } },
         });
         setPrescription(template, 'set-2', {
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
@@ -219,18 +217,17 @@ describe('validateWorkoutTemplate', () => {
 
     it('rejects an unsupported weight unit', () => {
         const template = rowTemplate();
-        setLoad(template, 'set-1', { kind: 'external', basis: 'total', weight: { value: 40, unit: 'stone' } });
+        setLoad(template, 'set-1', { kind: 'external', weight: { value: 40, unit: 'stone' } });
 
         expect(pathsOf(template)).toContain('sets[0].prescription.load.weight.unit');
     });
 
     it('rejects a negative or non-finite external load', () => {
         const negative = rowTemplate();
-        setLoad(negative, 'set-1', { kind: 'external', basis: 'total', weight: { value: -5, unit: 'kg' } });
+        setLoad(negative, 'set-1', { kind: 'external', weight: { value: Number.NEGATIVE_INFINITY, unit: 'kg' } });
         const infinite = rowTemplate();
         setLoad(infinite, 'set-1', {
             kind: 'external',
-            basis: 'total',
             weight: { value: Number.POSITIVE_INFINITY, unit: 'kg' },
         });
 
@@ -240,7 +237,7 @@ describe('validateWorkoutTemplate', () => {
 
     it('accepts a zero external load as no added weight', () => {
         const template = rowTemplate();
-        setLoad(template, 'set-1', { kind: 'external', basis: 'total', weight: { value: 0, unit: 'kg' } });
+        setLoad(template, 'set-1', { kind: 'external', weight: { value: 0, unit: 'kg' } });
 
         expect(validateWorkoutTemplate(template).ok).toBe(true);
     });

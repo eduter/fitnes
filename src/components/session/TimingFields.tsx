@@ -1,3 +1,4 @@
+import { exerciseCopy } from '../../copy/exercise.ts';
 import { type JSX, Show } from 'solid-js';
 import { effectiveTiming, normalizeSetTiming, type TrackingTiming } from '../../domain/trackingTiming.ts';
 import { Spinner } from '../Controls/index.ts';
@@ -13,7 +14,7 @@ function TimingFields(props: TimingFieldsProps): JSX.Element {
             {(['prepSeconds', 'secondsPerRep'] as const).map((field) => (
                 <Show when={field === 'prepSeconds' || props.paced !== false}>
                     <Spinner
-                        label={field === 'prepSeconds' ? 'Prep seconds' : 'Seconds per rep'}
+                        label={exerciseCopy.timing[field]}
                         value={effectiveTiming(props.defaults, props.value)[field]}
                         min={field === 'prepSeconds' ? 0 : 0.1}
                         max={field === 'prepSeconds' ? 999 : 99.9}

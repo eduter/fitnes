@@ -1,6 +1,6 @@
 import { type } from 'arktype';
-import { executionMode, loadBasis } from './exercise.ts';
-import { nonNegativeCount, nonNegativeFinite, positiveCount, positiveFinite, weight } from './units.ts';
+import { executionMode } from './exercise.ts';
+import { nonNegativeCount, nonNegativeFinite, positiveCount, positiveFinite, weightUnit } from './units.ts';
 
 /**
  * The quantity prescribed, with its counting basis. Repetitions are positive
@@ -52,10 +52,15 @@ type ActualMeasurement = typeof actualMeasurement.infer;
  * one number, which is what weighted pull-ups require. A zero external weight
  * is valid and means no added load; it is not the same as omitting the load.
  */
+const addedWeight = type({
+    value: type('number').narrow((value, ctx) => Number.isFinite(value) || ctx.mustBe('a finite number')),
+    unit: weightUnit,
+}).onUndeclaredKey('reject');
+
 const loadConfiguration = type({ kind: '"none"' })
     .or({ kind: '"bodyweight"' })
-    .or({ kind: '"external"', basis: loadBasis, weight })
-    .or({ kind: '"bodyweightExternal"', basis: loadBasis, weight })
+    .or({ kind: '"external"', weight: addedWeight })
+    .or({ kind: '"bodyweightExternal"', weight: addedWeight })
     .onDeepUndeclaredKey('reject');
 type LoadConfiguration = typeof loadConfiguration.infer;
 

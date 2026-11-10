@@ -8,8 +8,15 @@ workout data on-device and core flows usable without a connection.
 Recording work during training must be quick. Exercise names, planned work,
 actual performance, actions, and session progress must be readable on a phone.
 
-The existing model is a good starting point. Preserve its measurement and load
-meanings when designing the interface; raise concrete gaps separately.
+An exercise defines its supported sides (Both sides, One side, or both), units
+(Reps or Seconds), and load behavior. A One side set applies its target to each
+side and records left and right separately. Show Sides and Unit selectors only
+when the exercise supports more than one choice; other exercise properties
+apply automatically.
+
+Added weight is the total external weight used during the movement: two 10 kg
+dumbbells and one 20 kg barbell both mean 20 kg. Negative added weight represents
+assistance; zero covers the unweighted case without a separate load selector.
 
 Owner clarification (2026-11-08): the tracking screen focuses on the current
 set rather than a list of sets. Show what to do now and provide a clear Log

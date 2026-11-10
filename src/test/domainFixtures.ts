@@ -19,7 +19,7 @@ function rowTemplate(): WorkoutTemplate {
                 prescription: {
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
                     executionMode: 'bilateral',
-                    load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                    load: { kind: 'external', weight: { value: 40, unit: 'kg' } },
                 },
             },
             {
@@ -28,7 +28,7 @@ function rowTemplate(): WorkoutTemplate {
                 prescription: {
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 6 },
                     executionMode: 'bilateral',
-                    load: { kind: 'external', basis: 'total', weight: { value: 45, unit: 'kg' } },
+                    load: { kind: 'external', weight: { value: 45, unit: 'kg' } },
                 },
             },
         ],

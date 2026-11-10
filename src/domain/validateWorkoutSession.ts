@@ -118,7 +118,7 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
 
         // A result has no execution mode; the snapshot's prescription already fixes it.
         const capabilityProblems = [
-            ...measurementProblems(exercise, result.measurement),
+            ...measurementProblems(exercise, result.measurement, set.prescription.executionMode),
             ...loadProblems(exercise, result.load),
         ];
         for (const problem of capabilityProblems) {
@@ -170,17 +170,6 @@ function resultPrescriptionProblems(prescription: SetPrescription, result: Actua
             message: `actual load kind '${result.load.kind}' does not match prescribed '${prescription.load.kind}'`,
         });
         return problems;
-    }
-
-    if (
-        (result.load.kind === 'external' || result.load.kind === 'bodyweightExternal') &&
-        (prescription.load.kind === 'external' || prescription.load.kind === 'bodyweightExternal') &&
-        result.load.basis !== prescription.load.basis
-    ) {
-        problems.push({
-            field: 'load',
-            message: `actual load basis '${result.load.basis}' does not match prescribed '${prescription.load.basis}'`,
-        });
     }
 
     return problems;

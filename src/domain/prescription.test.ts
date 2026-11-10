@@ -43,7 +43,6 @@ describe('prescription schemas', () => {
             executionMode: 'bilateral',
             load: {
                 kind: 'external',
-                basis: 'total',
                 weight: { value: 40, unit: 'kg', approximate: true },
             },
         };
@@ -136,4 +135,10 @@ describe('plan measurements stay positive', () => {
             type.errors
         );
     });
+});
+
+it('accepts finite negative added weight for assisted exercise', () => {
+    expect(loadConfiguration({ kind: 'bodyweightExternal', weight: { value: -20, unit: 'kg' } })).not.toBeInstanceOf(
+        type.errors
+    );
 });

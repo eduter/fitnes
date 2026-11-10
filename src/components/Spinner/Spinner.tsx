@@ -49,8 +49,8 @@ function Spinner(props: SpinnerProps): JSX.Element {
         const capacity = (10 ** (integerDigits + fractionDigits) - 1) / 10 ** fractionDigits;
         const min = local.min ?? 0;
         const max = local.max ?? capacity;
-        if (!Number.isFinite(min) || !Number.isFinite(max) || min < 0 || max < min || max > capacity) {
-            throw new Error('Spinner bounds must fit its nonnegative fixed mask');
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min < -capacity || max < min || max > capacity) {
+            throw new Error('Spinner bounds must fit its fixed mask');
         }
         const scale = 10 ** fractionDigits;
         if (
@@ -91,7 +91,9 @@ function Spinner(props: SpinnerProps): JSX.Element {
             <div class="nes-spinner__controls">
                 <span
                     class="nes-spinner__value-frame"
-                    style={{ 'inline-size': `${Math.max(22, masked().length * 7 + 4)}px` }}
+                    style={{
+                        'inline-size': `${Math.max(22, (mask().integerDigits + mask().fractionDigits + (mask().fractionDigits ? 1 : 0) + (mask().min < 0 ? 1 : 0)) * 7 + 4)}px`,
+                    }}
                 >
                     <Button
                         ref={(element) => {

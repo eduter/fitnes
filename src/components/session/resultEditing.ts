@@ -135,7 +135,7 @@ function formatReferenceLoad(load: LoadConfiguration, unit?: WeightUnit): string
 
     const weight = massValue(load.weight, unit ?? load.weight.unit);
     const amount = weight === undefined ? '?' : `${weight}${unit ?? load.weight.unit}`;
-    return load.kind === 'bodyweightExternal' ? `BW+${amount}` : amount;
+    return load.kind === 'bodyweightExternal' ? `BW${weight !== undefined && weight < 0 ? '' : '+'}${amount}` : amount;
 }
 
 /**

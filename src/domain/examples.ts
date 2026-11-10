@@ -4,57 +4,57 @@ import { exerciseId } from './ids.ts';
 const bentOverRow: ExerciseDefinition = {
     id: exerciseId.assert('ex-bent-over-row'),
     name: 'Bent-over row',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
+    measurements: ['repetitions'],
     executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perSide'] }],
+    load: { kind: 'external' },
 };
 
 const pullUp: ExerciseDefinition = {
     id: exerciseId.assert('ex-pull-up'),
     name: 'Pull-up',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
+    measurements: ['repetitions'],
     executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
+    load: { kind: 'bodyweightExternal' },
 };
 
 const plank: ExerciseDefinition = {
     id: exerciseId.assert('ex-plank'),
     name: 'Plank',
-    measurements: [{ measurement: 'duration', countBasis: 'total' }],
+    measurements: ['duration'],
     executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }],
+    load: { kind: 'bodyweight' },
 };
 
 const halfCrimpHold: ExerciseDefinition = {
     id: exerciseId.assert('ex-half-crimp-hold'),
     name: 'Half-crimp hold',
-    measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
+    measurements: ['duration'],
     executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    load: { kind: 'external' },
 };
 
 const wristCurl: ExerciseDefinition = {
     id: exerciseId.assert('ex-wrist-curl'),
     name: 'Wrist curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['repetitions'],
+    executionModes: ['unilateral'],
+    load: { kind: 'external' },
 };
 
 const airSquat: ExerciseDefinition = {
     id: exerciseId.assert('ex-air-squat'),
     name: 'Air squat',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
+    measurements: ['repetitions'],
     executionModes: ['bilateral'],
-    loads: [{ kind: 'none' }],
+    load: { kind: 'none' },
 };
 
 const dumbbellCurl: ExerciseDefinition = {
     id: exerciseId.assert('ex-dumbbell-curl'),
     name: 'Dumbbell curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'perSide' }],
+    measurements: ['repetitions'],
     executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    load: { kind: 'external' },
 };
 
 /** Representative catalog entries covering every current capability combination. */

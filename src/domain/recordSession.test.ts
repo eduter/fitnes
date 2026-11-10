@@ -40,7 +40,7 @@ describe('draftResultFromPrescription', () => {
         const prescription = {
             measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 10 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 10, unit: 'kg' } },
         } as const;
 
         const result = draftResultFromPrescription('entry-1', prescription, 2_000);
@@ -77,7 +77,7 @@ describe('per-side actuals', () => {
         setPrescription(template, 'set-1', {
             measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 10 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 10, unit: 'kg' } },
         });
         template.sets = [template.sets[0]];
         template.sequence = [{ id: 'entry-1', plannedSetId: 'set-1' }];
@@ -166,7 +166,7 @@ describe('skipped sets', () => {
         setPrescription(template, 'set-1', {
             measurement: { measurement: 'duration', countBasis: 'perSide', seconds: 30 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 20, unit: 'kg' } },
         });
         const session = createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 });
         const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
@@ -231,7 +231,7 @@ describe('recordResult', () => {
     it('rejects a result that changes the prescription meaning', () => {
         const session = createSessionFromTemplate({ id: 'sess-1', template: rowTemplate(), startedAt: 1_000 });
         const drafted = draftResultFromPrescription('entry-1', session.snapshot.sets[0].prescription, 2_000);
-        drafted.load = { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } };
+        drafted.load = { kind: 'bodyweight' };
 
         const recorded = recordResult(session, drafted);
 

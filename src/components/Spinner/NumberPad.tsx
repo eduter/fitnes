@@ -1,4 +1,4 @@
-import { createMemo, createSignal, For, type JSX, Show } from 'solid-js';
+import { createEffect, createMemo, createSignal, For, type JSX, Show } from 'solid-js';
 import { Button } from '../Button/Button.tsx';
 import { dialogActionCopy } from '../DialogActions.tsx';
 import { formatMaskedNumber, type NumberMask, replaceNumberDigit } from './numberMask.ts';
@@ -7,10 +7,17 @@ import './NumberPad.css';
 /** A fixed-mask three-column keypad; edits apply immediately and End only closes it. */
 function NumberPad(props: NumberPadProps): JSX.Element {
     const [selected, setSelected] = createSignal(props.mask.integerDigits - 1);
+    const [negative, setNegative] = createSignal(props.value < 0);
+    createEffect(() => {
+        // Keep a chosen sign at zero until the user enters the magnitude
+        if (props.value !== 0) {
+            setNegative(props.value < 0);
+        }
+    });
     const slots = createMemo(() =>
         Array.from({ length: props.mask.integerDigits + props.mask.fractionDigits }, (_, i) => i)
     );
-    const digits = () => formatMaskedNumber(props.value, props.mask).replace('.', '');
+    const digits = () => formatMaskedNumber(Math.abs(props.value), props.mask).replace('.', '');
     const buttons: HTMLButtonElement[] = [];
 
     function select(slot: number): void {
@@ -18,12 +25,12 @@ function NumberPad(props: NumberPadProps): JSX.Element {
         buttons[slot]?.focus({ preventScroll: true });
     }
     function choose(digit: number): void {
-        props.onChange(replaceNumberDigit(props.value, selected(), digit, props.mask));
+        props.onChange(replaceNumberDigit(props.value, selected(), digit, props.mask, negative()));
         select(Math.min(slots().length - 1, selected() + 1));
     }
     function erase(): void {
         const slot = Math.max(0, selected() - 1);
-        props.onChange(replaceNumberDigit(props.value, slot, 0, props.mask));
+        props.onChange(replaceNumberDigit(props.value, slot, 0, props.mask, negative()));
         select(slot);
     }
     function handleKeys(event: KeyboardEvent): void {
@@ -39,13 +46,27 @@ function NumberPad(props: NumberPadProps): JSX.Element {
         } else if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             event.preventDefault();
             const next = (Number(digits()[selected()]) + (event.key === 'ArrowUp' ? 1 : 9)) % 10;
-            props.onChange(replaceNumberDigit(props.value, selected(), next, props.mask));
+            props.onChange(replaceNumberDigit(props.value, selected(), next, props.mask, negative()));
         }
     }
 
     return (
         <fieldset class="nes-number-pad" aria-label="Number pad" onKeyDown={handleKeys}>
             <div class="nes-number-pad__slots">
+                <Show when={props.mask.min < 0}>
+                    <Button
+                        variant="plain"
+                        aria-label="Toggle sign"
+                        onPress={() => {
+                            setNegative(!negative());
+                            if (props.value !== 0) {
+                                props.onChange(Math.max(props.mask.min, Math.min(props.mask.max, -props.value)));
+                            }
+                        }}
+                    >
+                        {negative() ? '-' : '+'}
+                    </Button>
+                </Show>
                 <For each={slots()}>
                     {(slot) => (
                         <>
@@ -93,7 +114,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
     );
 }
 
-/** Controlled nonnegative number and mask for the spinner's keyboard-free editor. */
+/** Controlled number and mask for the spinner's keyboard-free editor. */
 interface NumberPadProps {
     label: string;
     value: number;

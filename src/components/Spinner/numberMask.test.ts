@@ -17,3 +17,10 @@ describe('fixed numerical mask', () => {
         expect(replaceNumberDigit(0, 0, 9, { ...mask, max: 100 })).toBe(100);
     });
 });
+
+it('formats and edits negative loads while preserving their sign', () => {
+    const signed = { ...mask, min: -999.99 };
+    expect(formatMaskedNumber(-12.5, signed)).toBe('-012.50');
+    expect(replaceNumberDigit(-12.5, 2, 3, signed)).toBe(-13.5);
+    expect(stepNumber(0, 1, -1, signed)).toBe(-1);
+});

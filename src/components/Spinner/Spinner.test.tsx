@@ -145,3 +145,46 @@ describe('Spinner', () => {
         expect(document.activeElement).toBe(opener);
     });
 });
+
+it('supports negative values through steps and keypad sign entry', () => {
+    const [value, setValue] = createSignal(0);
+    render(() => (
+        <Spinner
+            label="Added weight"
+            value={value()}
+            onChange={setValue}
+            min={-999.99}
+            integerDigits={3}
+            fractionDigits={2}
+        />
+    ));
+    fireEvent.click(screen.getByRole('button', { name: 'Decrease Added weight' }));
+    expect(value()).toBe(-1);
+    fireEvent.click(screen.getByRole('button', { name: /Added weight:.*Edit number/ }));
+    fireEvent.animationEnd(screen.getByRole('dialog', { name: 'Edit Added weight' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Toggle sign' }));
+    expect(value()).toBe(1);
+});
+
+it('can choose assistance before entering a magnitude from zero', () => {
+    const [value, setValue] = createSignal(0);
+    render(() => (
+        <Spinner
+            label="Added weight"
+            value={value()}
+            onChange={setValue}
+            min={-999.99}
+            integerDigits={3}
+            fractionDigits={2}
+        />
+    ));
+    press(screen.getByRole('button', { name: /Added weight:.*Edit number/ }));
+    fireEvent.animationEnd(screen.getByRole('dialog', { name: 'Edit Added weight' }));
+    press(screen.getByRole('button', { name: 'Toggle sign' }));
+    press(screen.getByRole('button', { name: 'Digit 5' }));
+    expect(value()).toBe(-5);
+    press(screen.getByRole('button', { name: 'Select digit 3: 5' }));
+    press(screen.getByRole('button', { name: 'Digit 0' }));
+    press(screen.getByRole('button', { name: 'Digit 2' }));
+    expect(value()).toBe(-0.2);
+});

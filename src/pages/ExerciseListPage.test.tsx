@@ -98,3 +98,21 @@ it('keeps an unsaved new exercise when dismissal is cancelled', async () => {
     fireEvent.animationEnd(confirm);
     expect(within(editor).getByRole('textbox', { name: 'Name' })).toHaveProperty('value', 'Keep my draft');
 });
+
+it('keeps the Sides window inside the scaled application surface', async () => {
+    const surface = document.createElement('div');
+    surface.id = 'root';
+    document.body.append(surface);
+    try {
+        renderLibrary();
+        fireEvent.click(await screen.findByRole('button', { name: 'Edit Air squat' }));
+        const editor = await screen.findByRole('dialog', { name: 'Edit exercise' });
+        fireEvent.animationEnd(editor);
+        fireEvent.click(within(editor).getByRole('button', { name: /Sides:/ }));
+        const sides = await screen.findByRole('dialog', { name: 'Choose Sides' });
+        expect(surface.contains(sides)).toBe(true);
+    } finally {
+        cleanup();
+        surface.remove();
+    }
+});

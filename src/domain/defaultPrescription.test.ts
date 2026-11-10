@@ -4,16 +4,16 @@ import { defaultPrescription } from './defaultPrescription.ts';
 import { prescriptionProblems } from './capability.ts';
 
 describe('defaultPrescription', () => {
-    it('picks the first allowed measurement, execution mode, and load for each example', () => {
+    it('inherits fixed movement and load behavior with the first supported unit', () => {
         expect(defaultPrescription(bentOverRow)).toEqual({
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
             executionMode: 'bilateral',
-            load: { kind: 'external', basis: 'total', weight: { value: 0, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 0, unit: 'kg' } },
         });
         expect(defaultPrescription(pullUp)).toEqual({
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
             executionMode: 'bilateral',
-            load: { kind: 'bodyweight' },
+            load: { kind: 'bodyweightExternal', weight: { value: 0, unit: 'kg' } },
         });
         expect(defaultPrescription(plank)).toEqual({
             measurement: { measurement: 'duration', countBasis: 'total', seconds: 30 },
@@ -23,7 +23,7 @@ describe('defaultPrescription', () => {
         expect(defaultPrescription(halfCrimpHold)).toEqual({
             measurement: { measurement: 'duration', countBasis: 'perSide', seconds: 30 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perSide', weight: { value: 0, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 0, unit: 'kg' } },
         });
         expect(defaultPrescription(airSquat)).toEqual({
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },

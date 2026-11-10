@@ -1,3 +1,4 @@
+import { exerciseCopy } from '../copy/exercise.ts';
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button, ConfirmDialog } from '../components/Controls/index.ts';
@@ -164,21 +165,8 @@ interface ExerciseListPageProps {
 }
 
 function exerciseSummary(value: ExerciseDefinition): string {
-    const measures = [
-        ...new Set(value.measurements.map((item) => (item.measurement === 'repetitions' ? 'Reps' : 'Seconds'))),
-    ].join(' / ');
-    const loads = value.loads
-        .map(
-            (item) =>
-                ({
-                    none: 'No weight',
-                    bodyweight: 'Bodyweight',
-                    external: 'Added weight',
-                    bodyweightExternal: 'Bodyweight + added weight',
-                })[item.kind]
-        )
-        .join(' / ');
-    return `${measures} · ${value.loads.length > 1 ? `${value.loads.length} weight options` : loads}`;
+    const measures = value.measurements.map((unit) => exerciseCopy.units[unit]).join(' / ');
+    return `${measures} · ${exerciseCopy.weights[value.load.kind]}`;
 }
 
 export { ExerciseListPage };

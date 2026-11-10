@@ -20,7 +20,7 @@ Import controls from `src/components/Controls/index.ts`.
 | DialogActions | Editor footer | Cancel (or No) at left, positive action at right. End alone at right for already-persisted edits. Central copy in dialogActionCopy; no per-screen synonyms. |
 | MoveButton | Reorder an item | Dedicated 16×16 shaft arrow and destination bar. Gold icon with an accessible Move … up/down verb. Disabled at list boundaries. Never reuse it for increments, pagination or navigation; those retain their existing glyphs. |
 | Button | Actions such as Edit, Delete, Duplicate, Record, End | Gold uppercase text, no chevron. `onPress` provides immediate primary press plus keyboard activation. Native disabled semantics. Pointer input belongs only to visible text/icons; layout space stays passive. |
-| OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. There is no layout variant. |
+| OptionPicker | One choice, including On/Off | A framed field sized to the widest option/legend. Value opens an anchored options-only window below, flipping above if needed. Selecting applies/closes; outside/Escape closes without selecting. Values and options preserve caller casing. There is no layout variant. |
 | MultiPicker | Multiple memberships | Full-width framed summary (two names then +N, or None), with two lines reserved so memberships never resize the field. Values align at the top; the summary button has no opaque fill over the border. Options stay open on toggle. A reserved check appears immediately after each label; text never shifts. End is separated at the bottom right. Membership changes apply immediately; End/outside only close. |
 | Spinner / NumberPad | Quantities, reps, sets, load | Framed fixed-mask value and compact symmetric day-style arrows. Value opens a keyboard-free numeric pad containing digits/keys only, no visible header, and End. Back erases a digit; it is not window navigation. Changes are immediate; End only closes. |
 | DateSpinner | Recording bodyweight dates | Framed YYYY.MM.DD with adjacent-day arrows. Native calendar opens only when the date is pressed, as explicitly approved by the owner. Controlled value is a local YYYY-MM-DD date; day arithmetic avoids DST issues. |
@@ -54,7 +54,7 @@ Import controls from `src/components/Controls/index.ts`.
   The FitNES wordmark appears on Home only. The workout library is called
   Workouts in the interface; storage still uses the existing template records.
 - A popup choice menu contains only options. Multi-choice adds End at the bottom
-  right. Numeric pads have no visible header and close with End. Keep accessible
+  right. Numeric pads have no visible header and close with End. Signed load fields include a sign key beside the digit slots; other quantities stay nonnegative. Keep accessible
   names even when decorative headers are absent.
 - Use current-state summaries and short Edit/Delete/Duplicate actions. Edit
   opens one bounded form; do not paginate a modal. Put common fields together.

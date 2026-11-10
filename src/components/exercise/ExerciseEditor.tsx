@@ -137,9 +137,9 @@ function blankExercise(): ExerciseDefinition {
     return {
         id: generateExerciseId(),
         name: '',
-        measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
+        measurements: ['repetitions'],
         executionModes: ['bilateral'],
-        loads: [{ kind: 'none' }],
+        load: { kind: 'none' },
     };
 }
 

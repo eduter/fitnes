@@ -1,132 +1,73 @@
-import type { ExerciseDefinition, LoadOption, MeasurementOption } from './exercise.ts';
+import { countBasisFor, type ExerciseDefinition, type ExecutionMode } from './exercise.ts';
 import type { LoadConfiguration, MeasurementValue, SetPrescription } from './prescription.ts';
 
-/**
- * A prescription field that conflicts with the exercise definition, with a
- * message explaining the conflict. The field name is relative to the
- * prescription so callers can prefix it with the owning document path.
- */
+/** A prescription field that conflicts with its owning exercise. */
 interface PrescriptionProblem {
     field: 'measurement' | 'executionMode' | 'load';
     message: string;
 }
 
-function findMeasurementOption(
-    exercise: ExerciseDefinition,
-    measurement: MeasurementValue['measurement'],
-    countBasis: MeasurementValue['countBasis']
-): MeasurementOption | undefined {
-    return exercise.measurements.find(
-        (option) => option.measurement === measurement && option.countBasis === countBasis
-    );
-}
-
-function findLoadOption(exercise: ExerciseDefinition, kind: LoadOption['kind']): LoadOption | undefined {
-    return exercise.loads.find((option) => option.kind === kind);
-}
-
-function describeMeasurements(exercise: ExerciseDefinition): string {
-    return exercise.measurements.map((option) => `${option.measurement}/${option.countBasis}`).join(', ');
-}
-
-function describeLoads(exercise: ExerciseDefinition): string {
-    return exercise.loads
-        .map((option) =>
-            option.kind === 'external' || option.kind === 'bodyweightExternal'
-                ? `${option.kind} (${option.bases.join(', ')})`
-                : option.kind
-        )
-        .join(', ');
-}
-
+/** Report units or counting that conflict with the set's selected movement. */
 function measurementProblems(
     exercise: ExerciseDefinition,
-    value: { measurement: MeasurementValue['measurement']; countBasis: MeasurementValue['countBasis'] }
+    value: Pick<MeasurementValue, 'measurement' | 'countBasis'>,
+    mode: ExecutionMode
 ): PrescriptionProblem[] {
     const { measurement, countBasis } = value;
-
-    if (findMeasurementOption(exercise, measurement, countBasis)) {
-        return [];
-    }
-
-    const sameMeasurement = exercise.measurements.some((option) => option.measurement === measurement);
-    if (sameMeasurement) {
+    if (!exercise.measurements.includes(measurement)) {
         return [
             {
                 field: 'measurement',
-                message: `exercise '${exercise.name}' does not support '${measurement}' counted '${countBasis}'; allowed: ${describeMeasurements(exercise)}`,
+                message: `exercise '${exercise.name}' does not support '${measurement}' measurement; allowed: ${exercise.measurements.join(', ')}`,
             },
         ];
     }
-
-    return [
-        {
-            field: 'measurement',
-            message: `exercise '${exercise.name}' does not support '${measurement}' measurement; allowed: ${describeMeasurements(exercise)}`,
-        },
-    ];
+    const expected = countBasisFor(mode);
+    if (countBasis !== expected) {
+        return [
+            {
+                field: 'measurement',
+                message: `exercise '${exercise.name}' requires '${measurement}' counted '${expected}' for '${mode}' movement`,
+            },
+        ];
+    }
+    return [];
 }
 
+/** Reject a set movement the exercise does not support. */
 function executionModeProblems(exercise: ExerciseDefinition, prescription: SetPrescription): PrescriptionProblem[] {
     const { executionMode } = prescription;
-
-    if (exercise.executionModes.includes(executionMode)) {
-        return [];
+    if (!exercise.executionModes.includes(executionMode)) {
+        return [
+            {
+                field: 'executionMode',
+                message: `exercise '${exercise.name}' supports '${exercise.executionModes.join(', ')}' execution`,
+            },
+        ];
     }
-
-    return [
-        {
-            field: 'executionMode',
-            message: `exercise '${exercise.name}' does not support '${executionMode}' execution; allowed: ${exercise.executionModes.join(', ')}`,
-        },
-    ];
+    return [];
 }
 
-/**
- * Report every way `prescription` conflicts with `exercise`. Checks the
- * measurement and its counting basis, the execution mode, and the load
- * configuration including the external-load basis.
- */
+/** Report every configuration that conflicts with the owning exercise. */
 function prescriptionProblems(exercise: ExerciseDefinition, prescription: SetPrescription): PrescriptionProblem[] {
     return [
-        ...measurementProblems(exercise, prescription.measurement),
+        ...measurementProblems(exercise, prescription.measurement, prescription.executionMode),
         ...executionModeProblems(exercise, prescription),
         ...loadProblems(exercise, prescription.load),
     ];
 }
 
-/**
- * Report every way `load` conflicts with `exercise`: whether the load kind is
- * allowed and, for external load, whether its basis is one the exercise
- * supports.
- */
+/** Reject a load configuration that changes the exercise's fixed load behavior. */
 function loadProblems(exercise: ExerciseDefinition, load: LoadConfiguration): PrescriptionProblem[] {
-    const option = findLoadOption(exercise, load.kind);
-    if (!option) {
+    if (load.kind !== exercise.load.kind) {
         return [
             {
                 field: 'load',
-                message: `exercise '${exercise.name}' does not allow '${load.kind}' load; allowed: ${describeLoads(exercise)}`,
+                message: `exercise '${exercise.name}' does not allow '${load.kind}' load; required: ${exercise.load.kind}`,
             },
         ];
     }
-
-    if (load.kind === 'none' || load.kind === 'bodyweight') {
-        return [];
-    }
-
-    if ((option.kind === 'external' || option.kind === 'bodyweightExternal') && option.bases.includes(load.basis)) {
-        return [];
-    }
-
-    const allowedBases =
-        option.kind === 'external' || option.kind === 'bodyweightExternal' ? option.bases.join(', ') : 'none';
-    return [
-        {
-            field: 'load',
-            message: `exercise '${exercise.name}' does not allow '${load.kind}' load basis '${load.basis}'; allowed: ${allowedBases}`,
-        },
-    ];
+    return [];
 }
 
 export { executionModeProblems, loadProblems, measurementProblems, prescriptionProblems };

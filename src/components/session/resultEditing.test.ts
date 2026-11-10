@@ -13,7 +13,7 @@ function result(overrides: Partial<ActualResult> = {}): ActualResult {
     return {
         sequenceEntryId: 'entry-1',
         measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
-        load: { kind: 'external', basis: 'total', weight: { value: 60, unit: 'kg' } },
+        load: { kind: 'external', weight: { value: 60, unit: 'kg' } },
         completedAt: 2_000,
         ...overrides,
     };
@@ -28,7 +28,7 @@ describe('resultCells', () => {
         const cells = resultCells(
             result({
                 measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9 } },
-                load: { kind: 'external', basis: 'perSide', weight: { value: 12, unit: 'kg' } },
+                load: { kind: 'external', weight: { value: 12, unit: 'kg' } },
             })
         );
 
@@ -49,9 +49,7 @@ describe('resultCells', () => {
 
     it('treats a weighted bodyweight set as an editable weight', () => {
         expect(
-            resultCells(
-                result({ load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 5, unit: 'kg' } } })
-            ).load
+            resultCells(result({ load: { kind: 'bodyweightExternal', weight: { value: 5, unit: 'kg' } } })).load
         ).toBe('weight');
     });
 
@@ -122,16 +120,15 @@ describe('withSideCount', () => {
 describe('withWeight', () => {
     it('replaces the external mass and keeps the unit', () => {
         const next = withWeight(result(), 62.5);
-        expect(next.load).toEqual({ kind: 'external', basis: 'total', weight: { value: 62.5, unit: 'kg' } });
+        expect(next.load).toEqual({ kind: 'external', weight: { value: 62.5, unit: 'kg' } });
     });
 
     it('replaces the added mass of a weighted bodyweight set', () => {
         const weighted = result({
-            load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 5, unit: 'kg' } },
+            load: { kind: 'bodyweightExternal', weight: { value: 5, unit: 'kg' } },
         });
         expect(withWeight(weighted, 7.5).load).toEqual({
             kind: 'bodyweightExternal',
-            basis: 'total',
             weight: { value: 7.5, unit: 'kg' },
         });
     });
@@ -153,7 +150,7 @@ describe('formatSetReference', () => {
 
     it('renders added weight on a weighted bodyweight set', () => {
         const weighted = result({
-            load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 5, unit: 'kg' } },
+            load: { kind: 'bodyweightExternal', weight: { value: 5, unit: 'kg' } },
         });
         expect(formatSetReference(weighted)).toBe('BW+5kg×8');
     });
@@ -161,7 +158,7 @@ describe('formatSetReference', () => {
     it('renders per-side counts as left/right', () => {
         const perSide = result({
             measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 10, right: 9 } },
-            load: { kind: 'external', basis: 'perSide', weight: { value: 12, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 12, unit: 'kg' } },
         });
         expect(formatSetReference(perSide)).toBe('12kg×10/9');
     });
@@ -196,4 +193,10 @@ describe('summarizeTargets', () => {
     it('renders nothing for an empty block', () => {
         expect(summarizeTargets([])).toBe('');
     });
+});
+
+it('shows assistance without a double sign in previous performance', () => {
+    expect(
+        formatSetReference(result({ load: { kind: 'bodyweightExternal', weight: { value: -10, unit: 'kg' } } }))
+    ).toBe('BW-10kg×8');
 });

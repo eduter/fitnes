@@ -88,10 +88,8 @@ function createSessionFromTemplate(input: StartSessionInput): WorkoutSession {
 }
 
 /**
- * Total load for a set when the external load is expressed as a total. Returns
- * `undefined` for per-hand and per-side bases, because totalling those needs a
- * side count the load configuration does not carry, and for a unit mismatch
- * between bodyweight and external load. Bodyweight and external load stay
+ * Total load for a set. Returns `undefined` for missing bodyweight or a unit
+ * mismatch between bodyweight and external load. Bodyweight and external load stay
  * separate in the stored result; this helper only derives a combined figure.
  */
 function totalLoad(load: LoadConfiguration, bodyweight: Weight | undefined): Weight | undefined {
@@ -104,10 +102,10 @@ function totalLoad(load: LoadConfiguration, bodyweight: Weight | undefined): Wei
     }
 
     if (load.kind === 'external') {
-        return load.basis === 'total' ? load.weight : undefined;
+        return load.weight;
     }
 
-    if (load.basis !== 'total' || bodyweight === undefined) {
+    if (bodyweight === undefined) {
         return undefined;
     }
 

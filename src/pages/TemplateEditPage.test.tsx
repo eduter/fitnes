@@ -131,15 +131,15 @@ it('edits sparse timing on each set with exercise defaults prefilled and no Timi
     fireEvent.click(within(row).getByRole('button', { name: 'Edit', exact: true }));
     const dialog = await screen.findByRole('dialog', { name: 'Edit planned set' });
     fireEvent.animationEnd(dialog);
-    expect(within(dialog).getByRole('button', { name: 'Prep seconds: 007. Edit number' })).toBeTruthy();
-    expect(within(dialog).getByRole('button', { name: 'Seconds per rep: 02.0. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Prep time (s): 007. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Rep duration (s): 02.0. Edit number' })).toBeTruthy();
     expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Prep seconds' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Prep time (s)' }));
     await waitFor(async () => expect((await db.templates.get(plan.id))?.sets[0].timing).toEqual({ prepSeconds: 8 }));
     expect((await db.templates.get(plan.id))?.sets[1].timing).toBeUndefined();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Decrease Prep seconds' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Decrease Prep time (s)' }));
     await waitFor(async () => expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined());
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Seconds per rep' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Increase Rep duration (s)' }));
     await waitFor(async () =>
         expect((await db.templates.get(plan.id))?.sets[0].timing).toEqual({ secondsPerRep: 2.1 })
     );
@@ -163,8 +163,8 @@ it('shows current exercise defaults rather than stale timing embedded in the wor
     fireEvent.click(within(row).getByRole('button', { name: 'Edit', exact: true }));
     const dialog = await screen.findByRole('dialog', { name: 'Edit planned set' });
     fireEvent.animationEnd(dialog);
-    expect(within(dialog).getByRole('button', { name: 'Prep seconds: 005. Edit number' })).toBeTruthy();
-    expect(within(dialog).getByRole('button', { name: 'Seconds per rep: 03.0. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Prep time (s): 005. Edit number' })).toBeTruthy();
+    expect(within(dialog).getByRole('button', { name: 'Rep duration (s): 03.0. Edit number' })).toBeTruthy();
     expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined();
 });
 

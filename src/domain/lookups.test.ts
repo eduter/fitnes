@@ -29,7 +29,6 @@ describe('templateUsesBodyweight', () => {
         template.sets[1].exerciseId = pullUp.id;
         template.sets[1].prescription.load = {
             kind: 'bodyweightExternal',
-            basis: 'total',
             weight: { value: 10, unit: 'kg' },
         };
 

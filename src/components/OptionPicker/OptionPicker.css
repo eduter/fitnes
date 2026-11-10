@@ -12,7 +12,7 @@
     white-space: normal;
     overflow-wrap: anywhere;
     text-align: left;
-    text-transform: uppercase;
+    text-transform: none;
 }
 .nes-option-picker__menu {
     display: flex;
@@ -28,7 +28,7 @@
     display: grid;
     block-size: 0;
     visibility: hidden;
-    text-transform: uppercase;
+    text-transform: none;
 }
 .nes-option-picker__sizer > span {
     grid-area: 1 / 1;
@@ -37,7 +37,7 @@
 
 .nes-option-picker__menu > .nes-button {
     justify-content: start;
-    text-transform: uppercase;
+    text-transform: none;
     min-block-size: 24px;
 }
 .nes-option-picker__value[data-variant="plain"] {
