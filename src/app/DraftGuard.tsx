@@ -28,6 +28,7 @@ function DraftGuard(props: DraftGuardProps): JSX.Element {
         <ConfirmDialog
             open={open()}
             onOpenChange={setOpen}
+            closeOnBack={false}
             message="Discard unsaved changes?"
             onConfirm={() => retry?.()}
             mount={document.getElementById('root') ?? undefined}

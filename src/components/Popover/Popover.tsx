@@ -1,5 +1,6 @@
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { useDialogHistory } from '../../routing/dialogHistory.ts';
 import { Button } from '../Button/Button.tsx';
 import { controlClasses } from '../Controls/controlClasses.ts';
 import { isTopModal, popModal, pushModal } from './modalStack.ts';
@@ -12,6 +13,7 @@ function Popover(props: PopoverProps): JSX.Element {
     const [local, rest] = splitProps(props, [
         'open',
         'onOpenChange',
+        'closeOnBack',
         'label',
         'children',
         'mount',
@@ -39,6 +41,11 @@ function Popover(props: PopoverProps): JSX.Element {
     const stepPixels = () => local.stepPixels ?? 16;
     const steps = () => Math.max(1, Math.ceil((phase() === 'closing' ? closingHeight() : height()) / stepPixels()));
     const duration = () => `${(steps() * (local.framesPerStep ?? 2) * 1000) / 60}ms`;
+
+    useDialogHistory({
+        open: () => local.open && local.closeOnBack !== false,
+        onClose: () => local.onOpenChange(false),
+    });
 
     function restoreBackground(): void {
         if (layer) {
@@ -312,6 +319,8 @@ interface PopoverProps
     extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children' | 'style' | 'onAnimationEnd' | 'onKeyDown' | 'ref'> {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    /** Whether the browser Back button dismisses this window. Defaults to true. */
+    closeOnBack?: boolean;
     label: string;
     children: JSX.Element;
     mount?: HTMLElement;
