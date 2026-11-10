@@ -22,3 +22,5 @@ export { TextArea } from '../TextArea/TextArea.tsx';
 export type { TextInputProps } from '../TextInput/TextInput.tsx';
 export { TextInput } from '../TextInput/TextInput.tsx';
 export { DialogTitle, PageTitle, SectionHeading } from '../Typography.tsx';
+export { FilePicker } from '../FilePicker/FilePicker.tsx';
+export type { FilePickerProps } from '../FilePicker/FilePicker.tsx';

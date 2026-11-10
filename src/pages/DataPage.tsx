@@ -1,18 +1,18 @@
-import { Button, ConfirmDialog, TextArea } from '../components/Controls/index.ts';
+import { Button, ConfirmDialog, FilePicker, TextArea } from '../components/Controls/index.ts';
 import { createSignal, Show, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { OptionPicker } from '../components/OptionPicker/OptionPicker.tsx';
 import type { WeightUnit } from '../domain/units.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
-import { countRecords, type DataExport } from '../domain/dataExport.ts';
+import { countRecords, type DataExport, parseDataExport } from '../domain/dataExport.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { downloadTextFile } from '../utils/download.ts';
 
 /**
  * Import and export the whole database as one JSON document. Export reads the
  * stored rows directly, so it still works when a row cannot be loaded; import
- * validates the entire document before writing, so a bad paste leaves the
+ * validates the entire document before writing, so an invalid document leaves the
  * current data untouched.
  */
 function DataPage(): JSX.Element {
@@ -20,6 +20,7 @@ function DataPage(): JSX.Element {
     const [confirming, setConfirming] = createSignal(false);
     let trigger: HTMLElement | undefined;
     const [draft, setDraft] = createSignal('');
+    const [reading, setReading] = createSignal(false);
     const [errors, setErrors] = createSignal<ValidationIssue[]>([]);
     const [status, setStatus] = createSignal<string | null>(null);
 
@@ -37,12 +38,34 @@ function DataPage(): JSX.Element {
         setStatus('Downloaded the current database.');
     }
 
+    async function loadFile(file: File): Promise<void> {
+        setReading(true);
+        setErrors([]);
+        setStatus(null);
+        setDraft('');
+
+        try {
+            const text = await file.text();
+            const parsed = parseDataExport(text);
+            if (!parsed.ok) {
+                setErrors(parsed.errors);
+                return;
+            }
+            setDraft(text);
+            setStatus(`Loaded ${file.name} — ${describe(parsed.value)}`);
+        } catch {
+            setErrors([{ path: '', message: `Could not read ${file.name}. Choose the file again.` }]);
+        } finally {
+            setReading(false);
+        }
+    }
+
     async function replaceAll(): Promise<void> {
         setErrors([]);
         setStatus(null);
 
         if (draft().trim() === '') {
-            setErrors([{ path: '', message: 'Paste an export document before replacing' }]);
+            setErrors([{ path: '', message: 'Choose a JSON file or paste an export document before replacing' }]);
             return;
         }
 
@@ -83,23 +106,33 @@ function DataPage(): JSX.Element {
             <div class="card stack">
                 <h2 class="card-title">Export</h2>
                 <div class="inline-fields">
-                    <Button type="button" onPress={() => void show()}>
+                    <Button type="button" disabled={reading()} onPress={() => void show()}>
                         Show current data
                     </Button>
-                    <Button type="button" onPress={() => void download()}>
+                    <Button type="button" disabled={reading()} onPress={() => void download()}>
                         Download JSON
                     </Button>
                 </div>
             </div>
             <div class="card stack">
                 <h2 class="card-title">Import</h2>
-                <TextArea label="Document" rows={5} value={draft()} onChange={setDraft} />
+                <FilePicker
+                    label="Choose file"
+                    accept=".json,application/json"
+                    disabled={reading()}
+                    onSelect={(file) => void loadFile(file)}
+                />
+                <Show when={reading()}>
+                    <p role="status">Reading file…</p>
+                </Show>
+                <TextArea label="Document" rows={5} value={draft()} disabled={reading()} onChange={setDraft} />
                 <div class="inline-fields">
-                    <Button type="button" onPress={() => void show()}>
+                    <Button type="button" disabled={reading()} onPress={() => void show()}>
                         Load current data
                     </Button>
                     <Button
                         type="button"
+                        disabled={reading()}
                         onPress={(event) => {
                             trigger = event.currentTarget;
                             setConfirming(true);
@@ -113,7 +146,7 @@ function DataPage(): JSX.Element {
     );
 }
 
-/** Summarise an imported document as record counts, so a paste can be sanity-checked. */
+/** Summarise an imported document as record counts, so an import can be sanity-checked. */
 function describe(value: DataExport): string {
     const counts = countRecords(value);
     return `${counts.exercises} exercises, ${counts.templates} workouts, ${counts.sessions} sessions, ${counts.bodyweightMeasurements} bodyweight readings`;
