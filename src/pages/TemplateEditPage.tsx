@@ -1,4 +1,4 @@
-import { A, useNavigate, useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
@@ -10,11 +10,12 @@ import { duplicateWorkoutTemplate } from '../domain/duplicateWorkoutTemplate.ts'
 import { generateWorkoutTemplateId } from '../domain/generateIds.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Create or edit a workout template. Valid edits persist immediately. */
 function TemplateEditPage(): JSX.Element {
     const params = useParams();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     const app = useAppData();
     const isNew = () => params.id === undefined;
 
@@ -82,7 +83,7 @@ function TemplateEditPage(): JSX.Element {
         }
         setCreated(true);
         setErrors([]);
-        navigate(`/templates/${result.value.id}`, { replace: true });
+        nav.replaceWorkout(result.value.id);
     }
 
     async function duplicate(): Promise<void> {
@@ -105,13 +106,13 @@ function TemplateEditPage(): JSX.Element {
             await app.saveTemplate({ ...edit, id: copy.id });
         }
 
-        navigate(`/templates/${copy.id}`);
+        nav.toWorkout(copy.id);
     }
 
     async function remove(): Promise<void> {
         if (await app.removeTemplate(draft().id)) {
             setDiscarded(true);
-            navigate('/templates');
+            nav.toWorkoutsList();
         }
     }
 
@@ -138,7 +139,7 @@ function TemplateEditPage(): JSX.Element {
             <ValidationErrors errors={errors()} />
             <PageHeader
                 title={created() ? draft().name || 'Workout' : 'New workout'}
-                actions={<Button onPress={() => navigate('/templates')}>Back</Button>}
+                actions={<Button onPress={() => nav.goBack()}>Back</Button>}
             />
             <Show
                 when={!missing()}
@@ -163,7 +164,7 @@ function TemplateEditPage(): JSX.Element {
                         onConfirm={() => void create()}
                         onCancel={() => {
                             setDiscarded(true);
-                            navigate('/templates');
+                            nav.goBack();
                         }}
                     />
                 </Show>

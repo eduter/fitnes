@@ -1,17 +1,17 @@
-import { useNavigate } from '@solidjs/router';
 import type { JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Large catalogs use a full-height page rather than a paginated modal. */
 function WorkoutPickerPage(): JSX.Element {
     const app = useAppData();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     return (
         <section class="page">
-            <PageHeader title="Start workout" actions={<Button onPress={() => navigate('/')}>Back</Button>} />
+            <PageHeader title="Start workout" actions={<Button onPress={() => nav.goBack()}>Back</Button>} />
             <PagedList
                 label="Choose workout"
                 items={app.templates()}
@@ -24,7 +24,7 @@ function WorkoutPickerPage(): JSX.Element {
                         <p>
                             {template.exercises.length} exercises · {template.sequence.length} steps
                         </p>
-                        <Button onPress={() => navigate(`/sessions/start/${template.id}`)}>Start</Button>
+                        <Button onPress={() => nav.toStartSession(template.id)}>Start</Button>
                     </article>
                 )}
             </PagedList>

@@ -96,6 +96,22 @@ describe('home actions', () => {
         expect(view.queryByRole('dialog')).toBeNull();
         expect(await db.bodyweightMeasurements.count()).toBe(8);
     });
+
+    it('dismisses the dialog on browser Back without leaving home', async () => {
+        const view = renderHome();
+        const button = view.getByRole('button', { name: 'Record weight' }) as HTMLButtonElement;
+        await waitFor(() => expect(button.disabled).toBe(false));
+        fireEvent.click(button);
+        const dialog = await view.findByRole('dialog');
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-reveal' });
+
+        window.history.back();
+        await waitFor(() => expect(dialog.getAttribute('data-phase')).toBe('closing'));
+        fireEvent.animationEnd(dialog, { animationName: 'nes-popover-hide' });
+        expect(view.queryByRole('dialog')).toBeNull();
+        expect(view.getByRole('button', { name: 'Record weight' })).toBeTruthy();
+        expect(await db.bodyweightMeasurements.count()).toBe(8);
+    });
 });
 
 it('asks before discarding a changed reading on outside or Escape dismissal', async () => {

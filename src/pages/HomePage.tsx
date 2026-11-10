@@ -1,4 +1,3 @@
-import { useNavigate } from '@solidjs/router';
 import { createSignal, type JSX, Show } from 'solid-js';
 import gymUrl from '../../art/home/gym.png?url';
 import { useAppData } from '../app/AppData.tsx';
@@ -6,11 +5,12 @@ import { DraftGuard } from '../app/DraftGuard.tsx';
 import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
 import { formatMass } from '../domain/convertWeight.ts';
+import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Home keeps frequent actions beside the adopted gym artwork. */
 function HomePage(): JSX.Element {
     const app = useAppData();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     const [weightOpen, setWeightOpen] = createSignal(false);
     const [readingDirty, setReadingDirty] = createSignal(false);
     const [discardReading, setDiscardReading] = createSignal(false);
@@ -36,9 +36,9 @@ function HomePage(): JSX.Element {
             />
             <div class="home-actions">
                 <Show when={active()}>
-                    {(session) => <Button onPress={() => navigate(`/sessions/${session().id}`)}>Resume workout</Button>}
+                    {(session) => <Button onPress={() => nav.toSession(session().id)}>Resume workout</Button>}
                 </Show>
-                <Button disabled={app.loadState() !== 'ready'} onPress={() => navigate('/workouts')}>
+                <Button disabled={app.loadState() !== 'ready'} onPress={() => nav.toWorkoutPicker()}>
                     Start workout
                 </Button>
                 <Button
