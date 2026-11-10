@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { cleanup, render, screen } from '@solidjs/testing-library';
 import { createSignal, type JSX } from 'solid-js';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useDialogHistory } from './dialogHistory.ts';
 
 afterEach(() => {
@@ -121,6 +121,43 @@ describe('useDialogHistory', () => {
         window.history.back();
         await settle();
         expect(screen.getByTestId('refuse-open').textContent).toBe('false');
+    });
+
+    it('keeps a replacement dialog open while the previous placeholder is being consumed', async () => {
+        let outer!: (value: boolean) => void;
+        let inner!: (value: boolean) => void;
+        render(() => (
+            <>
+                <Dialog
+                    label="outer"
+                    onRegister={(setOpen) => {
+                        outer = setOpen;
+                    }}
+                />
+                <Dialog
+                    label="inner"
+                    onRegister={(setOpen) => {
+                        inner = setOpen;
+                    }}
+                />
+            </>
+        ));
+        outer(true);
+        await settle();
+
+        const baseState = { _depth: 1 };
+        const back = vi.spyOn(window.history, 'back').mockImplementation(() => {});
+        outer(false);
+        inner(true);
+        // Chromium delivers this traversal after the replacement dialog opens.
+        window.history.replaceState(baseState, '', '/');
+        window.dispatchEvent(new PopStateEvent('popstate', { state: baseState }));
+        back.mockRestore();
+        await settle();
+        expect(screen.getByTestId('inner-open').textContent).toBe('true');
+        window.history.back();
+        await settle();
+        expect(screen.getByTestId('inner-open').textContent).toBe('false');
     });
 
     it('does not leave a phantom entry after a dialog closes and the route replaces it', async () => {

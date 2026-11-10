@@ -15,6 +15,7 @@ const STATE_KEY = 'fitnesDialog';
 let nextId = 0;
 let nextToken = 0;
 let listening = false;
+let consumingPlaceholder = false;
 let activeToken: number | undefined;
 const stack: OpenDialog[] = [];
 
@@ -42,6 +43,15 @@ function anyOpen(): boolean {
 
 /** The browser left the placeholder: dismiss the newest dialog. */
 function handlePopState(): void {
+    // A programmatic close queued this traversal before another dialog opened.
+    // Finish consuming the old entry without dismissing the replacement dialog.
+    if (consumingPlaceholder) {
+        consumingPlaceholder = false;
+        if (anyOpen()) {
+            pushPlaceholder();
+        }
+        return;
+    }
     if (activeToken === undefined || currentToken() === activeToken) {
         return;
     }
@@ -87,6 +97,7 @@ function useDialogHistory(options: DialogHistoryOptions): void {
         if (stack.length === 0 && activeToken !== undefined) {
             activeToken = undefined;
             if (currentToken() !== undefined) {
+                consumingPlaceholder = true;
                 window.history.back();
             }
         }
@@ -97,7 +108,7 @@ function useDialogHistory(options: DialogHistoryOptions): void {
             if (!pushed) {
                 pushed = true;
                 stack.push({ id, options });
-                if (activeToken === undefined) {
+                if (activeToken === undefined && !consumingPlaceholder) {
                     pushPlaceholder();
                 }
             }
