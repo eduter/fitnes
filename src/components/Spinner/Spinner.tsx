@@ -91,7 +91,9 @@ function Spinner(props: SpinnerProps): JSX.Element {
             <div class="nes-spinner__controls">
                 <span
                     class="nes-spinner__value-frame"
-                    style={{ 'inline-size': `${Math.max(22, masked().length * 7 + 4)}px` }}
+                    style={{
+                        'inline-size': `${Math.max(22, (mask().integerDigits + mask().fractionDigits + (mask().fractionDigits ? 1 : 0) + (mask().min < 0 ? 1 : 0)) * 7 + 4)}px`,
+                    }}
                 >
                     <Button
                         ref={(element) => {

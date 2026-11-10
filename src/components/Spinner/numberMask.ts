@@ -26,11 +26,17 @@ function stepNumber(value: number, step: number, direction: 1 | -1, mask: Number
 }
 
 /** Replace a single digit of the mask and clamp the resulting number to its valid range. */
-function replaceNumberDigit(value: number, slot: number, digit: number, mask: NumberMask): number {
+function replaceNumberDigit(
+    value: number,
+    slot: number,
+    digit: number,
+    mask: NumberMask,
+    negative = value < 0
+): number {
     const { fractionDigits, min, max } = mask;
     const digits = formatMaskedNumber(Math.abs(value), mask).replace('.', '').split('');
     digits[slot] = String(digit);
-    return Math.min(max, Math.max(min, ((value < 0 ? -1 : 1) * Number(digits.join(''))) / 10 ** fractionDigits));
+    return Math.min(max, Math.max(min, ((negative ? -1 : 1) * Number(digits.join(''))) / 10 ** fractionDigits));
 }
 
 export { formatMaskedNumber, stepNumber, replaceNumberDigit };
