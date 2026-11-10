@@ -1,15 +1,15 @@
-import { useNavigate } from '@solidjs/router';
 import type { JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { useAppNavigate } from '../routing/navigation.ts';
 import { formatDateTime } from '../utils/datetime.ts';
 
 /** Browse saved sessions with room for the available phone height. */
 function SessionListPage(): JSX.Element {
     const app = useAppData();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     return (
         <section class="page">
             <PageHeader title="History" />
@@ -21,7 +21,7 @@ function SessionListPage(): JSX.Element {
                             {formatDateTime(item.startedAt)} · {item.results.length}/{item.snapshot.sequence.length}
                         </p>
                         <div class="button-row">
-                            <Button onPress={() => navigate(`/sessions/${item.id}`)}>Review</Button>
+                            <Button onPress={() => nav.toSession(item.id)}>Review</Button>
                         </div>
                     </article>
                 )}

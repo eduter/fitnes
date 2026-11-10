@@ -20,6 +20,7 @@ function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
         <Popover
             open={props.open}
             onOpenChange={props.onOpenChange}
+            closeOnBack={props.closeOnBack}
             label={message()}
             mount={props.mount}
             anchor={props.trigger}
@@ -42,6 +43,8 @@ function ConfirmDialog(props: ConfirmDialogProps): JSX.Element {
 interface ConfirmDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    /** Whether the browser Back button cancels this confirmation. Defaults to true. */
+    closeOnBack?: boolean;
     message: string;
     onConfirm: () => void;
     mount?: HTMLElement;

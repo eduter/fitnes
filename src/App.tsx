@@ -1,46 +1,17 @@
-import { useLocation, useNavigate } from '@solidjs/router';
 import { type JSX, onCleanup, onMount, Show } from 'solid-js';
 import logoUrl from '../art/logo/logo.png?url';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
-import { basePath, pathWithinBase } from './app/basePath.ts';
-import { BottomTabs, type TabId } from './components/BottomTabs/BottomTabs.tsx';
+import { BottomTabs } from './components/BottomTabs/BottomTabs.tsx';
 import { SteelPanel } from './components/SteelPanel/SteelPanel.tsx';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
+import { useActiveTab, useAppNavigate, useIsHome } from './routing/navigation.ts';
 import './App.css';
 
 /** The shared 256-pixel game screen, with persistent six-tab navigation. */
 function App(props: AppProps): JSX.Element {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const routePath = () => pathWithinBase(location.pathname, basePath);
-    const home = () => routePath() === '/';
-    const active = (): TabId => {
-        const path = routePath();
-        if (path.startsWith('/templates')) {
-            return 'templates';
-        }
-        if (path.startsWith('/exercises')) {
-            return 'exercises';
-        }
-        if (path.startsWith('/bodyweight')) {
-            return 'weight';
-        }
-        if (path.startsWith('/sessions')) {
-            return 'history';
-        }
-        if (path.startsWith('/data')) {
-            return 'settings';
-        }
-        return 'home';
-    };
-    const destinations: Record<TabId, string> = {
-        home: '/',
-        templates: '/templates',
-        exercises: '/exercises',
-        weight: '/bodyweight',
-        history: '/sessions',
-        settings: '/data',
-    };
+    const home = useIsHome();
+    const activeTab = useActiveTab();
+    const nav = useAppNavigate();
 
     onMount(() => {
         scaleScreen();
@@ -66,9 +37,9 @@ function App(props: AppProps): JSX.Element {
                 </main>
                 <div class="app-tabs">
                     <BottomTabs
-                        active={active()}
+                        active={activeTab()}
                         onSelect={(tab) => {
-                            navigate(destinations[tab]);
+                            nav.toTab(tab);
                             window.scrollTo(0, 0);
                         }}
                     />

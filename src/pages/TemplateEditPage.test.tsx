@@ -167,3 +167,26 @@ it('shows current exercise defaults rather than stale timing embedded in the wor
     expect(within(dialog).getByRole('button', { name: 'Seconds per rep: 03.0. Edit number' })).toBeTruthy();
     expect((await db.templates.get(plan.id))?.sets[0].timing).toBeUndefined();
 });
+
+it('closes a nested chooser on Back, then the set dialog beneath it', async () => {
+    renderWorkout();
+    const before = await db.templates.get('preview-strength');
+    const dialog = await openAdd();
+    fireEvent.click(within(dialog).getByRole('button', { name: /^Exercise:/ }));
+    const chooser = await screen.findByRole('dialog', { name: 'Choose Exercise' });
+    fireEvent.animationEnd(chooser);
+
+    window.history.back();
+    await waitFor(() => expect(chooser.dataset.phase).toBe('closing'));
+    fireEvent.animationEnd(chooser);
+    expect(screen.queryByRole('dialog', { name: 'Choose Exercise' })).toBeNull();
+    // The set dialog underneath is still open and untouched.
+    expect(screen.getByRole('dialog', { name: 'Add set' })).toBe(dialog);
+
+    window.history.back();
+    await waitFor(() => expect(dialog.dataset.phase).toBe('closing'));
+    fireEvent.animationEnd(dialog);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Strength A' })).toBeTruthy();
+    expect(await db.templates.get('preview-strength')).toEqual(before);
+});

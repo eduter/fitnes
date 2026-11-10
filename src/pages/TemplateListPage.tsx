@@ -1,17 +1,17 @@
-import { useNavigate } from '@solidjs/router';
 import type { JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Browse saved templates with room for the available phone height. */
 function TemplateListPage(): JSX.Element {
     const app = useAppData();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     return (
         <section class="page">
-            <PageHeader title="Workouts" actions={<Button onPress={() => navigate('/templates/new')}>Create</Button>} />
+            <PageHeader title="Workouts" actions={<Button onPress={() => nav.toNewWorkout()}>Create</Button>} />
             <PagedList label="Workouts" items={app.templates()} rowHeight={72} empty="No workouts yet.">
                 {(item) => (
                     <article>
@@ -20,8 +20,8 @@ function TemplateListPage(): JSX.Element {
                             {item.sequence.length} steps · {item.exercises.length} exercises
                         </p>
                         <div class="button-row">
-                            <Button onPress={() => navigate(`/templates/${item.id}`)}>Edit</Button>
-                            <Button onPress={() => navigate(`/sessions/start/${item.id}`)}>Start</Button>
+                            <Button onPress={() => nav.toWorkout(item.id)}>Edit</Button>
+                            <Button onPress={() => nav.toStartSession(item.id)}>Start</Button>
                         </div>
                     </article>
                 )}

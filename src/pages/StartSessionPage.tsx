@@ -1,15 +1,16 @@
-import { A, useNavigate, useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button } from '../components/Controls/index.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { ValidationIssue } from '../domain/validation.ts';
+import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Start the chosen workout once, automatically snapshotting the latest recorded weight. */
 function StartSessionPage(): JSX.Element {
     const params = useParams();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     const app = useAppData();
     const template = () => app.templates().find((candidate) => candidate.id === params.templateId);
     const [busy, setBusy] = createSignal(false);
@@ -39,7 +40,7 @@ function StartSessionPage(): JSX.Element {
                 setErrors(result.errors);
                 return;
             }
-            navigate(`/sessions/${result.value.id}`, { replace: true });
+            nav.replaceSession(result.value.id);
         } finally {
             setBusy(false);
         }
@@ -65,7 +66,7 @@ function StartSessionPage(): JSX.Element {
                         </Show>
                         <Show when={errors().length > 0}>
                             <Button onPress={() => void start()}>Retry</Button>
-                            <Button onPress={() => navigate('/workouts')}>Back</Button>
+                            <Button onPress={() => nav.goBack()}>Back</Button>
                         </Show>
                     </>
                 )}
