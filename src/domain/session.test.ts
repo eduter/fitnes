@@ -19,7 +19,7 @@ function rowResult(sequenceEntryId: string, reps: number, kg: number, completedA
     return {
         sequenceEntryId,
         measurement: { measurement: 'repetitions', countBasis: 'total', reps },
-        load: { kind: 'external', basis: 'total', weight: { value: kg, unit: 'kg' } },
+        load: { kind: 'external', weight: { value: kg, unit: 'kg' } },
         completedAt,
     };
 }
@@ -82,10 +82,7 @@ describe('createSessionFromTemplate', () => {
 describe('totalLoad', () => {
     it('sums bodyweight and total external load in the same unit', () => {
         expect(
-            totalLoad(
-                { kind: 'bodyweightExternal', basis: 'total', weight: { value: 10, unit: 'kg' } },
-                { value: 80, unit: 'kg' }
-            )
+            totalLoad({ kind: 'bodyweightExternal', weight: { value: 10, unit: 'kg' } }, { value: 80, unit: 'kg' })
         ).toEqual({
             value: 90,
             unit: 'kg',
@@ -93,7 +90,7 @@ describe('totalLoad', () => {
     });
 
     it('returns the total external load on its own', () => {
-        expect(totalLoad({ kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } }, undefined)).toEqual({
+        expect(totalLoad({ kind: 'external', weight: { value: 40, unit: 'kg' } }, undefined)).toEqual({
             value: 40,
             unit: 'kg',
         });
@@ -103,24 +100,9 @@ describe('totalLoad', () => {
         expect(totalLoad({ kind: 'bodyweight' }, { value: 80, unit: 'kg' })).toEqual({ value: 80, unit: 'kg' });
     });
 
-    it('returns undefined for per-hand or per-side load', () => {
-        expect(
-            totalLoad({ kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } }, undefined)
-        ).toBeUndefined();
-        expect(
-            totalLoad(
-                { kind: 'bodyweightExternal', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
-                { value: 80, unit: 'kg' }
-            )
-        ).toBeUndefined();
-    });
-
     it('returns undefined on a unit mismatch rather than converting', () => {
         expect(
-            totalLoad(
-                { kind: 'bodyweightExternal', basis: 'total', weight: { value: 20, unit: 'lb' } },
-                { value: 80, unit: 'kg' }
-            )
+            totalLoad({ kind: 'bodyweightExternal', weight: { value: 20, unit: 'lb' } }, { value: 80, unit: 'kg' })
         ).toBeUndefined();
     });
 
@@ -183,7 +165,7 @@ describe('validateWorkoutSession', () => {
                 {
                     sequenceEntryId: 'entry-1',
                     measurement: { measurement: 'duration', countBasis: 'total', seconds: 30 },
-                    load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                    load: { kind: 'external', weight: { value: 40, unit: 'kg' } },
                     completedAt: 2_000,
                 },
             ] as WorkoutSession['results'],
@@ -194,12 +176,12 @@ describe('validateWorkoutSession', () => {
 
     it('rejects a result whose measurement type differs from its prescription', () => {
         const bad = session();
-        bad.snapshot.exercises[0].measurements.push({ measurement: 'duration', countBasis: 'total' });
+        bad.snapshot.exercises[0].measurements.push('duration');
         bad.results = [
             {
                 sequenceEntryId: 'entry-1',
                 measurement: { measurement: 'duration', countBasis: 'total', seconds: 30 },
-                load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                load: { kind: 'external', weight: { value: 40, unit: 'kg' } },
                 completedAt: 2_000,
             },
         ];
@@ -209,12 +191,11 @@ describe('validateWorkoutSession', () => {
 
     it('rejects a result whose count basis differs from its prescription', () => {
         const bad = session();
-        bad.snapshot.exercises[0].measurements.push({ measurement: 'repetitions', countBasis: 'perSide' });
         bad.results = [
             {
                 sequenceEntryId: 'entry-1',
                 measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 8, right: 8 } },
-                load: { kind: 'external', basis: 'total', weight: { value: 40, unit: 'kg' } },
+                load: { kind: 'external', weight: { value: 40, unit: 'kg' } },
                 completedAt: 2_000,
             },
         ];
@@ -222,19 +203,19 @@ describe('validateWorkoutSession', () => {
         expect(pathsOf(bad)).toEqual(['results[0].measurement']);
     });
 
-    it('rejects a result whose load basis differs from its prescription', () => {
+    it('accepts a result with a different actual added weight', () => {
         const bad = session({
             results: [
                 {
                     sequenceEntryId: 'entry-1',
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 8 },
-                    load: { kind: 'external', basis: 'perSide', weight: { value: 20, unit: 'kg' } },
+                    load: { kind: 'external', weight: { value: 20, unit: 'kg' } },
                     completedAt: 2_000,
                 },
             ],
         });
 
-        expect(pathsOf(bad)).toEqual(['results[0].load']);
+        expect(validateWorkoutSession(bad).ok).toBe(true);
     });
 
     it('rejects a result whose load kind differs from its prescription', () => {
@@ -244,7 +225,7 @@ describe('validateWorkoutSession', () => {
             setPrescription(template, set.id, {
                 measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
                 executionMode: 'bilateral',
-                load: { kind: 'bodyweight' },
+                load: { kind: 'bodyweightExternal', weight: { value: 0, unit: 'kg' } },
             });
         }
         const bad = createSessionFromTemplate({ id: 'sess-1', template, startedAt: 1_000 });
@@ -253,9 +234,7 @@ describe('validateWorkoutSession', () => {
                 sequenceEntryId: 'entry-1',
                 measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
                 load: {
-                    kind: 'bodyweightExternal',
-                    basis: 'total',
-                    weight: { value: 10, unit: 'kg' },
+                    kind: 'bodyweight',
                 },
                 completedAt: 2_000,
             },
@@ -271,7 +250,7 @@ describe('validateWorkoutSession', () => {
             setPrescription(template, set.id, {
                 measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
                 executionMode: 'bilateral',
-                load: { kind: 'bodyweight' },
+                load: { kind: 'bodyweightExternal', weight: { value: 0, unit: 'kg' } },
             });
         }
         const bad = {
@@ -280,7 +259,7 @@ describe('validateWorkoutSession', () => {
                 {
                     sequenceEntryId: 'entry-1',
                     measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
-                    load: { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } },
+                    load: { kind: 'external', weight: { value: 10, unit: 'kg' } },
                     completedAt: 2_000,
                 },
             ],

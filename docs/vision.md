@@ -8,8 +8,19 @@ workout data on-device and core flows usable without a connection.
 Recording work during training must be quick. Exercise names, planned work,
 actual performance, actions, and session progress must be readable on a phone.
 
-The existing model is a good starting point. Preserve its measurement and load
-meanings when designing the interface; raise concrete gaps separately.
+Owner decision (2026-11-10): an exercise fixes its Sides (Both sides or One
+side), supported Unit (Reps or Seconds), and load behavior. A one-side exercise
+applies its target to each side; there is no independent counting-basis choice.
+Different movement variants, such as pull-ups and one-arm pull-ups, are separate
+exercises. Sets edit quantities and timing, automatically applying fixed
+properties and showing a Unit selector only when both units are supported.
+Added weight always means the total external weight used during the movement;
+two 10 kg dumbbells and one 20 kg barbell both mean 20 kg. Zero added weight
+covers the unweighted case without a separate set-level load selector. Exercise
+and workout fields share sentence-case terminology from `src/copy/exercise.ts`;
+choice values preserve casing. Keep labels sufficient on their own, without
+additional explanatory UI copy. No in-app data migration is required; the owner
+will provide exported JSON for a separate one-time conversion.
 
 Owner clarification (2026-11-08): the tracking screen focuses on the current
 set rather than a list of sets. Show what to do now and provide a clear Log

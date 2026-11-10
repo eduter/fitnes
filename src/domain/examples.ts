@@ -4,57 +4,57 @@ import { exerciseId } from './ids.ts';
 const bentOverRow: ExerciseDefinition = {
     id: exerciseId.assert('ex-bent-over-row'),
     name: 'Bent-over row',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perSide'] }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'external' },
 };
 
 const pullUp: ExerciseDefinition = {
     id: exerciseId.assert('ex-pull-up'),
     name: 'Pull-up',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'bodyweightExternal' },
 };
 
 const plank: ExerciseDefinition = {
     id: exerciseId.assert('ex-plank'),
     name: 'Plank',
-    measurements: [{ measurement: 'duration', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }],
+    measurements: ['duration'],
+    executionMode: 'bilateral',
+    load: { kind: 'bodyweight' },
 };
 
 const halfCrimpHold: ExerciseDefinition = {
     id: exerciseId.assert('ex-half-crimp-hold'),
     name: 'Half-crimp hold',
-    measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
-    executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['duration'],
+    executionMode: 'unilateral',
+    load: { kind: 'external' },
 };
 
 const wristCurl: ExerciseDefinition = {
     id: exerciseId.assert('ex-wrist-curl'),
     name: 'Wrist curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['repetitions'],
+    executionMode: 'unilateral',
+    load: { kind: 'external' },
 };
 
 const airSquat: ExerciseDefinition = {
     id: exerciseId.assert('ex-air-squat'),
     name: 'Air squat',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'none' }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'none' },
 };
 
 const dumbbellCurl: ExerciseDefinition = {
     id: exerciseId.assert('ex-dumbbell-curl'),
     name: 'Dumbbell curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'perSide' }],
-    executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['repetitions'],
+    executionMode: 'unilateral',
+    load: { kind: 'external' },
 };
 
 /** Representative catalog entries covering every current capability combination. */

@@ -13,13 +13,13 @@ describe('prescriptionSummary', () => {
         expect(prescriptionSummary(prescription())).toBe('8 reps @ 40kg');
     });
 
-    it('marks a per-side count and a per-side load', () => {
+    it('marks a per-side count while keeping added weight total', () => {
         const perSide = prescription({
             measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 10 },
-            load: { kind: 'external', basis: 'perSide', weight: { value: 12, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 12, unit: 'kg' } },
         });
 
-        expect(prescriptionSummary(perSide)).toBe('10 reps/side @ 12kg/side');
+        expect(prescriptionSummary(perSide)).toBe('10 reps/side @ 12kg');
     });
 
     it('names bodyweight instead of a mass', () => {
@@ -28,7 +28,7 @@ describe('prescriptionSummary', () => {
 
     it('shows added weight on a weighted bodyweight set', () => {
         const weighted = prescription({
-            load: { kind: 'bodyweightExternal', basis: 'total', weight: { value: 10, unit: 'kg' } },
+            load: { kind: 'bodyweightExternal', weight: { value: 10, unit: 'kg' } },
         });
 
         expect(prescriptionSummary(weighted)).toBe('8 reps @ bodyweight + 10kg');

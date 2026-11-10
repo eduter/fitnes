@@ -172,17 +172,6 @@ function resultPrescriptionProblems(prescription: SetPrescription, result: Actua
         return problems;
     }
 
-    if (
-        (result.load.kind === 'external' || result.load.kind === 'bodyweightExternal') &&
-        (prescription.load.kind === 'external' || prescription.load.kind === 'bodyweightExternal') &&
-        result.load.basis !== prescription.load.basis
-    ) {
-        problems.push({
-            field: 'load',
-            message: `actual load basis '${result.load.basis}' does not match prescribed '${prescription.load.basis}'`,
-        });
-    }
-
     return problems;
 }
 

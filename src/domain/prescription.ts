@@ -1,5 +1,5 @@
 import { type } from 'arktype';
-import { executionMode, loadBasis } from './exercise.ts';
+import { executionMode } from './exercise.ts';
 import { nonNegativeCount, nonNegativeFinite, positiveCount, positiveFinite, weight } from './units.ts';
 
 /**
@@ -54,8 +54,8 @@ type ActualMeasurement = typeof actualMeasurement.infer;
  */
 const loadConfiguration = type({ kind: '"none"' })
     .or({ kind: '"bodyweight"' })
-    .or({ kind: '"external"', basis: loadBasis, weight })
-    .or({ kind: '"bodyweightExternal"', basis: loadBasis, weight })
+    .or({ kind: '"external"', weight })
+    .or({ kind: '"bodyweightExternal"', weight })
     .onDeepUndeclaredKey('reject');
 type LoadConfiguration = typeof loadConfiguration.infer;
 

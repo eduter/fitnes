@@ -16,18 +16,20 @@ describe('duplicateExercise', () => {
 
         expect(copy.name).toBe('Pull-up (copy)');
         expect(copy.measurements).toEqual(pullUp.measurements);
-        expect(copy.executionModes).toEqual(pullUp.executionModes);
-        expect(copy.loads).toEqual(pullUp.loads);
+        expect(copy.executionMode).toEqual(pullUp.executionMode);
+        expect(copy.load).toEqual(pullUp.load);
     });
 
     it('copies nested capability arrays so later edits cannot reach the source', () => {
         const copy = duplicateExercise(pullUp);
 
-        copy.measurements[0]!.countBasis = 'perSide';
-        copy.executionModes.push('unilateral');
+        copy.measurements.push('duration');
+        copy.executionMode = 'unilateral';
+        copy.load.kind = 'none';
 
-        expect(pullUp.measurements[0]!.countBasis).toBe('total');
-        expect(pullUp.executionModes).toEqual(['bilateral']);
+        expect(pullUp.measurements).toEqual(['repetitions']);
+        expect(pullUp.load.kind).toBe('bodyweightExternal');
+        expect(pullUp.executionMode).toBe('bilateral');
     });
 
     it('suffixes an already-suffixed name instead of stacking the same suffix', () => {

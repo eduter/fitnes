@@ -36,7 +36,7 @@ function loadSummary(prescription: SetPrescription, unit?: WeightUnit): string {
         return 'bodyweight';
     }
 
-    const weight = `${massValue(load.weight, unit ?? load.weight.unit)}${unit ?? load.weight.unit}${load.basis === 'perSide' ? '/side' : ''}`;
+    const weight = `${massValue(load.weight, unit ?? load.weight.unit)}${unit ?? load.weight.unit}`;
     return load.kind === 'bodyweightExternal' ? `bodyweight + ${weight}` : weight;
 }
 

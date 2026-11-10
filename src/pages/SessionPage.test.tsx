@@ -123,7 +123,8 @@ it('finishes both sides of unilateral wrist curls before persisting and advancin
     session.snapshot.exercises.push(structuredClone(wristCurl));
     first.exerciseId = wristCurl.id;
     first.prescription.executionMode = 'unilateral';
-    first.prescription.load = { kind: 'external', basis: 'perSide', weight: { value: 10, unit: 'kg' } };
+    first.prescription.measurement.countBasis = 'perSide';
+    first.prescription.load = { kind: 'external', weight: { value: 10, unit: 'kg' } };
     await db.sessions.put(session);
 
     renderSession();

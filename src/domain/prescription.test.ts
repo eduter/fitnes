@@ -43,7 +43,6 @@ describe('prescription schemas', () => {
             executionMode: 'bilateral',
             load: {
                 kind: 'external',
-                basis: 'total',
                 weight: { value: 40, unit: 'kg', approximate: true },
             },
         };

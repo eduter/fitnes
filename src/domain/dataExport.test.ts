@@ -139,7 +139,7 @@ describe('parseDataExport', () => {
         const prescription = {
             measurement: { measurement: 'repetitions', countBasis: 'perSide', reps: 8 },
             executionMode: 'unilateral',
-            load: { kind: 'external', basis: 'perSide', weight: { value: 12, unit: 'kg' } },
+            load: { kind: 'external', weight: { value: 12, unit: 'kg' } },
         } as const;
         setPrescription(template, 'set-1', structuredClone(prescription));
         setPrescription(template, 'set-2', structuredClone(prescription));
@@ -148,7 +148,7 @@ describe('parseDataExport', () => {
             {
                 sequenceEntryId: 'entry-1',
                 measurement: { measurement: 'repetitions', countBasis: 'perSide', sides: { left: 0, right: 8 } },
-                load: { kind: 'external', basis: 'perSide', weight: { value: 12, unit: 'kg' } },
+                load: { kind: 'external', weight: { value: 12, unit: 'kg' } },
                 completedAt: 2_000,
             },
         ];

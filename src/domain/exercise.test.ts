@@ -5,41 +5,41 @@ import { exerciseDefinition } from './exercise.ts';
 const bentOverRow = {
     id: 'ex-bent-over-row',
     name: 'Bent-over row',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['total', 'perSide'] }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'external' },
 };
 
 const pullUp = {
     id: 'ex-pull-up',
     name: 'Pull-up',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }, { kind: 'bodyweightExternal', bases: ['total'] }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'bodyweightExternal' },
 };
 
 const plank = {
     id: 'ex-plank',
     name: 'Plank',
-    measurements: [{ measurement: 'duration', countBasis: 'total' }],
-    executionModes: ['bilateral'],
-    loads: [{ kind: 'bodyweight' }],
+    measurements: ['duration'],
+    executionMode: 'bilateral',
+    load: { kind: 'bodyweight' },
 };
 
 const halfCrimpHold = {
     id: 'ex-half-crimp-hold',
     name: 'Half-crimp hold',
-    measurements: [{ measurement: 'duration', countBasis: 'perSide' }],
-    executionModes: ['unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['duration'],
+    executionMode: 'unilateral',
+    load: { kind: 'external' },
 };
 
 const wristCurl = {
     id: 'ex-wrist-curl',
     name: 'Wrist curl',
-    measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-    executionModes: ['bilateral', 'unilateral'],
-    loads: [{ kind: 'external', bases: ['perSide'] }],
+    measurements: ['repetitions'],
+    executionMode: 'bilateral',
+    load: { kind: 'external' },
 };
 
 describe('exerciseDefinition', () => {
@@ -53,9 +53,9 @@ describe('exerciseDefinition', () => {
         const bodyweightSquat = {
             id: 'ex-air-squat',
             name: 'Air squat',
-            measurements: [{ measurement: 'repetitions', countBasis: 'total' }],
-            executionModes: ['bilateral'],
-            loads: [{ kind: 'none' }],
+            measurements: ['repetitions'],
+            executionMode: 'bilateral',
+            load: { kind: 'none' },
         };
 
         expect(exerciseDefinition(bodyweightSquat)).not.toBeInstanceOf(type.errors);
@@ -72,7 +72,7 @@ describe('exerciseDefinition', () => {
         expect(
             exerciseDefinition({
                 ...bentOverRow,
-                loads: [{ kind: 'external', bases: ['total'], equipment: 'barbell' }],
+                load: { kind: 'external', equipment: 'barbell' },
             })
         ).toBeInstanceOf(type.errors);
     });
@@ -83,47 +83,33 @@ describe('exerciseDefinition', () => {
     });
 
     it('rejects an unknown measurement type', () => {
-        const invalid = { ...plank, measurements: [{ measurement: 'distance', countBasis: 'total' }] };
+        const invalid = { ...plank, measurements: ['distance'] };
 
         expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
     });
 
     it('rejects an unknown execution mode', () => {
-        const invalid = { ...plank, executionModes: ['alternating'] };
+        const invalid = { ...plank, executionMode: 'alternating' };
 
         expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
     });
 
-    it('rejects an unknown load basis', () => {
-        const invalid = { ...bentOverRow, loads: [{ kind: 'external', bases: ['each-side-ish'] }] };
-
-        expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
+    it('rejects obsolete weight bases and multiple movement choices', () => {
+        expect(exerciseDefinition({ ...bentOverRow, load: { kind: 'external', bases: ['perSide'] } })).toBeInstanceOf(
+            type.errors
+        );
+        expect(exerciseDefinition({ ...pullUp, executionModes: ['bilateral', 'unilateral'] })).toBeInstanceOf(
+            type.errors
+        );
     });
 
-    it('rejects external load without any basis', () => {
-        const invalid = { ...bentOverRow, loads: [{ kind: 'external', bases: [] }] };
-
-        expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
-    });
-
-    it('rejects bodyweight plus external load without any basis', () => {
-        const invalid = { ...pullUp, loads: [{ kind: 'bodyweightExternal', bases: [] }] };
-
-        expect(exerciseDefinition(invalid)).toBeInstanceOf(type.errors);
-    });
-
-    it('rejects duplicate measurement options and execution modes', () => {
+    it('rejects duplicate measurement options', () => {
         const duplicateMeasurement = {
             ...plank,
-            measurements: [
-                { measurement: 'duration', countBasis: 'total' },
-                { measurement: 'duration', countBasis: 'total' },
-            ],
+            measurements: ['duration', 'duration'],
         };
-        const duplicateMode = { ...plank, executionModes: ['bilateral', 'bilateral'] };
 
         expect(exerciseDefinition(duplicateMeasurement)).toBeInstanceOf(type.errors);
-        expect(exerciseDefinition(duplicateMode)).toBeInstanceOf(type.errors);
     });
 
     it('rejects a measurement with no capabilities', () => {

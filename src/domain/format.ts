@@ -27,21 +27,13 @@ function formatLoad(load: LoadConfiguration): string {
         return 'bodyweight';
     }
 
-    const external = `${formatWeight(load.weight)} ${basisLabel(load.basis)}`;
+    const external = formatWeight(load.weight);
     return load.kind === 'bodyweightExternal' ? `bodyweight + ${external}` : external;
 }
 
 /** Render a mass and its unit. Values are never converted. */
 function formatWeight(weight: Weight): string {
     return `${weight.value} ${weight.unit}`;
-}
-
-function basisLabel(basis: 'total' | 'perSide'): string {
-    if (basis === 'total') {
-        return 'total';
-    }
-
-    return '/ side';
 }
 
 export { formatLoad, formatMeasurement, formatWeight };

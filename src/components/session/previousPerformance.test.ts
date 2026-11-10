@@ -21,7 +21,7 @@ function result(entryId: string, reps: number, weight: number): WorkoutSession['
     return {
         sequenceEntryId: entryId,
         measurement: { measurement: 'repetitions', countBasis: 'total', reps },
-        load: { kind: 'external', basis: 'total', weight: { value: weight, unit: 'kg' } },
+        load: { kind: 'external', weight: { value: weight, unit: 'kg' } },
         completedAt: 1_000,
     };
 }
@@ -37,7 +37,6 @@ describe('previousPerformance', () => {
         expect(previous['entry-1']?.measurement).toEqual({ measurement: 'repetitions', countBasis: 'total', reps: 6 });
         expect(previous['entry-2']?.load).toEqual({
             kind: 'external',
-            basis: 'total',
             weight: { value: 40, unit: 'kg' },
         });
     });

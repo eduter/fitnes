@@ -1,3 +1,4 @@
+import { addedWeightLabel } from '../../copy/exercise.ts';
 import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../../app/AppData.tsx';
 import { massValue } from '../../domain/convertWeight.ts';
@@ -73,7 +74,7 @@ function SessionSet(props: SessionSetProps): JSX.Element {
                     <DialogTitle>{prefix()}</DialogTitle>
                     <Show when={shape()?.load === 'weight'} fallback={<p>{bodyweightMarker(props.draft)}</p>}>
                         <CompactNumberField
-                            label={`External ${app.massUnit()}${props.draft?.load.kind === 'external' || props.draft?.load.kind === 'bodyweightExternal' ? (props.draft.load.basis === 'perSide' ? '/side' : '') : ''}`}
+                            label={addedWeightLabel(app.massUnit())}
                             value={weightValue(props.draft, app.massUnit())}
                             onChange={(value) =>
                                 props.draft && props.onDraftChange(withWeight(props.draft, value, app.massUnit()))
