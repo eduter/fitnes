@@ -28,6 +28,7 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
                     { value: 'unilateral', label: exerciseCopy.sideOptions.unilateral },
                 ]}
                 onChange={(values) => patch({ executionModes: values as ExecutionMode[] })}
+                popoverMount={document.getElementById('root') ?? undefined}
             />
             <MultiPicker
                 label={exerciseCopy.unit}
