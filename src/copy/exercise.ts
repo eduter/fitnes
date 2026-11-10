@@ -14,7 +14,7 @@ const exerciseCopy = {
         external: 'Added weight',
         bodyweightExternal: 'Bodyweight + added weight',
     } satisfies Record<LoadOption['kind'], string>,
-    timing: { prepSeconds: 'Prep seconds', secondsPerRep: 'Seconds per rep' },
+    timing: { prepSeconds: 'Prep time (s)', secondsPerRep: 'Rep duration (s)' },
 };
 
 /** Label a target using the same units as the exercise definition. */
