@@ -224,7 +224,7 @@ describe('validateWorkoutTemplate', () => {
 
     it('rejects a negative or non-finite external load', () => {
         const negative = rowTemplate();
-        setLoad(negative, 'set-1', { kind: 'external', weight: { value: -5, unit: 'kg' } });
+        setLoad(negative, 'set-1', { kind: 'external', weight: { value: Number.NEGATIVE_INFINITY, unit: 'kg' } });
         const infinite = rowTemplate();
         setLoad(infinite, 'set-1', {
             kind: 'external',

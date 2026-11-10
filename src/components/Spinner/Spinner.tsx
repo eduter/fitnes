@@ -49,8 +49,8 @@ function Spinner(props: SpinnerProps): JSX.Element {
         const capacity = (10 ** (integerDigits + fractionDigits) - 1) / 10 ** fractionDigits;
         const min = local.min ?? 0;
         const max = local.max ?? capacity;
-        if (!Number.isFinite(min) || !Number.isFinite(max) || min < 0 || max < min || max > capacity) {
-            throw new Error('Spinner bounds must fit its nonnegative fixed mask');
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min < -capacity || max < min || max > capacity) {
+            throw new Error('Spinner bounds must fit its fixed mask');
         }
         const scale = 10 ** fractionDigits;
         if (

@@ -136,3 +136,9 @@ describe('plan measurements stay positive', () => {
         );
     });
 });
+
+it('accepts finite negative added weight for assisted exercise', () => {
+    expect(loadConfiguration({ kind: 'bodyweightExternal', weight: { value: -20, unit: 'kg' } })).not.toBeInstanceOf(
+        type.errors
+    );
+});

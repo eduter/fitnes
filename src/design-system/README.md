@@ -54,7 +54,7 @@ Import controls from `src/components/Controls/index.ts`.
   The FitNES wordmark appears on Home only. The workout library is called
   Workouts in the interface; storage still uses the existing template records.
 - A popup choice menu contains only options. Multi-choice adds End at the bottom
-  right. Numeric pads have no visible header and close with End. Keep accessible
+  right. Numeric pads have no visible header and close with End. Signed load fields include a sign key beside the digit slots; other quantities stay nonnegative. Keep accessible
   names even when decorative headers are absent.
 - Use current-state summaries and short Edit/Delete/Duplicate actions. Edit
   opens one bounded form; do not paginate a modal. Put common fields together.

@@ -75,6 +75,7 @@ function SessionSet(props: SessionSetProps): JSX.Element {
                     <Show when={shape()?.load === 'weight'} fallback={<p>{bodyweightMarker(props.draft)}</p>}>
                         <CompactNumberField
                             label={addedWeightLabel(app.massUnit())}
+                            min={-999.99}
                             value={weightValue(props.draft, app.massUnit())}
                             onChange={(value) =>
                                 props.draft && props.onDraftChange(withWeight(props.draft, value, app.massUnit()))

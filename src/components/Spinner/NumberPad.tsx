@@ -10,7 +10,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
     const slots = createMemo(() =>
         Array.from({ length: props.mask.integerDigits + props.mask.fractionDigits }, (_, i) => i)
     );
-    const digits = () => formatMaskedNumber(props.value, props.mask).replace('.', '');
+    const digits = () => formatMaskedNumber(Math.abs(props.value), props.mask).replace('.', '');
     const buttons: HTMLButtonElement[] = [];
 
     function select(slot: number): void {
@@ -46,6 +46,15 @@ function NumberPad(props: NumberPadProps): JSX.Element {
     return (
         <fieldset class="nes-number-pad" aria-label="Number pad" onKeyDown={handleKeys}>
             <div class="nes-number-pad__slots">
+                <Show when={props.mask.min < 0}>
+                    <Button
+                        variant="plain"
+                        aria-label="Toggle sign"
+                        onPress={() => props.onChange(Math.max(props.mask.min, Math.min(props.mask.max, -props.value)))}
+                    >
+                        {props.value < 0 ? '−' : '+'}
+                    </Button>
+                </Show>
                 <For each={slots()}>
                     {(slot) => (
                         <>
@@ -93,7 +102,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
     );
 }
 
-/** Controlled nonnegative number and mask for the spinner's keyboard-free editor. */
+/** Controlled number and mask for the spinner's keyboard-free editor. */
 interface NumberPadProps {
     label: string;
     value: number;

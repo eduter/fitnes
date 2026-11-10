@@ -1,3 +1,4 @@
+import { addedWeightLabel } from '../../copy/exercise.ts';
 import { type } from 'arktype';
 import { batch, createEffect, createMemo, createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
 import { massValue } from '../../domain/convertWeight.ts';
@@ -452,7 +453,8 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                                     }
                                 >
                                     <ResultNumberField
-                                        label={`External ${props.unit}`}
+                                        label={addedWeightLabel(props.unit)}
+                                        signed
                                         value={
                                             value().load.kind === 'external' ||
                                             value().load.kind === 'bodyweightExternal'
@@ -580,7 +582,7 @@ function updateGuidedDraft(sessionId: string, draft: ActualResult, previous: Act
 }
 /** Keep large imported results loggable even beyond the shared five-digit keypad capacity. */
 function ResultNumberField(props: ResultNumberFieldProps): JSX.Element {
-    const digits = () => Math.max(3, String(Math.floor(props.value)).length);
+    const digits = () => Math.max(3, String(Math.floor(Math.abs(props.value))).length);
     const fraction = () => (props.integer ? 0 : Math.max(0, Math.min(2, 5 - digits())));
     const representable = () => digits() <= 5 && props.value <= 10 ** digits() - 10 ** -fraction();
     return (
@@ -595,6 +597,7 @@ function ResultNumberField(props: ResultNumberFieldProps): JSX.Element {
             <Spinner
                 label={props.label}
                 value={props.value}
+                min={props.signed ? -(10 ** digits() - 10 ** -fraction()) : 0}
                 integerDigits={digits()}
                 fractionDigits={fraction()}
                 step={props.integer || fraction() === 0 ? 1 : fraction() === 1 ? 0.1 : 0.25}
@@ -606,6 +609,7 @@ function ResultNumberField(props: ResultNumberFieldProps): JSX.Element {
     );
 }
 interface ResultNumberFieldProps {
+    signed?: boolean;
     label: string;
     value: number;
     integer?: boolean;

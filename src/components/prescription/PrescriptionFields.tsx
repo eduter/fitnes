@@ -65,7 +65,7 @@ function PrescriptionFields(props: PrescriptionFieldsProps): JSX.Element {
             <Show when={props.exercise.load.kind === 'external' || props.exercise.load.kind === 'bodyweightExternal'}>
                 <NumberField
                     label={addedWeightLabel(app.massUnit())}
-                    min={0}
+                    min={-999.99}
                     value={
                         props.value.load.kind === 'external' || props.value.load.kind === 'bodyweightExternal'
                             ? massValue(props.value.load.weight, app.massUnit())
