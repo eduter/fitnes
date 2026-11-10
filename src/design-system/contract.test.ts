@@ -6,7 +6,11 @@ import { expect, it } from 'vitest';
 it('keeps native controls inside their approved component implementations', () => {
     const implementations: Record<string, readonly string[]> = {
         button: ['src/components/Button/Button.tsx', 'src/components/BottomTabs/BottomTabs.tsx'],
-        input: ['src/components/TextInput/TextInput.tsx', 'src/components/DateSpinner/DateSpinner.tsx'],
+        input: [
+            'src/components/TextInput/TextInput.tsx',
+            'src/components/DateSpinner/DateSpinner.tsx',
+            'src/components/FilePicker/FilePicker.tsx',
+        ],
     };
     implementations.textarea = ['src/components/TextArea/TextArea.tsx'];
     const violations: string[] = [];

@@ -13,6 +13,7 @@ function TextArea(props: TextAreaProps): JSX.Element {
                 id={id}
                 value={props.value}
                 rows={props.rows ?? 4}
+                disabled={props.disabled}
                 style={{ height: `${(props.rows ?? 4) * 16 + 4}px` }}
                 onInput={(event) => props.onChange(event.currentTarget.value)}
             />
@@ -23,6 +24,7 @@ function TextArea(props: TextAreaProps): JSX.Element {
 interface TextAreaProps {
     label: string;
     rows?: number;
+    disabled?: boolean;
     value: string;
     onChange: (value: string) => void;
 }
