@@ -62,7 +62,7 @@ describe('validateWorkoutTemplate', () => {
 
     it('rejects an execution mode the exercise does not support', () => {
         const template = rowTemplate();
-        useOnlyExercise(template, { ...structuredClone(pullUp), executionMode: 'bilateral' });
+        useOnlyExercise(template, { ...structuredClone(pullUp), executionModes: ['bilateral'] });
         setPrescription(template, 'set-1', {
             measurement: { measurement: 'repetitions', countBasis: 'total', reps: 5 },
             executionMode: 'unilateral',

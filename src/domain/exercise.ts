@@ -26,14 +26,17 @@ const measurements = measurementType
     .atLeastLength(1)
     .narrow((values, ctx) => new Set(values).size === values.length || ctx.mustBe('unique'));
 
-/** A reusable exercise with fixed movement and load behavior and supported measurement units. */
+/** A reusable exercise with supported movements and fixed load behavior and supported measurement units. */
 const exerciseDefinition = type({
     id: exerciseId,
     name: 'string > 0',
     'description?': 'string',
     'timing?': trackingTiming,
     measurements,
-    executionMode,
+    executionModes: executionMode
+        .array()
+        .atLeastLength(1)
+        .narrow((modes, ctx) => new Set(modes).size === modes.length || ctx.mustBe('unique')),
     load: loadOption,
 }).onDeepUndeclaredKey('reject');
 type ExerciseDefinition = typeof exerciseDefinition.infer;

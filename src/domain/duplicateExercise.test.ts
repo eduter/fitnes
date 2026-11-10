@@ -16,7 +16,7 @@ describe('duplicateExercise', () => {
 
         expect(copy.name).toBe('Pull-up (copy)');
         expect(copy.measurements).toEqual(pullUp.measurements);
-        expect(copy.executionMode).toEqual(pullUp.executionMode);
+        expect(copy.executionModes).toEqual(pullUp.executionModes);
         expect(copy.load).toEqual(pullUp.load);
     });
 
@@ -24,12 +24,12 @@ describe('duplicateExercise', () => {
         const copy = duplicateExercise(pullUp);
 
         copy.measurements.push('duration');
-        copy.executionMode = 'unilateral';
+        copy.executionModes = ['unilateral'];
         copy.load.kind = 'none';
 
         expect(pullUp.measurements).toEqual(['repetitions']);
         expect(pullUp.load.kind).toBe('bodyweightExternal');
-        expect(pullUp.executionMode).toBe('bilateral');
+        expect(pullUp.executionModes).toEqual(['bilateral']);
     });
 
     it('suffixes an already-suffixed name instead of stacking the same suffix', () => {

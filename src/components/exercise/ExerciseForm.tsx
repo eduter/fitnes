@@ -20,14 +20,14 @@ function ExerciseForm(props: ExerciseFormProps): JSX.Element {
         <div class="editor-fields">
             <TextField label="Name" value={props.value.name} required onChange={(name) => patch({ name })} />
             <SectionHeading>Tracking options</SectionHeading>
-            <SelectField
+            <MultiPicker
                 label={exerciseCopy.sides}
-                value={props.value.executionMode}
+                values={props.value.executionModes}
                 options={[
                     { value: 'bilateral', label: exerciseCopy.sideOptions.bilateral },
                     { value: 'unilateral', label: exerciseCopy.sideOptions.unilateral },
                 ]}
-                onChange={(value) => patch({ executionMode: value as ExecutionMode })}
+                onChange={(values) => patch({ executionModes: values as ExecutionMode[] })}
             />
             <MultiPicker
                 label={exerciseCopy.unit}

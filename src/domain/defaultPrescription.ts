@@ -12,7 +12,7 @@ const DEFAULT_WEIGHT = { value: 0, unit: 'kg' } as const;
  */
 function defaultPrescription(exercise: ExerciseDefinition): SetPrescription {
     const measurementOption = exercise.measurements[0];
-    const executionMode = exercise.executionMode;
+    const executionMode = exercise.executionModes[0];
     const loadOption = exercise.load;
 
     if (!measurementOption || !executionMode || !loadOption) {

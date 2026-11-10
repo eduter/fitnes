@@ -6,7 +6,7 @@ const bentOverRow = {
     id: 'ex-bent-over-row',
     name: 'Bent-over row',
     measurements: ['repetitions'],
-    executionMode: 'bilateral',
+    executionModes: ['bilateral'],
     load: { kind: 'external' },
 };
 
@@ -14,7 +14,7 @@ const pullUp = {
     id: 'ex-pull-up',
     name: 'Pull-up',
     measurements: ['repetitions'],
-    executionMode: 'bilateral',
+    executionModes: ['bilateral'],
     load: { kind: 'bodyweightExternal' },
 };
 
@@ -22,7 +22,7 @@ const plank = {
     id: 'ex-plank',
     name: 'Plank',
     measurements: ['duration'],
-    executionMode: 'bilateral',
+    executionModes: ['bilateral'],
     load: { kind: 'bodyweight' },
 };
 
@@ -30,7 +30,7 @@ const halfCrimpHold = {
     id: 'ex-half-crimp-hold',
     name: 'Half-crimp hold',
     measurements: ['duration'],
-    executionMode: 'unilateral',
+    executionModes: ['unilateral'],
     load: { kind: 'external' },
 };
 
@@ -38,7 +38,7 @@ const wristCurl = {
     id: 'ex-wrist-curl',
     name: 'Wrist curl',
     measurements: ['repetitions'],
-    executionMode: 'bilateral',
+    executionModes: ['bilateral'],
     load: { kind: 'external' },
 };
 
@@ -54,7 +54,7 @@ describe('exerciseDefinition', () => {
             id: 'ex-air-squat',
             name: 'Air squat',
             measurements: ['repetitions'],
-            executionMode: 'bilateral',
+            executionModes: ['bilateral'],
             load: { kind: 'none' },
         };
 
@@ -98,7 +98,7 @@ describe('exerciseDefinition', () => {
         expect(exerciseDefinition({ ...bentOverRow, load: { kind: 'external', bases: ['perSide'] } })).toBeInstanceOf(
             type.errors
         );
-        expect(exerciseDefinition({ ...pullUp, executionModes: ['bilateral', 'unilateral'] })).toBeInstanceOf(
+        expect(exerciseDefinition({ ...pullUp, executionModes: ['bilateral', 'bilateral'] })).toBeInstanceOf(
             type.errors
         );
     });

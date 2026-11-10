@@ -8,14 +8,17 @@ workout data on-device and core flows usable without a connection.
 Recording work during training must be quick. Exercise names, planned work,
 actual performance, actions, and session progress must be readable on a phone.
 
-Owner decision (2026-11-10): an exercise fixes its Sides (Both sides or One
-side), supported Unit (Reps or Seconds), and load behavior. A one-side exercise
+Owner decision (2026-11-10): an exercise defines its supported Sides (Both
+sides, One side, or both), supported Unit (Reps or Seconds), and load behavior.
+A set selected as One side
 applies its target to each side; there is no independent counting-basis choice.
 Different movement variants, such as pull-ups and one-arm pull-ups, are separate
 exercises. Sets edit quantities and timing, automatically applying fixed
-properties and showing a Unit selector only when both units are supported.
+properties. Show Sides and Unit selectors only when their respective options
+allow more than one choice.
 Added weight always means the total external weight used during the movement;
-two 10 kg dumbbells and one 20 kg barbell both mean 20 kg. Zero added weight
+two 10 kg dumbbells and one 20 kg barbell both mean 20 kg. Negative added weight
+represents assistance. Zero added weight
 covers the unweighted case without a separate set-level load selector. Exercise
 and workout fields share sentence-case terminology from `src/copy/exercise.ts`;
 choice values preserve casing. Keep labels sufficient on their own, without

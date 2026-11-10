@@ -8,7 +8,7 @@ const pullUp = {
     id: 'ex-pull-up',
     name: 'Pull-up',
     measurements: ['repetitions'],
-    executionMode: 'bilateral',
+    executionModes: ['bilateral'],
     load: { kind: 'bodyweightExternal' },
 } as const;
 
@@ -33,7 +33,16 @@ describe('exercise-owned configuration', () => {
         expect(prescriptionProblems(exercise, prescription).some((issue) => issue.field === 'measurement')).toBe(true);
     });
     it('derives a target for each side for one-side-at-a-time movement', () => {
-        const exercise = exerciseDefinition.assert({ ...pullUp, executionMode: 'unilateral' });
+        const exercise = exerciseDefinition.assert({ ...pullUp, executionModes: ['unilateral'] });
         expect(defaultPrescription(exercise).measurement.countBasis).toBe('perSide');
     });
+});
+
+it('validates either supported sides choice while rejecting contradictory counting', () => {
+    const exercise = exerciseDefinition.assert({ ...pullUp, executionModes: ['bilateral', 'unilateral'] });
+    const prescription = defaultPrescription(exercise);
+    prescription.executionMode = 'unilateral';
+    expect(prescriptionProblems(exercise, prescription)).not.toEqual([]);
+    prescription.measurement.countBasis = 'perSide';
+    expect(prescriptionProblems(exercise, prescription)).toEqual([]);
 });

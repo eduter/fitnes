@@ -118,7 +118,7 @@ function checkResults(issues: IssueCollector, session: WorkoutSession): void {
 
         // A result has no execution mode; the snapshot's prescription already fixes it.
         const capabilityProblems = [
-            ...measurementProblems(exercise, result.measurement),
+            ...measurementProblems(exercise, result.measurement, set.prescription.executionMode),
             ...loadProblems(exercise, result.load),
         ];
         for (const problem of capabilityProblems) {
