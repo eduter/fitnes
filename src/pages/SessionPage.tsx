@@ -1,4 +1,4 @@
-import { A, useNavigate, useParams } from '@solidjs/router';
+import { A, useParams } from '@solidjs/router';
 import { createMemo, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
@@ -25,12 +25,13 @@ import { validateWorkoutSession } from '../domain/validateWorkoutSession.ts';
 import type { ValidationIssue, ValidationResult } from '../domain/validation.ts';
 import type { SequenceEntry } from '../domain/workoutTemplate.ts';
 import { withExecutionTiming } from '../domain/workoutTiming.ts';
+import { useAppNavigate } from '../routing/navigation.ts';
 import { formatDateTime } from '../utils/datetime.ts';
 
 /** Log results against a session snapshot, or review a completed session. */
 function SessionPage(): JSX.Element {
     const params = useParams();
-    const navigate = useNavigate();
+    const nav = useAppNavigate();
     const app = useAppData();
     const session = (): WorkoutSession | undefined => app.sessions().find((candidate) => candidate.id === params.id);
 
@@ -185,7 +186,7 @@ function SessionPage(): JSX.Element {
         const current = session();
         if (current && (await app.removeSession(current.id))) {
             setDrafts({});
-            navigate('/sessions');
+            nav.toHistoryList();
         }
         setBusy(false);
     }
