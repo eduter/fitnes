@@ -64,7 +64,7 @@ function NumberPad(props: NumberPadProps): JSX.Element {
                             }
                         }}
                     >
-                        {negative() ? '−' : '+'}
+                        {negative() ? '-' : '+'}
                     </Button>
                 </Show>
                 <For each={slots()}>
