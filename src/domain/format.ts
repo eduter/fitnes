@@ -28,7 +28,11 @@ function formatLoad(load: LoadConfiguration): string {
     }
 
     const external = formatWeight(load.weight);
-    return load.kind === 'bodyweightExternal' ? `bodyweight + ${external}` : external;
+    if (load.kind === 'bodyweightExternal') {
+        const sign = load.weight.value < 0 ? '-' : '+';
+        return `bodyweight ${sign} ${formatWeight({ ...load.weight, value: Math.abs(load.weight.value) })}`;
+    }
+    return external;
 }
 
 /** Render a mass and its unit. Values are never converted. */

@@ -49,3 +49,9 @@ describe('prescriptionSummary', () => {
         expect(prescriptionSummary(defaultPrescription(airSquat))).toMatch(/reps/);
     });
 });
+
+it('shows assistance as subtraction from bodyweight', () => {
+    expect(
+        prescriptionSummary(prescription({ load: { kind: 'bodyweightExternal', weight: { value: -10, unit: 'kg' } } }))
+    ).toBe('8 reps @ bodyweight - 10kg');
+});

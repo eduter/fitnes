@@ -194,3 +194,9 @@ describe('summarizeTargets', () => {
         expect(summarizeTargets([])).toBe('');
     });
 });
+
+it('shows assistance without a double sign in previous performance', () => {
+    expect(
+        formatSetReference(result({ load: { kind: 'bodyweightExternal', weight: { value: -10, unit: 'kg' } } }))
+    ).toBe('BW-10kg×8');
+});

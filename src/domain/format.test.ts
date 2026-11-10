@@ -45,3 +45,7 @@ describe('formatWeight', () => {
         expect(formatWeight({ value: 80.2, unit: 'kg' })).toBe('80.2 kg');
     });
 });
+
+it('describes assistance as subtraction from bodyweight', () => {
+    expect(formatLoad({ kind: 'bodyweightExternal', weight: { value: -10, unit: 'kg' } })).toBe('bodyweight - 10 kg');
+});
