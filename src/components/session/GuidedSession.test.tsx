@@ -48,6 +48,7 @@ function setup(perSide = false, saves = true, reps = 8, unilateral = false) {
 
 it('keeps the step and editable performance when saving fails', async () => {
     const { onLog, draft } = setup(false, false);
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await screen.findByText('Could not save. Try Log again.');
     expect(onLog).toHaveBeenCalledWith(draft);
@@ -58,8 +59,10 @@ it('keeps the step and editable performance when saving fails', async () => {
 
 it('guides sides independently before saving one result with both side values and its original load', async () => {
     const { onLog, draft } = setup(true);
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
     expect(onLog).not.toHaveBeenCalled();
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await waitFor(() => expect(onLog).toHaveBeenCalledWith(draft));
     await waitFor(() => expect(localStorage.getItem(`fitnes-guided:session:${draft.sequenceEntryId}`)).toBeNull());
@@ -67,6 +70,7 @@ it('guides sides independently before saving one result with both side values an
 
 it('keeps large imported performance loggable beyond the keypad capacity', async () => {
     const { onLog, draft } = setup(false, true, 100000);
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await waitFor(() => expect(onLog).toHaveBeenCalledWith(draft));
 });
@@ -83,6 +87,7 @@ it('preserves a right-side correction made before switching sides and refreshing
     fireEvent.click(within(editor).getByRole('button', { name: 'Decrease Actual right' }));
     fireEvent.click(within(editor).getByRole('button', { name: 'End', exact: true }));
     fireEvent.animationEnd(editor);
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
     cleanup();
 
@@ -103,6 +108,7 @@ it('preserves a right-side correction made before switching sides and refreshing
 it('guides unilateral total-counted sets left then right before advancing', async () => {
     const { onLog, draft } = setup(false, true, 8, true);
     expect(screen.getByText('Left')).toBeTruthy();
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
     expect(onLog).not.toHaveBeenCalled();
     expect(screen.getByText('Right')).toBeTruthy();
@@ -111,6 +117,7 @@ it('guides unilateral total-counted sets left then right before advancing', asyn
 
     const resumed = setup(false, true, 8, true);
     expect(screen.getByText('Right')).toBeTruthy();
+    startSet();
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
     await waitFor(() => expect(resumed.onLog).toHaveBeenCalledWith(draft));
 });
@@ -150,4 +157,23 @@ it('skips a unilateral set without requiring a second side', async () => {
             })
         )
     );
+});
+
+function startSet(): void {
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    const now = Date.now();
+    vi.spyOn(Date, 'now').mockReturnValue(now + 400000000);
+}
+
+it('prevents logging or advancing a side before Start, including after Reset', () => {
+    const { onLog } = setup(true);
+    const next = screen.getByRole('button', { name: 'Next side', exact: true });
+    expect(next.hasAttribute('disabled')).toBe(true);
+    fireEvent.click(next);
+    expect(screen.getByText('Left')).toBeTruthy();
+    expect(onLog).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pause', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Reset', exact: true }));
+    expect(next.hasAttribute('disabled')).toBe(true);
 });

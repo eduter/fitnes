@@ -140,6 +140,9 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         if (busy()) {
             return;
         }
+        if (!skipped && !started()) {
+            return;
+        }
         stopForEditor();
         if (!rest() && started() && !done() && !manualSides()[side()]) {
             setValue(skipped ? 0 : timed() ? Math.floor(Math.max(0, elapsed() / 1000 - prep())) : position().reps);
@@ -325,7 +328,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                             />
                         </Show>
                     </div>
-                    <Button disabled={busy()} onPress={() => void log()}>
+                    <Button disabled={busy() || !started()} onPress={() => void log()}>
                         {busy()
                             ? 'Saving'
                             : rest()
@@ -341,6 +344,20 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                 <div class="button-row">
                     <Button disabled={busy()} onPress={() => void log(true)}>
                         Skip
+                    </Button>
+                    <Button
+                        disabled={busy() || !props.onPrevious}
+                        onPress={async () => {
+                            stopForEditor();
+                            setBusy(true);
+                            try {
+                                await props.onPrevious?.();
+                            } finally {
+                                setBusy(false);
+                            }
+                        }}
+                    >
+                        Previous
                     </Button>
                     <Show when={started() && !running() && !done()}>
                         <Button disabled={busy()} onPress={reset}>
@@ -496,6 +513,7 @@ interface GuidedSessionProps {
     nextName?: string;
     unit: WeightUnit;
     onLog: (draft: ActualResult | undefined) => Promise<boolean>;
+    onPrevious?: () => Promise<void>;
     onReview: (draft: ActualResult | undefined) => void;
     onComplete: (trigger?: HTMLElement) => void;
     onDelete: (trigger?: HTMLElement) => void;

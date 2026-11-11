@@ -45,8 +45,8 @@ results and rest completion use IndexedDB. Full database replacement clears
 old transient caches. Clearing a recorded result also clears its cached timer draft. Wake lock is requested when available and reacquired
 when the page becomes visible, with a manual-screen fallback message.
 
-Initial behavior for Android review: Log without starting records the displayed
-planned/edited result. Early Log records completed reps or elapsed work seconds
+Log and Next side are disabled until Start for the current side, including after
+Reset or switching sides. Early Log records completed reps or elapsed work seconds
 unless the count was manually corrected. Completed timers wait for Log; actual
 performance can be adjusted in place or with More → Result, including external
 load and independent side values. Unilateral execution and per-side measurements
@@ -56,7 +56,9 @@ storage keeps its existing meaning: per-side results retain independent values;
 total-counted results retain one shared count, finalized when logging Right. Skip records zero work
 for a set, or completes a rest early. A rest auto-starts on entering its step;
 Next completes it, including early. Logging advances only after successful
-persistence. After the last step, Complete finishes the session. More → Review
+persistence. Previous clears the preceding step’s result or rest completion and
+reopens it with a fresh timer; the current step’s paused timer stays cached.
+Previous is also available after the last step, before Complete finishes the session. More → Review
 shows the existing list for review/edit/clear; Track returns to unfinished work.
 
 The exercise name is the main heading. No generic Workout heading, Current set

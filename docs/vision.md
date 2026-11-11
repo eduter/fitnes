@@ -22,6 +22,11 @@ Owner clarification (2026-11-08): the tracking screen focuses on the current
 set rather than a list of sets. Show what to do now and provide a clear Log
 action that records the result and advances to the next set.
 
+Owner feedback (2026-11-11): require Start before Log or Next side for each
+side. Skip remains the explicit zero-work action. Previous reopens the preceding
+sequence step and removes its logged result or rest completion, so an accidental
+log can be corrected during training, including after the final step.
+
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging
 equipment, then a visible remaining-time countdown. The screen should stay
