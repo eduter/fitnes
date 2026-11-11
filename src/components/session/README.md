@@ -47,7 +47,12 @@ when the page becomes visible, with a manual-screen fallback message.
 
 Log and Next side are disabled until Start for the current side, including after
 Reset or switching sides. Early Log records completed reps or elapsed work seconds
-unless the count was manually corrected. Completed timers wait for Log; actual
+unless the count was manually corrected. Before the timer finishes, Log and Next
+side pause and ask Yes/No with the exact proposed reps/seconds against the target.
+Side confirmations identify Left/Right; final per-side logging shows both values.
+Yes commits the frozen proposal. No/outside/Escape/Back resumes only if the timer
+was running, without changing its draft or manual corrections. Completed sets log
+directly; explicit rest Next and Skip retain their existing behavior. Completed timers wait for Log; actual
 performance can be adjusted in place or with More → Result, including external
 load and independent side values. Unilateral execution and per-side measurements
 both guide Left then Right, with the side visible before Start;

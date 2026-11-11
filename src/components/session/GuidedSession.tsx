@@ -8,7 +8,7 @@ import { type ActualResult, actualResult } from '../../domain/session.ts';
 import { effectiveTiming } from '../../domain/trackingTiming.ts';
 import type { WeightUnit } from '../../domain/units.ts';
 import type { SequenceEntry } from '../../domain/workoutTemplate.ts';
-import { Button, DialogActions, DialogTitle, PageTitle, Popover, Spinner } from '../Controls/index.ts';
+import { Button, ConfirmDialog, DialogActions, DialogTitle, PageTitle, Popover, Spinner } from '../Controls/index.ts';
 import { prescriptionSummary } from '../template/prescriptionSummary.ts';
 import { formatSetReference, totalCountValue, withSideCount, withTotalCount, withWeight } from './resultEditing.ts';
 import './GuidedSession.css';
@@ -27,6 +27,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const [manualSides, setManualSides] = createSignal<ManualSides>(restored?.manualSides ?? {});
     const [more, setMore] = createSignal(false);
     const [resultOpen, setResultOpen] = createSignal(false);
+    const [pendingLog, setPendingLog] = createSignal<{ draft?: ActualResult; message: string; resume: boolean }>();
     const [busy, setBusy] = createSignal(false);
     const [message, setMessage] = createSignal('');
     const [wakeMessage, setWakeMessage] = createSignal('');
@@ -136,7 +137,55 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         }
     }
 
-    async function log(skipped = false): Promise<void> {
+    function draftForLog(): ActualResult | undefined {
+        const value = draft();
+        if (!value || rest() || done() || manualSides()[side()]) {
+            return value;
+        }
+        const count = timed() ? Math.floor(Math.max(0, elapsed() / 1000 - prep())) : position().reps;
+        return perSide() ? withSideCount(value, side(), count) : withTotalCount(value, count);
+    }
+
+    function requestLog(element: HTMLElement): void {
+        if (busy() || !started() || pendingLog()) {
+            return;
+        }
+        trigger = element;
+        const resume = running();
+        stopForEditor();
+        if (rest() || done()) {
+            void log();
+            return;
+        }
+
+        // Freeze the proposed result without turning an automatic count into a manual correction
+        const value = draftForLog();
+        const measurement = value?.measurement;
+        const unit = timed() ? 'seconds' : 'reps';
+        const count =
+            measurement?.countBasis === 'perSide'
+                ? measurement.sides[side()]
+                : measurement
+                  ? totalCountValue(measurement)
+                  : 0;
+        const prefix = separateSides() ? `${sideLabel()}: ` : '';
+        const left =
+            measurement?.countBasis === 'perSide' && side() === 'right'
+                ? `Left: ${measurement.sides.left} of ${target()} ${unit}; `
+                : '';
+        const next = separateSides() && side() === 'left' ? ' and go to Right' : '';
+        setPendingLog({ draft: value, resume, message: `Log ${left}${prefix}${count} of ${target()} ${unit}${next}?` });
+    }
+
+    function cancelLog(): void {
+        const pending = pendingLog();
+        setPendingLog(undefined);
+        if (pending?.resume) {
+            start();
+        }
+    }
+
+    async function log(skipped = false, confirmed?: ActualResult): Promise<void> {
         if (busy()) {
             return;
         }
@@ -144,9 +193,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             return;
         }
         stopForEditor();
-        if (!rest() && started() && !done() && !manualSides()[side()]) {
-            setValue(skipped ? 0 : timed() ? Math.floor(Math.max(0, elapsed() / 1000 - prep())) : position().reps);
-        }
+        setDraft(confirmed ?? draftForLog());
         if (skipped && draft()) {
             const value = draft() as ActualResult;
             setDraft(perSide() ? withSideCount(withSideCount(value, 'left', 0), 'right', 0) : withTotalCount(value, 0));
@@ -221,6 +268,25 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
 
     return (
         <article class="live-guided" aria-label="Guided workout">
+            <ConfirmDialog
+                open={pendingLog() !== undefined}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        cancelLog();
+                    }
+                }}
+                message={pendingLog()?.message ?? ''}
+                onConfirm={() => {
+                    const pending = pendingLog();
+                    if (!pending) {
+                        return;
+                    }
+                    setPendingLog(undefined);
+                    void log(false, pending.draft);
+                }}
+                trigger={() => trigger}
+                mount={document.getElementById('root') ?? undefined}
+            />
             <header class="live-guided__header">
                 <PageTitle>{name()}</PageTitle>
                 <Button
@@ -328,7 +394,7 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                             />
                         </Show>
                     </div>
-                    <Button disabled={busy() || !started()} onPress={() => void log()}>
+                    <Button disabled={busy() || !started()} onPress={(event) => requestLog(event.currentTarget)}>
                         {busy()
                             ? 'Saving'
                             : rest()

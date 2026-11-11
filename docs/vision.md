@@ -26,6 +26,11 @@ Owner feedback (2026-11-11): require Start before Log or Next side for each
 side. Skip remains the explicit zero-work action. Previous reopens the preceding
 sequence step and removes its logged result or rest completion, so an accidental
 log can be corrected during training, including after the final step.
+Early Log or Next side asks for confirmation with the exact proposed count
+against the target (for example, “Log 10 of 20 reps?”). Pause while confirming;
+Yes commits that fixed count, and cancellation resumes only a previously running
+set. Include seconds for timed sets and identify sides for unilateral work.
+Completed sets still log directly.
 
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging

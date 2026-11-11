@@ -51,6 +51,7 @@ it('shows only the current set and advances after a real result is persisted', a
     expect(screen.queryByRole('button', { name: 'Log Bent-over row set 2' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await confirmEarlyLog();
     await waitFor(async () => expect((await db.sessions.get(sessionId))?.results).toHaveLength(1));
     await waitFor(() => expect(screen.getByText(/^Step 2 of /)).toBeTruthy());
     const saved = await db.sessions.get(sessionId);
@@ -94,6 +95,7 @@ it('keeps guided edits in Review and uses newer Review edits when returning to T
     fireEvent.click(screen.getByRole('button', { name: 'Track', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await confirmEarlyLog();
     await waitFor(async () => {
         expect((await db.sessions.get(sessionId))?.results[0]?.measurement).toMatchObject({ reps: 4 });
     });
@@ -138,11 +140,13 @@ it('finishes both sides of unilateral wrist curls before persisting and advancin
     expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
     fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+    await confirmEarlyLog();
     expect(screen.getByText('Right')).toBeTruthy();
     expect(screen.getByRole('progressbar', { name: 'Workout progress' }).getAttribute('aria-valuenow')).toBe('1');
     expect((await db.sessions.get(sessionId))?.results).toHaveLength(0);
     fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+    await confirmEarlyLog();
     await waitFor(async () => expect((await db.sessions.get(sessionId))?.results).toHaveLength(1));
     expect(await screen.findByRole('heading', { name: 'Bent-over row' })).toBeTruthy();
     expect(screen.getByText(/^Step 2 of /)).toBeTruthy();
@@ -218,3 +222,10 @@ it('keeps the recorded result and timer cache when undo cannot be saved', async 
     await screen.findByText(/^Step 1 of /);
     expect(screen.getByRole('button', { name: 'Start', exact: true })).toBeTruthy();
 });
+
+async function confirmEarlyLog(): Promise<void> {
+    const dialog = await screen.findByRole('dialog', { name: /^Log / });
+    fireEvent.animationEnd(dialog);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
+    fireEvent.animationEnd(dialog);
+}
