@@ -43,7 +43,7 @@ draft without resetting its timer or selected side. Manual count corrections
 are tracked independently for each side and survive refresh. Validated
 results and rest completion use IndexedDB. Full database replacement clears
 old transient caches. Clearing a recorded result also clears its cached timer draft. Wake lock is requested when available and reacquired
-when the page becomes visible, with a manual-screen fallback message.
+when the page becomes visible, without status or fallback copy.
 
 Log and Next side are disabled until Start for the current side, including after
 Reset or switching sides. Early Log records completed reps or elapsed work seconds
@@ -69,3 +69,8 @@ shows the existing list for review/edit/clear; Track returns to unfinished work.
 The exercise name is the main heading. No generic Workout heading, Current set
 label or Ready when you are message appears during tracking. No corridor or
 audio cues are implemented. Real Android review remains necessary.
+
+The guided layout keeps Skip/Previous/Reset inside the steel frame without
+scrolling on phone viewports. It reserves each timer/action/result slot across
+phases, using tighter spacing and a one-line Next summary in short frames. Save
+errors replace the Next summary instead of pushing controls below the frame.

@@ -30,7 +30,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const [pendingLog, setPendingLog] = createSignal<{ draft?: ActualResult; message: string; resume: boolean }>();
     const [busy, setBusy] = createSignal(false);
     const [message, setMessage] = createSignal('');
-    const [wakeMessage, setWakeMessage] = createSignal('');
     let trigger: HTMLElement | undefined;
     let wake: WakeLockSentinel | undefined;
     let disposed = false;
@@ -84,7 +83,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
 
     async function keepAwake(): Promise<void> {
         if (!('wakeLock' in navigator)) {
-            setWakeMessage('Keep the screen on manually.');
             return;
         }
         if (wake && !wake.released) {
@@ -97,10 +95,8 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                 return;
             }
             wake = acquired;
-            setWakeMessage('Screen stays on');
-            acquired.addEventListener('release', () => setWakeMessage('Screen lock released'));
         } catch {
-            setWakeMessage('Keep the screen on manually.');
+            /* Wake lock is optional; guidance continues when the browser cannot keep the screen awake */
         }
     }
 
@@ -406,7 +402,9 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                 </div>
             </div>
             <div class="live-guided__bottom">
-                <p>Next: {props.nextName ?? 'Finish workout'}</p>
+                <p role={message() ? 'alert' : undefined}>
+                    {message() || `Next: ${props.nextName ?? 'Finish workout'}`}
+                </p>
                 <div class="button-row">
                     <Button disabled={busy()} onPress={() => void log(true)}>
                         Skip
@@ -431,9 +429,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                         </Button>
                     </Show>
                 </div>
-                <p class="live-guided__feedback" role="status">
-                    {message() || wakeMessage()}
-                </p>
             </div>
             <Popover
                 open={more()}

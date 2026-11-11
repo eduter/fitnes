@@ -31,6 +31,9 @@ against the target (for example, “Log 10 of 20 reps?”). Pause while confirmi
 Yes commits that fixed count, and cancellation resumes only a previously running
 set. Include seconds for timed sets and identify sides for unilateral work.
 Completed sets still log directly.
+Keep Skip and Previous visible inside the tracking frame without scrolling on
+phone screens. Adapt spacing to the available frame height. Screen wake lock
+runs silently; omit its status and fallback copy. Save errors remain visible.
 
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging
@@ -70,8 +73,8 @@ Current set label and the Ready when you are message.
 
 Owner feedback: all tracking elements retain fixed vertical positions throughout
 a set, including ready, preparation, active, paused and completed states. Reserve
-space for conditional status, pacing, actions, result editing and wake-lock
-feedback rather than recentering content as controls appear. Spinner contents
+space for conditional status, pacing, actions and result editing rather than
+recentering content as controls appear. Spinner contents
 align to the right when a longer label determines the field width.
 
 Owner feedback (2026-11-09): one-side-at-a-time sets guide Left then Right,

@@ -226,7 +226,7 @@ function SessionPage(): JSX.Element {
     }
 
     return (
-        <section class="page">
+        <section class="page" classList={{ 'page--tracking': !readOnly() && !reviewing() && !!activeEntry() }}>
             <DraftGuard
                 dirty={Object.keys(drafts()).some(
                     (id) =>

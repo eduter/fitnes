@@ -1,26 +1,30 @@
+.page--tracking {
+    container-type: size;
+}
 .live-guided {
     display: flex;
     flex-direction: column;
     flex: 1;
     min-height: 0;
-    gap: 8px;
+    gap: 4px;
 }
 .live-guided__header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 8px;
-    min-height: 64px;
+    min-height: 32px;
+    flex-shrink: 0;
 }
 .live-guided__header > .nes-page-title {
     flex: 1;
     min-width: 0;
 }
 .live-guided__prescription {
-    height: 64px;
+    height: 48px;
+    flex-shrink: 0;
     display: grid;
     grid-template-rows: 16px 16px 16px;
-    gap: 8px;
 }
 .live-guided__prescription p {
     white-space: nowrap;
@@ -30,12 +34,11 @@
 .live-guided__focus {
     display: grid;
     flex: 1;
-    min-height: 208px;
+    min-height: 152px;
     grid-template-rows: 16px 48px 16px 16px 48px;
-    gap: 4px;
+    gap: 2px;
     align-content: center;
     justify-items: center;
-    padding-block: 8px;
 }
 .live-guided__status,
 .live-guided__cue,
@@ -91,6 +94,7 @@
     background: var(--nes-ink);
 }
 .live-guided__bottom {
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -102,7 +106,17 @@
 .live-guided__bottom .button-row {
     height: 16px;
 }
-.live-guided__feedback {
-    height: 32px;
-    overflow: hidden;
+@container (height < 360px) {
+    .live-guided {
+        gap: 2px;
+    }
+    .live-guided__focus {
+        min-height: 148px;
+        gap: 1px;
+    }
+    .live-guided__bottom > p:first-child {
+        height: 16px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 }
