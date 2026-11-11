@@ -23,7 +23,11 @@ function setup(perSide = false, saves = true, reps = 8, unilateral = false, time
         reps,
     };
     if (timed) {
-        plan.sets[0].prescription.measurement = { measurement: 'duration', countBasis: 'total', seconds: reps };
+        plan.sets[0].prescription.measurement = {
+            measurement: 'duration',
+            countBasis: perSide ? 'perSide' : 'total',
+            seconds: reps,
+        };
     }
     if (unilateral) {
         plan.sets[0].prescription.executionMode = 'unilateral';
@@ -100,7 +104,7 @@ it('preserves a right-side correction made before switching sides and refreshing
     fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
     now += 8000;
     fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
-    await confirmEarlyLog('Log Left: 8 of 8 reps; Right: 7 of 8 reps?');
+    await confirmEarlyLog('Log Right: 7 of 8 reps?');
     await waitFor(() =>
         expect(onLog).toHaveBeenCalledWith({
             ...draft,
@@ -274,3 +278,71 @@ async function confirmEarlyLog(message: string): Promise<void> {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
     fireEvent.animationEnd(dialog);
 }
+
+it.each([false, true])(
+    'allows a short Left followed by a full Right, including after refresh (timed=%s)',
+    async (timed) => {
+        setup(true, true, 20, true, timed);
+        let now = Date.now();
+        vi.spyOn(Date, 'now').mockImplementation(() => now);
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        now += timed ? 15000 : 35000;
+        fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+        await confirmEarlyLog(`Log Left: 10 of 20 ${timed ? 'seconds' : 'reps'} and go to Right?`);
+        expect(screen.getByText('Right', { exact: true })).toBeTruthy();
+        cleanup();
+
+        const { onLog } = setup(true, true, 20, true, timed);
+        expect(screen.getByText('Right', { exact: true })).toBeTruthy();
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        now += timed ? 25000 : 65000;
+        await screen.findByText('Set complete · Right');
+        fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+        expect(screen.queryByRole('dialog')).toBeNull();
+        await waitFor(() =>
+            expect(onLog).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    measurement: {
+                        measurement: timed ? 'duration' : 'repetitions',
+                        countBasis: 'perSide',
+                        sides: { left: 10, right: 20 },
+                    },
+                })
+            )
+        );
+    }
+);
+
+it.each([false, true])(
+    'confirms only Right when both sides finish short, keeping their different results (timed=%s)',
+    async (timed) => {
+        const { onLog } = setup(true, true, 20, true, timed);
+        let now = Date.now();
+        vi.spyOn(Date, 'now').mockImplementation(() => now);
+        const unit = timed ? 'seconds' : 'reps';
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        now += timed ? 15000 : 35000;
+        fireEvent.click(screen.getByRole('button', { name: 'Next side', exact: true }));
+        await confirmEarlyLog(`Log Left: 10 of 20 ${unit} and go to Right?`);
+        expect(onLog).not.toHaveBeenCalled();
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        now += timed ? 10000 : 20000;
+        fireEvent.click(screen.getByRole('button', { name: 'Log', exact: true }));
+        const dialog = await screen.findByRole('dialog', { name: `Log Right: 5 of 20 ${unit}?` });
+        fireEvent.animationEnd(dialog);
+        expect(dialog.textContent).not.toContain('Left');
+        expect(onLog).not.toHaveBeenCalled();
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
+        await waitFor(() =>
+            expect(onLog).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    measurement: {
+                        measurement: timed ? 'duration' : 'repetitions',
+                        countBasis: 'perSide',
+                        sides: { left: 10, right: 5 },
+                    },
+                })
+            )
+        );
+    }
+);

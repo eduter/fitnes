@@ -165,12 +165,8 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
                   ? totalCountValue(measurement)
                   : 0;
         const prefix = separateSides() ? `${sideLabel()}: ` : '';
-        const left =
-            measurement?.countBasis === 'perSide' && side() === 'right'
-                ? `Left: ${measurement.sides.left} of ${target()} ${unit}; `
-                : '';
         const next = separateSides() && side() === 'left' ? ' and go to Right' : '';
-        setPendingLog({ draft: value, resume, message: `Log ${left}${prefix}${count} of ${target()} ${unit}${next}?` });
+        setPendingLog({ draft: value, resume, message: `Log ${prefix}${count} of ${target()} ${unit}${next}?` });
     }
 
     function cancelLog(): void {

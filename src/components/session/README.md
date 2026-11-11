@@ -49,7 +49,8 @@ Log and Next side are disabled until Start for the current side, including after
 Reset or switching sides. Early Log records completed reps or elapsed work seconds
 unless the count was manually corrected. Before the timer finishes, Log and Next
 side pause and ask Yes/No with the exact proposed reps/seconds against the target.
-Side confirmations identify Left/Right; final per-side logging shows both values.
+Side confirmations name only the current side and its proposed result. Ending
+one side early does not change the other side’s target, timer or result.
 Yes commits the frozen proposal. No/outside/Escape/Back resumes only if the timer
 was running, without changing its draft or manual corrections. Completed sets log
 directly; explicit rest Next and Skip retain their existing behavior. Completed timers wait for Log; actual

@@ -29,7 +29,9 @@ log can be corrected during training, including after the final step.
 Early Log or Next side asks for confirmation with the exact proposed count
 against the target (for example, “Log 10 of 20 reps?”). Pause while confirming;
 Yes commits that fixed count, and cancellation resumes only a previously running
-set. Include seconds for timed sets and identify sides for unilateral work.
+set. Include seconds for timed sets and identify only the current side for
+unilateral work. Each side is independent: finishing one side early does not
+shorten the other side’s target or assume its result.
 Completed sets still log directly.
 Keep Skip and Previous visible inside the tracking frame without scrolling on
 phone screens. Adapt spacing to the available frame height. Screen wake lock
