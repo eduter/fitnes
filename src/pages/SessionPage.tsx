@@ -119,25 +119,59 @@ function SessionPage(): JSX.Element {
         return change((current) => recordResult(current, { ...draft, completedAt: Date.now() }));
     }
 
-    function clear(entryId: SequenceEntryId): Promise<void> {
-        const next = { ...drafts() };
-        delete next[entryId];
-        setDrafts(next);
-        return change((current) => clearResult(current, entryId)).then(() => {
-            const value = session();
-            if (
-                !value ||
-                value.results.some((result) => result.sequenceEntryId === entryId) ||
-                value.completedRestIds?.includes(entryId)
-            ) {
-                return;
+    async function clear(entryId: SequenceEntryId): Promise<void> {
+        const key = `fitnes-guided:${params.id}:${entryId}`;
+        let cached: string | null = null;
+        const draft = drafts()[entryId];
+        await change((current) => {
+            // Refreshed data mounts the reopened step immediately, so clear its draft first
+            try {
+                cached = localStorage.getItem(key);
+                localStorage.removeItem(key);
+            } catch {
+                /* Session persistence still works when transient storage is unavailable */
+            }
+            const next = { ...drafts() };
+            delete next[entryId];
+            setDrafts(next);
+            return clearResult(current, entryId);
+        });
+        const value = session();
+        if (
+            value?.results.some((result) => result.sequenceEntryId === entryId) ||
+            value?.completedRestIds?.includes(entryId)
+        ) {
+            if (draft) {
+                setDrafts({ ...drafts(), [entryId]: draft });
             }
             try {
-                localStorage.removeItem(`fitnes-guided:${value.id}:${entryId}`);
+                if (cached !== null) {
+                    localStorage.setItem(key, cached);
+                }
             } catch {
-                /* The result was cleared even when transient storage is unavailable */
+                /* Failed saves retain their persisted result even without the timer cache */
             }
-        });
+        }
+    }
+
+    async function previousStep(): Promise<void> {
+        if (busy()) {
+            return;
+        }
+        const current = session();
+        if (!current || current.completedAt !== undefined) {
+            return;
+        }
+        const index = activeEntry()
+            ? current.snapshot.sequence.findIndex((entry) => entry.id === activeEntry()?.id)
+            : current.snapshot.sequence.length;
+        const previous = current.snapshot.sequence[index - 1];
+        if (!previous) {
+            return;
+        }
+        setBusy(true);
+        await clear(previous.id);
+        setBusy(false);
     }
 
     async function complete(): Promise<void> {
@@ -192,7 +226,7 @@ function SessionPage(): JSX.Element {
     }
 
     return (
-        <section class="page">
+        <section class="page" classList={{ 'page--tracking': !readOnly() && !reviewing() && !!activeEntry() }}>
             <DraftGuard
                 dirty={Object.keys(drafts()).some(
                     (id) =>
@@ -241,6 +275,11 @@ function SessionPage(): JSX.Element {
                                         title={current().snapshot.name}
                                         actions={
                                             <div class="button-row">
+                                                <Show when={!readOnly() && !activeEntry() && plannedCount() > 0}>
+                                                    <Button disabled={busy()} onPress={() => void previousStep()}>
+                                                        Previous
+                                                    </Button>
+                                                </Show>
                                                 <Show when={!readOnly() && activeEntry()}>
                                                     <Button onPress={() => setReviewing(false)}>Track</Button>
                                                 </Show>
@@ -379,62 +418,71 @@ function SessionPage(): JSX.Element {
                             }
                         >
                             {(id) => (
-                                <GuidedSession
-                                    sessionId={current().id}
-                                    entry={requireEntry(current(), id)}
-                                    occurrence={findOccurrence(current().snapshot, id)}
-                                    draft={effectiveDrafts()[id]}
-                                    previous={previous()[id]}
-                                    index={current().snapshot.sequence.findIndex((entry) => entry.id === id)}
-                                    count={plannedCount()}
-                                    unit={app.massUnit()}
-                                    nextName={(() => {
-                                        const index = current().snapshot.sequence.findIndex((entry) => entry.id === id);
-                                        const next = current().snapshot.sequence[index + 1];
-                                        return next?.restSeconds !== undefined
-                                            ? `Rest ${next.restSeconds}s`
-                                            : next
-                                              ? findOccurrence(current().snapshot, next.id)?.exercise.name
-                                              : undefined;
-                                    })()}
-                                    onLog={async (draft) => {
-                                        const entry = current().snapshot.sequence.find((entry) => entry.id === id);
-                                        if (entry?.restSeconds !== undefined) {
-                                            await change((value) => recordRest(value, id));
-                                            return session()?.completedRestIds?.includes(id) ?? false;
+                                <>
+                                    <ValidationErrors errors={errors()} />
+                                    <GuidedSession
+                                        sessionId={current().id}
+                                        entry={requireEntry(current(), id)}
+                                        occurrence={findOccurrence(current().snapshot, id)}
+                                        draft={effectiveDrafts()[id]}
+                                        previous={previous()[id]}
+                                        index={current().snapshot.sequence.findIndex((entry) => entry.id === id)}
+                                        count={plannedCount()}
+                                        unit={app.massUnit()}
+                                        nextName={(() => {
+                                            const index = current().snapshot.sequence.findIndex(
+                                                (entry) => entry.id === id
+                                            );
+                                            const next = current().snapshot.sequence[index + 1];
+                                            return next?.restSeconds !== undefined
+                                                ? `Rest ${next.restSeconds}s`
+                                                : next
+                                                  ? findOccurrence(current().snapshot, next.id)?.exercise.name
+                                                  : undefined;
+                                        })()}
+                                        onLog={async (draft) => {
+                                            const entry = current().snapshot.sequence.find((entry) => entry.id === id);
+                                            if (entry?.restSeconds !== undefined) {
+                                                await change((value) => recordRest(value, id));
+                                                return session()?.completedRestIds?.includes(id) ?? false;
+                                            }
+                                            if (!draft) {
+                                                return false;
+                                            }
+                                            await change((value) =>
+                                                recordResult(value, {
+                                                    ...draft,
+                                                    completedAt: Math.max(Date.now(), value.startedAt),
+                                                })
+                                            );
+                                            return (
+                                                session()?.results.some((result) => result.sequenceEntryId === id) ??
+                                                false
+                                            );
+                                        }}
+                                        onPrevious={
+                                            current().snapshot.sequence[0]?.id !== id ? previousStep : undefined
                                         }
-                                        if (!draft) {
-                                            return false;
-                                        }
-                                        await change((value) =>
-                                            recordResult(value, {
-                                                ...draft,
-                                                completedAt: Math.max(Date.now(), value.startedAt),
-                                            })
-                                        );
-                                        return (
-                                            session()?.results.some((result) => result.sequenceEntryId === id) ?? false
-                                        );
-                                    }}
-                                    onReview={(draft) => {
-                                        if (draft) {
-                                            setDrafts({ ...drafts(), [id]: draft });
-                                        }
-                                        setReviewing(true);
-                                    }}
-                                    onComplete={(element) => {
-                                        trigger = element;
-                                        if (loggedCount() < plannedCount()) {
-                                            setConfirming('complete');
-                                        } else {
-                                            void complete();
-                                        }
-                                    }}
-                                    onDelete={(element) => {
-                                        trigger = element;
-                                        setConfirming('delete');
-                                    }}
-                                />
+                                        onReview={(draft) => {
+                                            if (draft) {
+                                                setDrafts({ ...drafts(), [id]: draft });
+                                            }
+                                            setReviewing(true);
+                                        }}
+                                        onComplete={(element) => {
+                                            trigger = element;
+                                            if (loggedCount() < plannedCount()) {
+                                                setConfirming('complete');
+                                            } else {
+                                                void complete();
+                                            }
+                                        }}
+                                        onDelete={(element) => {
+                                            trigger = element;
+                                            setConfirming('delete');
+                                        }}
+                                    />
+                                </>
                             )}
                         </Show>
                     </>

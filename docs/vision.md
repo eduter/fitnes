@@ -22,6 +22,21 @@ Owner clarification (2026-11-08): the tracking screen focuses on the current
 set rather than a list of sets. Show what to do now and provide a clear Log
 action that records the result and advances to the next set.
 
+Owner feedback (2026-11-11): require Start before Log or Next side for each
+side. Skip remains the explicit zero-work action. Previous reopens the preceding
+sequence step and removes its logged result or rest completion, so an accidental
+log can be corrected during training, including after the final step.
+Early Log or Next side asks for confirmation with the exact proposed count
+against the target (for example, “Log 10 of 20 reps?”). Pause while confirming;
+Yes commits that fixed count, and cancellation resumes only a previously running
+set. Include seconds for timed sets and identify only the current side for
+unilateral work. Each side is independent: finishing one side early does not
+shorten the other side’s target or assume its result.
+Completed sets still log directly.
+Keep Skip and Previous visible inside the tracking frame without scrolling on
+phone screens. Adapt spacing to the available frame height. Screen wake lock
+runs silently; omit its status and fallback copy. Save errors remain visible.
+
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging
 equipment, then a visible remaining-time countdown. The screen should stay
@@ -60,8 +75,8 @@ Current set label and the Ready when you are message.
 
 Owner feedback: all tracking elements retain fixed vertical positions throughout
 a set, including ready, preparation, active, paused and completed states. Reserve
-space for conditional status, pacing, actions, result editing and wake-lock
-feedback rather than recentering content as controls appear. Spinner contents
+space for conditional status, pacing, actions and result editing rather than
+recentering content as controls appear. Spinner contents
 align to the right when a longer label determines the field width.
 
 Owner feedback (2026-11-09): one-side-at-a-time sets guide Left then Right,

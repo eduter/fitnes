@@ -43,11 +43,17 @@ draft without resetting its timer or selected side. Manual count corrections
 are tracked independently for each side and survive refresh. Validated
 results and rest completion use IndexedDB. Full database replacement clears
 old transient caches. Clearing a recorded result also clears its cached timer draft. Wake lock is requested when available and reacquired
-when the page becomes visible, with a manual-screen fallback message.
+when the page becomes visible, without status or fallback copy.
 
-Initial behavior for Android review: Log without starting records the displayed
-planned/edited result. Early Log records completed reps or elapsed work seconds
-unless the count was manually corrected. Completed timers wait for Log; actual
+Log and Next side are disabled until Start for the current side, including after
+Reset or switching sides. Early Log records completed reps or elapsed work seconds
+unless the count was manually corrected. Before the timer finishes, Log and Next
+side pause and ask Yes/No with the exact proposed reps/seconds against the target.
+Side confirmations name only the current side and its proposed result. Ending
+one side early does not change the other side’s target, timer or result.
+Yes commits the frozen proposal. No/outside/Escape/Back resumes only if the timer
+was running, without changing its draft or manual corrections. Completed sets log
+directly; explicit rest Next and Skip retain their existing behavior. Completed timers wait for Log; actual
 performance can be adjusted in place or with More → Result, including external
 load and independent side values. Unilateral execution and per-side measurements
 both guide Left then Right, with the side visible before Start;
@@ -56,9 +62,16 @@ storage keeps its existing meaning: per-side results retain independent values;
 total-counted results retain one shared count, finalized when logging Right. Skip records zero work
 for a set, or completes a rest early. A rest auto-starts on entering its step;
 Next completes it, including early. Logging advances only after successful
-persistence. After the last step, Complete finishes the session. More → Review
+persistence. Previous clears the preceding step’s result or rest completion and
+reopens it with a fresh timer; the current step’s paused timer stays cached.
+Previous is also available after the last step, before Complete finishes the session. More → Review
 shows the existing list for review/edit/clear; Track returns to unfinished work.
 
 The exercise name is the main heading. No generic Workout heading, Current set
 label or Ready when you are message appears during tracking. No corridor or
 audio cues are implemented. Real Android review remains necessary.
+
+The guided layout keeps Skip/Previous/Reset inside the steel frame without
+scrolling on phone viewports. It reserves each timer/action/result slot across
+phases, using tighter spacing and a one-line Next summary in short frames. Save
+errors replace the Next summary instead of pushing controls below the frame.
