@@ -1,4 +1,4 @@
-import { Button, ConfirmDialog, FilePicker, TextArea } from '../components/Controls/index.ts';
+import { Button, ConfirmDialog, FilePicker, Spinner, TextArea } from '../components/Controls/index.ts';
 import { createSignal, Show, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { OptionPicker } from '../components/OptionPicker/OptionPicker.tsx';
@@ -87,6 +87,17 @@ function DataPage(): JSX.Element {
                 mount={document.getElementById('root') ?? undefined}
             />
             <PageHeader title="Settings" />
+            <Spinner
+                label="CRT intensity (%)"
+                value={app.crtIntensity()}
+                onChange={app.setCrtIntensity}
+                min={0}
+                max={100}
+                step={10}
+                integerDigits={3}
+                popoverMount={document.getElementById('root') ?? undefined}
+            />
+            <p class="muted">Set CRT to 0 to turn it off.</p>
             <OptionPicker
                 label="Mass unit"
                 value={app.massUnit()}

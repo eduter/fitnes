@@ -12,6 +12,12 @@ changes to the visual direction require owner review.
 
 ## Available components and when to use them
 
+`CrtDisplay` is the owner-adopted app-wide display layer (see its component README).
+It uses the existing logical pixel grid, covers dialogs without intercepting input,
+and compensates mask darkening. Settings uses Spinner for 0–100% intensity (80% default).
+Source palette/composition proofs run with CRT disabled; they validate the source
+image, not the post-processed display output.
+
 Import controls from `src/components/Controls/index.ts`.
 
 | Component | Use | Contract |
