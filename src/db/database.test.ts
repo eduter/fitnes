@@ -65,6 +65,9 @@ describe('FitnesDB', () => {
             'bodyweightMeasurements',
             'exercises',
             'sessions',
+            'syncBackups',
+            'syncLocal',
+            'syncState',
             'templates',
             'workouts',
         ]);

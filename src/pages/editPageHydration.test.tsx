@@ -76,8 +76,10 @@ beforeAll(async () => {
     await seedDatabase();
 });
 
-afterEach(() => {
+afterEach(async () => {
     cleanup();
+    // Dialog cleanup consumes a real browser history entry asynchronously, even under MemoryRouter.
+    await waitFor(() => expect(window.history.state?.fitnesDialog).toBeUndefined());
 });
 
 async function openEditor(view: ReturnType<typeof render>, label: string): Promise<HTMLInputElement> {

@@ -1,7 +1,7 @@
-import { latestBodyweightAtOrBefore, type BodyweightMeasurement } from '../domain/bodyweight.ts';
-import { EXPORT_SCHEMA_VERSION, type DataExport } from '../domain/dataExport.ts';
-import type { ExerciseDefinition } from '../domain/exercise.ts';
+import { type BodyweightMeasurement, latestBodyweightAtOrBefore } from '../domain/bodyweight.ts';
+import type { DataExport } from '../domain/dataExport.ts';
 import { exampleExercises } from '../domain/examples.ts';
+import type { ExerciseDefinition } from '../domain/exercise.ts';
 import type { WorkoutSession } from '../domain/session.ts';
 import { validateBodyweightMeasurement } from '../domain/validateBodyweightMeasurement.ts';
 import { validateExercise } from '../domain/validateExercise.ts';
@@ -9,16 +9,29 @@ import { validateWorkoutSession } from '../domain/validateWorkoutSession.ts';
 import { validateWorkoutTemplate } from '../domain/validateWorkoutTemplate.ts';
 import type { ValidationResult } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import { notifyDataChange } from './changes.ts';
 import type { FitnesDB } from './database.ts';
+import {
+    domainTables,
+    mutateRecord,
+    rawData,
+    readLocalMetadata,
+    replaceLocalData,
+    type WriteGuard,
+} from './syncAdapter.ts';
 
 /** Persist a valid catalog exercise, leaving the store unchanged when validation fails. */
-async function putExercise(db: FitnesDB, input: unknown): Promise<ValidationResult<ExerciseDefinition>> {
+async function putExercise(
+    db: FitnesDB,
+    input: unknown,
+    guard?: WriteGuard
+): Promise<ValidationResult<ExerciseDefinition>> {
     const parsed = validateExercise(input);
     if (!parsed.ok) {
         return parsed;
     }
 
-    await db.exercises.put(parsed.value);
+    await mutateRecord(db, 'exercises', parsed.value.id, () => db.exercises.put(parsed.value), guard);
     return parsed;
 }
 
@@ -35,27 +48,38 @@ async function getExercise(db: FitnesDB, id: string): Promise<ExerciseDefinition
 }
 
 /** Remove a catalog exercise. Templates and sessions keep their snapshots. */
-async function deleteExercise(db: FitnesDB, id: string): Promise<void> {
-    await db.exercises.delete(id);
+async function deleteExercise(db: FitnesDB, id: string, guard?: WriteGuard): Promise<void> {
+    await mutateRecord(db, 'exercises', id, () => db.exercises.delete(id), guard);
 }
 
 /** Insert the representative catalog when the exercise store is empty. */
 async function seedExampleExercises(db: FitnesDB): Promise<void> {
-    if ((await db.exercises.count()) > 0) {
-        return;
-    }
-
-    await db.exercises.bulkPut(exampleExercises);
+    await db.transaction('rw', [...domainTables(db), db.syncLocal], async (transaction) => {
+        const meta = await readLocalMetadata(db);
+        if (meta.initialized) {
+            return;
+        }
+        const pristine = (await db.exercises.count()) === 0;
+        if (pristine) {
+            await db.exercises.bulkPut(exampleExercises);
+        }
+        await db.syncLocal.put({ ...meta, initialized: true, generation: meta.generation + (pristine ? 1 : 0) });
+        transaction.on('complete', notifyDataChange);
+    });
 }
 
 /** Persist a valid workout template. */
-async function putTemplate(db: FitnesDB, input: unknown): Promise<ValidationResult<WorkoutTemplate>> {
+async function putTemplate(
+    db: FitnesDB,
+    input: unknown,
+    guard?: WriteGuard
+): Promise<ValidationResult<WorkoutTemplate>> {
     const parsed = validateWorkoutTemplate(input);
     if (!parsed.ok) {
         return parsed;
     }
 
-    await db.templates.put(parsed.value);
+    await mutateRecord(db, 'templates', parsed.value.id, () => db.templates.put(parsed.value), guard);
     return parsed;
 }
 
@@ -72,18 +96,18 @@ async function getTemplate(db: FitnesDB, id: string): Promise<WorkoutTemplate | 
 }
 
 /** Remove a workout template. Sessions keep their snapshots. */
-async function deleteTemplate(db: FitnesDB, id: string): Promise<void> {
-    await db.templates.delete(id);
+async function deleteTemplate(db: FitnesDB, id: string, guard?: WriteGuard): Promise<void> {
+    await mutateRecord(db, 'templates', id, () => db.templates.delete(id), guard);
 }
 
 /** Persist a valid workout session. */
-async function putSession(db: FitnesDB, input: unknown): Promise<ValidationResult<WorkoutSession>> {
+async function putSession(db: FitnesDB, input: unknown, guard?: WriteGuard): Promise<ValidationResult<WorkoutSession>> {
     const parsed = validateWorkoutSession(input);
     if (!parsed.ok) {
         return parsed;
     }
 
-    await db.sessions.put(parsed.value);
+    await mutateRecord(db, 'sessions', parsed.value.id, () => db.sessions.put(parsed.value), guard);
     return parsed;
 }
 
@@ -100,21 +124,28 @@ async function getSession(db: FitnesDB, id: string): Promise<WorkoutSession | un
 }
 
 /** Remove a recorded or in-progress session. */
-async function deleteSession(db: FitnesDB, id: string): Promise<void> {
-    await db.sessions.delete(id);
+async function deleteSession(db: FitnesDB, id: string, guard?: WriteGuard): Promise<void> {
+    await mutateRecord(db, 'sessions', id, () => db.sessions.delete(id), guard);
 }
 
 /** Persist a valid bodyweight reading. */
 async function putBodyweightMeasurement(
     db: FitnesDB,
-    input: unknown
+    input: unknown,
+    guard?: WriteGuard
 ): Promise<ValidationResult<BodyweightMeasurement>> {
     const parsed = validateBodyweightMeasurement(input);
     if (!parsed.ok) {
         return parsed;
     }
 
-    await db.bodyweightMeasurements.put(parsed.value);
+    await mutateRecord(
+        db,
+        'bodyweightMeasurements',
+        parsed.value.id,
+        () => db.bodyweightMeasurements.put(parsed.value),
+        guard
+    );
     return parsed;
 }
 
@@ -134,8 +165,8 @@ async function latestStoredBodyweight(db: FitnesDB, at: number): Promise<Bodywei
 }
 
 /** Remove one bodyweight reading. Sessions keep their snapshots. */
-async function deleteBodyweightMeasurement(db: FitnesDB, id: string): Promise<void> {
-    await db.bodyweightMeasurements.delete(id);
+async function deleteBodyweightMeasurement(db: FitnesDB, id: string, guard?: WriteGuard): Promise<void> {
+    await mutateRecord(db, 'bodyweightMeasurements', id, () => db.bodyweightMeasurements.delete(id), guard);
 }
 
 /**
@@ -145,21 +176,7 @@ async function deleteBodyweightMeasurement(db: FitnesDB, id: string): Promise<vo
  * should never be the thing that loses data.
  */
 async function exportDatabase(db: FitnesDB): Promise<DataExport> {
-    const [exercises, templates, sessions, bodyweightMeasurements] = await Promise.all([
-        db.exercises.toArray(),
-        db.templates.toArray(),
-        db.sessions.toArray(),
-        db.bodyweightMeasurements.toArray(),
-    ]);
-
-    return {
-        schemaVersion: EXPORT_SCHEMA_VERSION,
-        exportedAt: Date.now(),
-        exercises,
-        templates,
-        sessions,
-        bodyweightMeasurements,
-    };
+    return db.transaction('r', domainTables(db), async () => ({ ...(await rawData(db)), exportedAt: Date.now() }));
 }
 
 /**
@@ -168,20 +185,7 @@ async function exportDatabase(db: FitnesDB): Promise<DataExport> {
  * whole-database replace, not a merge: a record absent from `value` is deleted.
  */
 async function importDatabase(db: FitnesDB, value: DataExport): Promise<void> {
-    await db.transaction('rw', db.exercises, db.templates, db.sessions, db.bodyweightMeasurements, async () => {
-        await Promise.all([
-            db.exercises.clear(),
-            db.templates.clear(),
-            db.sessions.clear(),
-            db.bodyweightMeasurements.clear(),
-        ]);
-        await Promise.all([
-            db.exercises.bulkPut(value.exercises),
-            db.templates.bulkPut(value.templates),
-            db.sessions.bulkPut(value.sessions),
-            db.bodyweightMeasurements.bulkPut(value.bodyweightMeasurements),
-        ]);
-    });
+    await replaceLocalData(db, value);
 }
 
 function readExercise(row: ExerciseDefinition): ExerciseDefinition {
