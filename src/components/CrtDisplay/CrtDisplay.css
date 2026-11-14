@@ -4,8 +4,7 @@
     z-index: 10000;
     pointer-events: none;
     /* Backdrop processing preserves the containing blocks used by fixed modal layers. */
-    backdrop-filter: brightness(calc(1 + var(--crt-strength) * 0.9)) saturate(calc(1 + var(--crt-strength) * 0.25))
-        blur(calc(var(--crt-strength) * 0.14px));
+    backdrop-filter: blur(calc(var(--crt-strength) * 0.14px));
 }
 
 .crt-display::before,

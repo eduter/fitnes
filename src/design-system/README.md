@@ -14,7 +14,8 @@ changes to the visual direction require owner review.
 
 `CrtDisplay` is the owner-adopted app-wide display layer (see its component README).
 It uses the existing logical pixel grid, covers dialogs without intercepting input,
-and compensates mask darkening. Settings uses Spinner for 0–100% intensity (80% default).
+without brightness or saturation compensation. Settings uses Spinner for 0–100%
+intensity (80% default). Color changes remain the owner's decision.
 Source palette/composition proofs run with CRT disabled; they validate the source
 image, not the post-processed display output.
 

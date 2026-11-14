@@ -155,8 +155,9 @@ future palette changes still require an exact construction and owner approval.
 
 Owner decision (2026-11-14): adopt the rounded-pixel CRT display treatment across
 the actual application, defaulting to 80% intensity. Settings persists intensity
-on-device, including zero for an unfiltered display. Compensate for mask darkening
-before considering palette changes; current artwork and source colors remain adopted.
+on-device, including zero for an unfiltered display. Owner correction: preserve the
+original colors without brightness or saturation compensation. The owner will judge
+whether mask darkening calls for color changes; do not adjust colors preemptively.
 The display treatment is post-processing, outside the NES source-composition proof.
 
 Owner-approved controls use gold interactive values/actions and copper passive
