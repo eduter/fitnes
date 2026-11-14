@@ -2,7 +2,9 @@
 function stableJson(value: unknown): string {
     return JSON.stringify(value, (_key, item: unknown) => {
         if (item && typeof item === 'object' && !Array.isArray(item)) {
-            return Object.fromEntries(Object.entries(item).sort(([left], [right]) => left.localeCompare(right, 'en')));
+            return Object.fromEntries(
+                Object.entries(item).sort(([left], [right]) => (left < right ? -1 : left > right ? 1 : 0))
+            );
         }
         return item;
     });

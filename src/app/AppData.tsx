@@ -109,8 +109,7 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
 
     async function refreshExternal(): Promise<void> {
         try {
-            await reloadAll();
-            refreshPending = false;
+            refreshPending = !(await reloadAll(true));
         } catch (cause) {
             setLoadError(cause instanceof Error ? cause.message : 'Could not refresh local data.');
         }
@@ -143,7 +142,7 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         }
     }
 
-    async function reloadAll(): Promise<void> {
+    async function reloadAll(external = false): Promise<boolean> {
         const result = await withDbRead(() =>
             db.transaction('r', [...domainTables(db), db.syncLocal], async () => ({
                 exercises: await listExercises(db),
@@ -153,6 +152,9 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
                 meta: await readLocalMetadata(db),
             }))
         );
+        if (external && localDataInUse()) {
+            return false;
+        }
         synchronizeGuidedEpoch(result.meta.epoch);
         batch(() => {
             viewEpoch = result.meta.epoch;
@@ -161,11 +163,12 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
             setSessions(result.sessions);
             setBodyweightMeasurements(result.bodyweight);
         });
+        return true;
     }
 
     function storeRecord<T>(
         write: () => Promise<ValidationResult<T>>,
-        reload: () => Promise<void>
+        reload: () => Promise<unknown>
     ): Promise<ValidationResult<T>> {
         const current = writeQueue
             .catch(() => undefined)
@@ -192,7 +195,7 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         return current;
     }
 
-    async function removeRecord(write: () => Promise<void>, reload: () => Promise<void>): Promise<boolean> {
+    async function removeRecord(write: () => Promise<void>, reload: () => Promise<unknown>): Promise<boolean> {
         try {
             await withDbWrite(write);
             await reload();

@@ -7,3 +7,7 @@ dev-dist
 
 # Generated artwork proofs and emulator builds
 work/
+
+# Browser verification artifacts
+playwright-report/
+test-results/

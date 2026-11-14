@@ -41,7 +41,7 @@ function createLocalStore(db: FitnesDB, scope: string, active: () => boolean = (
                 }
             });
         },
-        preserveConflict: (conflict) => preserveConflict(db, conflict),
+        preserveConflict: (conflict) => preserveConflict(db, conflict, scope),
         replace: (generation, snapshot, next) =>
             withIdleData(async () => {
                 if (!active()) {
@@ -166,7 +166,10 @@ async function replaceLocalData(
             await db.syncBackups.put({
                 id: crypto.randomUUID(),
                 content: JSON.stringify(await rawData(db)),
-                createdAt: Date.now(),
+                createdAt: Math.max(
+                    Date.now(),
+                    ((await db.syncBackups.orderBy('createdAt').last())?.createdAt ?? 0) + 1
+                ),
                 label,
                 pinned: 0,
                 guidedCaches: caches,
@@ -262,6 +265,10 @@ function parseSyncDocument(content: string): DataExport {
         throw new Error('Unsupported sync document version.');
     }
     const { data } = source;
+    const supportedFields = new Set(['schemaVersion', 'exportedAt', ...collectionNames]);
+    if (Object.keys(data).some((key) => !supportedFields.has(key))) {
+        throw new Error('Sync data contains unsupported collections or fields. Update the app before syncing.');
+    }
     if (!Number.isInteger(data.schemaVersion) || data.schemaVersion < 1 || data.schemaVersion > EXPORT_SCHEMA_VERSION) {
         throw new Error('Unsupported FitNES data version. Update the app before syncing.');
     }
@@ -305,8 +312,12 @@ async function pruneBackups(db: FitnesDB): Promise<void> {
     await db.syncBackups.bulkDelete(routine.slice(20).map((copy) => copy.id));
 }
 
-async function preserveConflict(db: FitnesDB, conflict: Conflict): Promise<void> {
-    await db.transaction('rw', db.syncBackups, async () => {
+async function preserveConflict(db: FitnesDB, conflict: Conflict, scope: string): Promise<void> {
+    await db.transaction('rw', db.syncBackups, db.syncState, async () => {
+        const previous = await db.syncState.get(scope);
+        if (previous?.conflict && previous.conflict.id !== conflict.id) {
+            await db.syncBackups.where('conflictId').equals(previous.conflict.id).modify({ pinned: 0 });
+        }
         const common = { createdAt: Date.now(), pinned: 1, conflictId: conflict.id };
         await db.syncBackups.put({
             ...common,
@@ -323,6 +334,7 @@ async function preserveConflict(db: FitnesDB, conflict: Conflict): Promise<void>
                 content: conflict.remote.content,
             });
         }
+        await pruneBackups(db);
     });
 }
 

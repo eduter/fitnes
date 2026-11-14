@@ -101,6 +101,27 @@ describe('FitNES sync persistence', () => {
         expect((await exportDatabase(db)).exercises).toEqual([pullUp]);
         expect((await readLocalMetadata(db)).generation).toBe(generation + 1);
     });
+    it('keeps account checkpoints independent without changing local domain data', async () => {
+        await putExercise(db, pullUp);
+        const first = createLocalStore(db, 'account-one');
+        await first.saveCheckpoint({ key: 'account-one', baseline: { fingerprint: 'known', revision: 'r1' } });
+        const second = createLocalStore(db, 'account-two');
+        expect((await second.checkpoint()).baseline).toBeUndefined();
+        expect((await second.read()).empty).toBe(false);
+        expect((await first.checkpoint()).baseline?.revision).toBe('r1');
+    });
+
+    it('unpins superseded conflict candidates while protecting the current review', async () => {
+        const local = createLocalStore(db, 'scope');
+        const first = { id: 'first', local: await local.read(), remote: { content: 'first', revision: 'r1' } };
+        await local.preserveConflict(first);
+        await local.saveCheckpoint({ key: 'scope', conflict: first });
+        const second = { ...first, id: 'second', remote: { content: 'second', revision: 'r2' } };
+        await local.preserveConflict(second);
+        expect((await db.syncBackups.get('first-local'))?.pinned).toBe(0);
+        expect((await db.syncBackups.get('second-remote'))?.pinned).toBe(1);
+    });
+
     it('fingerprints record ordering and export times consistently', async () => {
         const data = { ...empty, exercises: [pullUp, { ...pullUp, id: 'another', name: 'Another' }] };
         const first = await decodeSnapshot(JSON.stringify({ version: 1, data: { ...data, exportedAt: 1 } }));
@@ -111,6 +132,7 @@ describe('FitNES sync persistence', () => {
     });
     it.each([
         { version: 2, data: empty },
+        { version: 1, data: { ...empty, unknownCollection: [] } },
         { version: 1, data: { schemaVersion: 4 } },
         { version: 1, data: { ...empty, schemaVersion: 5 } },
         { version: 1, data: { ...empty, exercises: [pullUp, pullUp] } },

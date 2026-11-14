@@ -17,6 +17,7 @@ function fixture(localContent = 'base', remoteContent: string | null = 'base', b
     let failUpload = false;
     let failBackup = false;
     let canApply = true;
+    let active = true;
     let uploadHook = () => {};
     let uploads = 0;
     const engine = createSyncEngine({
@@ -64,7 +65,7 @@ function fixture(localContent = 'base', remoteContent: string | null = 'base', b
             },
         },
         decode: async (content) => snapshot(content),
-        active: () => true,
+        active: () => active,
         now: () => 123,
     });
     return {
@@ -96,6 +97,9 @@ function fixture(localContent = 'base', remoteContent: string | null = 'base', b
         },
         setCanApply: (value: boolean) => {
             canApply = value;
+        },
+        disconnect: () => {
+            active = false;
         },
         onUpload: (fn: () => void) => {
             uploadHook = fn;
@@ -159,6 +163,24 @@ describe('snapshot synchronization', () => {
         expect((await f.engine.sync()).status).toBe('pending');
         expect(f.checkpoint.baseline?.fingerprint).toBe('local');
         expect(f.local.content).toBe('later');
+    });
+
+    it('leaves the upload journal recoverable when disconnected during a request', async () => {
+        const f = fixture('sent');
+        f.onUpload(() => f.disconnect());
+        expect((await f.engine.sync()).status).toBe('disconnected');
+        expect(f.remote?.content).toBe('sent');
+        expect(f.checkpoint.baseline?.fingerprint).toBe('base');
+        expect(f.checkpoint.journal?.snapshot.content).toBe('sent');
+    });
+
+    it('reports expired authorization even when revoked credentials invalidate the session', async () => {
+        const f = fixture('sent');
+        f.onUpload(() => {
+            f.disconnect();
+            throw new SyncFailure('auth', 'Reconnect Dropbox.');
+        });
+        expect((await f.engine.sync()).status).toBe('reauth');
     });
 
     it('reconciles a successful upload whose acknowledgement was interrupted', async () => {

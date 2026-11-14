@@ -272,3 +272,17 @@ choice/confirmation screen. This also applies to workouts without bodyweight
 sets. With no weight history, start without a snapshot. Multi-choice summaries
 align at the top of their fixed field. Popover motion uses a fixed frame behind
 a stepped overflow viewport to address reported Chromium painting artifacts.
+
+## Optional device synchronization
+
+Owner-approved direction (2026-11-14): Dropbox synchronization is optional. Local
+exercise/workout editing and tracking remain available offline or disconnected.
+Synchronize the four current domain collections, including logged workout progress;
+mass-unit preferences, running timers and unlogged inputs remain on their device.
+
+Use whole-dataset choices for concurrent edits, preserving both snapshots before
+resolution. Never choose a winner using device timestamps. Defer incoming dataset
+replacement while any tab is editing or tracking a workout. Keep 20 routine local
+recovery copies, protect unresolved conflicts, and preserve daily Dropbox backups
+plus exact remote conflict copies. Taskmaster remains unchanged. The generic engine
+and provider/persistence adapters stay separate for eventual package extraction.

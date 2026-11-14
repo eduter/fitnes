@@ -1,6 +1,7 @@
 let editors = 0;
 const idleListeners = new Set<() => void>();
 const EDIT_LOCK = 'fitnes-data-in-use';
+let idleChannel: BroadcastChannel | undefined;
 
 /** Hold a shared browser lock while an editor, confirmation, or workout tracker uses a local snapshot. */
 function holdLocalData(): () => void {
@@ -21,6 +22,7 @@ function holdLocalData(): () => void {
         editors--;
         releaseLock();
         if (!editors) {
+            idleChannel?.postMessage('idle');
             for (const listener of idleListeners) {
                 listener();
             }
@@ -47,7 +49,21 @@ function localDataInUse(): boolean {
 /** Retry deferred work when the final editor in this tab closes. */
 function onLocalDataIdle(listener: () => void): () => void {
     idleListeners.add(listener);
-    return () => idleListeners.delete(listener);
+    if (!idleChannel && typeof window !== 'undefined' && window.BroadcastChannel) {
+        idleChannel = new window.BroadcastChannel('fitnes-editor-idle');
+        idleChannel.onmessage = () => {
+            for (const notify of idleListeners) {
+                notify();
+            }
+        };
+    }
+    return () => {
+        idleListeners.delete(listener);
+        if (!idleListeners.size) {
+            idleChannel?.close();
+            idleChannel = undefined;
+        }
+    };
 }
 
 export { holdLocalData, localDataInUse, onLocalDataIdle, withIdleData };

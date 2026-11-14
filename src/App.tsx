@@ -1,10 +1,12 @@
-import { type JSX, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, type JSX, onCleanup, onMount, Show, untrack } from 'solid-js';
 import logoUrl from '../art/logo/logo.png?url';
 import { AppDataProvider, useAppData } from './app/AppData.tsx';
 import { BottomTabs } from './components/BottomTabs/BottomTabs.tsx';
+import { Button } from './components/Controls/index.ts';
 import { SteelPanel } from './components/SteelPanel/SteelPanel.tsx';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
 import { useActiveTab, useAppNavigate, useIsHome } from './routing/navigation.ts';
+import { appSync } from './sync/controller.ts';
 import './App.css';
 
 /** The shared 256-pixel game screen, with persistent six-tab navigation. */
@@ -29,6 +31,7 @@ function App(props: AppProps): JSX.Element {
                         </div>
                     </header>
                 </Show>
+                <SyncLifecycle />
                 <StatusBanner />
                 <main class="app-main">
                     <Show when={home()} fallback={<SteelPanel class="page-panel">{props.children}</SteelPanel>}>
@@ -51,6 +54,24 @@ function App(props: AppProps): JSX.Element {
 
 interface AppProps {
     children?: JSX.Element;
+}
+
+function SyncLifecycle(): JSX.Element {
+    const app = useAppData();
+    const nav = useAppNavigate();
+    createEffect(() => {
+        if (app.loadState() === 'ready') {
+            const stop = untrack(() => appSync.start());
+            onCleanup(stop);
+        }
+    });
+    return (
+        <Show when={['conflict', 'reauth', 'error'].includes(appSync.state().status)}>
+            <p class="banner" role="status">
+                Dropbox needs attention. <Button onPress={() => nav.toTab('settings')}>Open Settings</Button>
+            </p>
+        </Show>
+    );
 }
 
 function StatusBanner(): JSX.Element {

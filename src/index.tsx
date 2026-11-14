@@ -1,9 +1,9 @@
 /* @refresh reload */
 import { Route, Router } from '@solidjs/router';
 import { render } from 'solid-js/web';
+import { RecoveryPage } from './pages/RecoveryPage.tsx';
 import './styles/global.css';
 import { registerSW } from 'virtual:pwa-register';
-import { WorkoutPickerPage } from './pages/WorkoutPickerPage.tsx';
 import { App } from './App.tsx';
 import { basePath } from './app/basePath.ts';
 import { BodyweightPage } from './pages/BodyweightPage.tsx';
@@ -16,6 +16,7 @@ import { SessionPage } from './pages/SessionPage.tsx';
 import { StartSessionPage } from './pages/StartSessionPage.tsx';
 import { TemplateEditPage } from './pages/TemplateEditPage.tsx';
 import { TemplateListPage } from './pages/TemplateListPage.tsx';
+import { WorkoutPickerPage } from './pages/WorkoutPickerPage.tsx';
 
 const root = document.getElementById('root');
 if (!root) {
@@ -38,6 +39,7 @@ render(
             <Route path="/sessions/:id" component={SessionPage} />
             <Route path="/bodyweight" component={BodyweightPage} />
             <Route path="/data" component={DataPage} />
+            <Route path="/data/recovery" component={RecoveryPage} />
         </Router>
     ),
     root

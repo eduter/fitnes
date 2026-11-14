@@ -1,4 +1,4 @@
-import { Dropbox, DropboxAuth, type DropboxResponse } from 'dropbox';
+import type { Dropbox, DropboxResponse } from 'dropbox';
 import { SyncFailure } from '../core/types.ts';
 
 const TOKEN_KEY = 'fitnes-dropbox-v1';
@@ -30,6 +30,7 @@ function createDropboxAuthorization(options: AuthorizationOptions): DropboxAutho
         if (!clientId) {
             throw new Error('Dropbox is not configured for this build.');
         }
+        const { DropboxAuth } = await import('dropbox');
         const auth = new DropboxAuth({ clientId, fetch: fetcher });
         const state = crypto.randomUUID();
         const url = await auth.getAuthenticationUrl(
@@ -66,6 +67,7 @@ function createDropboxAuthorization(options: AuthorizationOptions): DropboxAutho
         if (!code) {
             throw new Error('Dropbox did not return an authorization code.');
         }
+        const { Dropbox, DropboxAuth } = await import('dropbox');
         const auth = new DropboxAuth({ clientId, fetch: timedFetch(fetcher) });
         auth.setCodeVerifier(pending.verifier);
         try {
@@ -114,6 +116,8 @@ function createDropboxAuthorization(options: AuthorizationOptions): DropboxAutho
             if (!latest) {
                 throw new SyncFailure('auth', 'Reconnect Dropbox to sync.');
             }
+            const { DropboxAuth } = await import('dropbox');
+            assertActive();
             const auth = new DropboxAuth({ clientId, refreshToken: latest.refreshToken, fetch: requestFetch });
             try {
                 await auth.refreshAccessToken();
@@ -140,6 +144,8 @@ function createDropboxAuthorization(options: AuthorizationOptions): DropboxAutho
             if (!credentials) {
                 throw new SyncFailure('auth', 'Reconnect Dropbox to sync.');
             }
+            const { Dropbox } = await import('dropbox');
+            assertActive();
             let refreshed = false;
             if (credentials.expiresAt <= Date.now() + 60_000) {
                 await refresh();

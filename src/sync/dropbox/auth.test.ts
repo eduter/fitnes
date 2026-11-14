@@ -100,3 +100,69 @@ describe('Dropbox authorization', () => {
         });
     });
 });
+
+function storedSession(): void {
+    localStorage.setItem(
+        'fitnes-dropbox-v1',
+        JSON.stringify({
+            clientId: 'fitnes-key',
+            sessionId: 'session',
+            accountId: 'account-a',
+            accessToken: 'access',
+            refreshToken: 'refresh',
+            expiresAt: Date.now() + 3_600_000,
+        })
+    );
+}
+
+it('refreshes and retries a rejected request exactly once', async () => {
+    storedSession();
+    const { auth, fetcher } = fixture();
+    fetcher.mockResolvedValueOnce(
+        new Response(JSON.stringify({ access_token: 'refreshed', expires_in: 3600 }), { status: 200 })
+    );
+    let requests = 0;
+    const session = auth.connection(new AbortController().signal);
+    const response = await session.run(async () => {
+        if (++requests === 1) {
+            throw { status: 401 };
+        }
+        return { status: 200, headers: new Headers(), result: { ok: true } };
+    });
+    expect(response.result).toEqual({ ok: true });
+    expect(requests).toBe(2);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(auth.tokens()?.accessToken).toBe('refreshed');
+});
+
+it('requires reconnection when Dropbox rejects a refresh token', async () => {
+    storedSession();
+    const { auth, fetcher } = fixture();
+    fetcher.mockResolvedValueOnce(new Response(JSON.stringify({ error: 'invalid_grant' }), { status: 400 }));
+    await expect(
+        auth.connection(new AbortController().signal).run(async () => {
+            throw { status: 401 };
+        })
+    ).rejects.toMatchObject({ kind: 'auth' });
+    expect(auth.tokens()).toBeNull();
+});
+
+it('never resurrects disconnected credentials when a refresh finishes late', async () => {
+    storedSession();
+    const { auth, fetcher } = fixture();
+    let finish!: (response: Response) => void;
+    fetcher.mockImplementationOnce(
+        () =>
+            new Promise((resolve) => {
+                finish = resolve;
+            })
+    );
+    const operation = auth.connection(new AbortController().signal).run(async () => {
+        throw { status: 401 };
+    });
+    await vi.waitFor(() => expect(fetcher).toHaveBeenCalled());
+    auth.disconnect();
+    finish(new Response(JSON.stringify({ access_token: 'late-token', expires_in: 3600 }), { status: 200 }));
+    await expect(operation).rejects.toThrow('connection changed');
+    expect(auth.tokens()).toBeNull();
+});
