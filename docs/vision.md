@@ -208,6 +208,12 @@ ship opaque square artwork and let Android apply its launcher mask. The wordmark
 continues to identify the app on Home. `npm run generate:icons` regenerates the
 launcher assets and favicons from the hero via `tools/build-pwa-icons.ts`.
 
+Owner decision (2026-11-15): bake the same 80% rounded-pixel phosphor and scanline
+masks into install icons and favicons. Keep the approved crop, opaque square assets,
+and original source colors; do not brighten or saturate them. Supersample the mask
+for small output sizes. The source home artwork remains unchanged. Installed icons
+use the fixed default effect; changing the in-app intensity does not rewrite them.
+
 Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 as a navigation design reference: show a few choices, then expose further
 options through subsequent menus, keeping workout interaction quick. It is an
