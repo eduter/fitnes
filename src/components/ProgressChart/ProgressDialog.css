@@ -1,0 +1,13 @@
+/* A graph should occupy the screen without the underlying lists competing for attention. */
+.nes-popover-layer:has(.progress-dialog) {
+    background: var(--nes-ground);
+}
+.progress-dialog__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.progress-dialog__actions > .nes-dialog-actions {
+    flex: 1;
+}

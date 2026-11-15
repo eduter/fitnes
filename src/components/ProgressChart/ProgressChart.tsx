@@ -3,6 +3,8 @@ import './ProgressChart.css';
 
 /** Fixed-resolution, integer-pixel time series using passive NES inks and square markers. */
 function ProgressChart(props: ProgressChartProps): JSX.Element {
+    const width = () => props.width ?? 232;
+    const height = () => props.height ?? 144;
     const all = createMemo(() => props.series.flatMap((series) => series.points));
     const bounds = createMemo(() => {
         const values = all().map((point) => point.value);
@@ -12,8 +14,10 @@ function ProgressChart(props: ProgressChartProps): JSX.Element {
         const dates = all().map((point) => point.at);
         return { low: low - padding, high: high + padding, start: Math.min(...dates), end: Math.max(...dates) };
     });
-    const x = (at: number) => 40 + Math.round(((at - bounds().start) / (bounds().end - bounds().start || 1)) * 176);
-    const y = (value: number) => 112 - Math.round(((value - bounds().low) / (bounds().high - bounds().low)) * 104);
+    const x = (at: number) =>
+        40 + Math.round(((at - bounds().start) / (bounds().end - bounds().start || 1)) * (width() - 56));
+    const y = (value: number) =>
+        height() - 32 - Math.round(((value - bounds().low) / (bounds().high - bounds().low)) * (height() - 40));
     return (
         <figure class="progress-chart" aria-label={props.label}>
             <figcaption>
@@ -21,13 +25,20 @@ function ProgressChart(props: ProgressChartProps): JSX.Element {
             </figcaption>
             <Show
                 when={all().length}
-                fallback={<p class="progress-chart__empty">{props.empty ?? 'No data in this period.'}</p>}
+                fallback={
+                    <p class="progress-chart__empty" style={{ 'min-height': `${height()}px` }}>
+                        {props.empty ?? 'No data in this period.'}
+                    </p>
+                }
             >
-                <div class="progress-chart__plot">
+                <div
+                    class="progress-chart__plot"
+                    style={{ width: `${width()}px`, height: `${height()}px`, '--chart-date-top': `${height() - 24}px` }}
+                >
                     <svg
-                        viewBox="0 0 232 144"
-                        width="232"
-                        height="144"
+                        viewBox={`0 0 ${width()} ${height()}`}
+                        width={width()}
+                        height={height()}
                         role="img"
                         aria-label={props.label}
                         shape-rendering="crispEdges"
@@ -41,7 +52,7 @@ function ProgressChart(props: ProgressChartProps): JSX.Element {
                                 const value = () => bounds().low + ((bounds().high - bounds().low) * index) / 2;
                                 return (
                                     <g>
-                                        <path class="progress-chart__grid" d={`M40 ${y(value())} H216`} />
+                                        <path class="progress-chart__grid" d={`M40 ${y(value())} H${width() - 16}`} />
                                     </g>
                                 );
                             }}
@@ -91,24 +102,24 @@ function ProgressChart(props: ProgressChartProps): JSX.Element {
                         {shortDate(bounds().end)}
                     </span>
                 </div>
-                <div class="progress-chart__legend">
-                    <For each={props.series}>
-                        {(series, index) => (
-                            <span>
-                                <span
-                                    aria-hidden="true"
-                                    class={
-                                        index() === 0 && props.series.length > 1
-                                            ? 'progress-chart__key progress-chart__key--dotted'
-                                            : 'progress-chart__key'
-                                    }
-                                />{' '}
-                                {series.label}
-                            </span>
-                        )}
-                    </For>
-                </div>
             </Show>
+            <div class="progress-chart__legend">
+                <For each={props.series}>
+                    {(series, index) => (
+                        <span>
+                            <span
+                                aria-hidden="true"
+                                class={
+                                    index() === 0 && props.series.length > 1
+                                        ? 'progress-chart__key progress-chart__key--dotted'
+                                        : 'progress-chart__key'
+                                }
+                            />{' '}
+                            {series.label}
+                        </span>
+                    )}
+                </For>
+            </div>
         </figure>
     );
 }
@@ -118,12 +129,14 @@ interface ChartSeries {
     label: string;
     points: readonly { at: number; value: number }[];
 }
-/** Accessible title, unit, and time series for a fixed 232-pixel plot. */
+/** Accessible title, unit, and time series at a caller-selected integer resolution. */
 interface ProgressChartProps {
     label: string;
     unit: string;
     series: readonly ChartSeries[];
     empty?: string;
+    width?: number;
+    height?: number;
 }
 function shortDate(at: number): string {
     const date = new Date(at);

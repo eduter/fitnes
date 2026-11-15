@@ -1,14 +1,16 @@
-import { createMemo, createSignal, type JSX, Show } from 'solid-js';
+import { createMemo, createSignal, type JSX } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
-import { exerciseProgress, progressRanges, rangeStart } from '../domain/progress.ts';
+import { exerciseProgress, rangeStart } from '../domain/progress.ts';
 import { formatDate } from '../utils/datetime.ts';
-import { OptionPicker } from './Controls/index.ts';
+import { Button, OptionPicker } from './Controls/index.ts';
 import { PagedList } from './PagedList.tsx';
-import { ProgressChart } from './ProgressChart/ProgressChart.tsx';
+import { ProgressDialog } from './ProgressChart/ProgressDialog.tsx';
 
 /** Compare one exercise across completed workouts, preserving its actual load and reps. */
 function ExerciseProgress(): JSX.Element {
     const app = useAppData();
+    const [graphOpen, setGraphOpen] = createSignal(false);
+    let graphTrigger: HTMLElement | undefined;
     const [selected, setSelected] = createSignal('');
     const [range, setRange] = createSignal('3');
     const choices = createMemo(() => {
@@ -41,23 +43,26 @@ function ExerciseProgress(): JSX.Element {
                 disabled={!choices().length}
                 popoverMount={document.getElementById('root') ?? undefined}
             />
-            <OptionPicker
-                label="Period"
-                options={progressRanges}
-                value={range()}
-                onChange={setRange}
-                popoverMount={document.getElementById('root') ?? undefined}
-            />
-            <ProgressChart
-                label="Estimated max"
+            <Button
+                onPress={(event) => {
+                    graphTrigger = event.currentTarget;
+                    setGraphOpen(true);
+                }}
+            >
+                Graph
+            </Button>
+            <ProgressDialog
+                open={graphOpen()}
+                onOpenChange={setGraphOpen}
+                trigger={() => graphTrigger}
+                label={choices().find((choice) => choice.value === exerciseId())?.label ?? 'Exercise'}
                 unit={app.massUnit()}
+                range={range()}
+                onRangeChange={setRange}
                 series={series()}
                 empty="No weighted rep sets in this period."
+                explanation="Epley estimate: weight × (1 + reps ÷ 30). Each point is your best set from a completed workout. Use it as a rough strength trend across rep ranges; higher-rep estimates are less precise."
             />
-            <p>Epley estimate. Higher reps are less reliable. Compare sets near your limit.</p>
-            <Show when={points().some((point) => point.reps > 15)}>
-                <p>Includes sets above 15 reps.</p>
-            </Show>
             <PagedList
                 label="Exercise progress sets"
                 items={points().toReversed()}

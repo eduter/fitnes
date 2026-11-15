@@ -1,24 +1,26 @@
 import { createMemo, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
-import { Button, ConfirmDialog, OptionPicker, Popover } from '../components/Controls/index.ts';
+import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
 import { DialogActions } from '../components/DialogActions.tsx';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
 import { DateField, NumberField } from '../components/fields.tsx';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
-import { ProgressChart } from '../components/ProgressChart/ProgressChart.tsx';
+import { ProgressDialog } from '../components/ProgressChart/ProgressDialog.tsx';
 import { DialogTitle } from '../components/Typography.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
 import { formatMass, massValue } from '../domain/convertWeight.ts';
-import { bodyweightProgress, progressRanges, rangeStart } from '../domain/progress.ts';
+import { bodyweightProgress, rangeStart } from '../domain/progress.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { formatDate } from '../utils/datetime.ts';
 
 /** Record and review local readings without expanding rows or shifting history. */
 function BodyweightPage(): JSX.Element {
     const app = useAppData();
+    const [graphOpen, setGraphOpen] = createSignal(false);
+    let graphTrigger: HTMLElement | undefined;
     const [range, setRange] = createSignal('3');
     const points = createMemo(() =>
         bodyweightProgress(app.bodyweightMeasurements(), app.massUnit()).filter(
@@ -66,20 +68,26 @@ function BodyweightPage(): JSX.Element {
                     </Button>
                 }
             />
-            <OptionPicker
-                label="Period"
-                options={progressRanges}
-                value={range()}
-                onChange={setRange}
-                popoverMount={document.getElementById('root') ?? undefined}
-            />
-            <ProgressChart
+            <Button
+                onPress={(event) => {
+                    graphTrigger = event.currentTarget;
+                    setGraphOpen(true);
+                }}
+            >
+                Graph
+            </Button>
+            <ProgressDialog
+                open={graphOpen()}
+                onOpenChange={setGraphOpen}
+                trigger={() => graphTrigger}
                 label="Bodyweight"
                 unit={app.massUnit()}
+                range={range()}
+                onRangeChange={setRange}
                 series={series()}
-                empty="No readings in this period. Record your weight or choose a longer period."
+                empty="No readings in this period."
+                explanation="Daily shows the mean of that day's readings. The 7-day average uses recorded days in the trailing seven calendar days."
             />
-            <p>Daily mean; 7-day mean of recorded days.</p>
             <PagedList
                 label="Weight history"
                 items={app.bodyweightMeasurements()}

@@ -125,3 +125,6 @@ policy for them.
 - [x] Prove sampled native chart screens against hardware budgets; retain
   [captures and reproduction commands](design/progress/README.md).
 - [ ] Review chart readability on the owner's phone.
+
+- [x] Isolate bodyweight/exercise graphs in opaque modals; move estimate copy
+  behind ? and retain history outside the graph.

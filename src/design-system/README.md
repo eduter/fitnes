@@ -181,9 +181,11 @@ row with eight-pixel gaps. Keep the full accessible movement verbs on icon butto
 ## ProgressChart
 
 `components/ProgressChart/ProgressChart.tsx` owns reusable progress plots. Use a
-232×144 logical-pixel SVG with integer coordinates, crisp edges, square points,
+configurable integer-size SVG (216×240 in graph dialogs) with integer coordinates, crisp edges, square points,
 copper data and steel grid lines. Two series use dotted and solid lines so they
 remain distinguishable without introducing colors. Keep series chronological
 and in a common display unit. Always provide an accessible title, unit, legend
-and empty-state copy. Page-level history below provides exact recorded values.
+and empty-state copy. History outside the graph dialog provides exact recorded values.
+`ProgressDialog` composes the shared Popover with an opaque black background,
+a period picker and ?/End actions. The ? action opens a child help dialog.
 New chart compositions still require native screen palette proof/device review.

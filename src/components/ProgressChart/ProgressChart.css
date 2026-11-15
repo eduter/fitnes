@@ -48,7 +48,7 @@
 .progress-chart__start,
 .progress-chart__end {
     position: absolute;
-    top: 120px;
+    top: var(--chart-date-top, 120px);
 }
 .progress-chart__start {
     left: 40px;

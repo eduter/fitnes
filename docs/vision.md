@@ -302,7 +302,7 @@ and provider/persistence adapters stay separate for eventual package extraction.
 
 ## Progress graphs
 
-Owner request (2026-11-15): the Bodyweight tab leads with a line chart showing
+Owner request (2026-11-15): the Bodyweight tab offers a line chart showing
 both daily weight and its trailing seven-day average. A Period picker offers
 last month, three months, six months, last year and all time. Multiple readings
 on one local day form one daily mean; the rolling mean uses available daily
@@ -311,10 +311,15 @@ readings. Compute the average before filtering the visible period.
 
 Exercise Progress selects an exercise by its stable ID across all completed
 workouts, independent of changing workout splits. Plot the best Epley estimated
-one-rep max per session and retain that set's actual load and reps beneath the
-chart. High-rep estimates remain visible with a reliability note; no formula
-makes them exact. Single reps use their actual load, unilateral results use the
+one-rep max per session and retain that set's actual load and reps in history.
+High-rep estimates remain included; the explanation belongs behind a ? button. Single reps use their actual load, unilateral results use the
 weaker side, and bodyweight loads include the session's recorded bodyweight and
 any assistance/added weight. Timed, skipped, unloaded and missing-bodyweight
 results do not produce estimated-max points. Charts keep the shared pixel font,
 integer geometry, passive copper/steel inks and existing framed pickers.
+
+Owner feedback (2026-11-15): keep graph viewing focused. Graph opens an opaque
+modal containing the chart and period picker, with no history rows or explanatory
+copy. A ? button opens a separate help dialog; End/Back returns to the chart.
+Closing the graph restores the history page and its trigger. Apply the same
+focused presentation to bodyweight and exercise charts in the real app.
