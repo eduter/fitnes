@@ -177,3 +177,13 @@ MoveButton's shaft arrow points toward a destination bar. It means reorder,
 whereas the small filled spinner triangles mean increment/decrement. Workout
 set rows place Edit, Duplicate, Delete and the two MoveButtons in one nonwrapping
 row with eight-pixel gaps. Keep the full accessible movement verbs on icon buttons.
+
+## ProgressChart
+
+`components/ProgressChart/ProgressChart.tsx` owns reusable progress plots. Use a
+232×144 logical-pixel SVG with integer coordinates, crisp edges, square points,
+copper data and steel grid lines. Two series use dotted and solid lines so they
+remain distinguishable without introducing colors. Keep series chronological
+and in a common display unit. Always provide an accessible title, unit, legend
+and empty-state copy. Page-level history below provides exact recorded values.
+New chart compositions still require native screen palette proof/device review.

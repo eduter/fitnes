@@ -1,0 +1,69 @@
+.progress-chart {
+    margin: 0;
+    flex: none;
+}
+.progress-chart figcaption {
+    margin-bottom: 4px;
+}
+.progress-chart svg {
+    display: block;
+    max-width: 100%;
+    color: var(--nes-ink);
+}
+.progress-chart__grid {
+    stroke: var(--nes-muted);
+}
+.progress-chart__daily {
+    stroke: var(--nes-ink);
+    fill: var(--nes-ink);
+}
+.progress-chart__average {
+    stroke: var(--nes-ink);
+    fill: var(--nes-ink);
+    stroke-width: 2;
+}
+.progress-chart__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.progress-chart__empty {
+    min-height: 144px;
+    display: flex;
+    align-items: center;
+}
+
+/* HTML labels preserve the pixel font's raster alignment; SVG text introduces fractional glyph advances. */
+.progress-chart__plot {
+    position: relative;
+    width: 232px;
+    height: 144px;
+}
+.progress-chart__tick {
+    position: absolute;
+    left: 0;
+    width: 36px;
+    text-align: right;
+}
+.progress-chart__start,
+.progress-chart__end {
+    position: absolute;
+    top: 120px;
+}
+.progress-chart__start {
+    left: 40px;
+}
+.progress-chart__end {
+    right: 16px;
+}
+
+.progress-chart__key {
+    display: inline-block;
+    vertical-align: middle;
+    width: 16px;
+    height: 2px;
+    background: var(--nes-ink);
+}
+.progress-chart__key--dotted {
+    background: repeating-linear-gradient(to right, var(--nes-ink) 0 2px, var(--nes-ground) 2px 4px);
+}

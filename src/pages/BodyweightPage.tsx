@@ -1,22 +1,34 @@
-import { createSignal, type JSX, Show } from 'solid-js';
+import { createMemo, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
-import { Button, ConfirmDialog, Popover } from '../components/Controls/index.ts';
+import { Button, ConfirmDialog, OptionPicker, Popover } from '../components/Controls/index.ts';
 import { DialogActions } from '../components/DialogActions.tsx';
 import { RecordWeightForm } from '../components/dialog/RecordWeightForm.tsx';
 import { DateField, NumberField } from '../components/fields.tsx';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { ProgressChart } from '../components/ProgressChart/ProgressChart.tsx';
 import { DialogTitle } from '../components/Typography.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
 import { formatMass, massValue } from '../domain/convertWeight.ts';
+import { bodyweightProgress, progressRanges, rangeStart } from '../domain/progress.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { formatDate } from '../utils/datetime.ts';
 
 /** Record and review local readings without expanding rows or shifting history. */
 function BodyweightPage(): JSX.Element {
     const app = useAppData();
+    const [range, setRange] = createSignal('3');
+    const points = createMemo(() =>
+        bodyweightProgress(app.bodyweightMeasurements(), app.massUnit()).filter(
+            (point) => point.at >= rangeStart(range(), Date.now())
+        )
+    );
+    const series = () => [
+        { label: 'Daily', points: points() },
+        { label: '7-day average', points: points().map((point) => ({ at: point.at, value: point.average })) },
+    ];
     const [adding, setAdding] = createSignal(false);
     const [readingDirty, setReadingDirty] = createSignal(false);
     const [discardReading, setDiscardReading] = createSignal(false);
@@ -54,6 +66,20 @@ function BodyweightPage(): JSX.Element {
                     </Button>
                 }
             />
+            <OptionPicker
+                label="Period"
+                options={progressRanges}
+                value={range()}
+                onChange={setRange}
+                popoverMount={document.getElementById('root') ?? undefined}
+            />
+            <ProgressChart
+                label="Bodyweight"
+                unit={app.massUnit()}
+                series={series()}
+                empty="No readings in this period. Record your weight or choose a longer period."
+            />
+            <p>Daily mean; 7-day mean of recorded days.</p>
             <PagedList
                 label="Weight history"
                 items={app.bodyweightMeasurements()}
