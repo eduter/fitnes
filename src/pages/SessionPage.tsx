@@ -2,6 +2,7 @@ import { A, useParams } from '@solidjs/router';
 import { createMemo, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
+import { useDataBarrier } from '../app/dataBarrier.ts';
 import { Button, ConfirmDialog } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
@@ -30,6 +31,7 @@ import { formatDateTime } from '../utils/datetime.ts';
 
 /** Log results against a session snapshot, or review a completed session. */
 function SessionPage(): JSX.Element {
+    useDataBarrier(() => true);
     const params = useParams();
     const nav = useAppNavigate();
     const app = useAppData();

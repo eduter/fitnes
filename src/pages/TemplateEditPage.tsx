@@ -2,6 +2,7 @@ import { A, useParams } from '@solidjs/router';
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
+import { useDataBarrier } from '../app/dataBarrier.ts';
 import { Button, ConfirmDialog, DialogActions } from '../components/Controls/index.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
 import { TemplateForm } from '../components/template/TemplateForm.tsx';
@@ -14,6 +15,7 @@ import { useAppNavigate } from '../routing/navigation.ts';
 
 /** Create or edit a workout template. Valid edits persist immediately. */
 function TemplateEditPage(): JSX.Element {
+    useDataBarrier(() => true);
     const params = useParams();
     const nav = useAppNavigate();
     const app = useAppData();

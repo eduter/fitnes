@@ -1,6 +1,6 @@
 import { VitePWA } from 'vite-plugin-pwa';
 import solid from 'vite-plugin-solid';
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 // GitHub Pages serves a project site under `/<repo>/`; the deploy workflow sets
 // PAGES_BASE_PATH to that path. A bare `npm run build` stays at the domain root.
@@ -76,6 +76,7 @@ export default defineConfig(({ mode }) => ({
         : {}),
     test: {
         environment: 'node',
+        exclude: [...configDefaults.exclude, 'e2e/**'],
         maxWorkers: 2,
         setupFiles: ['src/test/setup.ts'],
     },
