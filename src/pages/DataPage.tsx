@@ -1,11 +1,13 @@
-import { Button, ConfirmDialog, FilePicker, Spinner, TextArea } from '../components/Controls/index.ts';
-import { createSignal, Show, type JSX } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
+import { createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
+import { Button, ConfirmDialog, FilePicker, Spinner, TextArea } from '../components/Controls/index.ts';
 import { OptionPicker } from '../components/OptionPicker/OptionPicker.tsx';
-import type { WeightUnit } from '../domain/units.ts';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { SyncSettings } from '../components/SyncSettings.tsx';
 import { ValidationErrors } from '../components/ValidationErrors.tsx';
 import { countRecords, type DataExport, parseDataExport } from '../domain/dataExport.ts';
+import type { WeightUnit } from '../domain/units.ts';
 import type { ValidationIssue } from '../domain/validation.ts';
 import { downloadTextFile } from '../utils/download.ts';
 
@@ -17,6 +19,7 @@ import { downloadTextFile } from '../utils/download.ts';
  */
 function DataPage(): JSX.Element {
     const app = useAppData();
+    const navigate = useNavigate();
     const [confirming, setConfirming] = createSignal(false);
     let trigger: HTMLElement | undefined;
     const [draft, setDraft] = createSignal('');
@@ -81,7 +84,7 @@ function DataPage(): JSX.Element {
             <ConfirmDialog
                 open={confirming()}
                 onOpenChange={setConfirming}
-                message="Replace ALL local data with this document? Export a backup first."
+                message="Replace ALL local data with this document? Your current data is backed up first."
                 onConfirm={() => void replaceAll()}
                 trigger={() => trigger}
                 mount={document.getElementById('root') ?? undefined}
@@ -108,6 +111,8 @@ function DataPage(): JSX.Element {
                 onChange={(unit) => app.setMassUnit(unit as WeightUnit)}
                 popoverMount={document.getElementById('root') ?? undefined}
             />
+            <SyncSettings />
+            <Button onPress={() => navigate('/data/recovery')}>Recovery copies</Button>
             <h2 class="section-title">Data</h2>
             <p class="muted">
                 Export workout data as JSON. Import replaces exercises, templates, sessions and weight history.

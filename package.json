@@ -23,18 +23,21 @@
     "nes:rom": "node tools/nes-hardware/rom-cli.ts",
     "nes:emulate": "node tools/nes-hardware/emulate.ts",
     "nes:emulator:setup": "node tools/nes-hardware/setup-emulator.ts",
-    "build:preview": "tsc -b && vite build --mode preview && node tools/build-design-system.ts dist/design-system"
+    "build:preview": "tsc -b && vite build --mode preview && node tools/build-design-system.ts dist/design-system",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@solidjs/router": "^1.0.0",
     "arktype": "^2.2.8",
     "dexie": "^4.4.6",
+    "dropbox": "^10.66.0",
     "solid-js": "^1.9.17",
     "workbox-precaching": "^7.4.1"
   },
   "devDependencies": {
     "@babel/parser": "7.29.9",
     "@biomejs/biome": "^2.5.15",
+    "@playwright/test": "^1.65.1",
     "@solidjs/testing-library": "^0.8.10",
     "@types/node": "^26.6.5",
     "@vite-pwa/assets-generator": "^2.0.0",

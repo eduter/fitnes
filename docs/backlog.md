@@ -102,3 +102,17 @@ policy for them.
   backfilled later.
 - [ ] Define the session-construction trust boundary.
 - [ ] Decide whether tighter string and numeric validation policies are needed.
+
+## Optional Dropbox synchronization
+
+- [x] Add baseline comparison, conditional writes, durable upload recovery and
+  explicit complete-dataset conflict choices without changing Taskmaster.
+- [x] Add atomic local generation tracking, stale-save checks, replacement backups,
+  recovery UI and cross-tab editor/tracker barriers.
+- [x] Cover independent devices, offline/reload, conflicts, recovery and authentication
+  with mocked provider tests and headless Chromium flows.
+- [ ] Configure a separate App Folder Dropbox registration and its approved callback
+  URLs before enabling real synchronization.
+- [ ] Dogfood synchronization and device handoff on Android.
+- [ ] Extract the generic engine and provider adapters into a shared dependency
+  after both FitNES and Taskmaster requirements have informed its API.

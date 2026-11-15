@@ -61,3 +61,29 @@ it('recovers the ready state after replacing corrupt local data with a valid imp
     expect(app.loadError()).toBeNull();
     expect(app.exercises()).toEqual(expect.arrayContaining(data.exercises));
 });
+
+it('keeps an active editor snapshot and rejects a competing tab save', async () => {
+    const { holdLocalData } = await import('../sync/locks.ts');
+    const { putExercise } = await import('../db/repository.ts');
+    const data = previewData(Date.now());
+    await importDatabase(db, data);
+    let app!: AppData;
+    render(() => (
+        <AppDataProvider>
+            {(() => {
+                app = useAppData();
+                return null;
+            })()}
+        </AppDataProvider>
+    ));
+    await waitFor(() => expect(app.loadState()).toBe('ready'));
+    const original = app.exercises()[0];
+    const release = holdLocalData();
+    try {
+        await putExercise(db, { ...original, name: 'Changed in another tab' });
+        expect((await app.saveExercise({ ...original, name: 'Stale draft' })).ok).toBe(false);
+        expect((await db.exercises.get(original.id))?.name).toBe('Changed in another tab');
+    } finally {
+        release();
+    }
+});

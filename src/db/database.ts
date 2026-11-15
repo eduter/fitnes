@@ -6,8 +6,13 @@ import type { WorkoutSession } from '../domain/session.ts';
 import { validateWorkoutSession } from '../domain/validateWorkoutSession.ts';
 import { validateWorkoutTemplate } from '../domain/validateWorkoutTemplate.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
+import type { Checkpoint } from '../sync/core/types.ts';
+import type { LocalMetadata, RecoveryCopy } from './syncAdapter.ts';
 
 class FitnesDB extends Dexie {
+    syncLocal!: Table<LocalMetadata, string>;
+    syncState!: Table<Checkpoint, string>;
+    syncBackups!: Table<RecoveryCopy, string>;
     exercises!: Table<ExerciseDefinition, string>;
     templates!: Table<WorkoutTemplate, string>;
     sessions!: Table<WorkoutSession, string>;
@@ -53,6 +58,7 @@ class FitnesDB extends Dexie {
                     }
                 }
             });
+        this.version(4).stores({ syncLocal: 'key', syncState: 'key', syncBackups: 'id, createdAt, conflictId' });
     }
 }
 

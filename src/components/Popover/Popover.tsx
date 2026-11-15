@@ -1,5 +1,6 @@
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
+import { useDataBarrier } from '../../app/dataBarrier.ts';
 import { useDialogHistory } from '../../routing/dialogHistory.ts';
 import { Button } from '../Button/Button.tsx';
 import { controlClasses } from '../Controls/controlClasses.ts';
@@ -10,6 +11,7 @@ import './Popover.css';
 
 /** A stepped modal viewport around a fixed, opaque frame; closing retains the complete content. */
 function Popover(props: PopoverProps): JSX.Element {
+    useDataBarrier(() => props.open);
     const [local, rest] = splitProps(props, [
         'open',
         'onOpenChange',

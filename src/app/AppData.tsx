@@ -1,4 +1,5 @@
-import { createContext, createSignal, type JSX, onMount, useContext } from 'solid-js';
+import { batch, createContext, createSignal, type JSX, onCleanup, onMount, useContext } from 'solid-js';
+import { onDataChange } from '../db/changes.ts';
 import { db } from '../db/database.ts';
 import { waitForDb, withDbRead, withDbWrite } from '../db/dbLifecycle.ts';
 import {
@@ -19,7 +20,9 @@ import {
     putTemplate,
     seedExampleExercises,
 } from '../db/repository.ts';
+import { domainTables, readLocalMetadata, synchronizeGuidedEpoch, type WriteGuard } from '../db/syncAdapter.ts';
 import type { BodyweightMeasurement } from '../domain/bodyweight.ts';
+import type { CollectionName } from '../domain/dataExport.ts';
 import { type DataExport, parseDataExport, serializeDataExport } from '../domain/dataExport.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 import { generateWorkoutSessionId } from '../domain/generateIds.ts';
@@ -29,6 +32,8 @@ import type { ValidationResult } from '../domain/validation.ts';
 import type { WorkoutTemplate } from '../domain/workoutTemplate.ts';
 import { withExecutionTiming } from '../domain/workoutTiming.ts';
 import { seedPreview } from '../preview/seedPreview.ts';
+import { stableJson } from '../sync/core/content.ts';
+import { localDataInUse, onLocalDataIdle } from '../sync/locks.ts';
 
 type LoadState = 'loading' | 'ready' | 'error';
 
@@ -89,9 +94,49 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
     const [sessions, setSessions] = createSignal<WorkoutSession[]>([]);
     const [bodyweightMeasurements, setBodyweightMeasurements] = createSignal<BodyweightMeasurement[]>([]);
 
+    let viewEpoch = 0;
+    let refreshPending = false;
+    let writeQueue: Promise<unknown> = Promise.resolve();
     onMount(() => {
+        const stopChanges = onDataChange(() => {
+            if (loadState() === 'loading') {
+                return;
+            }
+            refreshPending = true;
+            if (!localDataInUse()) {
+                void refreshExternal();
+            }
+        });
+        const stopIdle = onLocalDataIdle(() => {
+            if (refreshPending) {
+                void refreshExternal();
+            }
+        });
+        onCleanup(() => {
+            stopChanges();
+            stopIdle();
+        });
         void initialize();
     });
+
+    async function refreshExternal(): Promise<void> {
+        try {
+            refreshPending = !(await reloadAll(true));
+        } catch (cause) {
+            setLoadError(cause instanceof Error ? cause.message : 'Could not refresh local data.');
+        }
+    }
+
+    function guard(collection: CollectionName, id: string): WriteGuard {
+        const values = {
+            exercises: exercises(),
+            templates: templates(),
+            sessions: sessions(),
+            bodyweightMeasurements: bodyweightMeasurements(),
+        };
+        const previous = values[collection].find((row) => row.id === id);
+        return { epoch: viewEpoch, previous: previous === undefined ? undefined : stableJson(previous) };
+    }
 
     async function initialize(): Promise<void> {
         try {
@@ -109,45 +154,60 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
         }
     }
 
-    async function reloadAll(): Promise<void> {
-        await Promise.all([reloadExercises(), reloadTemplates(), reloadSessions(), reloadBodyweight()]);
-    }
-
-    async function reloadExercises(): Promise<void> {
-        setExercises(await withDbRead(() => listExercises(db)));
-    }
-
-    async function reloadTemplates(): Promise<void> {
-        setTemplates(await withDbRead(() => listTemplates(db)));
-    }
-
-    async function reloadSessions(): Promise<void> {
-        setSessions(await withDbRead(() => listSessions(db)));
-    }
-
-    async function reloadBodyweight(): Promise<void> {
-        setBodyweightMeasurements(await withDbRead(() => listBodyweightMeasurements(db)));
-    }
-
-    async function storeRecord<T>(
-        write: () => Promise<ValidationResult<T>>,
-        reload: () => Promise<void>
-    ): Promise<ValidationResult<T>> {
-        try {
-            const result = await withDbWrite(write);
-            if (result.ok) {
-                await reload();
-            }
-            return result;
-        } catch (cause) {
-            return {
-                ok: false,
-                errors: [{ path: '', message: cause instanceof Error ? cause.message : 'Could not save local data.' }],
-            };
+    async function reloadAll(external = false): Promise<boolean> {
+        const result = await withDbRead(() =>
+            db.transaction('r', [...domainTables(db), db.syncLocal], async () => ({
+                exercises: await listExercises(db),
+                templates: await listTemplates(db),
+                sessions: await listSessions(db),
+                bodyweight: await listBodyweightMeasurements(db),
+                meta: await readLocalMetadata(db),
+            }))
+        );
+        if (external && localDataInUse()) {
+            return false;
         }
+        synchronizeGuidedEpoch(result.meta.epoch);
+        batch(() => {
+            viewEpoch = result.meta.epoch;
+            setExercises(result.exercises);
+            setTemplates(result.templates);
+            setSessions(result.sessions);
+            setBodyweightMeasurements(result.bodyweight);
+        });
+        return true;
     }
 
-    async function removeRecord(write: () => Promise<void>, reload: () => Promise<void>): Promise<boolean> {
+    function storeRecord<T>(
+        write: () => Promise<ValidationResult<T>>,
+        reload: () => Promise<unknown>
+    ): Promise<ValidationResult<T>> {
+        const current = writeQueue
+            .catch(() => undefined)
+            .then(async () => {
+                try {
+                    const result = await withDbWrite(write);
+                    if (result.ok) {
+                        await reload();
+                    }
+                    return result;
+                } catch (cause) {
+                    return {
+                        ok: false as const,
+                        errors: [
+                            {
+                                path: '',
+                                message: cause instanceof Error ? cause.message : 'Could not save local data.',
+                            },
+                        ],
+                    };
+                }
+            });
+        writeQueue = current;
+        return current;
+    }
+
+    async function removeRecord(write: () => Promise<void>, reload: () => Promise<unknown>): Promise<boolean> {
         try {
             await withDbWrite(write);
             await reload();
@@ -160,35 +220,38 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
     }
 
     function saveExercise(input: unknown): Promise<ValidationResult<ExerciseDefinition>> {
-        return storeRecord(() => putExercise(db, input), reloadExercises);
+        return storeRecord(() => putExercise(db, input, guard('exercises', (input as { id: string }).id)), reloadAll);
     }
 
     function removeExercise(id: string): Promise<boolean> {
-        return removeRecord(() => deleteExercise(db, id), reloadExercises);
+        return removeRecord(() => deleteExercise(db, id, guard('exercises', id)), reloadAll);
     }
 
     function saveTemplate(input: unknown): Promise<ValidationResult<WorkoutTemplate>> {
-        return storeRecord(() => putTemplate(db, input), reloadTemplates);
+        return storeRecord(() => putTemplate(db, input, guard('templates', (input as { id: string }).id)), reloadAll);
     }
 
     function removeTemplate(id: string): Promise<boolean> {
-        return removeRecord(() => deleteTemplate(db, id), reloadTemplates);
+        return removeRecord(() => deleteTemplate(db, id, guard('templates', id)), reloadAll);
     }
 
     function saveSession(input: unknown): Promise<ValidationResult<WorkoutSession>> {
-        return storeRecord(() => putSession(db, input), reloadSessions);
+        return storeRecord(() => putSession(db, input, guard('sessions', (input as { id: string }).id)), reloadAll);
     }
 
     function removeSession(id: string): Promise<boolean> {
-        return removeRecord(() => deleteSession(db, id), reloadSessions);
+        return removeRecord(() => deleteSession(db, id, guard('sessions', id)), reloadAll);
     }
 
     function saveBodyweight(input: unknown): Promise<ValidationResult<BodyweightMeasurement>> {
-        return storeRecord(() => putBodyweightMeasurement(db, input), reloadBodyweight);
+        return storeRecord(
+            () => putBodyweightMeasurement(db, input, guard('bodyweightMeasurements', (input as { id: string }).id)),
+            reloadAll
+        );
     }
 
     function removeBodyweight(id: string): Promise<boolean> {
-        return removeRecord(() => deleteBodyweightMeasurement(db, id), reloadBodyweight);
+        return removeRecord(() => deleteBodyweightMeasurement(db, id, guard('bodyweightMeasurements', id)), reloadAll);
     }
 
     async function startSession(template: WorkoutTemplate): Promise<ValidationResult<WorkoutSession>> {
