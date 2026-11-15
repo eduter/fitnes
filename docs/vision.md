@@ -153,6 +153,13 @@ future palette changes still require an exact construction and owner approval.
 
 ## Design direction
 
+Owner decision (2026-11-14): adopt the rounded-pixel CRT display treatment across
+the actual application, defaulting to 80% intensity. Settings persists intensity
+on-device, including zero for an unfiltered display. Owner correction: preserve the
+original colors without brightness or saturation compensation. The owner will judge
+whether mask darkening calls for color changes; do not adjust colors preemptively.
+The display treatment is post-processing, outside the NES source-composition proof.
+
 Owner-approved controls use gold interactive values/actions and copper passive
 text, with two-pixel cut-corner frames. Numeric/date spinners share compact
 symmetric geometry. Names and multiline notes use native text entry inside the
@@ -200,6 +207,12 @@ near the bottom. Preserve its pixels and palette with nearest-neighbor scaling;
 ship opaque square artwork and let Android apply its launcher mask. The wordmark
 continues to identify the app on Home. `npm run generate:icons` regenerates the
 launcher assets and favicons from the hero via `tools/build-pwa-icons.ts`.
+
+Owner decision (2026-11-15): bake the same 80% rounded-pixel phosphor and scanline
+masks into install icons and favicons. Keep the approved crop, opaque square assets,
+and original source colors; do not brighten or saturate them. Supersample the mask
+for small output sizes. The source home artwork remains unchanged. Installed icons
+use the fixed default effect; changing the in-app intensity does not rewrite them.
 
 Use the [menu capture](https://capture-487s.dw3-capture-preview.pages.dev/)
 as a navigation design reference: show a few choices, then expose further

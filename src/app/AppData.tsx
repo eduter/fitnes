@@ -38,6 +38,8 @@ import { localDataInUse, onLocalDataIdle } from '../sync/locks.ts';
 type LoadState = 'loading' | 'ready' | 'error';
 
 interface AppData {
+    crtIntensity: () => number;
+    setCrtIntensity: (intensity: number) => void;
     massUnit: () => WeightUnit;
     setMassUnit: (unit: WeightUnit) => void;
     loadState: () => LoadState;
@@ -68,6 +70,16 @@ const AppDataContext = createContext<AppData>();
 
 /** Load IndexedDB collections and expose persisted catalog/history operations. */
 function AppDataProvider(props: AppDataProviderProps): JSX.Element {
+    const savedCrt = localStorage.getItem('fitnes-crt-intensity');
+    const initialCrt = savedCrt === null ? 80 : Number(savedCrt);
+    const [crtIntensity, setCrt] = createSignal(
+        Number.isInteger(initialCrt) && initialCrt >= 0 && initialCrt <= 100 ? initialCrt : 80
+    );
+    function setCrtIntensity(intensity: number): void {
+        const value = Math.max(0, Math.min(100, Math.round(intensity)));
+        localStorage.setItem('fitnes-crt-intensity', String(value));
+        setCrt(value);
+    }
     const [massUnit, setUnit] = createSignal<WeightUnit>(
         localStorage.getItem('fitnes-mass-unit') === 'lb' ? 'lb' : 'kg'
     );
@@ -297,6 +309,8 @@ function AppDataProvider(props: AppDataProviderProps): JSX.Element {
     }
 
     const value: AppData = {
+        crtIntensity,
+        setCrtIntensity,
         massUnit,
         setMassUnit,
         loadState,

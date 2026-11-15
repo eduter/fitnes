@@ -8,6 +8,37 @@ import { type AppData, AppDataProvider, useAppData } from './AppData.tsx';
 
 afterEach(cleanup);
 
+it('defaults CRT to 80 percent and restores an immediately persisted display choice', () => {
+    localStorage.removeItem('fitnes-crt-intensity');
+    let app!: AppData;
+    function mount(): void {
+        render(() => (
+            <AppDataProvider>
+                {(() => {
+                    app = useAppData();
+                    return null;
+                })()}
+            </AppDataProvider>
+        ));
+    }
+    mount();
+    expect(app.crtIntensity()).toBe(80);
+    app.setCrtIntensity(100);
+    cleanup();
+    mount();
+    expect(app.crtIntensity()).toBe(100);
+    app.setCrtIntensity(0);
+    cleanup();
+    mount();
+    expect(app.crtIntensity()).toBe(0);
+    cleanup();
+    localStorage.setItem('fitnes-crt-intensity', 'invalid');
+    mount();
+    expect(app.crtIntensity()).toBe(80);
+    cleanup();
+    localStorage.removeItem('fitnes-crt-intensity');
+});
+
 it('recovers the ready state after replacing corrupt local data with a valid import', async () => {
     const data = previewData(Date.now());
     await importDatabase(db, data);

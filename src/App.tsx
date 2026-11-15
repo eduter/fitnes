@@ -4,6 +4,7 @@ import { AppDataProvider, useAppData } from './app/AppData.tsx';
 import { BottomTabs } from './components/BottomTabs/BottomTabs.tsx';
 import { Button } from './components/Controls/index.ts';
 import { SteelPanel } from './components/SteelPanel/SteelPanel.tsx';
+import { CrtDisplay } from './components/CrtDisplay/CrtDisplay.tsx';
 import { dbError, dbStatus } from './db/dbLifecycle.ts';
 import { useActiveTab, useAppNavigate, useIsHome } from './routing/navigation.ts';
 import { appSync } from './sync/controller.ts';
@@ -23,6 +24,7 @@ function App(props: AppProps): JSX.Element {
 
     return (
         <AppDataProvider>
+            <CrtDisplay />
             <div class="app" classList={{ 'app--home': home() }}>
                 <Show when={home()}>
                     <header class="app-header">
