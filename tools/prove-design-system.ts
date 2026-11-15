@@ -15,6 +15,10 @@ function main(): void {
         throw new Error('Design-system proof requires a native 256px-wide capture');
     }
     const home = JSON.parse(readFileSync('art/home/construction.json', 'utf8')) as HardwareConstruction;
+    // Graphs use the owner's brighter source inks in one background palette to avoid long sprite-only lines.
+    if (mode === 'progress') {
+        home.palettes[2] = [15, 0, 39, 32];
+    }
     const colors = displayColors(home.emphasis);
     const codes = [...new Set([...home.palettes.flat(), ...(home.spritePalettes ?? []).flat()])];
     const indexed = new Uint8Array(image.width * image.height);
@@ -45,13 +49,13 @@ function main(): void {
             sprites: [],
         };
         // Preserve the proven home composition rather than reassigning its sprite pixels
-        if (top === 0 && mode !== 'ui') {
+        if (top === 0 && mode !== 'ui' && mode !== 'progress') {
             background.set(Buffer.from(home.backgroundPixels, 'base64'));
             construction.sprites = [...(home.sprites ?? [])];
         }
         for (let y = 0; y < height; y += 8) {
             for (let x = 0; x < 256; x += 8) {
-                if (top === 0 && mode !== 'ui' && y < home.height) {
+                if (top === 0 && mode !== 'ui' && mode !== 'progress' && y < home.height) {
                     construction.attributes.push(home.attributes[(y / 8) * 32 + x / 8]);
                     continue;
                 }

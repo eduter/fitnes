@@ -14,12 +14,12 @@
     stroke: var(--nes-muted);
 }
 .progress-chart__daily {
-    stroke: var(--nes-ink);
-    fill: var(--nes-ink);
+    stroke: var(--nes-color-off-white);
+    fill: var(--nes-color-off-white);
 }
 .progress-chart__average {
-    stroke: var(--nes-ink);
-    fill: var(--nes-ink);
+    stroke: var(--nes-color-orange);
+    fill: var(--nes-color-orange);
     stroke-width: 2;
 }
 .progress-chart__legend {
@@ -62,8 +62,16 @@
     vertical-align: middle;
     width: 16px;
     height: 2px;
-    background: var(--nes-ink);
+    background: var(--chart-key, var(--nes-color-off-white));
 }
 .progress-chart__key--dotted {
-    background: repeating-linear-gradient(to right, var(--nes-ink) 0 2px, var(--nes-ground) 2px 4px);
+    background: repeating-linear-gradient(
+        to right,
+        var(--chart-key, var(--nes-color-off-white)) 0 2px,
+        var(--nes-ground) 2px 4px
+    );
+}
+
+.progress-chart__legend > span:nth-child(2) {
+    --chart-key: var(--nes-color-orange);
 }

@@ -1,29 +1,32 @@
 # Progress chart review
 
-The retained 256×640 captures use seeded preview data, Chromium at DPR 1,
-loaded pixel fonts and CRT intensity zero. They cover the complete Bodyweight
-graph modal and Bent-over row graph modal across four completed workout sessions.
-The background is opaque black; histories and navigation are hidden while viewing
-a graph. Estimate copy appears only in the separate ? help dialog.
+The retained 256×640 Chromium captures use seeded preview data, DPR 1,
+loaded pixel fonts and CRT intensity zero:
 
-- [Bodyweight](weight.png): daily means and trailing seven-calendar-day means.
-- [Exercise progress](exercise.png): estimated strength trend.
-- [Graph help](help.png): explanation opened with the ? button.
+- [Bodyweight](weight.png): latest individual reading and inline daily/average chart.
+- [Weight records](records.png): scrollable history over the existing page.
+- [Exercise progress](exercise.png): graph opened directly from an exercise row.
+- [Graph help](help.png): explanation behind ? over the current graph.
 
 Reproduce the palette/attribute/sprite checks from the repository root:
 
 ```sh
-node tools/prove-design-system.ts docs/design/progress/weight.png work/progress/weight-proof ui
-node tools/prove-design-system.ts docs/design/progress/exercise.png work/progress/exercise-proof ui
-node tools/prove-design-system.ts docs/design/progress/help.png work/progress/help-proof ui
+node tools/prove-design-system.ts docs/design/progress/weight.png work/progress/weight-proof progress
+node tools/prove-design-system.ts docs/design/progress/records.png work/progress/records-proof progress
+node tools/prove-design-system.ts docs/design/progress/exercise.png work/progress/exercise-proof progress
+node tools/prove-design-system.ts docs/design/progress/help.png work/progress/help-proof progress
 ```
 
-All nine vertical crops passed the existing `mmc5-exattr` reconstruction checker
-with Composite Direct display palette and red emphasis 1. The maximum sprite
-count per scanline was zero. This is the existing construction checker, not an
-independent emulator run. HTML labels and CSS legend strokes avoid SVG-text and
-Unicode fallback antialiasing that introduced colors outside the palette.
+The progress composition assigns background palette 2 to PPU codes [15, 0, 39,
+32]: black, steel, orange and off-white. This uses the owner's requested source
+inks without requiring long graph lines to consume sprites. Other background
+and sprite palettes remain those of the home construction. No constraints in
+the checker are relaxed. All twelve vertical crops pass `mmc5-exattr` with
+Composite Direct RGB and red emphasis 1; the maximum is two sprites per scanline.
+This is the existing construction checker, not an independent emulator run.
 
-Chromium browser checks exercised period/exercise selection, graph opening and dismissal,
-help opening and browser Back with restored focus with
-no page errors or horizontal overflow. Android device review remains pending.
+Browser checks at 256×640 and 390×844 cover records/edit stacking, direct
+exercise-row progress, ? help, browser Back, restored focus and transparent
+backdrops, with no page errors or horizontal overflow. Component tests cover
+editing/deleting a reading and refreshing the latest-reading summary. Android
+device review remains pending.

@@ -12,7 +12,9 @@ import type { ExerciseDefinition } from '../domain/exercise.ts';
 /** Browse the exercise library and edit directly in a window over the selected row. */
 function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
     const app = useAppData();
-    const [progress, setProgress] = createSignal(false);
+    const [progressOpen, setProgressOpen] = createSignal(false);
+    const [progressExercise, setProgressExercise] = createSignal<ExerciseDefinition>();
+    let progressTrigger: HTMLElement | undefined;
     const [ids, setIds] = createSignal<string[]>([]);
     const [reveal, setReveal] = createSignal<string>();
     createEffect(() => {
@@ -92,65 +94,70 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
         <section class="page">
             <PageHeader
                 title="Exercises"
-                actions={
-                    <div class="button-row">
-                        <Button onPress={() => setProgress(!progress())}>{progress() ? 'Library' : 'Progress'}</Button>
-                        <Show when={!progress()}>
-                            <Button onPress={(event) => create(event.currentTarget)}>Create</Button>
-                        </Show>
-                    </div>
-                }
+                actions={<Button onPress={(event) => create(event.currentTarget)}>Create</Button>}
             />
             <Show when={status()}>
                 <p role="status">{status()}</p>
             </Show>
-            <Show when={progress()}>
-                <ExerciseProgress />
-            </Show>
-            <Show when={!progress()}>
-                <PagedList
-                    label="Exercises"
-                    items={ids()}
-                    reveal={reveal()}
-                    rowHeight={64}
-                    empty="No exercises yet. Create your first exercise."
-                >
-                    {(id) => (
-                        <Show when={app.exercises().find((item) => item.id === id)}>
-                            {(item) => (
-                                <article>
-                                    <h2 class="list-item__title">{item().name}</h2>
-                                    <p class="muted">{exerciseSummary(item())}</p>
-                                    <div class="button-row">
-                                        <Button
-                                            aria-label={`Edit ${item().name}`}
-                                            onPress={(event) => edit(item(), event.currentTarget)}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            aria-label={`Duplicate ${item().name}`}
-                                            disabled={busy()}
-                                            onPress={(event) => void duplicate(item(), event.currentTarget)}
-                                        >
-                                            Duplicate
-                                        </Button>
-                                        <Button
-                                            aria-label={`Delete ${item().name}`}
-                                            onPress={() => {
-                                                setSelected(item());
-                                                setDeleting(true);
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </div>
-                                </article>
-                            )}
-                        </Show>
-                    )}
-                </PagedList>
-            </Show>
+            <PagedList
+                label="Exercises"
+                items={ids()}
+                reveal={reveal()}
+                rowHeight={64}
+                empty="No exercises yet. Create your first exercise."
+            >
+                {(id) => (
+                    <Show when={app.exercises().find((item) => item.id === id)}>
+                        {(item) => (
+                            <article>
+                                <h2 class="list-item__title">{item().name}</h2>
+                                <p class="muted">{exerciseSummary(item())}</p>
+                                <div class="button-row">
+                                    <Button
+                                        aria-label={`Progress ${item().name}`}
+                                        onPress={(event) => {
+                                            progressTrigger = event.currentTarget;
+                                            setProgressExercise(item());
+                                            setProgressOpen(true);
+                                        }}
+                                    >
+                                        Progress
+                                    </Button>
+
+                                    <Button
+                                        aria-label={`Edit ${item().name}`}
+                                        onPress={(event) => edit(item(), event.currentTarget)}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        aria-label={`Duplicate ${item().name}`}
+                                        disabled={busy()}
+                                        onPress={(event) => void duplicate(item(), event.currentTarget)}
+                                    >
+                                        Duplicate
+                                    </Button>
+                                    <Button
+                                        aria-label={`Delete ${item().name}`}
+                                        onPress={() => {
+                                            setSelected(item());
+                                            setDeleting(true);
+                                        }}
+                                    >
+                                        Delete
+                                    </Button>
+                                </div>
+                            </article>
+                        )}
+                    </Show>
+                )}
+            </PagedList>
+            <ExerciseProgress
+                open={progressOpen()}
+                onOpenChange={setProgressOpen}
+                exercise={progressExercise()}
+                trigger={() => progressTrigger}
+            />
             <ExerciseEditor
                 open={editorOpen()}
                 creating={creating()}

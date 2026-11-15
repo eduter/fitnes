@@ -309,17 +309,28 @@ on one local day form one daily mean; the rolling mean uses available daily
 means in the inclusive seven-calendar-day window, without inventing missing
 readings. Compute the average before filtering the visible period.
 
-Exercise Progress selects an exercise by its stable ID across all completed
-workouts, independent of changing workout splits. Plot the best Epley estimated
-one-rep max per session and retain that set's actual load and reps in history.
-High-rep estimates remain included; the explanation belongs behind a ? button. Single reps use their actual load, unilateral results use the
-weaker side, and bodyweight loads include the session's recorded bodyweight and
-any assistance/added weight. Timed, skipped, unloaded and missing-bodyweight
-results do not produce estimated-max points. Charts keep the shared pixel font,
-integer geometry, passive copper/steel inks and existing framed pickers.
+Each exercise row has a Progress action that opens that exercise's graph across
+completed workouts, independent of changing workout splits. Plot the best Epley
+estimated one-rep max per session. Progress shows only the graph; there is no
+exercise dropdown or result list. High-rep estimates remain included; the
+explanation belongs behind a ? button. Single reps use their actual load,
+unilateral results use the weaker side, and bodyweight loads include the
+session's recorded bodyweight and any assistance/added weight. Timed, skipped,
+unloaded and missing-bodyweight results do not produce estimated-max points.
 
-Owner feedback (2026-11-15): keep graph viewing focused. Graph opens an opaque
-modal containing the chart and period picker, with no history rows or explanatory
-copy. A ? button opens a separate help dialog; End/Back returns to the chart.
-Closing the graph restores the history page and its trigger. Apply the same
-focused presentation to bodyweight and exercise charts in the real app.
+Owner feedback (2026-11-15): Bodyweight's main content is its latest individual
+reading (date and weight) and graph. Records opens a scrollable modal for rare
+review/edit/delete operations. Do not put pagination inside that modal. Edits
+and deletions refresh the latest-reading summary and chart immediately.
+
+Graph, records and help modals use the normal transparent backdrop: existing
+page content remains visible behind each opaque window. ? opens a separate
+help dialog; End/Back closes the top window and restores focus.
+
+Owner color request (2026-11-15): brighten plots with the existing off-white
+and orange source inks. Daily/estimated-max series use off-white; the seven-day
+average uses orange. Keep gold for interactive controls and coral for errors.
+Retain dotted/solid styles so series do not depend on color alone. The graph
+composition uses background palette 2 = PPU [15, 0, 39, 32] (black, steel,
+orange, off-white); other home background and sprite palettes remain available.
+The progress construction proof verifies the combined screen under NES budgets.

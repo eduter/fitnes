@@ -126,5 +126,9 @@ policy for them.
   [captures and reproduction commands](design/progress/README.md).
 - [ ] Review chart readability on the owner's phone.
 
-- [x] Isolate bodyweight/exercise graphs in opaque modals; move estimate copy
-  behind ? and retain history outside the graph.
+- [x] Lead Bodyweight with the latest reading and inline chart; manage individual
+  records in a scrollable modal.
+- [x] Put Progress on each exercise row, remove the exercise selector/result list,
+  and keep estimate copy behind ?. Preserve underlying content behind modals.
+- [x] Brighten charts with off-white/orange, preserving semantic control/error inks
+  and proving a concrete progress palette construction.

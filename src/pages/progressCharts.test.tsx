@@ -6,6 +6,7 @@ import { AppDataProvider } from '../app/AppData.tsx';
 import { db } from '../db/database.ts';
 import { importDatabase } from '../db/repository.ts';
 import { previewData } from '../preview/seedPreview.ts';
+import { formatDate } from '../utils/datetime.ts';
 import { BodyweightPage } from './BodyweightPage.tsx';
 import { ExerciseListPage } from './ExerciseListPage.tsx';
 
@@ -27,11 +28,7 @@ it('filters both weight series together while retaining editable reading history
             <Route path="/" component={BodyweightPage} />
         </MemoryRouter>
     ));
-    expect(screen.queryByRole('img', { name: 'Bodyweight' })).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Graph', exact: true }));
-    const graph = await screen.findByRole('dialog', { name: 'Bodyweight graph' });
-    fireEvent.animationEnd(graph);
-    expect(within(graph).queryByRole('button', { name: 'Edit', exact: true })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Edit', exact: true })).toBeNull();
     await waitFor(() =>
         expect(screen.getByRole('img', { name: 'Bodyweight' }).textContent).toContain('7-day average: 8 points')
     );
@@ -43,26 +40,56 @@ it('filters both weight series together while retaining editable reading history
     expect(screen.getByRole('img', { name: 'Bodyweight' }).textContent).toContain('Daily: 9 points');
     expect(screen.getByRole('img', { name: 'Bodyweight' }).textContent).toContain('7-day average: 9 points');
     fireEvent.animationEnd(choices);
-    fireEvent.click(within(graph).getByRole('button', { name: 'End', exact: true }));
-    fireEvent.animationEnd(graph);
-    expect(screen.getAllByRole('button', { name: 'Edit', exact: true }).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: 'Records', exact: true }));
+    const records = await screen.findByRole('dialog', { name: 'Weight records' });
+    fireEvent.animationEnd(records);
+    expect(within(records).getAllByRole('button', { name: 'Edit', exact: true })).toHaveLength(9);
+    expect(within(records).queryByRole('button', { name: 'Next page' })).toBeNull();
+    fireEvent.click(within(records).getAllByRole('button', { name: 'Edit', exact: true })[0]);
+    const editor = await screen.findByRole('dialog', { name: 'Edit weight' });
+    fireEvent.animationEnd(editor);
+    const latest = await db.bodyweightMeasurements.orderBy('measuredAt').last();
+    if (!latest) {
+        throw new Error('Expected a seeded weight');
+    }
+    fireEvent.click(within(editor).getByRole('button', { name: 'Increase Weight (kg)' }));
+    await waitFor(async () =>
+        expect((await db.bodyweightMeasurements.get(latest.id))?.value).toBeCloseTo(latest.value + 0.1)
+    );
+    fireEvent.click(within(editor).getByRole('button', { name: 'End', exact: true }));
+    fireEvent.animationEnd(editor);
+    await waitFor(() =>
+        expect(
+            within(records).getByText(`${(latest.value + 0.1).toFixed(1)} kg · ${formatDate(latest.measuredAt)}`)
+        ).toBeTruthy()
+    );
+    fireEvent.click(within(records).getAllByRole('button', { name: 'Delete', exact: true })[0]);
+    const confirm = await screen.findByRole('dialog', { name: /^Delete / });
+    fireEvent.animationEnd(confirm);
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Yes', exact: true }));
+    await waitFor(async () => expect(await db.bodyweightMeasurements.get(latest.id)).toBeUndefined());
+    fireEvent.animationEnd(confirm);
+    fireEvent.click(within(records).getByRole('button', { name: 'End', exact: true }));
+    fireEvent.animationEnd(records);
+    expect(screen.queryByRole('button', { name: 'Edit', exact: true })).toBeNull();
+    const next = await db.bodyweightMeasurements.orderBy('measuredAt').last();
+    if (!next) {
+        throw new Error('Expected remaining weight history');
+    }
+    await waitFor(() =>
+        expect(screen.getByText(`${next.value.toFixed(1)} kg · ${formatDate(next.measuredAt)}`)).toBeTruthy()
+    );
 });
 
-it('selects exercise progress separately from workout grouping', async () => {
+it('opens each exercise graph directly without a dropdown or result list', async () => {
     render(() => (
         <MemoryRouter root={(props) => <AppDataProvider>{props.children}</AppDataProvider>}>
             <Route path="/" component={ExerciseListPage} />
         </MemoryRouter>
     ));
     await screen.findByRole('button', { name: 'Edit Air squat' });
-    fireEvent.click(screen.getByRole('button', { name: 'Progress', exact: true }));
-    fireEvent.click(screen.getByRole('button', { name: 'Exercise: Air squat' }));
-    const choices = await screen.findByRole('dialog', { name: 'Choose Exercise' });
-    fireEvent.animationEnd(choices);
-    fireEvent.click(within(choices).getByRole('button', { name: 'Bent-over row', exact: true }));
-    fireEvent.animationEnd(choices);
-    expect(screen.queryByText(/Epley estimate/)).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Graph', exact: true }));
+    expect(screen.queryByRole('button', { name: 'Exercise: Air squat' })).toBeNull();
+    fireEvent.click(await screen.findByRole('button', { name: 'Progress Bent-over row' }));
     const graph = await screen.findByRole('dialog', { name: 'Bent-over row graph' });
     fireEvent.animationEnd(graph);
     expect(await within(graph).findByRole('img', { name: 'Bent-over row' })).toBeTruthy();
@@ -77,6 +104,5 @@ it('selects exercise progress separately from workout grouping', async () => {
     expect(screen.getByRole('dialog', { name: 'Bent-over row graph' })).toBeTruthy();
     fireEvent.keyDown(graph, { key: 'Escape' });
     fireEvent.animationEnd(graph);
-    fireEvent.click(screen.getByRole('button', { name: 'Library', exact: true }));
     expect(await screen.findByRole('button', { name: 'Edit Air squat' })).toBeTruthy();
 });
