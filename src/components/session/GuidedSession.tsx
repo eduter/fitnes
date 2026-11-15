@@ -1,3 +1,5 @@
+import { playSfx } from '../../audio/sfx.ts';
+import { workoutCue, type WorkoutSoundState } from '../../audio/workoutCue.ts';
 import { addedWeightLabel } from '../../copy/exercise.ts';
 import { type } from 'arktype';
 import { batch, createEffect, createMemo, createSignal, For, type JSX, onCleanup, onMount, Show } from 'solid-js';
@@ -54,6 +56,24 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const position = createMemo(() =>
         guidedPosition(elapsed(), prep(), duration(), timed() ? undefined : timing().secondsPerRep)
     );
+    let previousSound: WorkoutSoundState | undefined;
+    let lastSoundUpdate = Date.now();
+    createEffect(() => {
+        const current: WorkoutSoundState = {
+            started: started(),
+            running: running(),
+            phase: position().phase,
+            count: position().phase === 'prep' || timed() ? position().remaining : position().reps,
+        };
+        const at = now();
+        const cue = workoutCue(previousSound, current);
+        // Delayed/background callbacks update the baseline without replaying missed cues
+        if (cue && (!previousSound?.running || at - lastSoundUpdate < 1500)) {
+            playSfx(cue);
+        }
+        previousSound = current;
+        lastSoundUpdate = at;
+    });
     const done = () => started() && position().phase === 'done';
     const name = () => (rest() ? 'Rest' : (props.occurrence?.exercise.name ?? 'Exercise'));
     const resultValue = () => {

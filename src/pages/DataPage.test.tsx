@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import { setSfxVolume } from '../audio/sfx.ts';
 import { MemoryRouter, Route } from '@solidjs/router';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@solidjs/testing-library';
 import { afterEach, beforeEach, expect, it } from 'vitest';
@@ -91,4 +92,23 @@ it('recovers from invalid stored records by importing a valid file', async () =>
     fireEvent.click(within(confirm).getByRole('button', { name: 'Yes', exact: true }));
     await screen.findByText(/Replaced local data/);
     await waitFor(async () => expect(await db.exercises.get('broken')).toBeUndefined());
+});
+
+it('steps SFX volume by ten, persists it, and bounds the spinner at 0 and 100', () => {
+    setSfxVolume(100);
+    renderSettings();
+    expect(screen.getByRole('button', { name: 'Increase SFX volume (%)' }).hasAttribute('disabled')).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Decrease SFX volume (%)' }));
+    expect(localStorage.getItem('fitnes-sfx-volume')).toBe('90');
+    fireEvent.click(screen.getByRole('button', { name: 'Increase SFX volume (%)' }));
+    expect(localStorage.getItem('fitnes-sfx-volume')).toBe('100');
+    for (let i = 0; i < 10; i++) {
+        fireEvent.click(screen.getByRole('button', { name: 'Decrease SFX volume (%)' }));
+    }
+    expect(localStorage.getItem('fitnes-sfx-volume')).toBe('0');
+    expect(screen.getByRole('button', { name: 'Decrease SFX volume (%)' }).hasAttribute('disabled')).toBe(true);
+    cleanup();
+    renderSettings();
+    expect(screen.getByRole('button', { name: /SFX volume.*000.*Edit number/ })).toBeTruthy();
+    setSfxVolume(100);
 });

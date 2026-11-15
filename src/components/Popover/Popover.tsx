@@ -1,3 +1,4 @@
+import { noteDialogChange, playDialogSfx } from '../../audio/sfx.ts';
 import { createEffect, createSignal, type JSX, onCleanup, Show, splitProps, untrack } from 'solid-js';
 import { Portal } from 'solid-js/web';
 import { useDataBarrier } from '../../app/dataBarrier.ts';
@@ -38,6 +39,7 @@ function Popover(props: PopoverProps): JSX.Element {
     let layer: HTMLDivElement | undefined;
     let opener: HTMLElement | undefined;
     let disposed = false;
+    let stopSound: (() => void) | undefined;
     let requestedHeight = 96;
     let availableHeight = Number.POSITIVE_INFINITY;
     const stepPixels = () => local.stepPixels ?? 16;
@@ -92,6 +94,8 @@ function Popover(props: PopoverProps): JSX.Element {
         const open = local.open;
         const current = untrack(phase);
         if (open && (current === 'closed' || current === 'closing')) {
+            noteDialogChange();
+            stopSound?.();
             if (current === 'closed') {
                 opener =
                     local.returnFocus?.() ??
@@ -111,6 +115,8 @@ function Popover(props: PopoverProps): JSX.Element {
                 });
             }
         } else if (!open && current !== 'closed' && current !== 'closing') {
+            noteDialogChange();
+            stopSound?.();
             // Reverse from the visible step if dismissal interrupts opening, without resizing the frame.
             const visible = panel?.offsetHeight ?? height();
             setClosingHeight(Math.ceil(visible / stepPixels()) * stepPixels());
@@ -258,6 +264,7 @@ function Popover(props: PopoverProps): JSX.Element {
 
     onCleanup(() => {
         disposed = true;
+        stopSound?.();
         stopPositioning();
         restoreBackground();
         if (phase() !== 'closed' && opener?.isConnected) {
@@ -294,7 +301,23 @@ function Popover(props: PopoverProps): JSX.Element {
                             '--nes-popover-height': `${height()}px`,
                             '--nes-popover-close-height': `${closingHeight()}px`,
                         }}
-                        onAnimationEnd={finishAnimation}
+                        onAnimationStart={(event) => {
+                            if (event.target !== event.currentTarget) {
+                                return;
+                            }
+                            if (!['nes-popover-reveal', 'nes-popover-hide'].includes(event.animationName)) {
+                                return;
+                            }
+                            stopSound?.();
+                            const seconds = Number.parseFloat(getComputedStyle(event.currentTarget).animationDuration);
+                            stopSound = playDialogSfx(seconds, event.animationName === 'nes-popover-hide');
+                        }}
+                        onAnimationEnd={(event) => {
+                            if (event.target === event.currentTarget) {
+                                stopSound?.();
+                            }
+                            finishAnimation(event);
+                        }}
                         onKeyDown={handleKeys}
                     >
                         <div
@@ -318,7 +341,10 @@ type PopoverPhase = 'closed' | 'measuring' | 'opening' | 'open' | 'closing';
 
 /** Children live in a portal; mount inside a positioned logical-pixel surface when it is scaled. */
 interface PopoverProps
-    extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children' | 'style' | 'onAnimationEnd' | 'onKeyDown' | 'ref'> {
+    extends Omit<
+        JSX.HTMLAttributes<HTMLDivElement>,
+        'children' | 'style' | 'onAnimationEnd' | 'onAnimationStart' | 'onKeyDown' | 'ref'
+    > {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     /** Whether the browser Back button dismisses this window. Defaults to true. */

@@ -1,3 +1,4 @@
+import { activateWithSfx } from '../../audio/sfx.ts';
 import { For, type JSX } from 'solid-js';
 import { SteelPanel } from '../SteelPanel/SteelPanel.tsx';
 import './BottomTabs.css';
@@ -24,7 +25,7 @@ function BottomTabs(props: BottomTabsProps): JSX.Element {
                             aria-label={item.label}
                             title={item.label}
                             aria-current={props.active === item.id ? 'page' : undefined}
-                            onClick={() => props.onSelect?.(item.id)}
+                            onClick={() => activateWithSfx(() => props.onSelect?.(item.id))}
                         >
                             <img src={item.icon} width="24" height="24" alt="" />
                         </button>

@@ -1,3 +1,4 @@
+import { activateWithSfx } from '../../audio/sfx.ts';
 import { type JSX, splitProps } from 'solid-js';
 import { controlClasses } from '../Controls/controlClasses.ts';
 import '../../styles/controls.css';
@@ -22,11 +23,11 @@ function Button(props: ButtonProps): JSX.Element {
                     return;
                 }
                 event.preventDefault();
-                local.onPress?.(event);
+                activateWithSfx(() => local.onPress?.(event));
             }}
             onClick={(event) => {
                 if (!event.currentTarget.matches(':disabled') && event.detail === 0) {
-                    local.onPress?.(event);
+                    activateWithSfx(() => local.onPress?.(event));
                 }
             }}
         >
