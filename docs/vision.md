@@ -299,3 +299,15 @@ replacement while any tab is editing or tracking a workout. Keep 20 routine loca
 recovery copies, protect unresolved conflicts, and preserve daily Dropbox backups
 plus exact remote conflict copies. Taskmaster remains unchanged. The generic engine
 and provider/persistence adapters stay separate for eventual package extraction.
+
+## Sound effects
+
+Owner decision (2026-11-15): use original synthesized effects for dialog motion,
+non-dialog button actions, and guided workout preparation, start, rep/second
+counts and completion. Dialog sweeps provisionally rise from 473 to 1937 Hz
+(and reverse when closing), matching the actual animation duration. They remain
+subject to sound-design refinement and have not been validated on NES hardware.
+Use the approved double chirp for other buttons, without doubling it on dialog
+transitions. Settings provides a persisted SFX volume percentage in increments
+of 10, bounded at 0 and 100, with 0 silent and 100 the full effect mix. No music
+or explanatory volume copy is included.
