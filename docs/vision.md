@@ -37,6 +37,11 @@ Keep Skip and Previous visible inside the tracking frame without scrolling on
 phone screens. Adapt spacing to the available frame height. Screen wake lock
 runs silently; omit its status and fallback copy. Save errors remain visible.
 
+Clearing a recorded set or rest from Review or the completion screen requires
+a Yes/No confirmation naming the exercise/rest and step. The recorded-result
+action says Clear; a Yes status must not silently erase a result on one tap.
+Cancelling leaves all recorded work intact, including after reload.
+
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging
 equipment, then a visible remaining-time countdown. The screen should stay

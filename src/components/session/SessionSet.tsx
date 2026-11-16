@@ -56,9 +56,9 @@ function SessionSet(props: SessionSetProps): JSX.Element {
                     <Button
                         aria-label={`${props.recorded ? 'Clear' : 'Log'} ${prefix()}`}
                         aria-pressed={props.recorded}
-                        onPress={() => (props.recorded ? props.onClear() : props.onLog())}
+                        onPress={(event) => (props.recorded ? props.onClear(event.currentTarget) : props.onLog())}
                     >
-                        {props.recorded ? 'Yes' : 'Log'}
+                        {props.recorded ? 'Clear' : 'Log'}
                     </Button>
                 </Show>
             </div>
@@ -129,7 +129,7 @@ interface SessionSetProps {
     readOnly: boolean;
     onDraftChange: (draft: ActualResult) => void;
     onLog: () => void;
-    onClear: () => void;
+    onClear: (trigger: HTMLElement) => void;
 }
 
 /** A bodyweight set has no editable mass, so its cell states that instead of showing a zero. */

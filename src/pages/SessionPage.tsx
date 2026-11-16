@@ -54,6 +54,7 @@ function SessionPage(): JSX.Element {
             : [];
     });
     const [confirming, setConfirming] = createSignal<'delete' | 'complete'>();
+    const [clearTarget, setClearTarget] = createSignal<{ id: SequenceEntryId; message: string }>();
     const [busy, setBusy] = createSignal(false);
     const [reviewing, setReviewing] = createSignal(false);
     const activeEntry = createMemo(() =>
@@ -119,6 +120,17 @@ function SessionPage(): JSX.Element {
 
     function edit(draft: ActualResult): Promise<void> {
         return change((current) => recordResult(current, { ...draft, completedAt: Date.now() }));
+    }
+
+    function requestClear(entryId: SequenceEntryId, element: HTMLElement): void {
+        const current = session();
+        if (!current) {
+            return;
+        }
+        const index = current.snapshot.sequence.findIndex((entry) => entry.id === entryId);
+        const name = findOccurrence(current.snapshot, entryId)?.exercise.name ?? 'rest';
+        trigger = element;
+        setClearTarget({ id: entryId, message: `Clear recorded ${name} step ${index + 1}?` });
     }
 
     async function clear(entryId: SequenceEntryId): Promise<void> {
@@ -235,6 +247,23 @@ function SessionPage(): JSX.Element {
                         !session()?.results.some((result) => result.sequenceEntryId === id) &&
                         JSON.stringify(drafts()[id]) !== JSON.stringify(defaults()[id])
                 )}
+            />
+            <ConfirmDialog
+                open={clearTarget() !== undefined}
+                onOpenChange={(open) => {
+                    if (!open) {
+                        setClearTarget(undefined);
+                    }
+                }}
+                message={clearTarget()?.message ?? ''}
+                onConfirm={() => {
+                    const target = clearTarget();
+                    if (target) {
+                        void clear(target.id);
+                    }
+                }}
+                trigger={() => trigger}
+                mount={document.getElementById('root') ?? undefined}
             />
             <ConfirmDialog
                 open={confirming() !== undefined}
@@ -377,7 +406,13 @@ function SessionPage(): JSX.Element {
                                                                 !readOnly() && current().completedRestIds?.includes(id)
                                                             }
                                                         >
-                                                            <Button onPress={() => void clear(id)}>Clear rest</Button>
+                                                            <Button
+                                                                onPress={(event) =>
+                                                                    requestClear(id, event.currentTarget)
+                                                                }
+                                                            >
+                                                                Clear rest
+                                                            </Button>
                                                         </Show>
                                                     </article>
                                                 }
@@ -410,7 +445,7 @@ function SessionPage(): JSX.Element {
                                                             }
                                                         }}
                                                         onLog={() => void log(id)}
-                                                        onClear={() => void clear(id)}
+                                                        onClear={(element) => requestClear(id, element)}
                                                     />
                                                 )}
                                             </Show>
