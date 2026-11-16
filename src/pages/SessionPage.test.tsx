@@ -229,3 +229,76 @@ async function confirmEarlyLog(): Promise<void> {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
     fireEvent.animationEnd(dialog);
 }
+
+async function prepareFinishedWorkout() {
+    const session = await db.sessions.get(sessionId);
+    if (!session) {
+        throw new Error('missing test session');
+    }
+    session.snapshot.sequence = session.snapshot.sequence.slice(0, 2);
+    session.snapshot.sets = session.snapshot.sets.slice(0, 2);
+    session.results = session.snapshot.sequence.map((entry) => {
+        const occurrence = session.snapshot.sets.find((set) => set.id === entry.plannedSetId);
+        if (!occurrence) {
+            throw new Error('missing test set');
+        }
+        return draftResultFromPrescription(entry.id, occurrence.prescription, session.startedAt);
+    });
+    await db.sessions.put(session);
+    return session;
+}
+
+it('keeps every result when an accidental clear is cancelled on the completion screen', async () => {
+    const before = await prepareFinishedWorkout();
+    renderSession();
+    await screen.findByRole('button', { name: 'Complete', exact: true });
+    const clear = screen.getByRole('button', { name: 'Clear Bent-over row set 2' });
+    fireEvent.click(clear);
+    const dialog = await screen.findByRole('dialog', { name: 'Clear recorded Bent-over row step 2?' });
+    fireEvent.animationEnd(dialog);
+    expect((await db.sessions.get(sessionId))?.results).toEqual(before.results);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'No', exact: true }));
+    fireEvent.animationEnd(dialog);
+    expect((await db.sessions.get(sessionId))?.results).toEqual(before.results);
+    expect(clear.textContent).toBe('Clear');
+    cleanup();
+    renderSession();
+    await screen.findByText('2/2 steps logged');
+    expect(screen.getByRole('button', { name: 'Complete', exact: true })).toBeTruthy();
+});
+
+it('clears only the confirmed result and restores that same step after reloading', async () => {
+    const before = await prepareFinishedWorkout();
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: 'Clear Bent-over row set 2' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Clear recorded Bent-over row step 2?' });
+    fireEvent.animationEnd(dialog);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
+    fireEvent.animationEnd(dialog);
+    await screen.findByText('Step 2 of 2');
+    expect((await db.sessions.get(sessionId))?.results).toEqual(before.results.slice(0, 1));
+    cleanup();
+    renderSession();
+    await screen.findByText('Step 2 of 2');
+    expect((await db.sessions.get(sessionId))?.results).toEqual(before.results.slice(0, 1));
+});
+
+it('requires confirmation before clearing a completed rest', async () => {
+    const session = await prepareFinishedWorkout();
+    const entry = session.snapshot.sequence[1];
+    session.snapshot.sequence[1] = { id: entry.id, restSeconds: 30 };
+    session.snapshot.sets = session.snapshot.sets.slice(0, 1);
+    session.results = session.results.slice(0, 1);
+    session.completedRestIds = [entry.id];
+    await db.sessions.put(session);
+    renderSession();
+    fireEvent.click(await screen.findByRole('button', { name: 'Clear rest', exact: true }));
+    const dialog = await screen.findByRole('dialog', { name: 'Clear recorded rest step 2?' });
+    fireEvent.animationEnd(dialog);
+    expect((await db.sessions.get(sessionId))?.completedRestIds).toEqual([entry.id]);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
+    fireEvent.animationEnd(dialog);
+    await screen.findByRole('heading', { name: 'Rest' });
+    expect((await db.sessions.get(sessionId))?.completedRestIds).toEqual([]);
+    expect((await db.sessions.get(sessionId))?.results).toEqual(session.results);
+});
