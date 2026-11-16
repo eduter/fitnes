@@ -40,7 +40,10 @@ runs silently; omit its status and fallback copy. Save errors remain visible.
 Guide the set while the owner exercises. A timed set has a Start action,
 a short preparation countdown to allow getting into position or arranging
 equipment, then a visible remaining-time countdown. The screen should stay
-on during the guided set so the owner can glance at it.
+on throughout an unfinished workout while its session screen is open, including
+before starting a set, between sets, during rest, pause and review. Release the
+screen wake lock when completing the workout or leaving its screen. Manual
+screen locking remains available; reacquire when returning to the visible workout.
 
 For repetition-based sets, support a configurable duration per repetition and
 count repetitions at that pace so the owner can follow along without keeping

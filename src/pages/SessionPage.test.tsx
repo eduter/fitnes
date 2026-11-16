@@ -24,6 +24,7 @@ beforeEach(async () => {
 afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
 });
 
 function renderSession() {
@@ -229,3 +230,41 @@ async function confirmEarlyLog(): Promise<void> {
     fireEvent.click(within(dialog).getByRole('button', { name: 'Yes', exact: true }));
     fireEvent.animationEnd(dialog);
 }
+
+it('holds one wake lock across ready, paused and successive steps until leaving the screen', async () => {
+    const release = vi.fn(async () => {});
+    const request = vi.fn(async () => ({ released: false, release }));
+    vi.stubGlobal('navigator', { wakeLock: { request } });
+    const view = renderSession();
+    await screen.findByRole('button', { name: 'Start', exact: true });
+    await waitFor(() => expect(request).toHaveBeenCalledExactlyOnceWith('screen'));
+    fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pause', exact: true }));
+    fireEvent.click(screen.getByRole('button', { name: 'Skip', exact: true }));
+    await screen.findByText(/^Step 2 of /);
+    expect(request).toHaveBeenCalledTimes(1);
+    expect(release).not.toHaveBeenCalled();
+    view.unmount();
+    expect(release).toHaveBeenCalledTimes(1);
+});
+
+it('releases the wake lock on completion while keeping the session page open', async () => {
+    const release = vi.fn(async () => {});
+    const request = vi.fn(async () => ({ released: false, release }));
+    vi.stubGlobal('navigator', { wakeLock: { request } });
+    renderSession();
+    await screen.findByRole('button', { name: 'Start', exact: true });
+    await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole('button', { name: 'More', exact: true }));
+    const menu = await screen.findByRole('dialog', { name: 'Workout actions' });
+    fireEvent.animationEnd(menu);
+    fireEvent.click(within(menu).getByRole('button', { name: 'Complete', exact: true }));
+    const confirmation = await screen.findByRole('dialog', { name: /^Finish with/ });
+    fireEvent.animationEnd(confirmation);
+    fireEvent.click(within(confirmation).getByRole('button', { name: 'Yes', exact: true }));
+    await waitFor(() => expect(release).toHaveBeenCalledTimes(1));
+    cleanup();
+    renderSession();
+    await screen.findByRole('button', { name: 'Reopen', exact: true });
+    expect(request).toHaveBeenCalledTimes(1);
+});
