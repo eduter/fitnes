@@ -4,7 +4,34 @@
 
 Read [the vision](docs/vision.md) before changing product behavior or visuals.
 Use [the backlog](docs/backlog.md) when choosing the next task.
-Update the owning document when an owner-approved decision changes.
+Update the owning document when an owner-approved decision changes, using
+these boundaries:
+
+- **Vision (`docs/vision.md`):** the product's purpose, intended user, core
+  experience, durable product principles, and owner-approved design direction
+  and constraints. Change it when those decisions change. Routine bug fixes,
+  usability details (such as screen timeout), implementation mechanics,
+  edge-case handling, test cases, and delivery status do not belong here.
+  Do not duplicate facts that can be read from code or tests; retain the
+  intent, rationale, constraints, and future direction they cannot explain.
+  A behavior change alone does not require a Vision edit. Do not append each
+  piece of owner feedback as a dated entry; incorporate durable decisions into
+  the relevant statement.
+- **Backlog (`docs/backlog.md`):** actionable remaining work and priorities.
+  Keep implementation specifications and a running history of fixes out.
+- **UI system contract (`src/design-system/README.md`):** shared component
+  vocabulary, composition rules, and approved exceptions. Component-local
+  behavior and usage belong in that component's documentation.
+- **Repository inventory (`docs/repo-status.md`):** where current sources and
+  retained references live, and their adoption or integration status.
+- **Code, tests, and PR descriptions:** implementation details, exact behavior
+  and edge cases, regression coverage, and the reason and validation for a
+  change. Prefer these for routine fixes rather than expanding product docs.
+
+Existing detail in Vision is not a precedent for adding more. When changing an
+already over-detailed passage, trim the relevant detail or move it to its owning
+source without discarding durable product decisions. Broader document cleanup
+is separate work.
 
 ## Interface foundation
 
