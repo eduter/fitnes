@@ -299,3 +299,38 @@ replacement while any tab is editing or tracking a workout. Keep 20 routine loca
 recovery copies, protect unresolved conflicts, and preserve daily Dropbox backups
 plus exact remote conflict copies. Taskmaster remains unchanged. The generic engine
 and provider/persistence adapters stay separate for eventual package extraction.
+
+## Progress graphs
+
+Owner request (2026-11-15): the Bodyweight tab offers a line chart showing
+both daily weight and its trailing seven-day average. A Period picker offers
+last month, three months, six months, last year and all time. Multiple readings
+on one local day form one daily mean; the rolling mean uses available daily
+means in the inclusive seven-calendar-day window, without inventing missing
+readings. Compute the average before filtering the visible period.
+
+Each exercise row has a Progress action that opens that exercise's graph across
+completed workouts, independent of changing workout splits. Plot the best Epley
+estimated one-rep max per session. Progress shows only the graph; there is no
+exercise dropdown or result list. High-rep estimates remain included; the
+explanation belongs behind a ? button. Single reps use their actual load,
+unilateral results use the weaker side, and bodyweight loads include the
+session's recorded bodyweight and any assistance/added weight. Timed, skipped,
+unloaded and missing-bodyweight results do not produce estimated-max points.
+
+Owner feedback (2026-11-15): Bodyweight's main content is its latest individual
+reading (date and weight) and graph. Records opens a scrollable modal for rare
+review/edit/delete operations. Do not put pagination inside that modal. Edits
+and deletions refresh the latest-reading summary and chart immediately.
+
+Graph, records and help modals use the normal transparent backdrop: existing
+page content remains visible behind each opaque window. ? opens a separate
+help dialog; End/Back closes the top window and restores focus.
+
+Owner color request (2026-11-15): brighten plots with the existing off-white
+and orange source inks. Daily/estimated-max series use off-white; the seven-day
+average uses orange. Keep gold for interactive controls and coral for errors.
+Retain dotted/solid styles so series do not depend on color alone. The graph
+composition uses background palette 2 = PPU [15, 0, 39, 32] (black, steel,
+orange, off-white); other home background and sprite palettes remain available.
+The progress construction proof verifies the combined screen under NES budgets.

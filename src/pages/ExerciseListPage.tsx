@@ -1,16 +1,20 @@
-import { exerciseCopy } from '../copy/exercise.ts';
 import { createEffect, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { Button, ConfirmDialog } from '../components/Controls/index.ts';
+import { ExerciseProgress } from '../components/ExerciseProgress.tsx';
 import { blankExercise, ExerciseEditor } from '../components/exercise/ExerciseEditor.tsx';
 import { PagedList } from '../components/PagedList.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
+import { exerciseCopy } from '../copy/exercise.ts';
 import { duplicateExercise } from '../domain/duplicateExercise.ts';
 import type { ExerciseDefinition } from '../domain/exercise.ts';
 
 /** Browse the exercise library and edit directly in a window over the selected row. */
 function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
     const app = useAppData();
+    const [progressOpen, setProgressOpen] = createSignal(false);
+    const [progressExercise, setProgressExercise] = createSignal<ExerciseDefinition>();
+    let progressTrigger: HTMLElement | undefined;
     const [ids, setIds] = createSignal<string[]>([]);
     const [reveal, setReveal] = createSignal<string>();
     createEffect(() => {
@@ -110,6 +114,17 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
                                 <p class="muted">{exerciseSummary(item())}</p>
                                 <div class="button-row">
                                     <Button
+                                        aria-label={`Progress ${item().name}`}
+                                        onPress={(event) => {
+                                            progressTrigger = event.currentTarget;
+                                            setProgressExercise(item());
+                                            setProgressOpen(true);
+                                        }}
+                                    >
+                                        Progress
+                                    </Button>
+
+                                    <Button
                                         aria-label={`Edit ${item().name}`}
                                         onPress={(event) => edit(item(), event.currentTarget)}
                                     >
@@ -137,6 +152,12 @@ function ExerciseListPage(props: ExerciseListPageProps): JSX.Element {
                     </Show>
                 )}
             </PagedList>
+            <ExerciseProgress
+                open={progressOpen()}
+                onOpenChange={setProgressOpen}
+                exercise={progressExercise()}
+                trigger={() => progressTrigger}
+            />
             <ExerciseEditor
                 open={editorOpen()}
                 creating={creating()}

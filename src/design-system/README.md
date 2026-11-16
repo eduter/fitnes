@@ -177,3 +177,16 @@ MoveButton's shaft arrow points toward a destination bar. It means reorder,
 whereas the small filled spinner triangles mean increment/decrement. Workout
 set rows place Edit, Duplicate, Delete and the two MoveButtons in one nonwrapping
 row with eight-pixel gaps. Keep the full accessible movement verbs on icon buttons.
+
+## ProgressChart
+
+`components/ProgressChart/ProgressChart.tsx` owns reusable progress plots. Use a
+configurable integer-size SVG (216×240 in graph dialogs) with integer coordinates, crisp edges, square points,
+off-white/orange data and steel grid lines. Two series use dotted and solid lines so they
+remain distinguishable using only the existing source palette. Keep series chronological
+and in a common display unit. Always provide an accessible title, unit, legend
+and empty-state copy. Bodyweight shows its latest reading and inline chart; individual readings live
+in a scrollable records Popover. Exercise rows open graph-only dialogs.
+`ProgressDialog` composes the shared Popover with the normal transparent backdrop,
+a period picker and ?/End actions. The ? action opens a child help dialog.
+New chart compositions still require native screen palette proof/device review.

@@ -1,0 +1,9 @@
+.progress-dialog__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.progress-dialog__actions > .nes-dialog-actions {
+    flex: 1;
+}

@@ -116,3 +116,19 @@ policy for them.
 - [ ] Dogfood synchronization and device handoff on Android.
 - [ ] Extract the generic engine and provider adapters into a shared dependency
   after both FitNES and Taskmaster requirements have informed its API.
+
+## Progress tracking
+
+- [x] Add bodyweight daily/rolling seven-day plots with calendar-period choices.
+- [x] Add exercise selection across workouts and estimated-max session history
+  retaining actual load/reps and explaining high-rep uncertainty.
+- [x] Prove sampled native chart screens against hardware budgets; retain
+  [captures and reproduction commands](design/progress/README.md).
+- [ ] Review chart readability on the owner's phone.
+
+- [x] Lead Bodyweight with the latest reading and inline chart; manage individual
+  records in a scrollable modal.
+- [x] Put Progress on each exercise row, remove the exercise selector/result list,
+  and keep estimate copy behind ?. Preserve underlying content behind modals.
+- [x] Brighten charts with off-white/orange, preserving semantic control/error inks
+  and proving a concrete progress palette construction.
