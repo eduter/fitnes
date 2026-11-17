@@ -2,6 +2,7 @@ import { A, useParams } from '@solidjs/router';
 import { createMemo, createSignal, type JSX, Show } from 'solid-js';
 import { useAppData } from '../app/AppData.tsx';
 import { DraftGuard } from '../app/DraftGuard.tsx';
+import { createScreenWakeLock } from '../browser/createScreenWakeLock.ts';
 import { useDataBarrier } from '../app/dataBarrier.ts';
 import { Button, ConfirmDialog } from '../components/Controls/index.ts';
 import { PagedList } from '../components/PagedList.tsx';
@@ -86,6 +87,7 @@ function SessionPage(): JSX.Element {
     });
 
     const readOnly = createMemo(() => session()?.completedAt !== undefined);
+    createScreenWakeLock(() => session() !== undefined && !readOnly());
 
     // Evaluate each mutation against the refreshed session, so rapid presses cannot overwrite another set
     let pending = Promise.resolve();

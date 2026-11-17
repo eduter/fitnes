@@ -31,8 +31,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
     const [busy, setBusy] = createSignal(false);
     const [message, setMessage] = createSignal('');
     let trigger: HTMLElement | undefined;
-    let wake: WakeLockSentinel | undefined;
-    let disposed = false;
     const rest = () => props.entry.restSeconds !== undefined;
     const measurement = () => props.occurrence?.set.prescription.measurement;
     const timed = () => rest() || measurement()?.measurement === 'duration';
@@ -81,25 +79,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         }
     }
 
-    async function keepAwake(): Promise<void> {
-        if (!('wakeLock' in navigator)) {
-            return;
-        }
-        if (wake && !wake.released) {
-            return;
-        }
-        try {
-            const acquired = await navigator.wakeLock.request('screen');
-            if (disposed || !started()) {
-                await acquired.release();
-                return;
-            }
-            wake = acquired;
-        } catch {
-            /* Wake lock is optional; guidance continues when the browser cannot keep the screen awake */
-        }
-    }
-
     function start(): void {
         batch(() => {
             setNow(Date.now());
@@ -107,7 +86,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             setStarted(true);
             setRunning(true);
         });
-        void keepAwake();
     }
     function pause(): void {
         batch(() => {
@@ -125,7 +103,6 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
             setAnchor(undefined);
             setNow(Date.now());
         });
-        void wake?.release();
     }
     function stopForEditor(): void {
         if (running()) {
@@ -239,22 +216,16 @@ function GuidedSession(props: GuidedSessionProps): JSX.Element {
         function visible(): void {
             if (document.visibilityState === 'visible' && started()) {
                 setNow(Date.now());
-                void keepAwake();
             }
         }
         document.addEventListener('visibilitychange', visible);
-        if (started()) {
-            void keepAwake();
-        }
         // Rest starts at the transition immediately following the previous persisted step.
         if (rest() && !started()) {
             start();
         }
         onCleanup(() => {
-            disposed = true;
             clearInterval(timer);
             document.removeEventListener('visibilitychange', visible);
-            void wake?.release();
         });
     });
 
