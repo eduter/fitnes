@@ -16,6 +16,11 @@ and record actual performance with little interruption. Keep exercise names,
 planned work, actual performance, actions, and progress readable on a phone.
 Focus the training experience on the current set.
 
+Workout sounds provide preparation, start, repetition/second pacing, and
+completion cues so the owner can follow a session without watching the screen.
+Keep their volume configurable, including silence. App-wide sound effects and
+music remain undecided.
+
 Workouts must support any ordered sequence of individual sets and rest,
 including circuits, supersets, and interleaved exercises. Do not constrain the
 sequence by grouping sets by exercise. Rest depends on the surrounding work;

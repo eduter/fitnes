@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import * as sfx from '../../audio/sfx.ts';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@solidjs/testing-library';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { findOccurrence } from '../../domain/lookups.ts';
@@ -346,3 +347,52 @@ it.each([false, true])(
         );
     }
 );
+
+it.each([false, true])('plays workout cues once without pause/resume replay (timed: %s)', (timed) => {
+    vi.useFakeTimers();
+    const sounds = vi.spyOn(sfx, 'playSfx').mockImplementation(() => undefined);
+    const prepare = vi.spyOn(sfx, 'prepareSfx').mockImplementation(() => undefined);
+    try {
+        setup(false, true, 2, false, timed);
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        expect(prepare).toHaveBeenCalledOnce();
+        expect(sounds.mock.calls.map((call) => call[0])).toEqual(['prepare']);
+        vi.advanceTimersByTime(1000);
+        expect(sounds.mock.calls.map((call) => call[0])).toEqual(['prepare', 'prepare']);
+        fireEvent.click(screen.getByRole('button', { name: 'Pause', exact: true }));
+        vi.advanceTimersByTime(2000);
+        const count = sounds.mock.calls.length;
+        fireEvent.click(screen.getByRole('button', { name: 'Resume', exact: true }));
+        expect(prepare).toHaveBeenCalledTimes(2);
+        expect(sounds).toHaveBeenCalledTimes(count);
+        vi.advanceTimersByTime(4000);
+        expect(sounds.mock.calls.filter((call) => call[0] === 'start')).toHaveLength(1);
+        vi.advanceTimersByTime(timed ? 1000 : 3000);
+        expect(sounds.mock.calls.filter((call) => call[0] === 'tick')).toHaveLength(1);
+        vi.advanceTimersByTime(timed ? 1000 : 3000);
+        expect(sounds.mock.calls.filter((call) => call[0] === 'complete')).toHaveLength(1);
+        vi.advanceTimersByTime(1000);
+        expect(sounds.mock.calls.filter((call) => call[0] === 'complete')).toHaveLength(1);
+    } finally {
+        cleanup();
+        vi.useRealTimers();
+    }
+});
+
+it('does not replay cues after a delayed timer callback', () => {
+    vi.useFakeTimers();
+    const sounds = vi.spyOn(sfx, 'playSfx').mockImplementation(() => undefined);
+    try {
+        setup(false, true, 8);
+        fireEvent.click(screen.getByRole('button', { name: 'Start', exact: true }));
+        expect(sounds.mock.calls.map((call) => call[0])).toEqual(['prepare']);
+        vi.setSystemTime(Date.now() + 10000);
+        vi.advanceTimersByTime(50);
+        expect(sounds.mock.calls.map((call) => call[0])).toEqual(['prepare']);
+        vi.advanceTimersByTime(1000);
+        expect(sounds.mock.calls.map((call) => call[0])).toEqual(['prepare', 'tick']);
+    } finally {
+        cleanup();
+        vi.useRealTimers();
+    }
+});
