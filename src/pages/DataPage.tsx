@@ -1,5 +1,6 @@
 import { useNavigate } from '@solidjs/router';
 import { createSignal, type JSX, Show } from 'solid-js';
+import { sfxVolume, setSfxVolume } from '../audio/sfx.ts';
 import { useAppData } from '../app/AppData.tsx';
 import { Button, ConfirmDialog, FilePicker, Spinner, TextArea } from '../components/Controls/index.ts';
 import { OptionPicker } from '../components/OptionPicker/OptionPicker.tsx';
@@ -111,8 +112,19 @@ function DataPage(): JSX.Element {
                 onChange={(unit) => app.setMassUnit(unit as WeightUnit)}
                 popoverMount={document.getElementById('root') ?? undefined}
             />
+            <Spinner
+                label="Workout SFX volume (%)"
+                value={sfxVolume()}
+                min={0}
+                max={100}
+                step={10}
+                integerDigits={3}
+                onChange={setSfxVolume}
+                popoverMount={document.getElementById('root') ?? undefined}
+            />
             <SyncSettings />
             <Button onPress={() => navigate('/data/recovery')}>Recovery copies</Button>
+
             <h2 class="section-title">Data</h2>
             <p class="muted">
                 Export workout data as JSON. Import replaces exercises, templates, sessions and weight history.
